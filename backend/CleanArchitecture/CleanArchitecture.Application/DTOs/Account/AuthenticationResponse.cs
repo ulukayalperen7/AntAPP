@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace CleanArchitecture.Core.DTOs.Account
 {
@@ -9,6 +10,7 @@ namespace CleanArchitecture.Core.DTOs.Account
         public string Email { get; set; }
         public List<string> Roles { get; set; }
         public bool IsVerified { get; set; }
+        [JsonPropertyName("jwToken")]
         public string JWToken { get; set; }
         public string RefreshToken { get; set; }
     }

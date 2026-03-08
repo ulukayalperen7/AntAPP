@@ -233,25 +233,19 @@ namespace CleanArchitecture.Infrastructure.Services
             };
         }
 
-        public async Task<EmailRequest> ForgotPassword(ForgotPasswordRequest model, string origin)
+        public async Task ForgotPassword(ForgotPasswordRequest model, string origin)
         {
             var account = await _userManager.FindByEmailAsync(model.Email);
-
-            // always return ok response to prevent email enumeration
-            if (account == null) throw new ApiException("User not found");
+            if (account == null) return;
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(account);
-            var route = "api/account/reset-password/";
-            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
             var emailRequest = new EmailRequest()
             {
-                Body = $"You reset token is - {code}",
+                Body = $"Your password reset token is: {code}",
                 To = model.Email,
                 Subject = "Reset Password",
             };
-            //TODO: Attach Email Service here and configure it via appsettings
-            //await _emailService.SendAsync(emailRequest);
-            return emailRequest;
+            await _emailService.SendAsync(emailRequest);
         }
 
         public async Task<string> ResetPassword(ResetPasswordRequest model)

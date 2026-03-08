@@ -28,11 +28,14 @@ namespace CleanArchitecture.Core.Features.Products.Commands.UpdateProduct
 
                 if (product == null) throw new EntityNotFoundException("product", command.Id);
 
-                var isUniqueBarcode = await _productRepository.IsUniqueBarcodeAsync(command.Barcode);
-
-                if(!isUniqueBarcode) throw new BarcodeIsNotUniqueException(command.Barcode);
+                if (product.Barcode != command.Barcode)
+                {
+                    var isUniqueBarcode = await _productRepository.IsUniqueBarcodeAsync(command.Barcode);
+                    if (!isUniqueBarcode) throw new BarcodeIsNotUniqueException(command.Barcode);
+                }
 
                 product.Name = command.Name;
+                product.Barcode = command.Barcode;
                 product.Rate = command.Rate;
                 product.Description = command.Description;
                 await _productRepository.UpdateAsync(product);

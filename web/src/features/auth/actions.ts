@@ -27,7 +27,7 @@ export async function login(
 
   let data: AuthUser & { refreshToken: string }
   try {
-    const res = await fetch(`${API_URL}/api/account/authenticate`, {
+    const res = await fetch(`${API_URL}/account/authenticate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -39,7 +39,7 @@ export async function login(
   }
 
   const jar = await cookies()
-  jar.set('accessToken', data.jWToken, cookieOpts(ACCESS_MAX_AGE))
+  jar.set('accessToken', data.jwToken, cookieOpts(ACCESS_MAX_AGE))
   jar.set('refreshToken', data.refreshToken, cookieOpts(REFRESH_MAX_AGE))
   redirect('/')
 }
@@ -56,14 +56,14 @@ export async function refreshTokens(): Promise<string> {
   const refreshToken = jar.get('refreshToken')?.value
   if (!refreshToken) throw new Error('No refresh token')
 
-  const res = await fetch(`${API_URL}/api/account/refresh-token`, {
+  const res = await fetch(`${API_URL}/account/refresh-token`, {
     method: 'POST',
     headers: { Cookie: `refreshToken=${refreshToken}` },
   })
   if (!res.ok) throw new Error('Token refresh failed')
 
-  const data: { jWToken: string; refreshToken: string } = await res.json()
-  jar.set('accessToken', data.jWToken, cookieOpts(ACCESS_MAX_AGE))
+  const data: { jwToken: string; refreshToken: string } = await res.json()
+  jar.set('accessToken', data.jwToken, cookieOpts(ACCESS_MAX_AGE))
   jar.set('refreshToken', data.refreshToken, cookieOpts(REFRESH_MAX_AGE))
-  return data.jWToken
+  return data.jwToken
 }

@@ -51,8 +51,8 @@ namespace CleanArchitecture.WebApi.Controllers
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
         {
             var origin = Request.Headers["origin"].FirstOrDefault() ?? "https://localhost:9001";
-            var result = await _accountService.ForgotPassword(model,origin);
-            return Ok(result);
+            await _accountService.ForgotPassword(model, origin);
+            return Ok("If an account with that email exists, a reset link has been sent.");
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)

@@ -4,5 +4,5 @@ export type AuthUser = {
   email: string
   roles: string[]
   isVerified: boolean
-  jWToken: string
+  jwToken: string
 }
