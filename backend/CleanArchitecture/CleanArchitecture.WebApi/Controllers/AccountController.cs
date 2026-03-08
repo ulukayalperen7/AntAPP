@@ -75,7 +75,7 @@ namespace CleanArchitecture.WebApi.Controllers
                 HttpOnly = true,
                 Expires = DateTimeOffset.UtcNow.AddDays(7),
                 SameSite = SameSiteMode.Strict,
-                Secure = true
+                Secure = Request.IsHttps
             });
         }
     }
