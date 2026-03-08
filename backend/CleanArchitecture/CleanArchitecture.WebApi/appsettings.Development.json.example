@@ -21,6 +21,6 @@
     "Key": "EN_AZ_32_KARAKTER_UZUN_GIZLI_ANAHTAR_BURAYA",
     "Issuer": "CoreIdentity",
     "Audience": "CoreIdentityUser",
-    "DurationInMinutes": 3600
+    "DurationInMinutes": 15
   }
 }

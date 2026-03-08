@@ -26,9 +26,11 @@ namespace CleanArchitecture.WebApi.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken()
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request = null)
         {
             var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrWhiteSpace(refreshToken))
+                refreshToken = request?.RefreshToken;
             if (string.IsNullOrEmpty(refreshToken))
                 return BadRequest("Refresh token not found.");
             var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());

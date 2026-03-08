@@ -1,19 +1,25 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+import 'server-only'
 
-if (!API_URL) {
-  throw new Error('NEXT_PUBLIC_API_URL environment variable is not set')
-}
+import { cookies } from 'next/headers'
+import { ACCESS_TOKEN_COOKIE, API_URL } from '@/features/auth/constants'
 
 export async function apiFetch<T>(
   path: string,
   options?: RequestInit
 ): Promise<T> {
+  const token = (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value
+  const headers = new Headers(options?.headers)
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
   const res = await fetch(`${API_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
     ...options,
+    headers,
+    cache: options?.cache ?? 'no-store',
   })
 
   if (!res.ok) {

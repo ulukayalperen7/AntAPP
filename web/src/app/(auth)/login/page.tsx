@@ -1,19 +1,60 @@
 'use client'
 
+import { useState } from 'react'
 import { useActionState } from 'react'
 import { login } from '@/features/auth/actions'
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('basicuser@gmail.com')
+  const [password, setPassword] = useState('123Pa$$word!')
   const [error, formAction, pending] = useActionState(login, null)
 
   return (
-    <form action={formAction}>
-      <input name="email" type="email" required placeholder="Email" />
-      <input name="password" type="password" required placeholder="Password" />
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button type="submit" disabled={pending}>
-        {pending ? 'Logging in...' : 'Login'}
-      </button>
-    </form>
+    <main style={{ maxWidth: 520, margin: '56px auto', padding: '0 16px' }}>
+      <h1>AntAPP Login</h1>
+      <p>Web User, Business ve Admin girişleri buradan yapılır.</p>
+      <form
+        action={formAction}
+        style={{ display: 'grid', gap: 12, marginTop: 20 }}
+      >
+        <input
+          name="email"
+          type="email"
+          required
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          name="password"
+          type="password"
+          required
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <p style={{ color: '#c62828' }}>{error}</p>}
+        <button type="submit" disabled={pending}>
+          {pending ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+
+      <div style={{ marginTop: 18 }}>
+        <p>Test hesaplar:</p>
+        <p>
+          User: <code>basicuser@gmail.com</code>
+        </p>
+        <p>
+          Business: <code>business@gmail.com</code>
+        </p>
+        <p>
+          Admin: <code>admin@gmail.com</code> veya{' '}
+          <code>superadmin@gmail.com</code>
+        </p>
+        <p>
+          Password: <code>123Pa$$word!</code>
+        </p>
+      </div>
+    </main>
   )
 }

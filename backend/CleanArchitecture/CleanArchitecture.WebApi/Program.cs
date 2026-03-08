@@ -28,6 +28,7 @@ builder.Services.AddControllers();
 builder.Services.AddApiVersioningExtension();
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
+builder.Services.AddHttpContextAccessor();
 
 //Build the application
 var app = builder.Build();
@@ -79,6 +80,8 @@ using (var scope = app.Services.CreateScope())
 
         await CleanArchitecture.Infrastructure.Seeds.DefaultRoles.SeedAsync(userManager, roleManager);
         await CleanArchitecture.Infrastructure.Seeds.DefaultSuperAdmin.SeedAsync(userManager, roleManager);
+        await CleanArchitecture.Infrastructure.Seeds.DefaultAdminUser.SeedAsync(userManager, roleManager);
+        await CleanArchitecture.Infrastructure.Seeds.DefaultBusinessUser.SeedAsync(userManager, roleManager);
         await CleanArchitecture.Infrastructure.Seeds.DefaultBasicUser.SeedAsync(userManager, roleManager);
         Log.Information("Finished Seeding Default Data");
         Log.Information("Application Starting");

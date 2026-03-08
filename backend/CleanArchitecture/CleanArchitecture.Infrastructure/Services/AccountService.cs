@@ -73,9 +73,13 @@ namespace CleanArchitecture.Infrastructure.Services
             response.IsVerified = user.EmailConfirmed;
             var refreshToken = GenerateRefreshToken(ipAddress);
             response.RefreshToken = refreshToken.Token;
-            user.RefreshTokens ??= new List<RefreshToken>();
-            user.RefreshTokens.Add(refreshToken);
-            await _userManager.UpdateAsync(user);
+            var trackedUser = await _userManager.Users
+                .AsTracking()
+                .Include(u => u.RefreshTokens)
+                .SingleAsync(u => u.Id == user.Id);
+            trackedUser.RefreshTokens ??= new List<RefreshToken>();
+            trackedUser.RefreshTokens.Add(refreshToken);
+            await _userManager.UpdateAsync(trackedUser);
             return response;
         }
 
@@ -158,7 +162,7 @@ namespace CleanArchitecture.Infrastructure.Services
 
             for (int i = 0; i < roles.Count; i++)
             {
-                roleClaims.Add(new Claim("roles", roles[i]));
+                roleClaims.Add(new Claim(ClaimTypes.Role, roles[i]));
             }
 
             string ipAddress = IpHelper.GetIpAddress();
