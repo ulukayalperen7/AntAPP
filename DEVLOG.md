@@ -28,14 +28,59 @@ Stack: Tamagui `2.0.0-rc.22` (React 19 zorunluluğu nedeniyle 1.x değil 2.x RC 
 - **mobile/user**: `tamagui` + `@tamagui/babel-plugin` kuruldu, `babel.config.js` oluşturuldu, root `_layout.tsx` `TamaguiProvider` ile sarıldı
 
 ### Solito entegrasyonu
-- `solito` tüm workspace'lere kuruldu (packages/app, packages/ui, web/*, mobile/user)
+- `solito` tüm workspace'lere kuruldu (packages/app, packages/ui, web, mobile/user)
 - `packages/app` platform-agnostic ekranlar için hazırlandı
 - Solito sayesinde `packages/app/src/screens/` altındaki ekranlar hem Next.js hem Expo'da kullanılabilecek
+
+### Web mimarisi yeniden düzenlendi
+- 3 ayrı Next.js projesi (web/user, web/admin, web/business) → **tek Next.js projesi** (web/)
+- App Router route group'ları: `(user)`, `(admin)`, `(business)`, `(auth)`
+- Her group kendi `layout.tsx`'ine sahip, root layout TamaguiProvider'ı sarıyor
+- Karar gerekçesi: tek deployment, ortak auth/state, gereksiz konfigürasyon duplikasyonu yok
+- `web/app/` ara klasörü kaldırıldı, Next.js projesi doğrudan `web/` altında
+- Workspace güncellendi: `"web/*"` → `"web"`
+
+### Next.js clean architecture klasör yapısı
+```
+web/src/
+  app/               ← App Router (Next.js convention)
+    (user)/          ← kullanıcı paneli route group
+    (admin)/         ← admin paneli route group
+    (business)/      ← işletme paneli route group
+    (auth)/          ← auth sayfaları (login, register...)
+  components/
+    ui/              ← temel UI bileşenleri
+    forms/           ← form bileşenleri
+  features/          ← feature-based modüller
+    auth/
+      components/
+      hooks/
+      services/
+  hooks/             ← paylaşılan hook'lar
+  lib/
+    api.ts           ← fetch wrapper (NEXT_PUBLIC_API_URL kullanır)
+  providers/
+    tamagui-provider.tsx
+  types/             ← TypeScript tipleri
+```
+
+### Ortam değişkenleri (.env) tasarımı
+- `web/.env.local` — gitignored, gerçek dev değerleri
+- `web/.env.example` — git'te tracked, şablon
+- `mobile/user/.env.local` — gitignored
+- `mobile/user/.env.example` — git'te tracked
+
+| Değişken | Kullanım |
+|---|---|
+| `NEXT_PUBLIC_API_URL` | Backend API base URL (web) |
+| `NEXT_PUBLIC_APP_URL` | Web app'in kendi adresi |
+| `EXPO_PUBLIC_API_URL` | Backend API base URL (mobile) |
+
+> Not: Fiziksel cihazda test için `EXPO_PUBLIC_API_URL`'e `localhost` yerine makinenin yerel IP'si girilmeli.
 
 ---
 
 ## Sıradaki adımlar
-- [ ] Backend API'ye bağlanacak ilk ekranı oluştur (örn. ürün listesi)
-- [ ] packages/app altında ilk shared screen yaz (Solito + Tamagui)
-- [ ] Her web app için port yapılandırması (user:3000, admin:3001, business:3002)
-- [ ] Ortam değişkenleri (.env) yapısını kur (API URL vb.)
+- [ ] İlk shared screen yaz: `packages/app/src/screens/` (Solito + Tamagui)
+- [ ] Auth flow: login ekranı → JWT token yönetimi
+- [ ] Backend API'ye bağlanacak ilk veri çekme (ürün listesi)

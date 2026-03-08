@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "workspaces": [
-    "web/*",
+    "web",
     "mobile/*",
     "packages/*"
   ],
   "scripts": {
-    "web": "npm run dev --workspace=web/app",
+    "web": "npm run dev --workspace=web",
     "mobile": "npm run start --workspace=mobile/user"
   }
 }
