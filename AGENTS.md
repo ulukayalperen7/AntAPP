@@ -105,8 +105,9 @@ cp mobile/user/.env.example mobile/user/.env.local
 2. Next.js **Server Action** (`features/auth/actions.ts`) sets both as httpOnly cookies
 3. `proxy.ts` (Next.js 16 middleware) checks `accessToken` cookie — redirects to `/login` if missing
 4. Access token: **15 minutes**
-5. Refresh token: **7 days**, rotated on use (old token revoked)
+5. Refresh token: **7 days**, rotated on use (old token revoked) via `POST /api/account/refresh-token`
 6. Mobile: refresh token read from JSON body, stored in `expo-secure-store` (not yet implemented)
+7. `ForgotPassword` always returns 200 — SMTP errors are swallowed intentionally (anti-enumeration)
 
 ---
 
@@ -150,5 +151,9 @@ cp mobile/user/.env.example mobile/user/.env.local
 
 - `packages/ui/src/tamagui.config.ts` → use `defaultConfig` (not `config`)
 - `web/src/proxy.ts` → Next.js 16 middleware file is `proxy.ts`, exported function must be named `proxy`
-- CORS allows only `localhost:3000` — update for production
+- CORS uses `WithOrigins("http://localhost:3000")` — `AllowAnyOrigin()` cannot be combined with `AllowCredentials()`
 - `appsettings.Development.json` is gitignored — new devs must create it from the `.example` file
+- `AuthenticationResponse.JWToken` has `[JsonPropertyName("jwToken")]` — without it, System.Text.Json emits `jWToken`
+- Refresh token rotation needs `.AsTracking().Include(u => u.RefreshTokens)` — `UserManager` defaults to no-tracking
+- `List<RefreshToken>` on `ApplicationUser` requires `OwnsMany` in `ApplicationDbContext.OnModelCreating`
+- Mobile `.module.css` files need a matching `.d.ts` declaration (see `animated-icon.module.css.d.ts`)
