@@ -101,11 +101,11 @@ cp mobile/user/.env.example mobile/user/.env.local
 
 **Hybrid httpOnly cookie + JWT strategy:**
 
-1. `POST /api/auth/login` → returns `jwToken` + `refreshToken` in JSON body (legacy `/api/account/authenticate` alias is preserved)
+1. `POST /api/auth/login` → returns `jwToken` + `refreshToken` in JSON body
 2. Next.js **Server Action** (`features/auth/actions.ts`) sets both as httpOnly cookies
 3. `proxy.ts` (Next.js 16 middleware) checks `accessToken` cookie — redirects to `/login` if missing
 4. Access token: **15 minutes**
-5. Refresh token: **7 days**, rotated on use (old token revoked) via `POST /api/auth/refresh` (legacy `/api/account/refresh-token` alias is preserved)
+5. Refresh token: **7 days**, rotated on use (old token revoked) via `POST /api/auth/refresh`
 6. Mobile: refresh token read from JSON body, stored in `expo-secure-store`
 7. `ForgotPassword` always returns 200 — SMTP errors are swallowed intentionally (anti-enumeration)
 

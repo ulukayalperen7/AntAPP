@@ -10,7 +10,7 @@
 - `appsettings.json` → `DurationInMinutes` 3600 → 15 dk
 - `ApplicationDbContext` → `OwnsMany` ile refresh token'lar DB'ye yazılır hale getirildi
 - `AccountService` → login'de refresh token persist ediliyor; `RefreshTokenAsync` eklendi (token rotation)
-- `AccountController` → httpOnly cookie set + `POST /api/auth/refresh` endpoint (legacy `/api/account/refresh-token` alias korunuyor)
+- `AccountController` → httpOnly cookie set + `POST /api/auth/refresh` endpoint
 - `AuthenticationResponse` → `[JsonIgnore]` kaldırıldı (Server Action JSON'dan okur)
 - CORS → `AllowAnyOrigin` → `WithOrigins + AllowCredentials`
 - `v1` API controller adları sadeleştirildi: `ProductController` → `RouteController`, `CategoryController` → `RouteCategoryController`

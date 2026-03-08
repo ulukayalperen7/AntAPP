@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +31,6 @@ namespace CleanArchitecture.WebApi.Extensions
                     }
                 });
                 c.CustomSchemaIds(GetSchemaId);
-                c.DocumentFilter<RemoveLegacyAccountPathsDocumentFilter>();
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -83,21 +81,6 @@ namespace CleanArchitecture.WebApi.Extensions
                 .Replace("__ROUTE_CATEGORY__", "RouteCategory")
                 .Replace("__ROUTES__", "Routes")
                 .Replace("__ROUTE__", "Route");
-        }
-
-        private sealed class RemoveLegacyAccountPathsDocumentFilter : IDocumentFilter
-        {
-            public void Apply(Microsoft.OpenApi.Models.OpenApiDocument swaggerDoc, DocumentFilterContext context)
-            {
-                var legacyPaths = swaggerDoc.Paths.Keys
-                    .Where(path => path.StartsWith("/api/Account", StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
-                foreach (var legacyPath in legacyPaths)
-                {
-                    swaggerDoc.Paths.Remove(legacyPath);
-                }
-            }
         }
 
         public static void AddApiVersioningExtension(this IServiceCollection services)

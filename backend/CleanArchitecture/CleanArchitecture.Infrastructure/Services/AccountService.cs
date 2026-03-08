@@ -209,7 +209,7 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var route = "api/account/confirm-email/";
+            var route = "api/auth/confirm-email/";
             var _enpointUri = new Uri(string.Concat($"{origin}/", route));
             var verificationUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "userId", user.Id);
             verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
@@ -224,7 +224,7 @@ namespace CleanArchitecture.Infrastructure.Services
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
             {
-                return  $"Account Confirmed for {user.Email}. You can now use the /api/Account/authenticate endpoint.";
+                return  $"Account Confirmed for {user.Email}. You can now use the /api/auth/login endpoint.";
             }
             else
             {

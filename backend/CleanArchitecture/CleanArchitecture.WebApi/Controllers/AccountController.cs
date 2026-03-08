@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.WebApi.Controllers
 {
-    [Route("api/[controller]")]
     [Route("api/auth")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -21,16 +20,14 @@ namespace CleanArchitecture.WebApi.Controllers
         {
             _accountService = accountService;
         }
-        [HttpPost("authenticate")]
         [HttpPost("login")]
-        public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
+        public async Task<IActionResult> Login(AuthenticationRequest request)
         {
             var response = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
             SetRefreshTokenCookie(response.RefreshToken);
             return Ok(response);
         }
 
-        [HttpPost("refresh-token")]
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request = null)
         {
