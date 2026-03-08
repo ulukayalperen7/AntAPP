@@ -16,8 +16,8 @@ project.fragment.lock.json
 artifacts/
 *.nupkg
 *.snupkg
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
+backend/**/[Pp]ackages/*
+!backend/**/[Pp]ackages/build/
 *.nuget.props
 *.nuget.targets
 *.dbmdl
@@ -48,54 +48,46 @@ appsettings.*.json
 !appsettings.json
 
 # ========================
-# MOBILE (React Native)
+# MOBILE (React Native / Expo)
 # ========================
-mobile/node_modules/
-mobile/.expo/
-mobile/dist/
-mobile/npm-debug.*
-mobile/*.jks
-mobile/*.p8
-mobile/*.p12
-mobile/*.key
-mobile/*.mobileprovision
-mobile/*.orig.*
-mobile/web-build/
-mobile/.expo-shared/
-mobile/android/.gradle/
-mobile/android/app/build/
-mobile/android/build/
-mobile/android/local.properties
-mobile/android/*.iml
-mobile/android/.idea/
-mobile/android/captures/
-mobile/android/app/src/main/assets/index.android.bundle
-mobile/ios/build/
-mobile/ios/Pods/
-mobile/ios/*.xcworkspace
-mobile/ios/Podfile.lock
-mobile/.env
-mobile/.env.local
-mobile/.env.*.local
+mobile/*/.expo/
+mobile/*/dist/
+mobile/*/.expo-shared/
+mobile/*/web-build/
+mobile/*/*.jks
+mobile/*/*.p8
+mobile/*/*.p12
+mobile/*/*.key
+mobile/*/*.mobileprovision
+mobile/*/*.orig.*
+mobile/*/android/.gradle/
+mobile/*/android/app/build/
+mobile/*/android/build/
+mobile/*/android/local.properties
+mobile/*/android/*.iml
+mobile/*/android/.idea/
+mobile/*/android/captures/
+mobile/*/android/app/src/main/assets/index.android.bundle
+mobile/*/ios/build/
+mobile/*/ios/Pods/
+mobile/*/ios/*.xcworkspace
+mobile/*/ios/Podfile.lock
+mobile/*/.env
+mobile/*/.env.local
+mobile/*/.env.*.local
 
 # ========================
 # WEB (Next.js)
 # ========================
-web/node_modules/
-web/.next/
-web/out/
-web/build/
-web/.env
-web/.env.local
-web/.env.development.local
-web/.env.test.local
-web/.env.production.local
-web/npm-debug.log*
-web/yarn-debug.log*
-web/yarn-error.log*
-web/.pnp/
-web/.pnp.js
-web/.vercel
+web/*/.next/
+web/*/out/
+web/*/build/
+web/*/.env
+web/*/.env.local
+web/*/.env.development.local
+web/*/.env.test.local
+web/*/.env.production.local
+web/*/.vercel
 
 # ========================
 # GENEL
@@ -109,3 +101,4 @@ Thumbs.db
 .env.local
 .idea/
 .vscode/settings.json
+node_modules

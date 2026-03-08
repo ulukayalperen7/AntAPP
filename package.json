@@ -1,0 +1,16 @@
+{
+  "name": "antapp",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "web/*",
+    "mobile/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "web:user": "npm run dev --workspace=web/user",
+    "web:admin": "npm run dev --workspace=web/admin",
+    "web:business": "npm run dev --workspace=web/business",
+    "mobile:user": "npm run start --workspace=mobile/user"
+  }
+}
