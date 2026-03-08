@@ -9,6 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@antapp/ui": "^0.0.1",
+    "@tamagui/next-plugin": "^2.0.0-rc.22",
+    "@tamagui/next-theme": "^2.0.0-rc.22",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3"
