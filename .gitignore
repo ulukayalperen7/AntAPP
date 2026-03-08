@@ -46,7 +46,6 @@ BenchmarkDotNet.Artifacts/
 **/launchSettings.json
 appsettings.*.json
 !appsettings.json
-!appsettings.Development.json
 
 # ========================
 # MOBILE (React Native)
@@ -110,7 +109,3 @@ Thumbs.db
 .env.local
 .idea/
 .vscode/settings.json
-
-.DS_Store
-.DS_Store
-.DS_Store

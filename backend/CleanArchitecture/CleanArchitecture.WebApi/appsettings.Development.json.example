@@ -1,0 +1,26 @@
+{
+  // Bu dosyayı kopyalayıp appsettings.Development.json olarak kaydedin.
+  // appsettings.Development.json gitignore'dadır — asla commit'lemeyin.
+
+  "UseInMemoryDatabase": true, // false yapıp DefaultConnection'ı doldurursanız SQL Server kullanılır
+
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=SERVER_ADI\\SQLEXPRESS;Initial Catalog=AntAppDb;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=true"
+  },
+
+  "MailSettings": {
+    "EmailFrom": "test@ornek.com",
+    "SmtpHost": "smtp.ethereal.email",   // Test için: https://ethereal.email
+    "SmtpPort": 587,
+    "SmtpUser": "ethereal_kullanici",
+    "SmtpPass": "ethereal_sifre",
+    "DisplayName": "AntAPP"
+  },
+
+  "JWTSettings": {
+    "Key": "EN_AZ_32_KARAKTER_UZUN_GIZLI_ANAHTAR_BURAYA",
+    "Issuer": "CoreIdentity",
+    "Audience": "CoreIdentityUser",
+    "DurationInMinutes": 3600
+  }
+}
