@@ -69,7 +69,10 @@ namespace CleanArchitecture.Infrastructure.Services
             response.Email = user.Email;
             response.UserName = user.UserName;
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
-            response.Roles = rolesList.ToList();
+            response.Roles = rolesList
+                .Select(RoleNames.ToPublicRole)
+                .Distinct()
+                .ToList();
             response.IsVerified = user.EmailConfirmed;
             var refreshToken = GenerateRefreshToken(ipAddress);
             response.RefreshToken = refreshToken.Token;
@@ -112,7 +115,10 @@ namespace CleanArchitecture.Infrastructure.Services
                 UserName = user.UserName,
                 IsVerified = user.EmailConfirmed,
                 RefreshToken = newRefreshToken.Token,
-                Roles = rolesList.ToList()
+                Roles = rolesList
+                    .Select(RoleNames.ToPublicRole)
+                    .Distinct()
+                    .ToList()
             };
         }
 

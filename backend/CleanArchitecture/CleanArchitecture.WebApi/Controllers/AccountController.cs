@@ -1,14 +1,18 @@
 ﻿using CleanArchitecture.Core.DTOs.Account;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.WebApi.Controllers
 {
     [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -18,6 +22,7 @@ namespace CleanArchitecture.WebApi.Controllers
             _accountService = accountService;
         }
         [HttpPost("authenticate")]
+        [HttpPost("login")]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
             var response = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
@@ -26,6 +31,7 @@ namespace CleanArchitecture.WebApi.Controllers
         }
 
         [HttpPost("refresh-token")]
+        [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request = null)
         {
             var refreshToken = Request.Cookies["refreshToken"];
@@ -36,6 +42,34 @@ namespace CleanArchitecture.WebApi.Controllers
             var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());
             SetRefreshTokenCookie(response.RefreshToken);
             return Ok(response);
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("refreshToken");
+            return Ok(new { message = "Logged out." });
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            var roles = User.FindAll(ClaimTypes.Role)
+                .Select(claim => RoleNames.ToPublicRole(claim.Value))
+                .Distinct()
+                .ToList();
+
+            var userName = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name || claim.Type == "sub")?.Value;
+            var email = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email || claim.Type == "email")?.Value;
+
+            return Ok(new
+            {
+                id = User.FindFirstValue("uid"),
+                userName,
+                email,
+                roles
+            });
         }
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync(RegisterRequest request)

@@ -59,7 +59,7 @@ export async function login(
 
   let data: AuthUser & { refreshToken: string }
   try {
-    const res = await fetch(`${API_URL}/account/authenticate`, {
+    const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
@@ -85,7 +85,7 @@ export async function refreshTokens(): Promise<string> {
   const refreshToken = jar.get(REFRESH_TOKEN_COOKIE)?.value
   if (!refreshToken) throw new Error('No refresh token')
 
-  const res = await fetch(`${API_URL}/account/refresh-token`, {
+  const res = await fetch(`${API_URL}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

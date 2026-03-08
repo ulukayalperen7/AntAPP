@@ -49,7 +49,7 @@ async function refreshFromBackend(
   refreshToken: string
 ): Promise<RefreshResponse | null> {
   try {
-    const res = await fetch(`${API_URL}/account/refresh-token`, {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

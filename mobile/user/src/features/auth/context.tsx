@@ -25,6 +25,17 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
+function toPublicRole(role: string): string {
+  if (role === 'Basic') return 'User'
+  if (role === 'Moderator') return 'Business'
+  if (role === 'SuperAdmin') return 'Admin'
+  return role
+}
+
+function normalizeRoles(roles: string[]): string[] {
+  return Array.from(new Set(roles.map((role) => toPublicRole(role))))
+}
+
 function toSession(data: AuthResponse): AuthSession {
   return {
     accessToken: data.jwToken,
@@ -33,13 +44,13 @@ function toSession(data: AuthResponse): AuthSession {
       id: data.id,
       userName: data.userName,
       email: data.email,
-      roles: data.roles,
+      roles: normalizeRoles(data.roles),
     },
   }
 }
 
 function canUseMobileClient(roles: string[]): boolean {
-  return roles.includes('Basic')
+  return normalizeRoles(roles).includes('User')
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {

@@ -45,12 +45,12 @@ async function post<T>(
 }
 
 export function authenticate(email: string, password: string) {
-  return post<AuthResponse>('/account/authenticate', { email, password })
+  return post<AuthResponse>('/auth/login', { email, password })
 }
 
 export function refreshWithToken(refreshToken: string) {
   return post<AuthResponse>(
-    '/account/refresh-token',
+    '/auth/refresh',
     { refreshToken },
     { Cookie: `refreshToken=${refreshToken}` }
   )

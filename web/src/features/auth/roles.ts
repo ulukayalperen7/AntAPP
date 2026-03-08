@@ -1,8 +1,17 @@
 const ADMIN_ROLES = new Set(['Admin', 'SuperAdmin'])
-const BUSINESS_ROLES = new Set(['Moderator', 'Admin', 'SuperAdmin'])
+const BUSINESS_ROLES = new Set(['Business', 'Moderator', 'Admin', 'SuperAdmin'])
 
-function normalizeRoles(roles: string[]): string[] {
-  return roles.map((role) => role.trim()).filter(Boolean)
+function toPublicRole(role: string): string {
+  if (role === 'Basic') return 'User'
+  if (role === 'Moderator') return 'Business'
+  if (role === 'SuperAdmin') return 'Admin'
+  return role
+}
+
+export function normalizeRoles(roles: string[]): string[] {
+  return roles
+    .map((role) => toPublicRole(role.trim()))
+    .filter(Boolean)
 }
 
 export function canAccessAdmin(roles: string[]): boolean {
