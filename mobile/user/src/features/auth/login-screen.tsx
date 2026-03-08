@@ -11,7 +11,7 @@ import { useAuth } from './context';
 
 export function LoginScreen() {
   const { login } = useAuth();
-  const [email, setEmail] = useState('basicuser@gmail.com');
+  const [email, setEmail] = useState('user@antapp.local');
   const [password, setPassword] = useState('123Pa$$word!');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,8 +59,8 @@ export function LoginScreen() {
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <View style={styles.hintBox}>
-        <Text style={styles.hintText}>Test user</Text>
-        <Text style={styles.hintText}>basicuser@gmail.com</Text>
+        <Text style={styles.hintText}>Demo user</Text>
+        <Text style={styles.hintText}>user@antapp.local</Text>
         <Text style={styles.hintText}>123Pa$$word!</Text>
       </View>
     </View>

@@ -14,7 +14,7 @@ namespace CleanArchitecture.WebApi.Controllers.v1
 {
     [ApiVersion("1.0")]
     [Authorize]
-    public class ProductController : BaseApiController
+    public class RouteController : BaseApiController
     {
         // GET: api/<controller>
         [HttpGet]

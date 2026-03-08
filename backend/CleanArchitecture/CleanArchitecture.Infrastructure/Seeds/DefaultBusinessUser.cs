@@ -9,13 +9,13 @@ namespace CleanArchitecture.Infrastructure.Seeds
     {
         public static async Task SeedAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            var user = await userManager.FindByEmailAsync("business@gmail.com");
+            var user = await userManager.FindByEmailAsync("business@antapp.local");
             if (user != null) return;
 
             var defaultUser = new ApplicationUser
             {
                 UserName = "business",
-                Email = "business@gmail.com",
+                Email = "business@antapp.local",
                 FirstName = "Ant",
                 LastName = "Business",
                 EmailConfirmed = true,

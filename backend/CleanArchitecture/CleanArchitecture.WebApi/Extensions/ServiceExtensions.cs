@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CleanArchitecture.WebApi.Extensions
 {
@@ -20,15 +22,17 @@ namespace CleanArchitecture.WebApi.Extensions
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Clean Architecture - CleanArchitecture.WebApi",
-                    Description = "This Api will be responsible for overall data distribution and authorization.",
+                    Title = "AntAPP API",
+                    Description = "Route Planning & Social Platform API",
                     Contact = new OpenApiContact
                     {
-                        Name = "codewithmukesh",
-                        Email = "hello@codewithmukesh.com",
-                        Url = new Uri("https://codewithmukesh.com/contact"),
+                        Name = "AntAPP Team",
+                        Email = "team@antapp.local",
+                        Url = new Uri("https://antapp.local"),
                     }
                 });
+                c.CustomSchemaIds(GetSchemaId);
+                c.DocumentFilter<RemoveLegacyAccountPathsDocumentFilter>();
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -56,6 +60,46 @@ namespace CleanArchitecture.WebApi.Extensions
                 });
             });
         }
+
+        private static string GetSchemaId(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var genericPrefix = string.Concat(type.GetGenericArguments().Select(GetSchemaId));
+                return genericPrefix + NormalizeSchemaName(type.Name.Split('`')[0]);
+            }
+
+            return NormalizeSchemaName(type.Name);
+        }
+
+        private static string NormalizeSchemaName(string name)
+        {
+            return name
+                .Replace("Categories", "__ROUTE_CATEGORIES__")
+                .Replace("Category", "__ROUTE_CATEGORY__")
+                .Replace("Products", "__ROUTES__")
+                .Replace("Product", "__ROUTE__")
+                .Replace("__ROUTE_CATEGORIES__", "RouteCategories")
+                .Replace("__ROUTE_CATEGORY__", "RouteCategory")
+                .Replace("__ROUTES__", "Routes")
+                .Replace("__ROUTE__", "Route");
+        }
+
+        private sealed class RemoveLegacyAccountPathsDocumentFilter : IDocumentFilter
+        {
+            public void Apply(Microsoft.OpenApi.Models.OpenApiDocument swaggerDoc, DocumentFilterContext context)
+            {
+                var legacyPaths = swaggerDoc.Paths.Keys
+                    .Where(path => path.StartsWith("/api/Account", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                foreach (var legacyPath in legacyPaths)
+                {
+                    swaggerDoc.Paths.Remove(legacyPath);
+                }
+            }
+        }
+
         public static void AddApiVersioningExtension(this IServiceCollection services)
         {
             services.AddApiVersioning(config =>

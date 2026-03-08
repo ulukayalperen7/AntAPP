@@ -10,7 +10,7 @@ namespace CleanArchitecture.WebApi.Extensions
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "CleanArchitecture.CleanArchitecture.WebApi");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AntAPP API v1");
             });
         }
         public static void UseErrorHandlingMiddleware(this IApplicationBuilder app)

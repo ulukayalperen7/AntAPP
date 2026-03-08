@@ -10,7 +10,7 @@ namespace CleanArchitecture.WebApi.Controllers.v1
 {
     [ApiVersion("1.0")]
     [Authorize(Roles = "Admin")]
-    public class CategoryController : BaseApiController
+    public class RouteCategoryController : BaseApiController
     {
 
         [HttpPost]

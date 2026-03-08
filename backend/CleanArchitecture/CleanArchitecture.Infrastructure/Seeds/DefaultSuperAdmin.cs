@@ -14,7 +14,7 @@ namespace CleanArchitecture.Infrastructure.Seeds
             var defaultUser = new ApplicationUser
             {
                 UserName = "superadmin",
-                Email = "superadmin@gmail.com",
+                Email = "superadmin@antapp.local",
                 FirstName = "Mukesh",
                 LastName = "Murugan",
                 EmailConfirmed = true,

@@ -10,9 +10,11 @@
 - `appsettings.json` → `DurationInMinutes` 3600 → 15 dk
 - `ApplicationDbContext` → `OwnsMany` ile refresh token'lar DB'ye yazılır hale getirildi
 - `AccountService` → login'de refresh token persist ediliyor; `RefreshTokenAsync` eklendi (token rotation)
-- `AccountController` → httpOnly cookie set + `POST /api/account/refresh-token` endpoint
+- `AccountController` → httpOnly cookie set + `POST /api/auth/refresh` endpoint (legacy `/api/account/refresh-token` alias korunuyor)
 - `AuthenticationResponse` → `[JsonIgnore]` kaldırıldı (Server Action JSON'dan okur)
 - CORS → `AllowAnyOrigin` → `WithOrigins + AllowCredentials`
+- `v1` API controller adları sadeleştirildi: `ProductController` → `RouteController`, `CategoryController` → `RouteCategoryController`
+- Development seed hesapları AntAPP formatına çekildi: `user@antapp.local`, `business@antapp.local`, `admin@antapp.local`
 
 **Web (Next.js):**
 - `features/auth/actions.ts` → `login`, `logout`, `refreshTokens` Server Actions
@@ -67,7 +69,6 @@
 ---
 
 ## Sıradaki adımlar
-- [ ] Mobile auth: `expo-secure-store` ile refresh token yönetimi
 - [ ] İlk shared screen: `packages/app/src/screens/` (Solito + Tamagui)
-- [ ] Backend'e bağlanan ilk veri çekme (ürün listesi)
+- [ ] Backend'e bağlanan ilk veri çekme (route listesi)
 - [ ] Admin/Business panel layout'ları

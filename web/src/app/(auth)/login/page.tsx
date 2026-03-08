@@ -5,7 +5,7 @@ import { useActionState } from 'react'
 import { login } from '@/features/auth/actions'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('basicuser@gmail.com')
+  const [email, setEmail] = useState('user@antapp.local')
   const [password, setPassword] = useState('123Pa$$word!')
   const [error, formAction, pending] = useActionState(login, null)
 
@@ -42,14 +42,13 @@ export default function LoginPage() {
       <div style={{ marginTop: 18 }}>
         <p>Test hesaplar:</p>
         <p>
-          User: <code>basicuser@gmail.com</code>
+          User: <code>user@antapp.local</code>
         </p>
         <p>
-          Business: <code>business@gmail.com</code>
+          Business: <code>business@antapp.local</code>
         </p>
         <p>
-          Admin: <code>admin@gmail.com</code> veya{' '}
-          <code>superadmin@gmail.com</code>
+          Admin: <code>admin@antapp.local</code>
         </p>
         <p>
           Password: <code>123Pa$$word!</code>
