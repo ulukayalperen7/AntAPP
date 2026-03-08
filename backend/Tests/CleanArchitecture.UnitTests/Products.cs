@@ -21,7 +21,7 @@ namespace CleanArchitecture.UnitTests
 
 
         [Fact]
-        public void When_UpdateProductCommandHandlerInvoked_WithNotExistingProduct_ShouldThrowEntityNotFoundException()
+        public async Task When_UpdateProductCommandHandlerInvoked_WithNotExistingProduct_ShouldThrowEntityNotFoundException()
         {
             productRepositoryAsync
                 .Setup(pr => pr.GetByIdAsync(It.IsAny<int>()))
@@ -32,11 +32,11 @@ namespace CleanArchitecture.UnitTests
             var command = this.fixture.Create<UpdateProductCommand>();
             var cancellationToken = this.fixture.Create<CancellationToken>();
 
-            Assert.ThrowsAsync<EntityNotFoundException>(()=>updateProductCommandHandler.Handle(command, cancellationToken));
+            await Assert.ThrowsAsync<EntityNotFoundException>(()=>updateProductCommandHandler.Handle(command, cancellationToken));
         }
 
         [Fact]
-        public void When_UpdateProductCommandHandlerInvoked_WithNotUniqueBarcode_ShouldThrowBarcodeIsNotUniqueException()
+        public async Task When_UpdateProductCommandHandlerInvoked_WithNotUniqueBarcode_ShouldThrowBarcodeIsNotUniqueException()
         {
             this.productRepositoryAsync
                 .Setup(pr=> pr.GetByIdAsync(It.IsAny<int>()))
@@ -51,7 +51,7 @@ namespace CleanArchitecture.UnitTests
             var command = this.fixture.Create<UpdateProductCommand>();
             var cancellationToken = this.fixture.Create<CancellationToken>();
 
-            Assert.ThrowsAsync<BarcodeIsNotUniqueException>(() => updateProductCommandHandler.Handle(command, cancellationToken));
+            await Assert.ThrowsAsync<BarcodeIsNotUniqueException>(() => updateProductCommandHandler.Handle(command, cancellationToken));
         }
 
         [Fact]

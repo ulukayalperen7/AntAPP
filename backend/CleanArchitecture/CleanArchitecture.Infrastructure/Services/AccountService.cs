@@ -245,7 +245,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 To = model.Email,
                 Subject = "Reset Password",
             };
-            await _emailService.SendAsync(emailRequest);
+            try { await _emailService.SendAsync(emailRequest); } catch { }
         }
 
         public async Task<string> ResetPassword(ResetPasswordRequest model)
