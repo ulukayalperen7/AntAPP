@@ -1,7 +1,9 @@
 import { withTamagui } from '@tamagui/next-plugin'
 import type { NextConfig } from 'next'
 
-const nextConfig: NextConfig = {}
+const nextConfig: NextConfig = {
+  turbopack: {},
+}
 
 export default withTamagui({
   config: '../../packages/ui/src/tamagui.config.ts',
