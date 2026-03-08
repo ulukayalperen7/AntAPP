@@ -1,5 +1,5 @@
 {
-  "name": "@antapp/web-admin",
+  "name": "@antapp/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
