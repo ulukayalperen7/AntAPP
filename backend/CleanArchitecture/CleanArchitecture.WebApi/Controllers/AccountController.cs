@@ -2,6 +2,7 @@
 using CleanArchitecture.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,7 +20,20 @@ namespace CleanArchitecture.WebApi.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> AuthenticateAsync(AuthenticationRequest request)
         {
-            return Ok(await _accountService.AuthenticateAsync(request, GenerateIPAddress()));
+            var response = await _accountService.AuthenticateAsync(request, GenerateIPAddress());
+            SetRefreshTokenCookie(response.RefreshToken);
+            return Ok(response);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+                return BadRequest("Refresh token not found.");
+            var response = await _accountService.RefreshTokenAsync(refreshToken, GenerateIPAddress());
+            SetRefreshTokenCookie(response.RefreshToken);
+            return Ok(response);
         }
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync(RegisterRequest request)
@@ -52,6 +66,17 @@ namespace CleanArchitecture.WebApi.Controllers
                 return Request.Headers["X-Forwarded-For"];
             else
                 return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+        }
+
+        private void SetRefreshTokenCookie(string token)
+        {
+            Response.Cookies.Append("refreshToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(7),
+                SameSite = SameSiteMode.Strict,
+                Secure = true
+            });
         }
     }
 }

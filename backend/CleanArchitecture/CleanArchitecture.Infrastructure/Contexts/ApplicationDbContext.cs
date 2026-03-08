@@ -49,6 +49,7 @@ namespace CleanArchitecture.Infrastructure.Contexts
             builder.Entity<ApplicationUser>(entity =>
             {
                 entity.ToTable(name: "User");
+                entity.OwnsMany(u => u.RefreshTokens);
             });
 
             builder.Entity<IdentityRole>(entity =>

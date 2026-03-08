@@ -9,6 +9,7 @@ using CleanArchitecture.Infrastructure.Helpers;
 using CleanArchitecture.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -72,7 +73,43 @@ namespace CleanArchitecture.Infrastructure.Services
             response.IsVerified = user.EmailConfirmed;
             var refreshToken = GenerateRefreshToken(ipAddress);
             response.RefreshToken = refreshToken.Token;
+            user.RefreshTokens ??= new List<RefreshToken>();
+            user.RefreshTokens.Add(refreshToken);
+            await _userManager.UpdateAsync(user);
             return response;
+        }
+
+        public async Task<AuthenticationResponse> RefreshTokenAsync(string token, string ipAddress)
+        {
+            var user = await _userManager.Users
+                .AsTracking()
+                .Include(u => u.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            if (user == null) throw new ApiException("Invalid token.");
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+            if (!refreshToken.IsActive) throw new ApiException("Invalid token.");
+
+            var newRefreshToken = GenerateRefreshToken(ipAddress);
+            refreshToken.Revoked = DateTime.UtcNow;
+            refreshToken.RevokedByIp = ipAddress;
+            refreshToken.ReplacedByToken = newRefreshToken.Token;
+            user.RefreshTokens.Add(newRefreshToken);
+            await _userManager.UpdateAsync(user);
+
+            var jwtSecurityToken = await GenerateJWToken(user);
+            var rolesList = await _userManager.GetRolesAsync(user);
+            return new AuthenticationResponse
+            {
+                Id = user.Id,
+                JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                Email = user.Email,
+                UserName = user.UserName,
+                IsVerified = user.EmailConfirmed,
+                RefreshToken = newRefreshToken.Token,
+                Roles = rolesList.ToList()
+            };
         }
 
         public async Task<string> RegisterAsync(RegisterRequest request, string origin)
