@@ -3,5 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "main": "src/index.ts",
-  "types": "src/index.ts"
+  "types": "src/index.ts",
+  "dependencies": {
+    "@antapp/ui": "^0.0.1",
+    "solito": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-native": ">=0.83"
+  }
 }

@@ -14,7 +14,8 @@
     "@tamagui/next-theme": "^2.0.0-rc.22",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "solito": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
