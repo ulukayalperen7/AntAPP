@@ -1,3 +1,4 @@
+import '@tamagui/native/setup-zeego';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
