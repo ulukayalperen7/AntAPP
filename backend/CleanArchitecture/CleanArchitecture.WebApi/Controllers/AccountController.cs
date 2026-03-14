@@ -53,7 +53,7 @@ namespace CleanArchitecture.WebApi.Controllers
         public IActionResult Me()
         {
             var roles = User.FindAll(ClaimTypes.Role)
-                .Select(claim => RoleNames.ToPublicRole(claim.Value))
+                .Select(claim => claim.Value)
                 .Distinct()
                 .ToList();
 

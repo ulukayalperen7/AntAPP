@@ -69,10 +69,7 @@ namespace CleanArchitecture.Infrastructure.Services
             response.Email = user.Email;
             response.UserName = user.UserName;
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
-            response.Roles = rolesList
-                .Select(RoleNames.ToPublicRole)
-                .Distinct()
-                .ToList();
+            response.Roles = rolesList.ToList();
             response.IsVerified = user.EmailConfirmed;
             var refreshToken = GenerateRefreshToken(ipAddress);
             response.RefreshToken = refreshToken.Token;
@@ -115,10 +112,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 UserName = user.UserName,
                 IsVerified = user.EmailConfirmed,
                 RefreshToken = newRefreshToken.Token,
-                Roles = rolesList
-                    .Select(RoleNames.ToPublicRole)
-                    .Distinct()
-                    .ToList()
+                Roles = rolesList.ToList()
             };
         }
 
@@ -132,9 +126,8 @@ namespace CleanArchitecture.Infrastructure.Services
             var user = new ApplicationUser
             {
                 Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                UserName = request.UserName
+                UserName = request.UserName,
+                UserType = request.UserType
             };
             var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);
             if (userWithSameEmail == null)
@@ -142,7 +135,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+                    await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
                     //TODO: Attach Email Service here and configure it via appsettings
                     //await _emailService.SendAsync(new Core.DTOs.Email.EmailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
@@ -198,9 +191,8 @@ namespace CleanArchitecture.Infrastructure.Services
 
         private string RandomTokenString()
         {
-            using var rngCryptoServiceProvider = new RNGCryptoServiceProvider();
             var randomBytes = new byte[40];
-            rngCryptoServiceProvider.GetBytes(randomBytes);
+            System.Security.Cryptography.RandomNumberGenerator.Fill(randomBytes);
             // convert random bytes to hex string
             return BitConverter.ToString(randomBytes).Replace("-", "");
         }
