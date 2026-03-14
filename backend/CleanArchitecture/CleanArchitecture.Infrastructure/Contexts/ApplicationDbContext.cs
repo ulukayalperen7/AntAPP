@@ -23,6 +23,12 @@ namespace CleanArchitecture.Infrastructure.Contexts
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Spot> Spots { get; set; }
+        public DbSet<Route> Routes { get; set; }
+        public DbSet<RouteSpot> RouteSpots { get; set; }
+        public DbSet<Collection> Collections { get; set; }
+        public DbSet<CollectionRoute> CollectionRoutes { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -50,6 +56,12 @@ namespace CleanArchitecture.Infrastructure.Contexts
                 entity.ToTable(name: "User");
                 entity.OwnsMany(u => u.RefreshTokens);
             });
+
+            builder.Entity<RouteSpot>()
+                .HasKey(rs => new { rs.RouteId, rs.SpotId });
+
+            builder.Entity<CollectionRoute>()
+                .HasKey(cr => new { cr.CollectionId, cr.RouteId });
 
             builder.Entity<IdentityRole>(entity =>
             {
