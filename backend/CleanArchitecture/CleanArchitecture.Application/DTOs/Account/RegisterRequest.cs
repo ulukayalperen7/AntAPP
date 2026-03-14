@@ -1,14 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CleanArchitecture.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Core.DTOs.Account
 {
     public class RegisterRequest
     {
         [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
+        public UserTypeEnum UserType { get; set; }
 
         [Required]
         [EmailAddress]
