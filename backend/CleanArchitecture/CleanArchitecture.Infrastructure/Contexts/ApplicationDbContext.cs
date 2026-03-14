@@ -23,7 +23,6 @@ namespace CleanArchitecture.Infrastructure.Contexts
         }
 
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
