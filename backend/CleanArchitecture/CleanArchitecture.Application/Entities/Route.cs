@@ -30,6 +30,6 @@ namespace CleanArchitecture.Core.Entities
         public virtual ICollection<RouteTag> RouteTags { get; set; }       // Many-to-many: A route can have multiple tags
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
-        public virtual ICollection<Rating> Ratings { get; set; }
+        public virtual ICollection<RouteRating> Ratings { get; set; }
     }
 }

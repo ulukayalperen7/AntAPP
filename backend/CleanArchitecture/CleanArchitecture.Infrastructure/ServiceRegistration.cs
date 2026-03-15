@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Interfaces.Repositories;
 using CleanArchitecture.Core.Wrappers;
 using CleanArchitecture.Core.Settings;
@@ -105,6 +105,8 @@ namespace CleanArchitecture.Infrastructure
             services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
 
             services.AddTransient<ITagRepositoryAsync, TagRepositoryAsync>();
+            services.AddTransient<IRouteRatingRepositoryAsync, RouteRatingRepositoryAsync>();
+            services.AddTransient<ISpotRatingRepositoryAsync, SpotRatingRepositoryAsync>();
             #endregion
         }
     }

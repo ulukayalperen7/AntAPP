@@ -24,35 +24,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Collection", b =>
                 {
                     b.Property<Guid>("Id")
@@ -143,9 +114,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<decimal>("AverageRating")
                         .HasColumnType("decimal(18,6)");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -184,8 +152,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
-
                     b.ToTable("Routes");
                 });
 
@@ -220,6 +186,21 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasIndex("SpotId");
 
                     b.ToTable("RouteSpots");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteTag", b =>
+                {
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RouteId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("RouteTags");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Spot", b =>
@@ -258,6 +239,35 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Spots");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
@@ -492,17 +502,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
-                {
-                    b.HasOne("CleanArchitecture.Core.Entities.Category", "Category")
-                        .WithMany("Routes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteSpot", b =>
                 {
                     b.HasOne("CleanArchitecture.Core.Entities.Route", "Route")
@@ -520,6 +519,25 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Route");
 
                     b.Navigation("Spot");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteTag", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.Route", "Route")
+                        .WithMany("RouteTags")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Core.Entities.Tag", "Tag")
+                        .WithMany("RouteTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+
+                    b.Navigation("Tag");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
@@ -618,11 +636,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Category", b =>
-                {
-                    b.Navigation("Routes");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Collection", b =>
                 {
                     b.Navigation("CollectionRoutes");
@@ -635,11 +648,18 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Ratings");
 
                     b.Navigation("RouteSpots");
+
+                    b.Navigation("RouteTags");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Spot", b =>
                 {
                     b.Navigation("RouteSpots");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
+                {
+                    b.Navigation("RouteTags");
                 });
 #pragma warning restore 612, 618
         }
