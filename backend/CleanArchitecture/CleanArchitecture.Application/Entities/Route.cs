@@ -22,8 +22,8 @@ namespace CleanArchitecture.Core.Entities
         public RouteTypeEnum RouteType { get; set; }
         public bool IsPublic { get; set; }
 
-        public decimal AverageRating { get; set; }
-        public int RatingCount { get; set; }
+        public long RatingSum { get; set; }
+        public long RatingCount { get; set; }
         public bool IsDeleted { get; set; }
 
         // Navigation properties

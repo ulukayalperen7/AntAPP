@@ -1,4 +1,6 @@
-using CleanArchitecture.Core.Interfaces.Repositories;
+using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Exceptions;
+using CleanArchitecture.Core.Interfaces;
 using MediatR;
 using System;
 using System.Threading;
@@ -15,25 +17,29 @@ namespace CleanArchitecture.Core.Features.SpotRatings.Queries.GetSpotAverageRati
     {
         public Guid SpotId { get; set; }
         public double? AverageStars { get; set; }
+        public long RatingCount { get; set; }
     }
 
     public class GetSpotAverageRatingQueryHandler : IRequestHandler<GetSpotAverageRatingQuery, GetSpotAverageRatingViewModel>
     {
-        private readonly ISpotRatingRepositoryAsync _ratingRepository;
+        private readonly IGenericRepositoryAsync<Spot> _spotRepository;
 
-        public GetSpotAverageRatingQueryHandler(ISpotRatingRepositoryAsync ratingRepository)
+        public GetSpotAverageRatingQueryHandler(IGenericRepositoryAsync<Spot> spotRepository)
         {
-            _ratingRepository = ratingRepository;
+            _spotRepository = spotRepository;
         }
 
         public async Task<GetSpotAverageRatingViewModel> Handle(GetSpotAverageRatingQuery request, CancellationToken cancellationToken)
         {
-            var average = await _ratingRepository.GetAverageStarsAsync(request.SpotId);
+            var spot = await _spotRepository.GetByIdAsync(request.SpotId);
+            if (spot == null)
+                throw new ApiException("Spot not found.");
 
             return new GetSpotAverageRatingViewModel
             {
-                SpotId = request.SpotId,
-                AverageStars = average
+                SpotId = spot.Id,
+                AverageStars = spot.RatingCount > 0 ? (double)spot.RatingSum / spot.RatingCount : null,
+                RatingCount = spot.RatingCount
             };
         }
     }

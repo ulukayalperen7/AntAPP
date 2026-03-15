@@ -8,6 +8,5 @@ namespace CleanArchitecture.Core.Interfaces.Repositories
     public interface ISpotRatingRepositoryAsync : IGenericRepositoryAsync<SpotRating>
     {
         Task<SpotRating> GetByUserAndSpotAsync(Guid userId, Guid spotId);
-        Task<double?> GetAverageStarsAsync(Guid spotId);
     }
 }

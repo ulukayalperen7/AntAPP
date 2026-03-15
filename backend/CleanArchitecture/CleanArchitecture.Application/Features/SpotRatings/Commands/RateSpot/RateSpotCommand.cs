@@ -18,13 +18,16 @@ namespace CleanArchitecture.Core.Features.SpotRatings.Commands.RateSpot
     public class RateSpotCommandHandler : IRequestHandler<RateSpotCommand, Guid>
     {
         private readonly ISpotRatingRepositoryAsync _ratingRepository;
+        private readonly IGenericRepositoryAsync<Spot> _spotRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
 
         public RateSpotCommandHandler(
             ISpotRatingRepositoryAsync ratingRepository,
+            IGenericRepositoryAsync<Spot> spotRepository,
             IAuthenticatedUserService authenticatedUser)
         {
             _ratingRepository = ratingRepository;
+            _spotRepository = spotRepository;
             _authenticatedUser = authenticatedUser;
         }
 
@@ -38,12 +41,18 @@ namespace CleanArchitecture.Core.Features.SpotRatings.Commands.RateSpot
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
 
+            var spot = await _spotRepository.GetByIdAsync(request.SpotId);
+            if (spot == null)
+                throw new ApiException("Spot not found.");
+
             var existing = await _ratingRepository.GetByUserAndSpotAsync(userId, request.SpotId);
 
             if (existing != null)
             {
+                spot.RatingSum = spot.RatingSum - existing.Stars + request.Stars;
                 existing.Stars = request.Stars;
                 await _ratingRepository.UpdateAsync(existing);
+                await _spotRepository.UpdateAsync(spot);
                 return existing.Id;
             }
 
@@ -55,7 +64,11 @@ namespace CleanArchitecture.Core.Features.SpotRatings.Commands.RateSpot
                 CreatedAt = DateTime.UtcNow
             };
 
+            spot.RatingSum += request.Stars;
+            spot.RatingCount++;
+
             await _ratingRepository.AddAsync(rating);
+            await _spotRepository.UpdateAsync(spot);
             return rating.Id;
         }
     }
