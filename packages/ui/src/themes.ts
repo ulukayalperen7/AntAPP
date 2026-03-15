@@ -13,6 +13,7 @@ export type BaseTheme = {
   borderColor: string
   borderColorHover: string
   borderColorFocus: string
+  outlineColor: string
   placeholderColor: string
   shadowColor: string
   shadowColorHover: string
@@ -46,6 +47,7 @@ const light: BaseTheme = {
   borderColor: '#E5E7EB',
   borderColorHover: '#D1D5DB',
   borderColorFocus: '#9CA3AF',
+  outlineColor: '#9CA3AF',
   placeholderColor: '#9CA3AF',
   shadowColor: 'rgba(15,23,42,0.08)',
   shadowColorHover: 'rgba(15,23,42,0.16)',
@@ -79,6 +81,7 @@ const dark: BaseTheme = {
   borderColor: '#1F2933',
   borderColorHover: '#374151',
   borderColorFocus: '#4B5563',
+  outlineColor: '#4B5563',
   placeholderColor: '#6B7280',
   shadowColor: 'rgba(0,0,0,0.6)',
   shadowColorHover: 'rgba(0,0,0,0.8)',

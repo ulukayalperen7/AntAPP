@@ -1,82 +1,97 @@
 import React, { useState } from 'react'
-import { YStack } from 'tamagui'
-import { Button, Card, Field, Input, Text, VStack } from '@antapp/ui'
+import { Button, Input, XStack } from '@antapp/ui'
+import { AuthField, AuthFooterLink, AuthNotice, AuthShell } from './auth-shell'
 
 export type AuthLoginScreenProps = {
-  onLogin: (email: string, password: string) => Promise<string | null>
-  loading?: boolean
-  title?: string
-  subtitle?: string
+  email: string
+  password: string
+  onEmailChange: (value: string) => void
+  onPasswordChange: (value: string) => void
+  onSubmit: () => void
+  pending?: boolean
+  error?: string | null
+  successMessage?: string | null
+  onNavigateToRegister?: () => void
 }
 
 export function AuthLoginScreen({
-  onLogin,
-  loading: externalLoading = false,
-  title = 'AntAPP',
-  subtitle = 'Hesabınıza giriş yapın',
+  email,
+  password,
+  onEmailChange,
+  onPasswordChange,
+  onSubmit,
+  pending = false,
+  error,
+  successMessage,
+  onNavigateToRegister,
 }: AuthLoginScreenProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [pending, setPending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const isLoading = pending || externalLoading
-
-  const onSubmit = async () => {
-    if (isLoading) return
-    setPending(true)
-    setError(null)
-    const result = await onLogin(email.trim(), password)
-    if (result) setError(result)
-    setPending(false)
-  }
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <YStack
-      flex={1}
-      backgroundColor="$background"
-      alignItems="center"
-      justifyContent="center"
-      paddingHorizontal="$4"
+    <AuthShell
+      title="Welcome Back"
+      subtitle="Discover amazing routes in Antalya"
+      panelTitle="Start your journey"
+      panelDescription="Plan better routes, return to saved stops faster, and keep your Antalya trips organized."
+      panelPosition="right"
+      footer={
+        onNavigateToRegister ? (
+          <AuthFooterLink
+            prefix="Don't have an account?"
+            actionLabel="Sign Up"
+            onPress={onNavigateToRegister}
+          />
+        ) : undefined
+      }
     >
-      <Card variant="elevated" width="100%" maxWidth={440}>
-        <Card.Content>
-          <VStack gap="$5">
-            <VStack gap="$1">
-              <Text variant="heading2">{title}</Text>
-              <Text variant="body" muted>
-                {subtitle}
-              </Text>
-            </VStack>
+      {successMessage ? <AuthNotice tone="success">{successMessage}</AuthNotice> : null}
+      {error ? <AuthNotice tone="error">{error}</AuthNotice> : null}
 
-            <VStack gap="$3">
-              <Field label="Email" error={error ?? undefined}>
-                <Input
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  placeholder="email@example.com"
-                />
-              </Field>
+      <AuthField label="Email">
+        <Input
+          value={email}
+          onChangeText={onEmailChange}
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          placeholder="Enter your email"
+          variant="filled"
+          size="lg"
+          disabled={pending}
+        />
+      </AuthField>
 
-              <Field label="Şifre">
-                <Input
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  placeholder="••••••••"
-                />
-              </Field>
-            </VStack>
+      <AuthField label="Password">
+        <XStack position="relative" alignItems="center">
+          <Input
+            flex={1}
+            value={password}
+            onChangeText={onPasswordChange}
+            secureTextEntry={!showPassword}
+            placeholder="Enter your password"
+            variant="filled"
+            size="lg"
+            paddingRight="$12"
+            disabled={pending}
+            onSubmitEditing={onSubmit}
+          />
+          <Button
+            variant="link"
+            size="sm"
+            position="absolute"
+            right="$3"
+            top="$2.5"
+            onPress={() => setShowPassword((current) => !current)}
+            disabled={pending}
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </Button>
+        </XStack>
+      </AuthField>
 
-            <Button onPress={onSubmit} loading={isLoading} disabled={isLoading}>
-              Giriş yap
-            </Button>
-          </VStack>
-        </Card.Content>
-      </Card>
-    </YStack>
+      <Button onPress={onSubmit} loading={pending} disabled={pending} size="lg" borderRadius="$4">
+        Sign In
+      </Button>
+    </AuthShell>
   )
 }
