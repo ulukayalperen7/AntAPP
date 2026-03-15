@@ -1,48 +1,47 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useAuth } from '@/features/auth/context';
+import React from 'react'
+import { YStack } from 'tamagui'
+import { Button, Card, Text, VStack, Divider, Badge } from '@antapp/ui'
+import { useAuth } from '../features/auth/context'
 
 export default function HomeScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth()
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Mobile User Panel</Text>
-      <Text style={styles.line}>Username: {user?.userName}</Text>
-      <Text style={styles.line}>Email: {user?.email}</Text>
-      <Text style={styles.line}>Roles: {user?.roles.join(', ')}</Text>
+    <YStack flex={1} backgroundColor="$background" paddingHorizontal="$4" paddingTop="$8">
+      <VStack gap="$4">
+        <VStack gap="$1">
+          <Text variant="heading2">Hoş geldin 👋</Text>
+          <Text variant="body" muted>
+            {user?.userName}
+          </Text>
+        </VStack>
 
-      <Pressable style={styles.logoutButton} onPress={logout}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
-    </View>
-  );
+        <Card variant="elevated">
+          <Card.Content>
+            <VStack gap="$3">
+              <VStack gap="$1">
+                <Text variant="label" muted>Email</Text>
+                <Text variant="body">{user?.email}</Text>
+              </VStack>
+
+              <Divider />
+
+              <VStack gap="$1">
+                <Text variant="label" muted>Roller</Text>
+                <YStack flexDirection="row" flexWrap="wrap" gap="$2">
+                  {user?.roles.map((role) => (
+                    <Badge key={role} variant="info">{role}</Badge>
+                  ))}
+                </YStack>
+              </VStack>
+            </VStack>
+          </Card.Content>
+        </Card>
+
+        <Button variant="outline" onPress={logout}>
+          Çıkış yap
+        </Button>
+      </VStack>
+    </YStack>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    gap: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 10,
-  },
-  line: {
-    fontSize: 16,
-  },
-  logoutButton: {
-    marginTop: 18,
-    backgroundColor: '#111',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  logoutText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-});

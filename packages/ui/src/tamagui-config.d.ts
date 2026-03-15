@@ -1,5 +1,5 @@
 import 'tamagui'
-import { tamaguiConfig } from './tamagui.config'
+import tamaguiConfig from './tamagui.config'
 
 type Conf = typeof tamaguiConfig
 
