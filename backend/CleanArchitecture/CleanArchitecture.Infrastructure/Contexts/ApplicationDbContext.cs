@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Contexts
 {
+    /// <summary>
+    /// This is the "Heart" of our database connection.
+    /// It maps our C# classes (Entities) to the actual tables in PostgreSQL (Supabase).
+    /// If you add a new table to the database, you must register it here.
+    /// </summary>
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         private readonly IDateTimeService _dateTime;
@@ -22,10 +27,11 @@ namespace CleanArchitecture.Infrastructure.Contexts
             _authenticatedUser = authenticatedUser;
         }
 
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Spot> Spots { get; set; }
-        public DbSet<Route> Routes { get; set; }
-        public DbSet<RouteSpot> RouteSpots { get; set; }
+        // Below are the tables currently in our database:
+        public DbSet<Category> Categories { get; set; } // Category table
+        public DbSet<Spot> Spots { get; set; }          // Spot (Place) table
+        public DbSet<Route> Routes { get; set; }        // Route table
+        public DbSet<RouteSpot> RouteSpots { get; set; } // Junction table for Routes and Spots
         public DbSet<Collection> Collections { get; set; }
         public DbSet<CollectionRoute> CollectionRoutes { get; set; }
         public DbSet<Rating> Ratings { get; set; }

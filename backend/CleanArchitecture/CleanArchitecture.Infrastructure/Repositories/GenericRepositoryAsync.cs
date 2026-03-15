@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Core.Interfaces;
+﻿using System;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -7,16 +8,22 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Repository
 {
+    /// <summary>
+    /// This is the "Generic Helper" for database work.
+    /// Instead of writing "Save to Database" code for every single table, we wrote it once here.
+    /// It can handle Categories, Routes, Spots, or anything else we add later.
+    /// </summary>
     public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
     {
         private readonly ApplicationDbContext _dbContext;
 
+        // We inject the Database Context (the connection) here.
         public GenericRepositoryAsync(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public virtual async Task<T> GetByIdAsync(int id)
+        public virtual async Task<T> GetByIdAsync(Guid id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }

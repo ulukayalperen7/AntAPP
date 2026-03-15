@@ -20,6 +20,10 @@ namespace CleanArchitecture.WebApi.Controllers
         {
             _accountService = accountService;
         }
+        // This endpoint is called when a user tries to log in.
+        // It checks if the email/password combination is correct in the database.
+        // If correct, it returns a 15-minute Access Token (JWT) in the response body.
+        // It also secretly creates a 7-day Refresh Token and attaches it as an HTTP-Only Cookie.
         [HttpPost("login")]
         public async Task<IActionResult> Login(AuthenticationRequest request)
         {
@@ -28,6 +32,9 @@ namespace CleanArchitecture.WebApi.Controllers
             return Ok(response);
         }
 
+        // When the 15-minute Access Token expires, the frontend calls this endpoint.
+        // It reads the HTTP-Only "refreshToken" cookie to verify the user.
+        // If valid, it generates and returns a brand new 15-minute Access Token and a new 7-day Refresh Token.
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request = null)
         {
