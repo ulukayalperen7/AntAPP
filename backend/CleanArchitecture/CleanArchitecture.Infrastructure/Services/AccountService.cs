@@ -136,9 +136,8 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
-                    var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    await _userManager.ConfirmEmailAsync(user, confirmToken);
-                    return $"User Registered Successfully.";
+                    var verificationUri = await SendVerificationEmail(user, origin);
+                    return $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
                 }
                 else
                 {
@@ -194,6 +193,17 @@ namespace CleanArchitecture.Infrastructure.Services
             System.Security.Cryptography.RandomNumberGenerator.Fill(randomBytes);
             // convert random bytes to hex string
             return BitConverter.ToString(randomBytes).Replace("-", "");
+        }
+
+        private async Task<string> SendVerificationEmail(ApplicationUser user, string origin)
+        {
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var route = "api/auth/confirm-email/";
+            var endpointUri = new Uri(string.Concat($"{origin}/", route));
+            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id);
+            verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
+            return verificationUri;
         }
 
         public async Task<string> ConfirmEmailAsync(string userId, string code)
