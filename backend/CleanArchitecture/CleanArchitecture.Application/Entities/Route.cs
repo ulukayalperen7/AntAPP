@@ -4,11 +4,14 @@ using System.Collections.Generic;
 
 namespace CleanArchitecture.Core.Entities
 {
+    /// <summary>
+    /// This is a "Route" in our app. A route is a path/journey that users create.
+    /// It can contain multiple Spots (places) and can be tagged with multiple labels.
+    /// For example: A route called "Istanbul Historical Walk" tagged with #Historical #Walking.
+    /// </summary>
     public class Route : AuditableBaseEntity
     {
         public Guid AuthorUserId { get; set; }
-        public Guid CategoryId { get; set; }
-        public virtual Category Category { get; set; }
 
         public Guid? OriginalRouteId { get; set; }
 
@@ -24,6 +27,7 @@ namespace CleanArchitecture.Core.Entities
         public bool IsDeleted { get; set; }
 
         // Navigation properties
+        public virtual ICollection<RouteTag> RouteTags { get; set; }       // Many-to-many: A route can have multiple tags
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
         public virtual ICollection<Rating> Ratings { get; set; }

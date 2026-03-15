@@ -4,5 +4,12 @@
         <name>CleanArchitecture.WebApi</name>
     </assembly>
     <members>
+        <member name="T:CleanArchitecture.WebApi.Controllers.v1.TagController">
+            <summary>
+            This controller handles all requests related to Tags (labels like Nature, Food, Historical).
+            Tags are flexible labels that can be attached to Routes.
+            A Route can have multiple Tags (many-to-many relationship).
+            </summary>
+        </member>
     </members>
 </doc>

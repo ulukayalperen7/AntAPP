@@ -28,7 +28,8 @@ namespace CleanArchitecture.Infrastructure.Contexts
         }
 
         // Below are the tables currently in our database:
-        public DbSet<Category> Categories { get; set; } // Category table
+        public DbSet<Tag> Tags { get; set; }             // Tag (Label) table
+        public DbSet<RouteTag> RouteTags { get; set; }   // Bridge: Route <-> Tag (many-to-many)
         public DbSet<Spot> Spots { get; set; }          // Spot (Place) table
         public DbSet<Route> Routes { get; set; }        // Route table
         public DbSet<RouteSpot> RouteSpots { get; set; } // Junction table for Routes and Spots
@@ -62,6 +63,10 @@ namespace CleanArchitecture.Infrastructure.Contexts
                 entity.ToTable(name: "User");
                 entity.OwnsMany(u => u.RefreshTokens);
             });
+
+            // Many-to-many: Route <-> Tag (via RouteTag bridge table)
+            builder.Entity<RouteTag>()
+                .HasKey(rt => new { rt.RouteId, rt.TagId });
 
             builder.Entity<RouteSpot>()
                 .HasKey(rs => new { rs.RouteId, rs.SpotId });
