@@ -73,12 +73,8 @@ namespace CleanArchitecture.WebApi.Extensions
         private static string NormalizeSchemaName(string name)
         {
             return name
-                .Replace("Categories", "__ROUTE_CATEGORIES__")
-                .Replace("Category", "__ROUTE_CATEGORY__")
                 .Replace("Products", "__ROUTES__")
                 .Replace("Product", "__ROUTE__")
-                .Replace("__ROUTE_CATEGORIES__", "RouteCategories")
-                .Replace("__ROUTE_CATEGORY__", "RouteCategory")
                 .Replace("__ROUTES__", "Routes")
                 .Replace("__ROUTE__", "Route");
         }

@@ -21,7 +21,7 @@ namespace CleanArchitecture.Core.Wrappers
             Data = data;
         }
 
-        // Use this when there is an error (e.g., "Category not found").
+        // Use this when there is an error (e.g., "Tag not found").
         public Response(string message)
         {
             Succeeded = false;
@@ -31,7 +31,7 @@ namespace CleanArchitecture.Core.Wrappers
         // Did the request work?
         public bool Succeeded { get; set; }
 
-        // A friendly message for the user (e.g., "Category deleted successfully").
+        // A friendly message for the user (e.g., "Tag deleted successfully").
         public string Message { get; set; }
 
         // If something went wrong, we list the specific errors here.

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CleanArchitecture.Core.Entities;
-using CleanArchitecture.Core.Features.Categories.Queries.GetAllCategories;
+using CleanArchitecture.Core.Features.Tags.Queries.GetAllTags;
 
 namespace CleanArchitecture.Core.Mappings
 {
@@ -8,8 +8,8 @@ namespace CleanArchitecture.Core.Mappings
     {
         public GeneralProfile()
         {
-            CreateMap<GetAllCategoriesQuery, GetAllCategoriesParameter>();
-            CreateMap<Category, GetAllCategoriesViewModel>().ReverseMap();
+            CreateMap<GetAllTagsQuery, GetAllTagsParameter>();
+            CreateMap<Tag, GetAllTagsViewModel>().ReverseMap();
         }
     }
 }
