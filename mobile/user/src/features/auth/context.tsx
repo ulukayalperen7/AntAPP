@@ -6,13 +6,13 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { authenticate, refreshWithToken } from './api'
+import { authenticate, refreshWithToken, registerAccount } from './api'
 import {
   clearAuthSession,
   loadAuthSession,
   persistAuthSession,
 } from './storage'
-import type { AuthResponse, AuthSession, AuthUser } from './types'
+import type { AuthMutationResult, AuthResponse, AuthSession, AuthUser } from './types'
 
 type AuthStatus = 'loading' | 'authenticated' | 'anonymous'
 
@@ -20,6 +20,12 @@ type AuthContextValue = {
   status: AuthStatus
   user: AuthUser | null
   login: (email: string, password: string) => Promise<string | null>
+  register: (
+    fullName: string,
+    email: string,
+    password: string,
+    confirmPassword: string
+  ) => Promise<AuthMutationResult>
   logout: () => Promise<void>
 }
 
@@ -112,6 +118,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession]
   )
 
+  const register = useCallback(
+    async (
+      fullName: string,
+      email: string,
+      password: string,
+      confirmPassword: string
+    ): Promise<AuthMutationResult> => {
+      try {
+        const message = await registerAccount(
+          fullName.trim(),
+          email.trim(),
+          password,
+          confirmPassword
+        )
+
+        return {
+          ok: true,
+          message,
+        }
+      } catch (error) {
+        return {
+          ok: false,
+          message:
+            error instanceof Error ? error.message : 'Registration failed',
+        }
+      }
+    },
+    []
+  )
+
   const logout = useCallback(async () => {
     await clearSession()
   }, [clearSession])
@@ -121,9 +157,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       status,
       user: session?.user ?? null,
       login,
+      register,
       logout,
     }),
-    [status, session, login, logout]
+    [status, session, login, register, logout]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

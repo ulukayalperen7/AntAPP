@@ -20,3 +20,8 @@ export type AuthSession = {
   refreshToken: string
   user: AuthUser
 }
+
+export type AuthMutationResult = {
+  ok: boolean
+  message: string
+}

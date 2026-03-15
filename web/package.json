@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@antapp/app": "^0.0.1",
     "@antapp/ui": "^0.0.1",
     "@tamagui/next-plugin": "^2.0.0-rc.22",
     "@tamagui/next-theme": "^2.0.0-rc.22",

@@ -44,6 +44,35 @@ async function post<T>(
   return (await res.json()) as T
 }
 
+async function postText(
+  path: string,
+  body: unknown,
+  headers?: Record<string, string>
+): Promise<string> {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) {
+    throw new Error(await parseApiError(res))
+  }
+
+  const raw = (await res.text()).trim()
+  if (!raw) return 'Request completed successfully.'
+
+  try {
+    const data = JSON.parse(raw)
+    if (typeof data === 'string' && data.length > 0) return data
+  } catch {}
+
+  return raw
+}
+
 export function authenticate(email: string, password: string) {
   return post<AuthResponse>('/auth/login', { email, password })
 }
@@ -54,4 +83,19 @@ export function refreshWithToken(refreshToken: string) {
     { refreshToken },
     { Cookie: `refreshToken=${refreshToken}` }
   )
+}
+
+export function registerAccount(
+  userName: string,
+  email: string,
+  password: string,
+  confirmPassword: string
+) {
+  return postText('/auth/register', {
+    userType: 0,
+    email,
+    userName,
+    password,
+    confirmPassword,
+  })
 }

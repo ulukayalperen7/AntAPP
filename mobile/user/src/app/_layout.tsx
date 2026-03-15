@@ -8,7 +8,7 @@ import { tamaguiConfig } from '@antapp/ui';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import AppTabs from '@/components/app-tabs';
 import { AuthProvider, useAuth } from '@/features/auth/context';
-import { LoginScreen } from '@/features/auth/login-screen';
+import { AuthScreen } from '@/features/auth/auth-screen';
 
 function AppContent() {
   const { status } = useAuth();
@@ -22,7 +22,7 @@ function AppContent() {
   }
 
   if (status === 'anonymous') {
-    return <LoginScreen />;
+    return <AuthScreen />;
   }
 
   return (
