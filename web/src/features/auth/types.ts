@@ -6,3 +6,8 @@ export type AuthUser = {
   isVerified: boolean
   jwToken: string
 }
+
+export type RegisterActionState = {
+  ok: boolean
+  message: string
+} | null

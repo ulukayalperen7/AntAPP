@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import type { AuthUser } from './types'
+import type { AuthUser, RegisterActionState } from './types'
 import {
   ACCESS_MAX_AGE,
   ACCESS_TOKEN_COOKIE,
@@ -24,7 +24,8 @@ function cookieOpts(maxAge: number) {
 
 function readBackendError(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
-  const message = (data as { message?: unknown }).message
+  const d = data as Record<string, unknown>
+  const message = d['message'] ?? d['Message']
   return typeof message === 'string' && message.length > 0 ? message : null
 }
 
@@ -73,6 +74,36 @@ export async function login(
 
   await setAuthCookies(data.jwToken, data.refreshToken)
   redirect(getLandingPathByRoles(data.roles))
+}
+
+export async function register(
+  _prevState: RegisterActionState,
+  formData: FormData
+): Promise<RegisterActionState> {
+  const email = formData.get('email') as string
+  const userName = formData.get('userName') as string
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userType: 0,
+        email,
+        userName,
+        password,
+        confirmPassword,
+      }),
+      cache: 'no-store',
+    })
+    if (!res.ok) return { ok: false, message: await parseError(res) }
+    const message = await res.json()
+    return { ok: true, message: typeof message === 'string' ? message : 'Registration successful.' }
+  } catch {
+    return { ok: false, message: 'Network error' }
+  }
 }
 
 export async function logout() {
