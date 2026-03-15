@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Core.Interfaces;
+using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
@@ -35,7 +35,8 @@ namespace CleanArchitecture.Infrastructure.Contexts
         public DbSet<RouteSpot> RouteSpots { get; set; } // Junction table for Routes and Spots
         public DbSet<Collection> Collections { get; set; }
         public DbSet<CollectionRoute> CollectionRoutes { get; set; }
-        public DbSet<Rating> Ratings { get; set; }
+        public DbSet<RouteRating> RouteRatings { get; set; }
+        public DbSet<SpotRating> SpotRatings { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

@@ -22,14 +22,14 @@ namespace CleanArchitecture.Core.Entities
         public RouteTypeEnum RouteType { get; set; }
         public bool IsPublic { get; set; }
 
-        public decimal AverageRating { get; set; }
-        public int RatingCount { get; set; }
+        public long RatingSum { get; set; }
+        public long RatingCount { get; set; }
         public bool IsDeleted { get; set; }
 
         // Navigation properties
         public virtual ICollection<RouteTag> RouteTags { get; set; }       // Many-to-many: A route can have multiple tags
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
-        public virtual ICollection<Rating> Ratings { get; set; }
+        public virtual ICollection<RouteRating> Ratings { get; set; }
     }
 }
