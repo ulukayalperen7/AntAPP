@@ -136,14 +136,13 @@ namespace CleanArchitecture.Infrastructure.Services
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
-                    var verificationUri = await SendVerificationEmail(user, origin);
-                    //TODO: Attach Email Service here and configure it via appsettings
-                    //await _emailService.SendAsync(new Core.DTOs.Email.EmailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
-                    return  $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
+                    var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    await _userManager.ConfirmEmailAsync(user, confirmToken);
+                    return $"User Registered Successfully.";
                 }
                 else
                 {
-                    throw new ApiException($"{result.Errors}");
+                    throw new ApiException(string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
             else
@@ -195,18 +194,6 @@ namespace CleanArchitecture.Infrastructure.Services
             System.Security.Cryptography.RandomNumberGenerator.Fill(randomBytes);
             // convert random bytes to hex string
             return BitConverter.ToString(randomBytes).Replace("-", "");
-        }
-
-        private async Task<string> SendVerificationEmail(ApplicationUser user, string origin)
-        {
-            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var route = "api/auth/confirm-email/";
-            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
-            var verificationUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "userId", user.Id);
-            verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
-            //Email Service Call Here
-            return verificationUri;
         }
 
         public async Task<string> ConfirmEmailAsync(string userId, string code)

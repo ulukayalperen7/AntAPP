@@ -39,7 +39,7 @@ namespace CleanArchitecture.WebApi.Controllers.v1
         // 3. DELETE TAG (DELETE) - Remove a tag by its ID.
         // SECURITY: Only Admins can delete tags.
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,SuperAdmin")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
         public async Task<IActionResult> Delete(Guid id)
         {
