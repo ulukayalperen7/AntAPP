@@ -1,59 +1,67 @@
 'use client'
 
-import { useState } from 'react'
-import { useActionState } from 'react'
+import { useState, useTransition } from 'react'
+import { YStack } from 'tamagui'
+import { Button, Card, Field, Input, Text, VStack } from '@antapp/ui'
 import { login } from '@/features/auth/actions'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('user@antapp.local')
-  const [password, setPassword] = useState('123Pa$$word!')
-  const [error, formAction, pending] = useActionState(login, null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  const handleSubmit = () => {
+    setError(null)
+    const formData = new FormData()
+    formData.append('email', email)
+    formData.append('password', password)
+    startTransition(async () => {
+      const result = await login(null, formData)
+      if (result) setError(result)
+    })
+  }
 
   return (
-    <main style={{ maxWidth: 520, margin: '56px auto', padding: '0 16px' }}>
-      <h1>AntAPP Login</h1>
-      <p>Web User, Business ve Admin girişleri buradan yapılır.</p>
-      <form
-        action={formAction}
-        style={{ display: 'grid', gap: 12, marginTop: 20 }}
-      >
-        <input
-          name="email"
-          type="email"
-          required
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          name="password"
-          type="password"
-          required
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <p style={{ color: '#c62828' }}>{error}</p>}
-        <button type="submit" disabled={pending}>
-          {pending ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+    <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center" minHeight="100vh">
+      <Card variant="elevated" width="100%" maxWidth={480}>
+        <Card.Content>
+          <VStack gap="$5">
+            <VStack gap="$1">
+              <Text variant="heading2">AntAPP</Text>
+              <Text variant="body" muted>
+                Hesabınıza giriş yapın.
+              </Text>
+            </VStack>
 
-      <div style={{ marginTop: 18 }}>
-        <p>Test hesaplar:</p>
-        <p>
-          User: <code>user@antapp.local</code>
-        </p>
-        <p>
-          Business: <code>business@antapp.local</code>
-        </p>
-        <p>
-          Admin: <code>admin@antapp.local</code>
-        </p>
-        <p>
-          Password: <code>123Pa$$word!</code>
-        </p>
-      </div>
-    </main>
+            <VStack gap="$3">
+              <Field label="Email">
+                <Input
+                  value={email}
+                  onChangeText={setEmail}
+                  autoComplete="email"
+                  placeholder="email@example.com"
+                  disabled={isPending}
+                />
+              </Field>
+
+              <Field label="Şifre" error={error ?? undefined}>
+                <Input
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  placeholder="••••••••"
+                  disabled={isPending}
+                />
+              </Field>
+            </VStack>
+
+            <Button onPress={handleSubmit} loading={isPending} disabled={isPending}>
+              Giriş yap
+            </Button>
+          </VStack>
+        </Card.Content>
+      </Card>
+    </YStack>
   )
 }

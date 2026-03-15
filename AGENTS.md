@@ -1,6 +1,7 @@
 # AGENTS.md — AntAPP
 
 > Guide for AI coding agents. Read this before writing any code.
+> **Frontend / UI işi yapacaksan:** `docs/FRONTEND.md` dosyasını oku.
 
 ## What Is This?
 

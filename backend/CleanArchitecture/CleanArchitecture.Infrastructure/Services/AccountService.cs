@@ -137,13 +137,11 @@ namespace CleanArchitecture.Infrastructure.Services
                 {
                     await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
-                    //TODO: Attach Email Service here and configure it via appsettings
-                    //await _emailService.SendAsync(new Core.DTOs.Email.EmailRequest() { From = "mail@codewithmukesh.com", To = user.Email, Body = $"Please confirm your account by visiting this URL {verificationUri}", Subject = "Confirm Registration" });
-                    return  $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
+                    return $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
                 }
                 else
                 {
-                    throw new ApiException($"{result.Errors}");
+                    throw new ApiException(string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
             else
@@ -202,10 +200,9 @@ namespace CleanArchitecture.Infrastructure.Services
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var route = "api/auth/confirm-email/";
-            var _enpointUri = new Uri(string.Concat($"{origin}/", route));
-            var verificationUri = QueryHelpers.AddQueryString(_enpointUri.ToString(), "userId", user.Id);
+            var endpointUri = new Uri(string.Concat($"{origin}/", route));
+            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id);
             verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
-            //Email Service Call Here
             return verificationUri;
         }
 
