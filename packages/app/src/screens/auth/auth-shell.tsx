@@ -10,7 +10,6 @@ import {
   YStack,
   ZStack,
   isWeb,
-  useMedia,
 } from '@antapp/ui'
 
 type AuthShellProps = {
@@ -43,12 +42,18 @@ export function AuthShell({
   footer,
   children,
 }: AuthShellProps) {
-  const media = useMedia()
-  const showPanel = isWeb && media.gtLg
+  const shellClassName = isWeb ? 'auth-shell' : undefined
+  const frameClassName = isWeb
+    ? `auth-shell__frame ${panelPosition === 'left' ? 'auth-shell__frame--panel-left' : ''}`.trim()
+    : undefined
+  const formClassName = isWeb ? 'auth-shell__form' : undefined
+  const panelClassName = isWeb ? 'auth-shell__panel' : undefined
+  const footerClassName = isWeb ? 'auth-shell__footer' : undefined
 
   return (
     <Theme name="light_user">
       <YStack
+        className={shellClassName}
         flex={1}
         backgroundColor="$background"
         justifyContent="center"
@@ -57,15 +62,23 @@ export function AuthShell({
         minHeight={isWeb ? '100vh' : undefined}
       >
         <XStack
+          className={frameClassName}
           width="100%"
-          maxWidth={showPanel ? 1180 : 560}
+          maxWidth={560}
           alignSelf="center"
           alignItems="stretch"
           justifyContent="center"
           gap="$5"
-          flexDirection={showPanel && panelPosition === 'left' ? 'row-reverse' : 'row'}
         >
-          <YStack flex={1} width="100%" maxWidth={560} alignSelf="center" justifyContent="center" gap="$5">
+          <YStack
+            className={formClassName}
+            flex={1}
+            width="100%"
+            maxWidth={560}
+            alignSelf="center"
+            justifyContent="center"
+            gap="$5"
+          >
             <VStack alignItems="center" gap="$2" paddingHorizontal="$2">
               <Text variant="heading2" align="center" color="$primary">
                 AntAPP
@@ -82,7 +95,7 @@ export function AuthShell({
 
             <Card
               variant="elevated"
-              size={showPanel ? 'lg' : 'md'}
+              size="md"
               width="100%"
               borderRadius="$5"
               backgroundColor="$backgroundStrong"
@@ -91,15 +104,22 @@ export function AuthShell({
             </Card>
 
             {footer ? (
-              <XStack width="100%" justifyContent="center" paddingHorizontal="$2">
+              <XStack
+                className={footerClassName}
+                width="100%"
+                justifyContent="center"
+                paddingHorizontal="$2"
+              >
                 {footer}
               </XStack>
             ) : null}
           </YStack>
 
-          {showPanel ? (
-            <AuthVisualPanel title={panelTitle} description={panelDescription} />
-          ) : null}
+          <AuthVisualPanel
+            className={panelClassName}
+            title={panelTitle}
+            description={panelDescription}
+          />
         </XStack>
       </YStack>
     </Theme>
@@ -162,14 +182,18 @@ export function AuthFooterLink({
 }
 
 function AuthVisualPanel({
+  className,
   title,
   description,
 }: {
+  className?: string
   title: string
   description: string
 }) {
   return (
     <YStack
+      className={className}
+      display="none"
       flex={1}
       minWidth={0}
       minHeight={760}

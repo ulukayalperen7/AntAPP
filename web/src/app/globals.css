@@ -35,6 +35,33 @@ a {
   text-decoration: none;
 }
 
+.auth-shell__frame {
+  max-width: 560px;
+}
+
+.auth-shell__panel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .auth-shell__frame {
+    max-width: 1180px !important;
+    flex-direction: row !important;
+  }
+
+  .auth-shell__frame.auth-shell__frame--panel-left {
+    flex-direction: row-reverse !important;
+  }
+
+  .auth-shell__form {
+    max-width: 560px !important;
+  }
+
+  .auth-shell__panel {
+    display: flex !important;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
