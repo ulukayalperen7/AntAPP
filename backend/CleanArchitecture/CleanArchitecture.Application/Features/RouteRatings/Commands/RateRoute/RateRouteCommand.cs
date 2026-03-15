@@ -18,13 +18,16 @@ namespace CleanArchitecture.Core.Features.RouteRatings.Commands.RateRoute
     public class RateRouteCommandHandler : IRequestHandler<RateRouteCommand, Guid>
     {
         private readonly IRouteRatingRepositoryAsync _ratingRepository;
+        private readonly IGenericRepositoryAsync<Route> _routeRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
 
         public RateRouteCommandHandler(
             IRouteRatingRepositoryAsync ratingRepository,
+            IGenericRepositoryAsync<Route> routeRepository,
             IAuthenticatedUserService authenticatedUser)
         {
             _ratingRepository = ratingRepository;
+            _routeRepository = routeRepository;
             _authenticatedUser = authenticatedUser;
         }
 
@@ -38,12 +41,18 @@ namespace CleanArchitecture.Core.Features.RouteRatings.Commands.RateRoute
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
 
+            var route = await _routeRepository.GetByIdAsync(request.RouteId);
+            if (route == null)
+                throw new ApiException("Route not found.");
+
             var existing = await _ratingRepository.GetByUserAndRouteAsync(userId, request.RouteId);
 
             if (existing != null)
             {
+                route.RatingSum = route.RatingSum - existing.Stars + request.Stars;
                 existing.Stars = request.Stars;
                 await _ratingRepository.UpdateAsync(existing);
+                await _routeRepository.UpdateAsync(route);
                 return existing.Id;
             }
 
@@ -55,7 +64,11 @@ namespace CleanArchitecture.Core.Features.RouteRatings.Commands.RateRoute
                 CreatedAt = DateTime.UtcNow
             };
 
+            route.RatingSum += request.Stars;
+            route.RatingCount++;
+
             await _ratingRepository.AddAsync(rating);
+            await _routeRepository.UpdateAsync(route);
             return rating.Id;
         }
     }

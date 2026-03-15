@@ -1,4 +1,6 @@
-using CleanArchitecture.Core.Interfaces.Repositories;
+using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Exceptions;
+using CleanArchitecture.Core.Interfaces;
 using MediatR;
 using System;
 using System.Threading;
@@ -15,25 +17,29 @@ namespace CleanArchitecture.Core.Features.RouteRatings.Queries.GetRouteAverageRa
     {
         public Guid RouteId { get; set; }
         public double? AverageStars { get; set; }
+        public long RatingCount { get; set; }
     }
 
     public class GetRouteAverageRatingQueryHandler : IRequestHandler<GetRouteAverageRatingQuery, GetRouteAverageRatingViewModel>
     {
-        private readonly IRouteRatingRepositoryAsync _ratingRepository;
+        private readonly IGenericRepositoryAsync<Route> _routeRepository;
 
-        public GetRouteAverageRatingQueryHandler(IRouteRatingRepositoryAsync ratingRepository)
+        public GetRouteAverageRatingQueryHandler(IGenericRepositoryAsync<Route> routeRepository)
         {
-            _ratingRepository = ratingRepository;
+            _routeRepository = routeRepository;
         }
 
         public async Task<GetRouteAverageRatingViewModel> Handle(GetRouteAverageRatingQuery request, CancellationToken cancellationToken)
         {
-            var average = await _ratingRepository.GetAverageStarsAsync(request.RouteId);
+            var route = await _routeRepository.GetByIdAsync(request.RouteId);
+            if (route == null)
+                throw new ApiException("Route not found.");
 
             return new GetRouteAverageRatingViewModel
             {
-                RouteId = request.RouteId,
-                AverageStars = average
+                RouteId = route.Id,
+                AverageStars = route.RatingCount > 0 ? (double)route.RatingSum / route.RatingCount : null,
+                RatingCount = route.RatingCount
             };
         }
     }
