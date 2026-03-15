@@ -11,7 +11,8 @@ namespace CleanArchitecture.Core.Entities
         public Point Location { get; set; }
         public bool IsActive { get; set; }
 
-        // Navigation property
+        // Navigation properties
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }
+        public virtual ICollection<SpotRating> SpotRatings { get; set; }
     }
 }
