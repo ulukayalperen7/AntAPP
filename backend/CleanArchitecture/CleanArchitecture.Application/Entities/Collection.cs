@@ -8,8 +8,10 @@ namespace CleanArchitecture.Core.Entities
         public Guid UserId { get; set; }
 
         public string Name { get; set; }
-        public bool IsDefault { get; set; }
-
+        public bool IsDefault { get; set; } // if true, the collection is the default collection for the user (Saved Routes)
+        public bool IsPublic { get; set; } // if true, the collection is public and can be viewed by anyone
+        public string Description { get; set; }
+        public string ThumbnailUrl { get; set; }
         // Navigation properties
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
     }
