@@ -95,7 +95,10 @@ namespace CleanArchitecture.Infrastructure.Repositories
 
         public async Task RemoveCollectionRouteAsync(CollectionRoute collectionRoute)
         {
-            _context.CollectionRoutes.Remove(collectionRoute);
+            var tracked = _context.CollectionRoutes.Local
+                .FirstOrDefault(cr => cr.CollectionId == collectionRoute.CollectionId && cr.RouteId == collectionRoute.RouteId);
+
+            _context.CollectionRoutes.Remove(tracked ?? collectionRoute);
             await _context.SaveChangesAsync();
         }
     }

@@ -36,7 +36,13 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastModified")
@@ -46,6 +52,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ThumbnailUrl")
                         .HasColumnType("text");
 
                     b.Property<Guid>("UserId")
@@ -77,31 +86,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("CollectionRoutes");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Rating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("RouteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<short>("Stars")
-                        .HasColumnType("smallint");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RouteId");
-
-                    b.ToTable("Ratings");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
                 {
                     b.Property<Guid>("Id")
@@ -110,9 +94,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.Property<Guid>("AuthorUserId")
                         .HasColumnType("uuid");
-
-                    b.Property<decimal>("AverageRating")
-                        .HasColumnType("decimal(18,6)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -138,8 +119,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<Guid?>("OriginalRouteId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("RatingCount")
-                        .HasColumnType("integer");
+                    b.Property<long>("RatingCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RatingSum")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("RouteType")
                         .HasColumnType("integer");
@@ -153,6 +137,31 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Routes");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<short>("Stars")
+                        .HasColumnType("smallint");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteId");
+
+                    b.ToTable("RouteRatings");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteSpot", b =>
@@ -236,9 +245,40 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
+                    b.Property<long>("RatingCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RatingSum")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
 
                     b.ToTable("Spots");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.SpotRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SpotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<short>("Stars")
+                        .HasColumnType("smallint");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpotId");
+
+                    b.ToTable("SpotRatings");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
@@ -491,7 +531,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Rating", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteRating", b =>
                 {
                     b.HasOne("CleanArchitecture.Core.Entities.Route", "Route")
                         .WithMany("Ratings")
@@ -538,6 +578,17 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Route");
 
                     b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.SpotRating", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.Spot", "Spot")
+                        .WithMany("SpotRatings")
+                        .HasForeignKey("SpotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Spot");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
@@ -655,6 +706,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Spot", b =>
                 {
                     b.Navigation("RouteSpots");
+
+                    b.Navigation("SpotRatings");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
