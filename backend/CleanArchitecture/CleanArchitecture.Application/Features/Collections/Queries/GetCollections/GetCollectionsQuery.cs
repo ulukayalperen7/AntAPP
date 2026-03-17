@@ -51,7 +51,7 @@ namespace CleanArchitecture.Core.Features.Collections.Queries.GetCollections
                 Description = c.Description,
                 ThumbnailUrl = c.ThumbnailUrl,
                 RouteCount = c.CollectionRoutes?.Count ?? 0,
-                Created = c.Created
+                Created = c.CreatedAt
             }).ToList();
 
             return new PagedResponse<CollectionViewModel>(viewModels, request.PageNumber, request.PageSize);
