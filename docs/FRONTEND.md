@@ -76,20 +76,31 @@ Token'lar `createTokens()` ile tanımlanır ve `$` prefix'iyle komponentlerde ku
 
 ### Renk Paleti
 
+### Kanonik Marka Paleti
+
+- **Primary:** `#005696` — ana marka / güven / derin Akdeniz mavisi
+- **Secondary:** `#FF8C00` — sıcak vurgu / güneş turuncusu
+- **Tertiary:** `#00CEC9` — ferahlık / hareket / kıyı turkuazı
+- **Neutral:** `#F8F9FA` — ana yüzey / arkaplan
+
+### Mevcut Token Grupları
+
 | Grup | Tonlar | Açıklama |
 |---|---|---|
-| `ant` | 50–950 | Brand rengi — turuncu/kahverengi |
-| `gray` | 50–950 | Nötr gri |
+| `ant` | 50–950 | Legacy sıcak accent ailesi — turuncu/güneş vurgu yüzeyleri |
+| `gray` | 50–950 | Nötr gri / yüzey geçişleri |
 | `success` | 50–500 | Yeşil |
-| `warning` | 50–500 | Sarı-turuncu |
+| `warning` | 50–500 | Sıcak uyarı / amber |
 | `error` | 50–500 | Kırmızı |
-| `info` | 50–500 | Mavi |
+| `info` | 50–500 | Mavi ailesi — primary yönüne en yakın mevcut token grubu |
 | `white`, `black`, `transparent` | — | Sabit değerler |
+
+> Not: Kod tabanında bazı token isimleri legacy olarak korunuyor (`ant`, `info` vb.). Yeni auth / editorial yüzeylerde ve yeni görsel çalışmalarda hedef palet her zaman **Primary `#005696` / Secondary `#FF8C00` / Tertiary `#00CEC9` / Neutral `#F8F9FA`** olmalı.
 
 Kullanım:
 ```tsx
 // Direkt token referansı (tema dışı renk)
-<YStack backgroundColor="$ant500" />
+<YStack backgroundColor="$info500" />
 <Text color="$error500" />
 ```
 
@@ -152,6 +163,8 @@ dark   →  dark_surface
 ```
 
 Tamagui'nin `{base}_{sub}` convention'ı kullanılır. `<Theme name="user">` uygulandığında, mevcut root tema `light` ise `light_user`, `dark` ise `dark_user` otomatik seçilir.
+
+> Tasarım yönü notu: Yeni görsel işlerde semantic tema kullanımı korunurken renk karakteri **Primary `#005696` / Secondary `#FF8C00` / Tertiary `#00CEC9` / Neutral `#F8F9FA`** etrafında kurulmalı.
 
 ### Semantic Tema Keys
 
@@ -607,16 +620,16 @@ Token eklemek/değiştirmek `themes.ts`'i **etkilemez** (temalar kendi hex değe
 
 const lightSupport: BaseTheme = {
   ...light,
-  primary: '#0891B2',     // cyan-600
-  primaryHover: '#0E7490',
-  primaryPress: '#155E75',
+  primary: '#00CEC9',
+  primaryHover: '#00B8B3',
+  primaryPress: '#009B97',
 }
 
 const darkSupport: BaseTheme = {
   ...dark,
-  primary: '#22D3EE',     // cyan-400
-  primaryHover: '#67E8F9',
-  primaryPress: '#A5F3FC',
+  primary: '#00CEC9',
+  primaryHover: '#5FE7E3',
+  primaryPress: '#A8F5F3',
 }
 
 export const themes = {
@@ -782,7 +795,7 @@ const color = theme.primary?.get() ?? '#EA580C'
 
 ```tsx
 // Hardcoded renk — asla
-<YStack backgroundColor="#EA580C" />
+<YStack backgroundColor="#005696" />
 <Text color="#111827" />
 
 // react-native primitive'leri — asla (fonts.native.ts hariç)

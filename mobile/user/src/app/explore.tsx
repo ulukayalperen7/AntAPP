@@ -1,181 +1,101 @@
-import { Image } from 'expo-image';
-import { SymbolView } from 'expo-symbols';
-import React from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState } from 'react'
+import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView } from '@antapp/ui'
+import type { RouteCardData } from '@antapp/ui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { ExternalLink } from '@/components/external-link';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+const CATEGORIES = ['All', 'History', 'Nature', 'Food']
 
-export default function TabTwoScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-  const insets = {
-    ...safeAreaInsets,
-    bottom: safeAreaInsets.bottom + BottomTabInset + Spacing.three,
-  };
-  const theme = useTheme();
+const NEARBY_ROUTES: RouteCardData[] = [
+  {
+    id: '1',
+    title: 'Classic Kaleiçi Tour',
+    distance: '1.2 km',
+    category: 'History',
+    description: 'A walk through the historic old town, featuring Hadrian\'s Gate...',
+  },
+  {
+    id: '2',
+    title: 'Düden Waterfall Trail',
+    distance: '3.5 km',
+    category: 'Nature',
+    rating: 4.7,
+  },
+]
 
-  const contentPlatformStyle = Platform.select({
-    android: {
-      paddingTop: insets.top,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-      paddingBottom: insets.bottom,
-    },
-    web: {
-      paddingTop: Spacing.six,
-      paddingBottom: Spacing.four,
-    },
-  });
+export default function ExploreScreen() {
+  const [activeCategory, setActiveCategory] = useState('All')
+  const insets = useSafeAreaInsets()
 
   return (
-    <ScrollView
-      style={[styles.scrollView, { backgroundColor: theme.background }]}
-      contentInset={insets}
-      contentContainerStyle={[styles.contentContainer, contentPlatformStyle]}>
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="subtitle">Explore</ThemedText>
-          <ThemedText style={styles.centerText} themeColor="textSecondary">
-            This screen has temporary AntAPP demo content.{'\n'}It will be simplified as route features grow.
-          </ThemedText>
+    <YStack flex={1} backgroundColor="$background">
+      {/* Search + Filters */}
+      <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} gap="$3" zIndex={10}>
+        <SearchInput placeholder="Search routes, stops..." size="md" />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <XStack gap="$2">
+            {CATEGORIES.map((cat) => (
+              <FilterChip
+                key={cat}
+                active={activeCategory === cat}
+                onPress={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </FilterChip>
+            ))}
+          </XStack>
+        </ScrollView>
+      </YStack>
 
-          <ExternalLink href="https://docs.expo.dev" asChild>
-            <Pressable style={({ pressed }) => pressed && styles.pressed}>
-              <ThemedView type="backgroundElement" style={styles.linkButton}>
-                <ThemedText type="link">Expo documentation</ThemedText>
-                <SymbolView
-                  tintColor={theme.text}
-                  name={{ ios: 'arrow.up.right.square', android: 'link', web: 'link' }}
-                  size={12}
-                />
-              </ThemedView>
-            </Pressable>
-          </ExternalLink>
-        </ThemedView>
+      {/* Map Placeholder */}
+      <YStack
+        flex={1}
+        backgroundColor="$muted"
+        alignItems="center"
+        justifyContent="center"
+        margin="$3"
+        borderRadius="$4"
+      >
+        <Text fontSize="$12">{'\u{1F5FA}'}</Text>
+        <Text variant="body" muted marginTop="$2">Map View</Text>
+        <Text variant="caption" muted>Explore routes around you</Text>
 
-        <ThemedView style={styles.sectionsWrapper}>
-          <Collapsible title="File-based routing">
-            <ThemedText type="small">
-              This app has two screens: <ThemedText type="code">src/app/index.tsx</ThemedText> and{' '}
-              <ThemedText type="code">src/app/explore.tsx</ThemedText>
-            </ThemedText>
-            <ThemedText type="small">
-              The layout file in <ThemedText type="code">src/app/_layout.tsx</ThemedText> sets up
-              the tab navigator.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/router/introduction">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
+        {/* Map Controls */}
+        <YStack
+          position="absolute"
+          right={12}
+          top={12}
+          gap="$2"
+        >
+          <XStack
+            width={40}
+            height={40}
+            borderRadius="$full"
+            backgroundColor="$backgroundStrong"
+            alignItems="center"
+            justifyContent="center"
+            shadowColor="$shadowColor"
+            shadowOffset={{ width: 0, height: 1 }}
+            shadowOpacity={1}
+            shadowRadius={3}
+            elevation={2}
+          >
+            <Text fontSize="$5">{'\u{1F4CD}'}</Text>
+          </XStack>
+        </YStack>
+      </YStack>
 
-          <Collapsible title="Android, iOS, and web support">
-            <ThemedView type="backgroundElement" style={styles.collapsibleContent}>
-              <ThemedText type="small">
-                You can open this project on Android, iOS, and the web. To open the web version,
-                press <ThemedText type="smallBold">w</ThemedText> in the terminal running this
-                project.
-              </ThemedText>
-              <Image
-                source={require('@/assets/images/tutorial-web.png')}
-                style={styles.imageTutorial}
-              />
-            </ThemedView>
-          </Collapsible>
-
-          <Collapsible title="Images">
-            <ThemedText type="small">
-              For static images, you can use the <ThemedText type="code">@2x</ThemedText> and{' '}
-              <ThemedText type="code">@3x</ThemedText> suffixes to provide files for different
-              screen densities.
-            </ThemedText>
-            <Image source={require('@/assets/images/react-logo.png')} style={styles.imageReact} />
-            <ExternalLink href="https://reactnative.dev/docs/images">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Light and dark mode components">
-            <ThemedText type="small">
-              This template has light and dark mode support. The{' '}
-              <ThemedText type="code">useColorScheme()</ThemedText> hook lets you inspect what the
-              user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-            </ThemedText>
-            <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-              <ThemedText type="linkPrimary">Learn more</ThemedText>
-            </ExternalLink>
-          </Collapsible>
-
-          <Collapsible title="Animations">
-            <ThemedText type="small">
-              This template includes an example of an animated component. The{' '}
-              <ThemedText type="code">src/components/ui/collapsible.tsx</ThemedText> component uses
-              the powerful <ThemedText type="code">react-native-reanimated</ThemedText> library to
-              animate opening this hint.
-            </ThemedText>
-          </Collapsible>
-        </ThemedView>
-        {Platform.OS === 'web' && <WebBadge />}
-      </ThemedView>
-    </ScrollView>
-  );
+      {/* Bottom Route Cards */}
+      <YStack paddingBottom={90}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
+          <XStack gap="$3">
+            {NEARBY_ROUTES.map((route) => (
+              <YStack key={route.id} width={260}>
+                <RouteCard data={route} />
+              </YStack>
+            ))}
+          </XStack>
+        </ScrollView>
+      </YStack>
+    </YStack>
+  )
 }
-
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  container: {
-    maxWidth: MaxContentWidth,
-    flexGrow: 1,
-  },
-  titleContainer: {
-    gap: Spacing.three,
-    alignItems: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.six,
-  },
-  centerText: {
-    textAlign: 'center',
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  linkButton: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.two,
-    borderRadius: Spacing.five,
-    justifyContent: 'center',
-    gap: Spacing.one,
-    alignItems: 'center',
-  },
-  sectionsWrapper: {
-    gap: Spacing.five,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-  },
-  collapsibleContent: {
-    alignItems: 'center',
-  },
-  imageTutorial: {
-    width: '100%',
-    aspectRatio: 296 / 171,
-    borderRadius: Spacing.three,
-    marginTop: Spacing.two,
-  },
-  imageReact: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
-  },
-});

@@ -1,4 +1,6 @@
 import { requireAuth } from '@/features/auth/guard'
+import { getServerSession } from '@/features/auth/session'
+import { UserShellWrapper } from './user-shell-wrapper'
 
 export default async function UserLayout({
   children,
@@ -6,5 +8,11 @@ export default async function UserLayout({
   children: React.ReactNode
 }) {
   await requireAuth('/')
-  return <>{children}</>
+  const session = await getServerSession()
+
+  return (
+    <UserShellWrapper userName={session?.userName}>
+      {children}
+    </UserShellWrapper>
+  )
 }
