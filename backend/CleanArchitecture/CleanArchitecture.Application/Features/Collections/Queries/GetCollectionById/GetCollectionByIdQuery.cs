@@ -42,7 +42,7 @@ namespace CleanArchitecture.Core.Features.Collections.Queries.GetCollectionById
                 IsPublic = collection.IsPublic,
                 Description = collection.Description,
                 ThumbnailUrl = collection.ThumbnailUrl,
-                Created = collection.Created,
+                Created = collection.CreatedAt,
                 Routes = collection.CollectionRoutes?.Select(cr => new CollectionRouteItemViewModel
                 {
                     RouteId = cr.RouteId,

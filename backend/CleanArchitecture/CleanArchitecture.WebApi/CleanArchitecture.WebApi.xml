@@ -4,11 +4,25 @@
         <name>CleanArchitecture.WebApi</name>
     </assembly>
     <members>
+        <member name="T:CleanArchitecture.WebApi.Controllers.v1.AdminCollectionController">
+            <summary>
+            Admin-only collection endpoints. No ownership checks are enforced —
+            admins can view, edit, and delete any user's collections.
+            SECURITY: Every action requires the "Admin" role.
+            </summary>
+        </member>
         <member name="T:CleanArchitecture.WebApi.Controllers.v1.TagController">
             <summary>
             This controller handles all requests related to Tags (labels like Nature, Food, Historical).
             Tags are flexible labels that can be attached to Routes.
             A Route can have multiple Tags (many-to-many relationship).
+            </summary>
+        </member>
+        <member name="T:CleanArchitecture.WebApi.Controllers.v1.UserCollectionController">
+            <summary>
+            User-facing collection endpoints. All actions are scoped to the authenticated user.
+            The user ID is always extracted from the JWT "uid" claim — never passed as a parameter.
+            Also exposes /api/me/saved-routes as a mobile-friendly shortcut for the default "Saved Routes" collection.
             </summary>
         </member>
     </members>

@@ -24,7 +24,7 @@ namespace CleanArchitecture.Infrastructure.Repositories
             return await _context.Collections
                 .Where(c => c.UserId == userId)
                 .Include(c => c.CollectionRoutes)
-                .OrderByDescending(c => c.Created)
+                .OrderByDescending(c => c.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()
@@ -35,7 +35,7 @@ namespace CleanArchitecture.Infrastructure.Repositories
         {
             return await _context.Collections
                 .Include(c => c.CollectionRoutes)
-                .OrderByDescending(c => c.Created)
+                .OrderByDescending(c => c.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .AsNoTracking()
