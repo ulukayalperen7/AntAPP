@@ -1,9 +1,10 @@
 using NetTopologySuite.Geometries;
 using System.Collections.Generic;
+using System;
 
 namespace CleanArchitecture.Core.Entities
 {
-    public class Spot : AuditableBaseEntity
+    public class Spot : BaseEntity
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -13,6 +14,10 @@ namespace CleanArchitecture.Core.Entities
 
         public long RatingSum { get; set; }
         public long RatingCount { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime UpdatedAt { get; set; }
 
         // Navigation properties
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }

@@ -4,7 +4,9 @@ using CleanArchitecture.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,13 +21,10 @@ namespace CleanArchitecture.Infrastructure.Contexts
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         private readonly IDateTimeService _dateTime;
-        private readonly IAuthenticatedUserService _authenticatedUser;
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IDateTimeService dateTime, IAuthenticatedUserService authenticatedUser) : base(options)
         {
             ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             _dateTime = dateTime;
-            _authenticatedUser = authenticatedUser;
         }
 
         // Below are the tables currently in our database:
@@ -42,21 +41,28 @@ namespace CleanArchitecture.Infrastructure.Contexts
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            foreach (var entry in ChangeTracker.Entries<AuditableBaseEntity>())
+            SetTimestamps(ChangeTracker.Entries<Route>());
+            SetTimestamps(ChangeTracker.Entries<Collection>());
+            SetTimestamps(ChangeTracker.Entries<Spot>());
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void SetTimestamps<TEntity>(IEnumerable<EntityEntry<TEntity>> entries) where TEntity : class
+        {
+            foreach (var entry in entries)
             {
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        entry.Entity.Created = _dateTime.NowUtc;
-                        entry.Entity.CreatedBy = _authenticatedUser.UserId;
+                        entry.Property("CreatedAt").CurrentValue = _dateTime.NowUtc;
+                        entry.Property("UpdatedAt").CurrentValue = _dateTime.NowUtc;
                         break;
                     case EntityState.Modified:
-                        entry.Entity.LastModified = _dateTime.NowUtc;
-                        entry.Entity.LastModifiedBy = _authenticatedUser.UserId;
+                        entry.Property("UpdatedAt").CurrentValue = _dateTime.NowUtc;
                         break;
                 }
             }
-            return base.SaveChangesAsync(cancellationToken);
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
