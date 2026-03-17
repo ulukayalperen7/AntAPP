@@ -15,6 +15,7 @@ export type AuthRegisterScreenProps = {
   pending?: boolean
   error?: string | null
   onNavigateToLogin?: () => void
+  mascot?: React.ReactNode
 }
 
 export function AuthRegisterScreen({
@@ -30,6 +31,7 @@ export function AuthRegisterScreen({
   pending = false,
   error,
   onNavigateToLogin,
+  mascot,
 }: AuthRegisterScreenProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -41,6 +43,7 @@ export function AuthRegisterScreen({
       panelTitle="Discover Antalya"
       panelDescription="Create your account, collect your favorite spots, and start building routes with a calmer rhythm."
       panelPosition="left"
+      mascot={mascot}
       footer={
         onNavigateToLogin ? (
           <AuthFooterLink

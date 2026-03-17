@@ -50,3 +50,27 @@ export type { AntSelectProps } from './components/form/select'
 
 export { Switch } from './components/form/switch'
 export type { SwitchProps } from './components/form/switch'
+
+export { Avatar } from './components/avatar'
+export type { AvatarProps } from './components/avatar'
+
+export { IconButton } from './components/icon-button'
+export type { IconButtonProps } from './components/icon-button'
+
+export { SearchInput } from './components/search-input'
+export type { SearchInputProps } from './components/search-input'
+
+export { FilterChip } from './components/filter-chip'
+export type { FilterChipProps } from './components/filter-chip'
+
+export { RatingDisplay } from './components/rating-display'
+export type { RatingDisplayProps } from './components/rating-display'
+
+export { ProgressBar } from './components/progress-bar'
+export type { ProgressBarProps } from './components/progress-bar'
+
+export { StatBox } from './components/stat-box'
+export type { StatBoxProps } from './components/stat-box'
+
+export { RouteCard } from './components/route-card'
+export type { RouteCardProps, RouteCardData } from './components/route-card'

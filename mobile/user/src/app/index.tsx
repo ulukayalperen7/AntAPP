@@ -1,47 +1,129 @@
-import React from 'react'
-import { YStack } from 'tamagui'
-import { Button, Card, Text, VStack, Divider, Badge } from '@antapp/ui'
-import { useAuth } from '../features/auth/context'
+import React, { useState } from 'react'
+import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
+import type { RouteCardData } from '@antapp/ui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+
+const CATEGORIES = ['All', 'Nature', 'History', 'Food', 'Entertainment']
+
+const POPULAR_ROUTES: RouteCardData[] = [
+  {
+    id: '1',
+    title: 'Classic Kaleiçi Tour',
+    description: 'Discover the historic narrow streets, Hadrian\'s Gate, and the ancient harbor of Antalya\'s old town.',
+    rating: 4.9,
+    distance: '3.5 km',
+    duration: '2h 30m',
+    category: 'History',
+    stopsCount: 12,
+    isOfficial: true,
+  },
+  {
+    id: '2',
+    title: 'Düden Waterfall Trail',
+    rating: 4.7,
+    distance: '5.8 km',
+    duration: '4h 15m',
+    category: 'Nature',
+    difficulty: 'moderate',
+    stopsCount: 8,
+  },
+  {
+    id: '3',
+    title: 'Old Town Foodie Trail',
+    rating: 4.5,
+    distance: '2.5 km',
+    duration: '2h',
+    category: 'Food',
+    difficulty: 'easy',
+    stopsCount: 10,
+  },
+]
 
 export default function HomeScreen() {
-  const { user, logout } = useAuth()
+  const [activeCategory, setActiveCategory] = useState('All')
+  const insets = useSafeAreaInsets()
 
   return (
-    <YStack flex={1} backgroundColor="$background" paddingHorizontal="$4" paddingTop="$8">
-      <VStack gap="$4">
-        <VStack gap="$1">
-          <Text variant="heading2">Hoş geldin 👋</Text>
-          <Text variant="body" muted>
-            {user?.userName}
-          </Text>
-        </VStack>
+    <YStack flex={1} backgroundColor="$background">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$4">
+          {/* Top Bar */}
+          <XStack justifyContent="space-between" alignItems="center">
+            <XStack alignItems="center" gap="$2">
+              <XStack
+                width={32}
+                height={32}
+                borderRadius="$full"
+                backgroundColor="$primary"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text fontSize="$3" color="#FFFFFF">{'\u{1F41C}'}</Text>
+              </XStack>
+              <Text variant="heading4">AntAPP</Text>
+            </XStack>
+            <XStack gap="$2" alignItems="center">
+              <IconButton variant="ghost" size="sm">
+                <Text fontSize="$5">{'\u{1F514}'}</Text>
+              </IconButton>
+              <Avatar size="sm" initials="U" />
+            </XStack>
+          </XStack>
 
-        <Card variant="elevated">
-          <Card.Content>
-            <VStack gap="$3">
-              <VStack gap="$1">
-                <Text variant="label" muted>Email</Text>
-                <Text variant="body">{user?.email}</Text>
-              </VStack>
+          {/* Search */}
+          <SearchInput placeholder="Where do you want to go?" size="md" />
 
-              <Divider />
+          {/* Category Filters */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <XStack gap="$2">
+              {CATEGORIES.map((cat) => (
+                <FilterChip
+                  key={cat}
+                  active={activeCategory === cat}
+                  onPress={() => setActiveCategory(cat)}
+                >
+                  {cat}
+                </FilterChip>
+              ))}
+            </XStack>
+          </ScrollView>
 
-              <VStack gap="$1">
-                <Text variant="label" muted>Roller</Text>
-                <YStack flexDirection="row" flexWrap="wrap" gap="$2">
-                  {user?.roles.map((role) => (
-                    <Badge key={role} variant="info">{role}</Badge>
-                  ))}
-                </YStack>
-              </VStack>
-            </VStack>
-          </Card.Content>
-        </Card>
+          {/* Popular Routes */}
+          <YStack gap="$3">
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="heading3">Popular Routes</Text>
+              <Text variant="body" color="$primary">See all</Text>
+            </XStack>
 
-        <Button variant="outline" onPress={logout}>
-          Çıkış yap
-        </Button>
-      </VStack>
+            <YStack gap="$4">
+              {POPULAR_ROUTES.map((route) => (
+                <RouteCard key={route.id} data={route} />
+              ))}
+            </YStack>
+          </YStack>
+        </YStack>
+      </ScrollView>
+
+      {/* Floating Map View Button */}
+      <XStack
+        position="absolute"
+        bottom={100}
+        alignSelf="center"
+        backgroundColor="$ant900"
+        paddingHorizontal="$4"
+        paddingVertical="$2.5"
+        borderRadius="$full"
+        alignItems="center"
+        gap="$2"
+        shadowColor="$shadowColor"
+        shadowOffset={{ width: 0, height: 2 }}
+        shadowOpacity={1}
+        shadowRadius={8}
+        elevation={4}
+      >
+        <Text fontSize="$4" color="#FFFFFF">{'\u{1F5FA}'}</Text>
+        <Text variant="label" color="#FFFFFF">Map View</Text>
+      </XStack>
     </YStack>
   )
 }
