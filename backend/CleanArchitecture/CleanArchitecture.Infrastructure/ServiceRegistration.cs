@@ -105,6 +105,7 @@ namespace CleanArchitecture.Infrastructure
             services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
 
             services.AddTransient<ITagRepositoryAsync, TagRepositoryAsync>();
+            services.AddTransient<ICollectionRepositoryAsync, CollectionRepositoryAsync>();
             services.AddTransient<IRouteRatingRepositoryAsync, RouteRatingRepositoryAsync>();
             services.AddTransient<ISpotRatingRepositoryAsync, SpotRatingRepositoryAsync>();
             #endregion
