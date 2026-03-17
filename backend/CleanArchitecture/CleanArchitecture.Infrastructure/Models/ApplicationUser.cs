@@ -1,15 +1,14 @@
-﻿using CleanArchitecture.Core.DTOs.Account;
-using CleanArchitecture.Core.Enums;
+using CleanArchitecture.Core.DTOs.Account;
+using CleanArchitecture.Core.Entities;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 
 namespace CleanArchitecture.Infrastructure.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
-        public string ProfilePhotoUrl { get; set; }
-        public UserTypeEnum UserType { get; set; }
-
+        public virtual User User { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
 
         public bool OwnsToken(string token)

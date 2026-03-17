@@ -4,6 +4,7 @@ using CleanArchitecture.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace CleanArchitecture.Infrastructure.Contexts
     /// It maps our C# classes (Entities) to the actual tables in PostgreSQL (Supabase).
     /// If you add a new table to the database, you must register it here.
     /// </summary>
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         private readonly IDateTimeService _dateTime;
         private readonly IAuthenticatedUserService _authenticatedUser;
@@ -37,6 +38,7 @@ namespace CleanArchitecture.Infrastructure.Contexts
         public DbSet<CollectionRoute> CollectionRoutes { get; set; }
         public DbSet<RouteRating> RouteRatings { get; set; }
         public DbSet<SpotRating> SpotRatings { get; set; }
+        public DbSet<User> DomainUsers { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
@@ -63,6 +65,17 @@ namespace CleanArchitecture.Infrastructure.Contexts
             {
                 entity.ToTable(name: "User");
                 entity.OwnsMany(u => u.RefreshTokens);
+                entity.HasOne(u => u.User)
+                    .WithOne()
+                    .HasForeignKey<User>(u => u.Id)
+                    .HasPrincipalKey<ApplicationUser>(u => u.Id)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasIndex(u => u.UserName).IsUnique();
             });
 
             // Many-to-many: Route <-> Tag (via RouteTag bridge table)
@@ -75,32 +88,56 @@ namespace CleanArchitecture.Infrastructure.Contexts
             builder.Entity<CollectionRoute>()
                 .HasKey(cr => new { cr.CollectionId, cr.RouteId });
 
-            builder.Entity<IdentityRole>(entity =>
+            builder.Entity<Route>()
+                .HasOne(r => r.AuthorUser)
+                .WithMany(u => u.AuthoredRoutes)
+                .HasForeignKey(r => r.AuthorUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Collection>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Collections)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RouteRating>()
+                .HasOne(rr => rr.User)
+                .WithMany(u => u.RouteRatings)
+                .HasForeignKey(rr => rr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SpotRating>()
+                .HasOne(sr => sr.User)
+                .WithMany(u => u.SpotRatings)
+                .HasForeignKey(sr => sr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<IdentityRole<Guid>>(entity =>
             {
                 entity.ToTable(name: "Role");
             });
-            builder.Entity<IdentityUserRole<string>>(entity =>
+            builder.Entity<IdentityUserRole<Guid>>(entity =>
             {
                 entity.ToTable("UserRoles");
             });
 
-            builder.Entity<IdentityUserClaim<string>>(entity =>
+            builder.Entity<IdentityUserClaim<Guid>>(entity =>
             {
                 entity.ToTable("UserClaims");
             });
 
-            builder.Entity<IdentityUserLogin<string>>(entity =>
+            builder.Entity<IdentityUserLogin<Guid>>(entity =>
             {
                 entity.ToTable("UserLogins");
             });
 
-            builder.Entity<IdentityRoleClaim<string>>(entity =>
+            builder.Entity<IdentityRoleClaim<Guid>>(entity =>
             {
                 entity.ToTable("RoleClaims");
 
             });
 
-            builder.Entity<IdentityUserToken<string>>(entity =>
+            builder.Entity<IdentityUserToken<Guid>>(entity =>
             {
                 entity.ToTable("UserTokens");
             });

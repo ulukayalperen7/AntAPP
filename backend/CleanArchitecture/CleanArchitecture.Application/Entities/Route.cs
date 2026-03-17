@@ -12,6 +12,7 @@ namespace CleanArchitecture.Core.Entities
     public class Route : AuditableBaseEntity
     {
         public Guid AuthorUserId { get; set; }
+        public virtual User AuthorUser { get; set; }
 
         public Guid? OriginalRouteId { get; set; }
 

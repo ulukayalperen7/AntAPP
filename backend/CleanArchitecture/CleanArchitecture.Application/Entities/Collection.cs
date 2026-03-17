@@ -6,6 +6,7 @@ namespace CleanArchitecture.Core.Entities
     public class Collection : AuditableBaseEntity
     {
         public Guid UserId { get; set; }
+        public virtual User User { get; set; }
 
         public string Name { get; set; }
         public bool IsDefault { get; set; }
