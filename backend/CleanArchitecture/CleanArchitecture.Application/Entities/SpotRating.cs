@@ -5,6 +5,7 @@ namespace CleanArchitecture.Core.Entities
     public class SpotRating : BaseEntity
     {
         public Guid UserId { get; set; }
+        public virtual User User { get; set; }
 
         public Guid SpotId { get; set; }
         public virtual Spot Spot { get; set; }

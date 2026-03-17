@@ -5,6 +5,7 @@ namespace CleanArchitecture.Core.Entities
     public class RouteRating : BaseEntity
     {
         public Guid UserId { get; set; }
+        public virtual User User { get; set; }
 
         public Guid RouteId { get; set; }
         public virtual Route Route { get; set; }

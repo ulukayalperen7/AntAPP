@@ -8,7 +8,7 @@ namespace CleanArchitecture.Core.Entities
     /// Unlike a category (one-to-one), multiple tags can be assigned to a single route.
     /// Examples: "Nature", "Historical", "Free", "Family-Friendly", "Food"
     /// </summary>
-    public class Tag : AuditableBaseEntity
+    public class Tag : BaseEntity
     {
         // The name of the tag (e.g., "Sunset Spots")
         public string Name { get; set; }

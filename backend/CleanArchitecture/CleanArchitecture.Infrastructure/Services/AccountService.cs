@@ -1,10 +1,12 @@
-﻿using CleanArchitecture.Core.DTOs.Account;
+using CleanArchitecture.Core.DTOs.Account;
 using CleanArchitecture.Core.DTOs.Email;
+using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Exceptions;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Core.Settings;
 using CleanArchitecture.Core.Wrappers;
+using CleanArchitecture.Infrastructure.Contexts;
 using CleanArchitecture.Infrastructure.Helpers;
 using CleanArchitecture.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
@@ -26,17 +28,19 @@ namespace CleanArchitecture.Infrastructure.Services
     public class AccountService : IAccountService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailService _emailService;
         private readonly JWTSettings _jwtSettings;
         private readonly IDateTimeService _dateTimeService;
+        private readonly ApplicationDbContext _dbContext;
         public AccountService(UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager,
+            RoleManager<IdentityRole<Guid>> roleManager,
             IOptions<JWTSettings> jwtSettings,
             IDateTimeService dateTimeService,
             SignInManager<ApplicationUser> signInManager,
-            IEmailService emailService)
+            IEmailService emailService,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -44,6 +48,7 @@ namespace CleanArchitecture.Infrastructure.Services
             _dateTimeService = dateTimeService;
             _signInManager = signInManager;
             this._emailService = emailService;
+            _dbContext = dbContext;
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request, string ipAddress)
@@ -64,7 +69,7 @@ namespace CleanArchitecture.Infrastructure.Services
             }
             JwtSecurityToken jwtSecurityToken = await GenerateJWToken(user);
             AuthenticationResponse response = new AuthenticationResponse();
-            response.Id = user.Id;
+            response.Id = user.Id.ToString();
             response.JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             response.Email = user.Email;
             response.UserName = user.UserName;
@@ -106,7 +111,7 @@ namespace CleanArchitecture.Infrastructure.Services
             var rolesList = await _userManager.GetRolesAsync(user);
             return new AuthenticationResponse
             {
-                Id = user.Id,
+                Id = user.Id.ToString(),
                 JWToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
                 Email = user.Email,
                 UserName = user.UserName,
@@ -123,18 +128,39 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 throw new ApiException($"Username '{request.UserName}' is already taken.");
             }
+
+            var userId = Guid.NewGuid();
             var user = new ApplicationUser
             {
+                Id = userId,
                 Email = request.Email,
+                UserName = request.UserName
+            };
+
+            var domainUser = new User
+            {
+                Id = userId,
                 UserName = request.UserName,
                 UserType = request.UserType
             };
+
             var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);
             if (userWithSameEmail == null)
             {
                 var result = await _userManager.CreateAsync(user, request.Password);
                 if (result.Succeeded)
                 {
+                    try
+                    {
+                        _dbContext.DomainUsers.Add(domainUser);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    catch
+                    {
+                        await _userManager.DeleteAsync(user);
+                        throw;
+                    }
+
                     await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
                     var verificationUri = await SendVerificationEmail(user, origin);
                     return $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
@@ -169,7 +195,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.Id),
+                new Claim("uid", user.Id.ToString()),
                 new Claim("ip", ipAddress)
             }
             .Union(userClaims)
@@ -201,7 +227,7 @@ namespace CleanArchitecture.Infrastructure.Services
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var route = "api/auth/confirm-email/";
             var endpointUri = new Uri(string.Concat($"{origin}/", route));
-            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id);
+            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id.ToString());
             verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
             return verificationUri;
         }
