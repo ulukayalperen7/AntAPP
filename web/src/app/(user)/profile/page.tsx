@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { YStack, XStack, Text, Button, Avatar, StatBox, Badge, RouteCard, FilterChip } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
+import { Award, Mountain, Sparkles, Star, Share2, Plus } from 'lucide-react'
 
 const PROFILE = {
   name: 'Alex Walker',
@@ -14,9 +15,9 @@ const PROFILE = {
 }
 
 const ACHIEVEMENTS = [
-  { icon: '\u{1F3C6}', name: 'Top Explorer', detail: 'Unlocked Dec 2023' },
-  { icon: '\u{26F0}', name: 'Mountain King', detail: 'Reached 5,000m total' },
-  { icon: '\u{2728}', name: 'Trail Blazer', detail: 'First to finish 5 routes' },
+  { Icon: Award, name: 'Top Explorer', detail: 'Unlocked Dec 2023', color: '#F59E0B' },
+  { Icon: Mountain, name: 'Mountain King', detail: 'Reached 5,000m total', color: '#6366F1' },
+  { Icon: Sparkles, name: 'Trail Blazer', detail: 'First to finish 5 routes', color: '#10B981' },
 ]
 
 const CREATED_ROUTES: RouteCardData[] = [
@@ -76,13 +77,15 @@ export default function ProfilePage() {
         <YStack flex={1} gap="$1">
           <Text variant="heading2">{PROFILE.name}</Text>
           <XStack alignItems="center" gap="$1.5">
-            <Text fontSize="$5" color="$primary">{'\u{2B50}'}</Text>
+            <Star size={18} color="var(--color-primary)" fill="var(--color-primary)" />
             <Text variant="body" color="$primary">{PROFILE.title}</Text>
           </XStack>
         </YStack>
         <XStack gap="$2">
           <Button variant="solid" size="md">Follow</Button>
-          <Button variant="outline" size="md">{'\u{1F517}'}</Button>
+          <Button variant="outline" size="md">
+            <Share2 size={18} color="currentColor" />
+          </Button>
         </XStack>
       </XStack>
 
@@ -144,7 +147,7 @@ export default function ProfilePage() {
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <Text fontSize="$6">{a.icon}</Text>
+                    <a.Icon size={22} color={a.color} />
                   </XStack>
                   <YStack>
                     <Text variant="label">{a.name}</Text>
@@ -199,7 +202,7 @@ export default function ProfilePage() {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Text fontSize="$8" color="$mutedForeground">+</Text>
+                <Plus size={24} color="var(--color-mutedForeground)" />
               </XStack>
               <Text variant="label">Create Route</Text>
               <Text variant="caption" muted>Share your latest adventure</Text>

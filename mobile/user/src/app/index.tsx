@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Feather } from '@expo/vector-icons'
 
 const CATEGORIES = ['All', 'Nature', 'History', 'Food', 'Entertainment']
 
@@ -58,13 +59,13 @@ export default function HomeScreen() {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Text fontSize="$3" color="#FFFFFF">{'\u{1F41C}'}</Text>
+                <Text fontSize="$2" fontWeight="700" color="#FFFFFF">A</Text>
               </XStack>
               <Text variant="heading4">AntAPP</Text>
             </XStack>
             <XStack gap="$2" alignItems="center">
               <IconButton variant="ghost" size="sm">
-                <Text fontSize="$5">{'\u{1F514}'}</Text>
+                <Feather name="bell" size={22} color="currentColor" />
               </IconButton>
               <Avatar size="sm" initials="U" />
             </XStack>
@@ -121,7 +122,7 @@ export default function HomeScreen() {
         shadowRadius={8}
         elevation={4}
       >
-        <Text fontSize="$4" color="#FFFFFF">{'\u{1F5FA}'}</Text>
+        <Feather name="map" size={18} color="#FFFFFF" />
         <Text variant="label" color="#FFFFFF">Map View</Text>
       </XStack>
     </YStack>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { YStack, XStack, Text, FilterChip, RouteCard, SearchInput, RatingDisplay, Divider } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
+import { Map, Search, Bookmark, MapPin } from 'lucide-react'
 
 const CATEGORIES = ['Nature', 'History', 'Food', 'Entertainment']
 const DIFFICULTIES = ['Easy', 'Mid', 'Hard']
@@ -64,7 +65,6 @@ export default function SearchPage() {
           <Text variant="caption" color="$primary" cursor="pointer" fontWeight="600">RESET ALL</Text>
         </XStack>
 
-        {/* Category */}
         <YStack gap="$2">
           <Text variant="label" color="$mutedForeground">Category</Text>
           <YStack gap="$1">
@@ -91,7 +91,6 @@ export default function SearchPage() {
 
         <Divider />
 
-        {/* Difficulty */}
         <YStack gap="$2">
           <Text variant="label" color="$mutedForeground">Difficulty Level</Text>
           <XStack gap="$2" flexWrap="wrap">
@@ -109,7 +108,6 @@ export default function SearchPage() {
 
         <Divider />
 
-        {/* Distance */}
         <YStack gap="$2">
           <XStack justifyContent="space-between">
             <Text variant="label" color="$mutedForeground">Distance</Text>
@@ -122,7 +120,6 @@ export default function SearchPage() {
 
         <Divider />
 
-        {/* Duration */}
         <YStack gap="$2">
           <XStack justifyContent="space-between">
             <Text variant="label" color="$mutedForeground">Duration</Text>
@@ -135,7 +132,6 @@ export default function SearchPage() {
 
         <Divider />
 
-        {/* Rating */}
         <YStack gap="$2">
           <Text variant="label" color="$mutedForeground">Minimum Rating</Text>
           <RatingDisplay value={4} />
@@ -144,7 +140,6 @@ export default function SearchPage() {
 
         <Divider />
 
-        {/* Route Type */}
         <YStack gap="$2">
           <Text variant="label" color="$mutedForeground">Route Type</Text>
           <YStack gap="$1.5">
@@ -226,8 +221,9 @@ export default function SearchPage() {
           borderColor="$borderColor"
           position="sticky"
           top={80}
+          gap="$2"
         >
-          <Text fontSize="$10" marginBottom="$2">{'\u{1F5FA}'}</Text>
+          <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
           <Text variant="body" muted>Map View</Text>
         </YStack>
       </YStack>

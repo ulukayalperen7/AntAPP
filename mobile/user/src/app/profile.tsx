@@ -3,11 +3,12 @@ import { YStack, XStack, Text, Avatar, StatBox, Button, RouteCard, FilterChip, B
 import type { RouteCardData } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useAuth } from '@/features/auth/context'
+import { Feather } from '@expo/vector-icons'
 
 const ACHIEVEMENTS = [
-  { icon: '\u{1F3C6}', name: 'Top Explorer', detail: 'Unlocked Dec 2023' },
-  { icon: '\u{26F0}', name: 'Mountain King', detail: 'Reached 5,000m total' },
-  { icon: '\u{2728}', name: 'Trail Blazer', detail: 'First to finish 5 routes' },
+  { icon: 'award' as const, name: 'Top Explorer', detail: 'Unlocked Dec 2023', color: '#F59E0B' },
+  { icon: 'trending-up' as const, name: 'Mountain King', detail: 'Reached 5,000m total', color: '#6366F1' },
+  { icon: 'zap' as const, name: 'Trail Blazer', detail: 'First to finish 5 routes', color: '#10B981' },
 ]
 
 const MY_ROUTES: RouteCardData[] = [
@@ -45,13 +46,15 @@ export default function ProfileScreen() {
             <YStack alignItems="center" gap="$1">
               <Text variant="heading2">{user?.userName ?? 'User'}</Text>
               <XStack alignItems="center" gap="$1.5">
-                <Text color="$primary">{'\u{2B50}'}</Text>
+                <Feather name="star" size={16} color="var(--color-primary, #005696)" />
                 <Text variant="body" color="$primary">Adventurer</Text>
               </XStack>
             </YStack>
             <XStack gap="$2">
               <Button variant="solid" size="sm">Follow</Button>
-              <Button variant="outline" size="sm">{'\u{1F517}'}</Button>
+              <Button variant="outline" size="sm">
+                <Feather name="share-2" size={18} color="currentColor" />
+              </Button>
             </XStack>
           </YStack>
 
@@ -79,7 +82,7 @@ export default function ProfileScreen() {
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <Text fontSize="$5">{a.icon}</Text>
+                    <Feather name={a.icon} size={20} color={a.color} />
                   </XStack>
                   <YStack flex={1}>
                     <Text variant="label" fontSize="$4">{a.name}</Text>
@@ -106,7 +109,6 @@ export default function ProfileScreen() {
             </YStack>
           </YStack>
 
-          {/* Logout */}
           <Button variant="outline" onPress={logout}>
             Logout
           </Button>

@@ -3,12 +3,13 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
+import { Globe, Route, Users, Bookmark, Settings } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { label: 'Explore', href: '/', icon: '\u{1F30D}' },
-  { label: 'My Routes', href: '/profile', icon: '\u{1F6A9}' },
-  { label: 'Community', href: '/community', icon: '\u{1F465}' },
-  { label: 'Saved', href: '/saved', icon: '\u{1F516}' },
+  { label: 'Explore', href: '/', Icon: Globe },
+  { label: 'My Routes', href: '/profile', Icon: Route },
+  { label: 'Community', href: '/community', Icon: Users },
+  { label: 'Saved', href: '/saved', Icon: Bookmark },
 ]
 
 export function AppSidebar({ userName }: { userName?: string }) {
@@ -37,7 +38,7 @@ export function AppSidebar({ userName }: { userName?: string }) {
             alignItems="center"
             justifyContent="center"
           >
-            <Text variant="label" color="#FFFFFF" fontSize="$3">{'\u{1F41C}'}</Text>
+            <img src="/ant-mascot.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
           </XStack>
           <Text variant="heading4" color="$color">AntAPP</Text>
         </XStack>
@@ -59,7 +60,7 @@ export function AppSidebar({ userName }: { userName?: string }) {
                   hoverStyle={{ backgroundColor: isActive ? '$ant50' : '$backgroundHover' }}
                   cursor="pointer"
                 >
-                  <Text fontSize="$5">{item.icon}</Text>
+                  <item.Icon size={20} color={isActive ? 'var(--color-primary)' : 'currentColor'} strokeWidth={isActive ? 2.5 : 2} />
                   <Text
                     variant="body"
                     weight={isActive ? 'semibold' : 'regular'}
@@ -85,7 +86,7 @@ export function AppSidebar({ userName }: { userName?: string }) {
             hoverStyle={{ backgroundColor: '$backgroundHover' }}
             cursor="pointer"
           >
-            <Text fontSize="$5">{'\u2699\uFE0F'}</Text>
+            <Settings size={20} color="currentColor" />
             <Text variant="body" color="$mutedForeground">Settings</Text>
           </XStack>
         </Link>
