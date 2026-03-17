@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260314211501_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260317223026_BaselineCurrentSchema")]
+    partial class BaselineCurrentSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,63 +27,30 @@ namespace CleanArchitecture.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Category", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Categories");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Collection", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Created")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Collections");
                 });
@@ -109,7 +76,56 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("CollectionRoutes");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Rating", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("OriginalRouteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("RatingCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RatingSum")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("RouteType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ThumbnailUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
+
+                    b.ToTable("Routes");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteRating", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -131,65 +147,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("RouteId");
 
-                    b.ToTable("Ratings");
-                });
+                    b.HasIndex("UserId");
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("AuthorUserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("AverageRating")
-                        .HasColumnType("decimal(18,6)");
-
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("OriginalRouteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("RatingCount")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RouteType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ThumbnailUrl")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("Routes");
+                    b.ToTable("RouteRatings");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteSpot", b =>
@@ -225,29 +185,35 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("RouteSpots");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteTag", b =>
+                {
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RouteId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("RouteTags");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Spot", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Created")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
 
                     b.Property<Point>("Location")
                         .HasColumnType("geometry");
@@ -258,15 +224,91 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
+                    b.Property<long>("RatingCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RatingSum")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.ToTable("Spots");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.SpotRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SpotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<short>("Stars")
+                        .HasColumnType("smallint");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpotId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SpotRatings");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ProfilePhotoUrl")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
+
+                    b.ToTable("Users", (string)null);
+                });
+
             modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
@@ -305,9 +347,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("ProfilePhotoUrl")
-                        .HasColumnType("text");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -317,9 +356,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
-
-                    b.Property<int>("UserType")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -333,10 +369,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -359,7 +396,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -373,9 +410,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -384,7 +420,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -398,9 +434,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -409,7 +444,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -420,9 +455,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -431,13 +465,13 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -446,10 +480,10 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -463,6 +497,17 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Collection", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.User", "User")
+                        .WithMany("Collections")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.CollectionRoute", b =>
@@ -484,26 +529,34 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Rating", b =>
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.User", "AuthorUser")
+                        .WithMany("AuthoredRoutes")
+                        .HasForeignKey("AuthorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AuthorUser");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteRating", b =>
                 {
                     b.HasOne("CleanArchitecture.Core.Entities.Route", "Route")
-                        .WithMany("Ratings")
+                        .WithMany("RouteRatings")
                         .HasForeignKey("RouteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Route");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Route", b =>
-                {
-                    b.HasOne("CleanArchitecture.Core.Entities.Category", "Category")
-                        .WithMany("Routes")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("CleanArchitecture.Core.Entities.User", "User")
+                        .WithMany("RouteRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("Route");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteSpot", b =>
@@ -525,12 +578,59 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Spot");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.RouteTag", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.Route", "Route")
+                        .WithMany("RouteTags")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Core.Entities.Tag", "Tag")
+                        .WithMany("RouteTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.SpotRating", b =>
+                {
+                    b.HasOne("CleanArchitecture.Core.Entities.Spot", "Spot")
+                        .WithMany("SpotRatings")
+                        .HasForeignKey("SpotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Core.Entities.User", "User")
+                        .WithMany("SpotRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Spot");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User", b =>
+                {
+                    b.HasOne("CleanArchitecture.Infrastructure.Models.ApplicationUser", null)
+                        .WithOne("User")
+                        .HasForeignKey("CleanArchitecture.Core.Entities.User", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
                 {
                     b.OwnsMany("CleanArchitecture.Core.DTOs.Account.RefreshToken", "RefreshTokens", b1 =>
                         {
-                            b1.Property<string>("ApplicationUserId")
-                                .HasColumnType("text");
+                            b1.Property<Guid>("ApplicationUserId")
+                                .HasColumnType("uuid");
 
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -570,16 +670,16 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("CleanArchitecture.Infrastructure.Models.ApplicationUser", null)
                         .WithMany()
@@ -588,7 +688,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("CleanArchitecture.Infrastructure.Models.ApplicationUser", null)
                         .WithMany()
@@ -597,9 +697,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -612,18 +712,13 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("CleanArchitecture.Infrastructure.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Core.Entities.Category", b =>
-                {
-                    b.Navigation("Routes");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Collection", b =>
@@ -635,14 +730,39 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 {
                     b.Navigation("CollectionRoutes");
 
-                    b.Navigation("Ratings");
+                    b.Navigation("RouteRatings");
 
                     b.Navigation("RouteSpots");
+
+                    b.Navigation("RouteTags");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Core.Entities.Spot", b =>
                 {
                     b.Navigation("RouteSpots");
+
+                    b.Navigation("SpotRatings");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.Tag", b =>
+                {
+                    b.Navigation("RouteTags");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Core.Entities.User", b =>
+                {
+                    b.Navigation("AuthoredRoutes");
+
+                    b.Navigation("Collections");
+
+                    b.Navigation("RouteRatings");
+
+                    b.Navigation("SpotRatings");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Infrastructure.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
