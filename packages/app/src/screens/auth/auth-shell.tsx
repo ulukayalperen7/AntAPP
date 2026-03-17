@@ -32,6 +32,7 @@ type AuthShellProps = {
   panelDescription: string
   panelPosition?: 'left' | 'right'
   footer?: React.ReactNode
+  mascot?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -53,8 +54,10 @@ export function AuthShell({
   panelDescription,
   panelPosition = 'right',
   footer,
+  mascot,
   children,
 }: AuthShellProps) {
+  const [showDecorativeLayers, setShowDecorativeLayers] = React.useState(!isWeb)
   const shellClassName = isWeb ? 'auth-shell' : undefined
   const frameClassName = isWeb
     ? `auth-shell__frame ${panelPosition === 'left' ? 'auth-shell__frame--panel-left' : ''}`.trim()
@@ -62,6 +65,11 @@ export function AuthShell({
   const formClassName = isWeb ? 'auth-shell__form' : undefined
   const panelClassName = isWeb ? 'auth-shell__panel' : undefined
   const footerClassName = isWeb ? 'auth-shell__footer' : undefined
+
+  React.useEffect(() => {
+    if (!isWeb) return
+    setShowDecorativeLayers(true)
+  }, [])
 
   return (
     <Theme name="light_user">
@@ -76,7 +84,7 @@ export function AuthShell({
         paddingVertical="$6"
         minHeight={isWeb ? '100vh' : undefined}
       >
-        <AuthBackdrop />
+        {showDecorativeLayers ? <AuthBackdrop /> : null}
 
         <XStack
           className={frameClassName}
@@ -111,15 +119,29 @@ export function AuthShell({
               </VStack>
             </VStack>
 
-            <Card
-              variant="elevated"
-              size="md"
-              width="100%"
-              borderRadius="$5"
-              backgroundColor={AUTH_PALETTE.neutralStrong}
-            >
-              <VStack gap="$4">{children}</VStack>
-            </Card>
+            <YStack position="relative" width="100%">
+              {mascot ? (
+                <YStack
+                  position="absolute"
+                  top={-80}
+                  left={20}
+                  zIndex={10}
+                  alignItems="center"
+                >
+                  {mascot}
+                </YStack>
+              ) : null}
+              <Card
+                variant="elevated"
+                size="md"
+                width="100%"
+                borderRadius="$5"
+                backgroundColor={AUTH_PALETTE.neutralStrong}
+                {...(mascot ? { paddingTop: '$5', marginTop: '$9' } : {})}
+              >
+                <VStack gap="$4">{children}</VStack>
+              </Card>
+            </YStack>
 
             {footer ? (
               <XStack
@@ -133,11 +155,13 @@ export function AuthShell({
             ) : null}
           </YStack>
 
-          <AuthVisualPanel
-            className={panelClassName}
-            title={panelTitle}
-            description={panelDescription}
-          />
+          {showDecorativeLayers ? (
+            <AuthVisualPanel
+              className={panelClassName}
+              title={panelTitle}
+              description={panelDescription}
+            />
+          ) : null}
         </XStack>
       </YStack>
     </Theme>
@@ -203,6 +227,9 @@ function AuthBackdrop() {
   const large = isWeb ? 440 : 260
   const medium = isWeb ? 320 : 200
   const small = isWeb ? 220 : 136
+  const routeDot = isWeb ? 16 : 10
+  const routeLine = isWeb ? 88 : 54
+  const routeLineSm = isWeb ? 58 : 38
 
   return (
     <YStack
@@ -243,7 +270,6 @@ function AuthBackdrop() {
         backgroundColor={AUTH_PALETTE.secondarySoft}
         opacity={0.56}
       />
-
       <YStack
         position="absolute"
         top={isWeb ? -96 : -60}
@@ -325,6 +351,38 @@ function AuthBackdrop() {
         backgroundColor={AUTH_PALETTE.tertiarySoft}
         opacity={0.54}
       />
+
+      <YStack position="absolute" top={isWeb ? 126 : 120} right={isWeb ? 132 : 22} gap="$2" opacity={0.78}>
+        <XStack gap="$2" alignItems="center">
+          <YStack width={routeDot} height={routeDot} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} />
+          <YStack width={routeLine} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.neutralStrong} opacity={0.74} />
+        </XStack>
+        <XStack gap="$2" alignItems="center" paddingLeft={isWeb ? 24 : 14}>
+          <YStack width={routeLineSm} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.primary} opacity={0.44} />
+          <YStack width={routeDot} height={routeDot} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiary} opacity={0.82} />
+        </XStack>
+      </YStack>
+
+      <YStack position="absolute" bottom={isWeb ? 188 : 168} left={isWeb ? 108 : 26} gap="$2.5" opacity={0.68}>
+        <XStack gap="$2" alignItems="center">
+          <YStack width={routeDot} height={routeDot} borderRadius="$full" backgroundColor={AUTH_PALETTE.primary} opacity={0.74} />
+          <YStack width={routeLineSm} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} opacity={0.58} />
+        </XStack>
+        <XStack gap="$2" alignItems="center" paddingLeft={isWeb ? 38 : 20}>
+          <YStack width={routeLine} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.neutralStrong} opacity={0.6} />
+        </XStack>
+      </YStack>
+
+      <YStack position="absolute" top={isWeb ? 352 : 300} right={isWeb ? 242 : 94} gap="$2" opacity={0.44}>
+        <XStack gap="$2" alignItems="center">
+          <YStack width={10} height={10} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} />
+          <YStack width={isWeb ? 46 : 28} height={5} borderRadius="$full" backgroundColor={AUTH_PALETTE.primary} />
+        </XStack>
+        <XStack gap="$2" alignItems="center" paddingLeft={isWeb ? 12 : 8}>
+          <YStack width={isWeb ? 26 : 16} height={5} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiary} />
+          <YStack width={8} height={8} borderRadius="$full" backgroundColor={AUTH_PALETTE.neutralStrong} />
+        </XStack>
+      </YStack>
     </YStack>
   )
 }
@@ -411,6 +469,48 @@ function AuthVisualPanel({
         backgroundColor={AUTH_PALETTE.primarySoft}
         opacity={0.1}
       />
+      <YStack
+        position="absolute"
+        top={132}
+        right={132}
+        width={164}
+        height={14}
+        borderRadius="$full"
+        backgroundColor={AUTH_PALETTE.neutralStrong}
+        opacity={0.12}
+      />
+      <YStack
+        position="absolute"
+        top={156}
+        right={112}
+        width={96}
+        height={14}
+        borderRadius="$full"
+        backgroundColor={AUTH_PALETTE.secondarySoft}
+        opacity={0.2}
+      />
+
+      <YStack position="absolute" top={120} left={96} gap="$2.5" opacity={0.84}>
+        <XStack gap="$2" alignItems="center">
+          <YStack width={16} height={16} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} />
+          <YStack width={92} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.neutralStrong} opacity={0.74} />
+        </XStack>
+        <XStack gap="$2" alignItems="center" paddingLeft={28}>
+          <YStack width={56} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiarySoft} opacity={0.78} />
+          <YStack width={16} height={16} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiary} opacity={0.72} />
+        </XStack>
+      </YStack>
+
+      <YStack position="absolute" bottom={156} right={86} gap="$2" opacity={0.56}>
+        <XStack gap="$2" alignItems="center">
+          <YStack width={12} height={12} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} />
+          <YStack width={68} height={5} borderRadius="$full" backgroundColor={AUTH_PALETTE.primarySoft} opacity={0.84} />
+        </XStack>
+        <XStack gap="$2" alignItems="center" paddingLeft={22}>
+          <YStack width={34} height={5} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiary} opacity={0.72} />
+          <YStack width={8} height={8} borderRadius="$full" backgroundColor={AUTH_PALETTE.neutralStrong} opacity={0.84} />
+        </XStack>
+      </YStack>
 
       <ZStack flex={1} justifyContent="space-between">
         <VStack gap="$2">
@@ -419,7 +519,7 @@ function AuthVisualPanel({
           </Text>
         </VStack>
 
-        <VStack gap="$5" maxWidth={460}>
+          <VStack gap="$5" maxWidth={460}>
           <XStack gap="$3" alignItems="center">
             <YStack width={48} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.secondary} opacity={0.92} />
             <YStack width={96} height={6} borderRadius="$full" backgroundColor={AUTH_PALETTE.tertiarySoft} opacity={0.5} />

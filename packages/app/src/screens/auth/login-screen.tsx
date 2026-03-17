@@ -12,6 +12,7 @@ export type AuthLoginScreenProps = {
   error?: string | null
   successMessage?: string | null
   onNavigateToRegister?: () => void
+  mascot?: React.ReactNode
 }
 
 export function AuthLoginScreen({
@@ -24,6 +25,7 @@ export function AuthLoginScreen({
   error,
   successMessage,
   onNavigateToRegister,
+  mascot,
 }: AuthLoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false)
 
@@ -34,6 +36,7 @@ export function AuthLoginScreen({
       panelTitle="Start your journey"
       panelDescription="Plan better routes, return to saved stops faster, and keep your Antalya trips organized."
       panelPosition="right"
+      mascot={mascot}
       footer={
         onNavigateToRegister ? (
           <AuthFooterLink

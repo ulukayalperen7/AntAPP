@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
+import { Image } from 'expo-image'
 import { AuthLoginScreen, AuthRegisterScreen } from '@antapp/app'
 import { useAuth } from './context'
+
+const mascotSource = require('@/assets/images/ant-mascot.png')
+const MascotImage = () => (
+  <Image source={mascotSource} style={{ width: 130, height: 130 }} contentFit="contain" />
+)
 
 type AuthMode = 'login' | 'register'
 
@@ -101,6 +107,7 @@ export function AuthScreen() {
         pending={pending}
         error={error}
         onNavigateToLogin={openLogin}
+        mascot={<MascotImage />}
       />
     )
   }
@@ -124,6 +131,7 @@ export function AuthScreen() {
       error={error}
       successMessage={successMessage}
       onNavigateToRegister={openRegister}
+      mascot={<MascotImage />}
     />
   )
 }

@@ -1,19 +1,83 @@
 'use client'
 
-import { startTransition, useActionState, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { startTransition, useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Text, VStack } from '@antapp/ui'
-import { AuthRegisterScreen, AuthShell } from '@antapp/app'
 import { register } from '@/features/auth/actions'
+
+const REGISTER_DRAFT_KEY = 'antapp-auth-register-draft'
+
+const AuthRegisterScreen = dynamic(
+  () => import('@antapp/app').then((mod) => mod.AuthRegisterScreen),
+  {
+    ssr: false,
+    loading: () => <div style={{ minHeight: '100vh', background: '#F8F9FA' }} />,
+  }
+)
+
+const AuthShell = dynamic(
+  () => import('@antapp/app').then((mod) => mod.AuthShell),
+  {
+    ssr: false,
+    loading: () => <div style={{ minHeight: '100vh', background: '#F8F9FA' }} />,
+  }
+)
 
 export default function RegisterPage() {
   const router = useRouter()
   const [state, formAction, pending] = useActionState(register, null)
   const [hasEditedSinceSubmit, setHasEditedSinceSubmit] = useState(false)
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false)
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+
+  useEffect(() => {
+    try {
+      const raw = window.sessionStorage.getItem(REGISTER_DRAFT_KEY)
+      if (!raw) return
+
+      const parsed = JSON.parse(raw) as {
+        fullName?: string
+        email?: string
+      }
+
+      if (typeof parsed.fullName === 'string') {
+        setFullName(parsed.fullName)
+      }
+
+      if (typeof parsed.email === 'string') {
+        setEmail(parsed.email)
+      }
+    } catch {
+      window.sessionStorage.removeItem(REGISTER_DRAFT_KEY)
+    } finally {
+      setHasRestoredDraft(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!hasRestoredDraft) return
+
+    const nextDraft = {
+      fullName: fullName.trim(),
+      email: email.trim(),
+    }
+
+    if (nextDraft.fullName.length === 0 && nextDraft.email.length === 0) {
+      window.sessionStorage.removeItem(REGISTER_DRAFT_KEY)
+      return
+    }
+
+    window.sessionStorage.setItem(REGISTER_DRAFT_KEY, JSON.stringify(nextDraft))
+  }, [email, fullName, hasRestoredDraft])
+
+  useEffect(() => {
+    if (!state?.ok) return
+    window.sessionStorage.removeItem(REGISTER_DRAFT_KEY)
+  }, [state])
 
   const handleSubmit = () => {
     setHasEditedSinceSubmit(false)
@@ -28,6 +92,14 @@ export default function RegisterPage() {
     })
   }
 
+  const mascotEl = (
+    <img
+      src="/ant-mascot.png"
+      alt="AntAPP Mascot"
+      style={{ width: 130, height: 130, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' }}
+    />
+  )
+
   if (state?.ok) {
     return (
       <AuthShell
@@ -36,6 +108,7 @@ export default function RegisterPage() {
         panelTitle="Discover Antalya"
         panelDescription="Your account has been created successfully. Continue to sign in when you're ready to explore."
         panelPosition="left"
+        mascot={mascotEl}
       >
         <VStack gap="$4" alignItems="center">
           <Text variant="bodyLarge" align="center" color="$success500">
@@ -78,6 +151,7 @@ export default function RegisterPage() {
       pending={pending}
       error={state?.ok === false && !hasEditedSinceSubmit ? state.message : null}
       onNavigateToLogin={() => router.push('/login')}
+      mascot={mascotEl}
     />
   )
 }
