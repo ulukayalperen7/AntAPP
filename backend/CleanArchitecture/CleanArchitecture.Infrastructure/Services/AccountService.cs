@@ -134,14 +134,14 @@ namespace CleanArchitecture.Infrastructure.Services
             {
                 Id = userId,
                 Email = request.Email,
-                UserName = request.UserName
+                UserName = request.UserName,
+                UserType = request.UserType
             };
 
             var domainUser = new User
             {
                 Id = userId,
-                UserName = request.UserName,
-                UserType = request.UserType
+                UserName = request.UserName
             };
 
             var userWithSameEmail = await _userManager.FindByEmailAsync(request.Email);

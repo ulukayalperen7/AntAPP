@@ -14,6 +14,7 @@ public class CollectionRepositoryIntegrationTests : IAsyncDisposable
     private readonly CollectionRepositoryAsync _repository;
     private readonly Guid _testUserId = Guid.NewGuid();
     private readonly List<Guid> _createdCollectionIds = new();
+    private readonly List<Guid> _extraUserIds = new();
 
     public CollectionRepositoryIntegrationTests()
     {
@@ -37,6 +38,45 @@ public class CollectionRepositoryIntegrationTests : IAsyncDisposable
 
         _context = new ApplicationDbContext(options, dateTimeMock.Object, authUserMock.Object);
         _repository = new CollectionRepositoryAsync(_context);
+
+        SeedTestUserAsync().GetAwaiter().GetResult();
+    }
+
+    private Task SeedExtraUserAsync(Guid userId) => SeedUserRowsAsync(userId);
+
+    // Collections.UserId → Users.Id → AspNetUsers.Id
+    // Insert a minimal AspNetUsers row first, then the Users row.
+    private async Task SeedTestUserAsync() => await SeedUserRowsAsync(_testUserId);
+
+    private async Task SeedUserRowsAsync(Guid userId)
+    {
+        var db = _context.Database;
+        await db.ExecuteSqlRawAsync("""
+            INSERT INTO "AspNetUsers"
+                ("Id","UserName","NormalizedUserName","Email","NormalizedEmail",
+                 "EmailConfirmed","PasswordHash","SecurityStamp","ConcurrencyStamp",
+                 "PhoneNumberConfirmed","TwoFactorEnabled","LockoutEnabled",
+                 "AccessFailedCount","UserType")
+            VALUES
+                ({0}, {1}, {2}, {3}, {4},
+                 false, '', gen_random_uuid()::text, gen_random_uuid()::text,
+                 false, false, false,
+                 0, 0)
+            ON CONFLICT ("Id") DO NOTHING
+            """,
+            _testUserId,
+            $"seed_{_testUserId:N}",
+            $"SEED_{_testUserId:N}",
+            $"seed_{_testUserId:N}@test.local",
+            $"SEED_{_testUserId:N}@TEST.LOCAL");
+
+        await db.ExecuteSqlRawAsync("""
+            INSERT INTO "Users" ("Id","UserName","ProfilePhotoUrl")
+            VALUES ({0}, {1}, '')
+            ON CONFLICT ("Id") DO NOTHING
+            """,
+            _testUserId,
+            $"seed_{_testUserId:N}");
     }
 
     [Fact]
@@ -67,14 +107,18 @@ public class CollectionRepositoryIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task GetCollectionsByUserIdAsync_ShouldReturnOnlyUserCollections()
     {
+        var otherId = Guid.NewGuid();
+        await SeedExtraUserAsync(otherId);
+
         var c1 = new Collection { UserId = _testUserId, Name = "User Collection 1", Description = string.Empty, ThumbnailUrl = string.Empty };
         var c2 = new Collection { UserId = _testUserId, Name = "User Collection 2", Description = string.Empty, ThumbnailUrl = string.Empty };
-        var other = new Collection { UserId = Guid.NewGuid(), Name = "Other User", Description = string.Empty, ThumbnailUrl = string.Empty };
+        var other = new Collection { UserId = otherId, Name = "Other User", Description = string.Empty, ThumbnailUrl = string.Empty };
 
         await _repository.AddAsync(c1);
         await _repository.AddAsync(c2);
         await _repository.AddAsync(other);
         _createdCollectionIds.AddRange(new[] { c1.Id, c2.Id, other.Id });
+        _extraUserIds.Add(otherId);
 
         var results = await _repository.GetCollectionsByUserIdAsync(_testUserId, 1, 10);
 
@@ -86,6 +130,8 @@ public class CollectionRepositoryIntegrationTests : IAsyncDisposable
     public async Task GetOrCreateDefaultCollectionAsync_CreatesOnFirstCall_ReturnsExistingOnSecond()
     {
         var userId = Guid.NewGuid();
+        await SeedExtraUserAsync(userId);
+        _extraUserIds.Add(userId);
 
         var first = await _repository.GetOrCreateDefaultCollectionAsync(userId);
         _createdCollectionIds.Add(first.Id);
@@ -243,6 +289,19 @@ public class CollectionRepositoryIntegrationTests : IAsyncDisposable
                 .Where(c => _createdCollectionIds.Contains(c.Id))
                 .ExecuteDeleteAsync();
         }
+
+        foreach (var extraId in _extraUserIds)
+        {
+            await _context.Database.ExecuteSqlRawAsync(
+                """DELETE FROM "Users" WHERE "Id" = {0}""", extraId);
+            await _context.Database.ExecuteSqlRawAsync(
+                """DELETE FROM "AspNetUsers" WHERE "Id" = {0}""", extraId);
+        }
+
+        await _context.Database.ExecuteSqlRawAsync(
+            """DELETE FROM "Users" WHERE "Id" = {0}""", _testUserId);
+        await _context.Database.ExecuteSqlRawAsync(
+            """DELETE FROM "AspNetUsers" WHERE "Id" = {0}""", _testUserId);
 
         await _context.DisposeAsync();
     }
