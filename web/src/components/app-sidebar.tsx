@@ -65,7 +65,7 @@ export function AppSidebar({
               justifyContent="center"
               flexShrink={0}
             >
-              <img src="/ant-mascot.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+              <img src="/ant-logo.png" alt="" style={{ width: 26, height: 26, objectFit: 'contain' }} />
             </XStack>
             {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
           </XStack>
