@@ -16,7 +16,7 @@ export function UserShell({
   return (
     <XStack flex={1} minHeight="100vh" backgroundColor="$background">
       <AppSidebar userName={userName} onLogout={onLogout} />
-      <YStack flex={1}>
+      <YStack flex={1} marginLeft={220} $md={{ marginLeft: 0 }}>
         <AppTopBar />
         <YStack flex={1} padding="$5" gap="$5">
           {children}

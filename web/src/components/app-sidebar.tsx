@@ -18,14 +18,16 @@ export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout
   return (
     <YStack
       width={220}
-      minHeight="100vh"
+      height="100vh"
       backgroundColor="$backgroundStrong"
       borderRightWidth={1}
       borderRightColor="$borderColor"
       paddingVertical="$4"
       justifyContent="space-between"
-      position="sticky"
+      position="fixed"
       top={0}
+      left={0}
+      zIndex={50}
       $md={{ display: 'none' }}
     >
       <YStack gap="$1">
