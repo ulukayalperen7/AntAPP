@@ -80,31 +80,45 @@ public class AccountServiceIntegrationTests : IAsyncDisposable
     [Fact]
     public async Task AuthenticateAsync_ReturnsTokens_ForConfirmedUser()
     {
-        using var scope = _serviceProvider.CreateScope();
-        await EnsureRolesExistAsync(scope.ServiceProvider);
-        SetHttpContext(scope.ServiceProvider);
-
-        var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         var request = CreateRegisterRequest();
 
-        await accountService.RegisterAsync(request, "http://localhost:3000");
-
-        var user = await userManager.FindByEmailAsync(request.Email)
-            ?? throw new InvalidOperationException("Registered user was not found.");
-        _createdUserIds.Add(user.Id);
-
-        user.EmailConfirmed = true;
-        var updateResult = await userManager.UpdateAsync(user);
-        Assert.True(updateResult.Succeeded, string.Join(", ", updateResult.Errors.Select(error => error.Description)));
-
-        var response = await accountService.AuthenticateAsync(new AuthenticationRequest
+        // Register in its own scope so the DbContext is disposed afterwards
+        using (var registerScope = _serviceProvider.CreateScope())
         {
-            Email = request.Email,
-            Password = request.Password
-        }, "127.0.0.1");
+            await EnsureRolesExistAsync(registerScope.ServiceProvider);
+            SetHttpContext(registerScope.ServiceProvider);
+            await registerScope.ServiceProvider
+                .GetRequiredService<IAccountService>()
+                .RegisterAsync(request, "http://localhost:3000");
+        }
 
-        Assert.Equal(user.Id.ToString(), response.Id);
+        // Confirm email in a separate scope so no tracked entity bleeds through
+        Guid userId;
+        using (var confirmScope = _serviceProvider.CreateScope())
+        {
+            var userManager = confirmScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await userManager.FindByEmailAsync(request.Email)
+                ?? throw new InvalidOperationException("Registered user was not found.");
+            userId = user.Id;
+            _createdUserIds.Add(userId);
+
+            user.EmailConfirmed = true;
+            var updateResult = await userManager.UpdateAsync(user);
+            Assert.True(updateResult.Succeeded, string.Join(", ", updateResult.Errors.Select(e => e.Description)));
+        }
+
+        // Authenticate in a third scope
+        using var loginScope = _serviceProvider.CreateScope();
+        SetHttpContext(loginScope.ServiceProvider);
+        var response = await loginScope.ServiceProvider
+            .GetRequiredService<IAccountService>()
+            .AuthenticateAsync(new AuthenticationRequest
+            {
+                Email = request.Email,
+                Password = request.Password
+            }, "127.0.0.1");
+
+        Assert.Equal(userId.ToString(), response.Id);
         Assert.False(string.IsNullOrWhiteSpace(response.JWToken));
         Assert.False(string.IsNullOrWhiteSpace(response.RefreshToken));
         Assert.Contains(RoleNames.BasicUser, response.Roles);
