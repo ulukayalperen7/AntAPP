@@ -1,5 +1,6 @@
 using CleanArchitecture.Core.DTOs.Account;
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Enums;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ namespace CleanArchitecture.Infrastructure.Models
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
+        public UserTypeEnum UserType { get; set; }
         public virtual User User { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
 
