@@ -89,10 +89,11 @@ export function registerAccount(
   userName: string,
   email: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
+  userType: number = 0
 ) {
   return postText('/auth/register', {
-    userType: 0,
+    userType,
     email,
     userName,
     password,
