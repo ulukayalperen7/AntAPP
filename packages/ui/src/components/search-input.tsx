@@ -1,5 +1,5 @@
 import React from 'react'
-import { styled, GetProps, XStack, Input as TamaguiInput, Text as TamaguiText } from 'tamagui'
+import { styled, GetProps, XStack, YStack, Input as TamaguiInput } from 'tamagui'
 
 const SearchFrame = styled(XStack, {
   alignItems: 'center',
@@ -47,14 +47,34 @@ export type SearchInputProps = Omit<GetProps<typeof SearchInputField>, 'size'> &
   iconAfter?: React.ReactNode
 }
 
+function DefaultSearchIcon() {
+  return (
+    <XStack width={18} height={18} alignItems="center" justifyContent="center">
+      <YStack
+        width={12}
+        height={12}
+        borderRadius="$full"
+        borderWidth={2}
+        borderColor="$mutedForeground"
+      />
+      <YStack
+        position="absolute"
+        bottom={0}
+        right={0}
+        width={6}
+        height={2}
+        backgroundColor="$mutedForeground"
+        borderRadius={1}
+        transform={[{ rotate: '45deg' }]}
+      />
+    </XStack>
+  )
+}
+
 export function SearchInput({ size = 'md', icon, iconAfter, ...rest }: SearchInputProps) {
   return (
     <SearchFrame size={size}>
-      {icon ?? (
-        <TamaguiText fontSize="$4" color="$mutedForeground">
-          &#x1F50D;
-        </TamaguiText>
-      )}
+      {icon ?? <DefaultSearchIcon />}
       <SearchInputField {...rest} />
       {iconAfter}
     </SearchFrame>

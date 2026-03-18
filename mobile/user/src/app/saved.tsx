@@ -2,42 +2,9 @@ import React from 'react'
 import { YStack, XStack, Text, RouteCard, ScrollView } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Feather } from '@expo/vector-icons'
 
-const SAVED_ROUTES: RouteCardData[] = [
-  {
-    id: '1',
-    title: 'Classic Kaleiçi Tour',
-    location: 'Antalya, Turkey',
-    rating: 4.9,
-    distance: '3.5 km',
-    duration: '2h 30m',
-    category: 'History',
-    difficulty: 'easy',
-    isFavorited: true,
-  },
-  {
-    id: '2',
-    title: 'Eagle Peak Trail',
-    location: 'Taurus Mountains',
-    rating: 4.8,
-    distance: '12.0 km',
-    duration: '4h 30m',
-    category: 'Nature',
-    difficulty: 'hard',
-    isFavorited: true,
-  },
-  {
-    id: '3',
-    title: 'Old Town Foodie Trail',
-    location: 'Kaleiçi, Turkey',
-    rating: 4.5,
-    distance: '2.5 km',
-    duration: '2h',
-    category: 'Food',
-    difficulty: 'easy',
-    isFavorited: true,
-  },
-]
+const SAVED_ROUTES: RouteCardData[] = []
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets()
@@ -49,17 +16,26 @@ export default function SavedScreen() {
           <Text variant="heading2">Saved Routes</Text>
           <Text variant="body" muted>{SAVED_ROUTES.length} routes saved</Text>
 
-          <YStack gap="$4">
-            {SAVED_ROUTES.map((route) => (
-              <RouteCard key={route.id} data={route} />
-            ))}
-          </YStack>
-
-          {SAVED_ROUTES.length === 0 && (
-            <YStack alignItems="center" justifyContent="center" paddingVertical="$10" gap="$3">
-              <Text fontSize="$12">{'\u{1F516}'}</Text>
+          {SAVED_ROUTES.length > 0 ? (
+            <YStack gap="$4">
+              {SAVED_ROUTES.map((route) => (
+                <RouteCard key={route.id} data={route} />
+              ))}
+            </YStack>
+          ) : (
+            <YStack alignItems="center" justifyContent="center" paddingVertical="$10" gap="$4">
+              <XStack
+                width={72}
+                height={72}
+                borderRadius="$full"
+                backgroundColor="$ant50"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Feather name="bookmark" size={32} color="var(--color-primary, #005696)" />
+              </XStack>
               <Text variant="heading4" muted>No saved routes yet</Text>
-              <Text variant="body" muted align="center">
+              <Text variant="body" muted align="center" maxWidth={280}>
                 Save routes you love to find them easily later
               </Text>
             </YStack>

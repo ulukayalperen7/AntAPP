@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { XStack, Text, SearchInput, IconButton, Button } from '@antapp/ui'
+import { Bell, Plus, Search } from 'lucide-react'
 
 export function AppTopBar() {
   return (
@@ -20,17 +21,21 @@ export function AppTopBar() {
           placeholder="Search routes, cities, or national parks..."
           size="md"
           flex={1}
+          icon={<Search size={18} color="var(--color-mutedForeground)" />}
         />
       </XStack>
 
       <XStack alignItems="center" gap="$3">
         <IconButton variant="ghost" size="md">
-          <Text fontSize="$6">{'\u{1F514}'}</Text>
+          <Bell size={22} color="currentColor" />
         </IconButton>
 
         <Link href="/create" style={{ textDecoration: 'none' }}>
           <Button variant="solid" size="sm">
-            + Create Route
+            <XStack alignItems="center" gap="$1.5">
+              <Plus size={16} color="#FFFFFF" />
+              <Text variant="label" color="#FFFFFF" fontSize="$3">Create Route</Text>
+            </XStack>
           </Button>
         </Link>
       </XStack>

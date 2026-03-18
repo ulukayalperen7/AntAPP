@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { YStack, XStack, Text, Input, Field, Button, Badge, ScrollView } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Feather } from '@expo/vector-icons'
 
 const CATEGORIES = ['Nature', 'History', 'Food', 'Entertainment']
 const DIFFICULTIES = ['Easy', 'Moderate', 'Hard']
@@ -21,7 +22,6 @@ export default function CreateScreen() {
             <Text variant="body" muted>Share your adventure with the community</Text>
           </YStack>
 
-          {/* Route Details Form */}
           <YStack gap="$4">
             <Field label="Route Name">
               <Input
@@ -45,7 +45,6 @@ export default function CreateScreen() {
               />
             </Field>
 
-            {/* Category */}
             <YStack gap="$2">
               <Text variant="label">Category</Text>
               <XStack flexWrap="wrap" gap="$2">
@@ -71,7 +70,6 @@ export default function CreateScreen() {
               </XStack>
             </YStack>
 
-            {/* Difficulty */}
             <YStack gap="$2">
               <Text variant="label">Difficulty</Text>
               <XStack gap="$2">
@@ -98,7 +96,6 @@ export default function CreateScreen() {
             </YStack>
           </YStack>
 
-          {/* Map Placeholder */}
           <YStack gap="$2">
             <Text variant="heading4">Add Stops</Text>
             <YStack
@@ -110,14 +107,14 @@ export default function CreateScreen() {
               borderWidth={2}
               borderStyle="dashed"
               borderColor="$borderColor"
+              gap="$2"
             >
-              <Text fontSize="$10">{'\u{1F5FA}'}</Text>
-              <Text variant="body" muted marginTop="$2">Tap on the map to add stops</Text>
+              <Feather name="map-pin" size={40} color="var(--color-mutedForeground, #999)" />
+              <Text variant="body" muted>Tap on the map to add stops</Text>
               <Text variant="caption" muted>Map — Coming Soon</Text>
             </YStack>
           </YStack>
 
-          {/* Save Button */}
           <Button variant="solid" size="lg">
             Save Draft
           </Button>

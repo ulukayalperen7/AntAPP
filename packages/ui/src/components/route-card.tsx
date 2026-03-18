@@ -68,6 +68,46 @@ const FavoriteButton = styled(XStack, {
   cursor: 'pointer',
 })
 
+function HeartIcon({ filled }: { filled: boolean }) {
+  return (
+    <XStack alignItems="center" justifyContent="center">
+      <YStack
+        width={10}
+        height={10}
+        borderRadius="$full"
+        backgroundColor={filled ? '$primary' : 'transparent'}
+        borderWidth={filled ? 0 : 1.5}
+        borderColor="$mutedForeground"
+      />
+      <YStack
+        width={10}
+        height={10}
+        borderRadius="$full"
+        backgroundColor={filled ? '$primary' : 'transparent'}
+        borderWidth={filled ? 0 : 1.5}
+        borderColor="$mutedForeground"
+        marginLeft={-4}
+      />
+      <YStack
+        position="absolute"
+        bottom={-3}
+        width={0}
+        height={0}
+        borderLeftWidth={8}
+        borderRightWidth={8}
+        borderTopWidth={8}
+        borderLeftColor="transparent"
+        borderRightColor="transparent"
+        borderTopColor={filled ? '$primary' : 'transparent'}
+      />
+    </XStack>
+  )
+}
+
+function SmallDot({ color = '$mutedForeground' }: { color?: string }) {
+  return <YStack width={6} height={6} borderRadius="$full" backgroundColor={color} />
+}
+
 export type RouteCardData = {
   id: string
   title: string
@@ -120,9 +160,7 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
           </XStack>
         )}
         <FavoriteButton onPress={onFavoritePress}>
-          <TamaguiText fontSize="$5" color={data.isFavorited ? '$primary' : '$mutedForeground'}>
-            {data.isFavorited ? '\u2665' : '\u2661'}
-          </TamaguiText>
+          <HeartIcon filled={!!data.isFavorited} />
         </FavoriteButton>
         {data.rating != null && (
           <XStack
@@ -136,7 +174,7 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
             alignItems="center"
             gap="$1"
           >
-            <TamaguiText fontSize="$2" color="$ant500">{'\u2605'}</TamaguiText>
+            <YStack width={8} height={8} borderRadius={2} backgroundColor="$ant500" transform={[{ rotate: '45deg' }]} />
             <TamaguiText fontSize="$3" fontWeight="600" color="$color">{data.rating.toFixed(1)}</TamaguiText>
           </XStack>
         )}
@@ -157,21 +195,21 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
           </TamaguiText>
         )}
         {data.location && (
-          <XStack alignItems="center" gap="$1">
-            <TamaguiText fontSize="$3" color="$mutedForeground">{'\u{1F4CD}'}</TamaguiText>
+          <XStack alignItems="center" gap="$1.5">
+            <SmallDot color="$primary" />
             <TamaguiText fontSize="$3" color="$mutedForeground">{data.location}</TamaguiText>
           </XStack>
         )}
         <XStack alignItems="center" gap="$3" marginTop="$1">
           {data.distance && (
-            <XStack alignItems="center" gap="$1">
-              <TamaguiText fontSize="$3" color="$mutedForeground">{'\u{1F6B6}'}</TamaguiText>
+            <XStack alignItems="center" gap="$1.5">
+              <SmallDot />
               <TamaguiText fontSize="$3" color="$mutedForeground">{data.distance}</TamaguiText>
             </XStack>
           )}
           {data.duration && (
-            <XStack alignItems="center" gap="$1">
-              <TamaguiText fontSize="$3" color="$mutedForeground">{'\u{1F552}'}</TamaguiText>
+            <XStack alignItems="center" gap="$1.5">
+              <SmallDot />
               <TamaguiText fontSize="$3" color="$mutedForeground">{data.duration}</TamaguiText>
             </XStack>
           )}

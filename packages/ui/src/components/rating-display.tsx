@@ -1,24 +1,33 @@
 import React from 'react'
-import { GetProps, XStack, Text as TamaguiText } from 'tamagui'
+import { GetProps, XStack, YStack, Text as TamaguiText } from 'tamagui'
 
 export type RatingDisplayProps = GetProps<typeof XStack> & {
   value: number
   maxStars?: number
   showValue?: boolean
+  starSize?: number
 }
 
-export function RatingDisplay({ value, maxStars = 5, showValue = true, ...rest }: RatingDisplayProps) {
-  const stars = Array.from({ length: maxStars }, (_, i) => {
-    if (i < Math.floor(value)) return '\u2605'
-    if (i < value) return '\u2605'
-    return '\u2606'
-  })
-
+function StarShape({ filled, size = 10 }: { filled: boolean; size?: number }) {
   return (
-    <XStack alignItems="center" gap="$1" {...rest}>
-      <TamaguiText fontSize="$3" color="$ant500">
-        {stars.join('')}
-      </TamaguiText>
+    <YStack
+      width={size}
+      height={size}
+      borderRadius={2}
+      backgroundColor={filled ? '$ant500' : '$muted'}
+      transform={[{ rotate: '45deg' }]}
+    />
+  )
+}
+
+export function RatingDisplay({ value, maxStars = 5, showValue = true, starSize = 10, ...rest }: RatingDisplayProps) {
+  return (
+    <XStack alignItems="center" gap="$1.5" {...rest}>
+      <XStack gap="$1" alignItems="center">
+        {Array.from({ length: maxStars }, (_, i) => (
+          <StarShape key={i} filled={i < Math.round(value)} size={starSize} />
+        ))}
+      </XStack>
       {showValue && (
         <TamaguiText fontSize="$4" fontWeight="600" color="$color">
           {value.toFixed(1)}

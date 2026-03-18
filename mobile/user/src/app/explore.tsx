@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Feather } from '@expo/vector-icons'
 
 const CATEGORIES = ['All', 'History', 'Nature', 'Food']
 
@@ -54,18 +55,13 @@ export default function ExploreScreen() {
         justifyContent="center"
         margin="$3"
         borderRadius="$4"
+        gap="$2"
       >
-        <Text fontSize="$12">{'\u{1F5FA}'}</Text>
-        <Text variant="body" muted marginTop="$2">Map View</Text>
+        <Feather name="map" size={48} color="var(--color-mutedForeground, #999)" />
+        <Text variant="body" muted>Map View</Text>
         <Text variant="caption" muted>Explore routes around you</Text>
 
-        {/* Map Controls */}
-        <YStack
-          position="absolute"
-          right={12}
-          top={12}
-          gap="$2"
-        >
+        <YStack position="absolute" right={12} top={12} gap="$2">
           <XStack
             width={40}
             height={40}
@@ -79,7 +75,7 @@ export default function ExploreScreen() {
             shadowRadius={3}
             elevation={2}
           >
-            <Text fontSize="$5">{'\u{1F4CD}'}</Text>
+            <Feather name="crosshair" size={20} color="var(--color-primary, #005696)" />
           </XStack>
         </YStack>
       </YStack>

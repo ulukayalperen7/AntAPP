@@ -1,6 +1,7 @@
 'use client'
 
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, Avatar, Badge, ProgressBar } from '@antapp/ui'
+import { Eye, Navigation, Bookmark, Ruler, Clock, TrendingUp, Landmark, Map, ImageIcon } from 'lucide-react'
 
 const ROUTE_DATA = {
   title: 'Classic Kaleici History Tour',
@@ -57,21 +58,34 @@ export default function RouteDetailPage() {
           <XStack alignItems="center" gap="$3" flexWrap="wrap">
             <RatingDisplay value={ROUTE_DATA.rating} />
             <Text variant="caption" color="$ant200">({ROUTE_DATA.reviewCount} reviews)</Text>
-            <Text variant="caption" color="$ant200">{'\u{1F441}'} {(ROUTE_DATA.views / 1000).toFixed(1)}k views</Text>
+            <XStack alignItems="center" gap="$1">
+              <Eye size={14} color="var(--color-ant200)" />
+              <Text variant="caption" color="$ant200">{(ROUTE_DATA.views / 1000).toFixed(1)}k views</Text>
+            </XStack>
           </XStack>
           <XStack gap="$3" marginTop="$2">
-            <Button variant="solid" size="md">{'\u{1F6A9}'} Start Navigation</Button>
-            <Button variant="outline" size="md">{'\u{1F516}'} Save</Button>
+            <Button variant="solid" size="md">
+              <XStack alignItems="center" gap="$1.5">
+                <Navigation size={16} color="#FFFFFF" />
+                <Text variant="label" color="#FFFFFF">Start Navigation</Text>
+              </XStack>
+            </Button>
+            <Button variant="outline" size="md">
+              <XStack alignItems="center" gap="$1.5">
+                <Bookmark size={16} color="currentColor" />
+                <Text variant="label">Save</Text>
+              </XStack>
+            </Button>
           </XStack>
         </YStack>
       </YStack>
 
       {/* Stats Bar */}
       <XStack gap="$3" flexWrap="wrap">
-        <StatBox value={ROUTE_DATA.distance} label="Distance" icon={<Text fontSize="$6">{'\u{1F4CF}'}</Text>} />
-        <StatBox value={ROUTE_DATA.duration} label="Duration" icon={<Text fontSize="$6">{'\u{1F552}'}</Text>} />
-        <StatBox value={ROUTE_DATA.difficulty} label="Difficulty" icon={<Text fontSize="$6">{'\u{1F4C8}'}</Text>} />
-        <StatBox value={ROUTE_DATA.category} label="Category" icon={<Text fontSize="$6">{'\u{1F3DB}'}</Text>} />
+        <StatBox value={ROUTE_DATA.distance} label="Distance" icon={<Ruler size={22} color="var(--color-primary)" />} />
+        <StatBox value={ROUTE_DATA.duration} label="Duration" icon={<Clock size={22} color="var(--color-primary)" />} />
+        <StatBox value={ROUTE_DATA.difficulty} label="Difficulty" icon={<TrendingUp size={22} color="var(--color-primary)" />} />
+        <StatBox value={ROUTE_DATA.category} label="Category" icon={<Landmark size={22} color="var(--color-primary)" />} />
       </XStack>
 
       {/* Two Column Layout */}
@@ -96,8 +110,9 @@ export default function RouteDetailPage() {
               borderWidth={2}
               borderStyle="dashed"
               borderColor="$borderColor"
+              gap="$2"
             >
-              <Text fontSize="$10" marginBottom="$2">{'\u{1F5FA}'}</Text>
+              <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
               <Text variant="body" muted>Route Map — Coming Soon</Text>
             </YStack>
           </YStack>
@@ -176,7 +191,7 @@ export default function RouteDetailPage() {
                   alignItems="center"
                   justifyContent="center"
                 >
-                  <Text fontSize="$7" color="$mutedForeground">{'\u{1F4F7}'}</Text>
+                  <ImageIcon size={24} color="var(--color-mutedForeground)" strokeWidth={1.5} />
                 </YStack>
               ))}
             </XStack>

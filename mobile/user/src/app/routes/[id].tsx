@@ -1,6 +1,7 @@
 import React from 'react'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, Avatar, ProgressBar, ScrollView } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Feather } from '@expo/vector-icons'
 
 const ROUTE = {
   title: 'Classic Kaleici History Tour',
@@ -75,8 +76,9 @@ export default function RouteDetailScreen() {
               borderWidth={2}
               borderStyle="dashed"
               borderColor="$borderColor"
+              gap="$2"
             >
-              <Text fontSize="$10">{'\u{1F5FA}'}</Text>
+              <Feather name="map" size={40} color="var(--color-mutedForeground, #999)" />
               <Text variant="body" muted>Route Map</Text>
             </YStack>
           </YStack>
@@ -143,7 +145,10 @@ export default function RouteDetailScreen() {
         borderTopColor="$borderColor"
       >
         <Button variant="solid" size="lg">
-          {'\u{1F6A9}'} Start Navigation
+          <XStack alignItems="center" gap="$2">
+            <Feather name="navigation" size={18} color="#FFFFFF" />
+            <Text variant="label" color="#FFFFFF">Start Navigation</Text>
+          </XStack>
         </Button>
       </YStack>
     </YStack>

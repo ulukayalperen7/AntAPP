@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { YStack, XStack, Text, RouteCard, FilterChip, ScrollView } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
+import { Map, Compass } from 'lucide-react'
 
 const CATEGORIES = ['All', 'Nature', 'History', 'Food', 'Entertainment']
 
@@ -164,8 +165,9 @@ export default function ExplorePage() {
           borderWidth={2}
           borderStyle="dashed"
           borderColor="$borderColor"
+          gap="$2"
         >
-          <Text fontSize="$10" marginBottom="$2">{'\u{1F5FA}'}</Text>
+          <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
           <Text variant="body" muted>Map — Coming Soon</Text>
           <Text variant="caption" muted>Real-time trails and traffic around you</Text>
         </YStack>
