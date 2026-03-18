@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
-import { Globe, Route, Users, Bookmark, Settings, LogOut } from 'lucide-react'
+import { Globe, Route, Users, Bookmark, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Explore', href: '/', Icon: Globe },
@@ -12,12 +12,26 @@ const NAV_ITEMS = [
   { label: 'Saved', href: '/saved', Icon: Bookmark },
 ]
 
-export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout?: () => void }) {
+const EXPANDED_WIDTH = 220
+const COLLAPSED_WIDTH = 64
+
+export function AppSidebar({
+  userName,
+  onLogout,
+  collapsed,
+  onToggle,
+}: {
+  userName?: string
+  onLogout?: () => void
+  collapsed?: boolean
+  onToggle?: () => void
+}) {
   const pathname = usePathname()
+  const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH
 
   return (
     <YStack
-      width={220}
+      width={width}
       height="100vh"
       backgroundColor="$backgroundStrong"
       borderRightWidth={1}
@@ -29,22 +43,63 @@ export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout
       left={0}
       zIndex={50}
       $md={{ display: 'none' }}
+      // @ts-ignore web transition
+      style={{ transition: 'width 200ms ease' }}
     >
       <YStack gap="$1">
-        <XStack paddingHorizontal="$4" paddingBottom="$6" alignItems="center" gap="$2">
-          <XStack
-            width={32}
-            height={32}
-            borderRadius="$full"
-            backgroundColor="$primary"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <img src="/ant-mascot.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+        {/* Logo + Toggle */}
+        <XStack
+          paddingHorizontal={collapsed ? '$2' : '$4'}
+          paddingBottom="$6"
+          alignItems="center"
+          justifyContent={collapsed ? 'center' : 'space-between'}
+          gap="$2"
+        >
+          <XStack alignItems="center" gap="$2" overflow="hidden">
+            <XStack
+              width={32}
+              height={32}
+              borderRadius="$full"
+              backgroundColor="$primary"
+              alignItems="center"
+              justifyContent="center"
+              flexShrink={0}
+            >
+              <img src="/ant-mascot.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+            </XStack>
+            {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
           </XStack>
-          <Text variant="heading4" color="$color">AntAPP</Text>
+          {onToggle && !collapsed && (
+            <XStack
+              cursor="pointer"
+              onPress={onToggle}
+              hoverStyle={{ opacity: 0.7 }}
+              padding="$1"
+            >
+              <PanelLeftClose size={18} color="currentColor" />
+            </XStack>
+          )}
         </XStack>
 
+        {/* Collapsed toggle button */}
+        {onToggle && collapsed && (
+          <XStack
+            paddingHorizontal="$2"
+            paddingBottom="$3"
+            justifyContent="center"
+          >
+            <XStack
+              cursor="pointer"
+              onPress={onToggle}
+              hoverStyle={{ opacity: 0.7 }}
+              padding="$1"
+            >
+              <PanelLeftOpen size={18} color="currentColor" />
+            </XStack>
+          </XStack>
+        )}
+
+        {/* Nav Items */}
         <YStack gap="$0.5" paddingHorizontal="$2">
           {NAV_ITEMS.map((item) => {
             const isActive = item.href === '/'
@@ -53,23 +108,26 @@ export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout
             return (
               <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
                 <XStack
-                  paddingHorizontal="$3"
+                  paddingHorizontal={collapsed ? '$0' : '$3'}
                   paddingVertical="$2.5"
                   borderRadius="$3"
                   gap="$2.5"
                   alignItems="center"
+                  justifyContent={collapsed ? 'center' : 'flex-start'}
                   backgroundColor={isActive ? '$ant50' : 'transparent'}
                   hoverStyle={{ backgroundColor: isActive ? '$ant50' : '$backgroundHover' }}
                   cursor="pointer"
                 >
                   <item.Icon size={20} color={isActive ? 'var(--color-primary)' : 'currentColor'} strokeWidth={isActive ? 2.5 : 2} />
-                  <Text
-                    variant="body"
-                    weight={isActive ? 'semibold' : 'regular'}
-                    color={isActive ? '$primary' : '$color'}
-                  >
-                    {item.label}
-                  </Text>
+                  {!collapsed && (
+                    <Text
+                      variant="body"
+                      weight={isActive ? 'semibold' : 'regular'}
+                      color={isActive ? '$primary' : '$color'}
+                    >
+                      {item.label}
+                    </Text>
+                  )}
                 </XStack>
               </Link>
             )
@@ -77,48 +135,61 @@ export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout
         </YStack>
       </YStack>
 
+      {/* Bottom Section */}
       <YStack paddingHorizontal="$2" gap="$2">
         <Link href="/settings" style={{ textDecoration: 'none' }}>
           <XStack
-            paddingHorizontal="$3"
+            paddingHorizontal={collapsed ? '$0' : '$3'}
             paddingVertical="$2.5"
             borderRadius="$3"
             gap="$2.5"
             alignItems="center"
+            justifyContent={collapsed ? 'center' : 'flex-start'}
             hoverStyle={{ backgroundColor: '$backgroundHover' }}
             cursor="pointer"
           >
             <Settings size={20} color="currentColor" />
-            <Text variant="body" color="$mutedForeground">Settings</Text>
+            {!collapsed && <Text variant="body" color="$mutedForeground">Settings</Text>}
           </XStack>
         </Link>
 
         <Divider marginHorizontal="$2" />
 
-        <XStack paddingHorizontal="$3" paddingVertical="$2" gap="$2.5" alignItems="center">
+        <XStack
+          paddingHorizontal={collapsed ? '$0' : '$3'}
+          paddingVertical="$2"
+          gap="$2.5"
+          alignItems="center"
+          justifyContent={collapsed ? 'center' : 'flex-start'}
+        >
           <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} />
-          <YStack flex={1}>
-            <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>
-            <Text variant="caption" muted>Explorer</Text>
-          </YStack>
+          {!collapsed && (
+            <YStack flex={1}>
+              <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>
+              <Text variant="caption" muted>Explorer</Text>
+            </YStack>
+          )}
         </XStack>
 
         {onLogout && (
           <XStack
-            paddingHorizontal="$3"
+            paddingHorizontal={collapsed ? '$0' : '$3'}
             paddingVertical="$2.5"
             borderRadius="$3"
             gap="$2.5"
             alignItems="center"
+            justifyContent={collapsed ? 'center' : 'flex-start'}
             hoverStyle={{ backgroundColor: '$backgroundHover' }}
             cursor="pointer"
             onPress={onLogout}
           >
             <LogOut size={18} color="var(--color-error500, #DC2626)" />
-            <Text variant="body" color="$error500" fontSize="$3">Sign Out</Text>
+            {!collapsed && <Text variant="body" color="$error500" fontSize="$3">Sign Out</Text>}
           </XStack>
         )}
       </YStack>
     </YStack>
   )
 }
+
+export { EXPANDED_WIDTH, COLLAPSED_WIDTH }
