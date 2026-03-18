@@ -161,7 +161,13 @@ namespace CleanArchitecture.Infrastructure.Services
                         throw;
                     }
 
-                    await _userManager.AddToRoleAsync(user, UserTypeEnum.BasicUser.ToString());
+                    var roleName = request.UserType switch
+                    {
+                        UserTypeEnum.BusinessUser => RoleNames.BusinessUser,
+                        UserTypeEnum.Admin => RoleNames.BasicUser,
+                        _ => RoleNames.BasicUser,
+                    };
+                    await _userManager.AddToRoleAsync(user, roleName);
                     var verificationUri = await SendVerificationEmail(user, origin);
                     return $"User Registered. Please confirm your account by visiting this URL {verificationUri}";
                 }

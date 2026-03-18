@@ -84,13 +84,14 @@ export async function register(
   const userName = formData.get('userName') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirmPassword') as string
+  const userType = formData.get('userType') === 'business' ? 1 : 0
 
   try {
     const res = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        userType: 0,
+        userType,
         email,
         userName,
         password,

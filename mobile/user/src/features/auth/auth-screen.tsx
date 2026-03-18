@@ -24,6 +24,7 @@ export function AuthScreen() {
   const [registerEmail, setRegisterEmail] = useState('')
   const [registerPassword, setRegisterPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [userType, setUserType] = useState<'personal' | 'business'>('personal')
 
   const openLogin = () => {
     setMode('login')
@@ -59,7 +60,8 @@ export function AuthScreen() {
       fullName,
       registerEmail,
       registerPassword,
-      confirmPassword
+      confirmPassword,
+      userType
     )
 
     if (result.ok) {
@@ -87,6 +89,7 @@ export function AuthScreen() {
         email={registerEmail}
         password={registerPassword}
         confirmPassword={confirmPassword}
+        userType={userType}
         onFullNameChange={(value) => {
           setFullName(value)
           setError(null)
@@ -103,6 +106,7 @@ export function AuthScreen() {
           setConfirmPassword(value)
           setError(null)
         }}
+        onUserTypeChange={setUserType}
         onSubmit={handleRegister}
         pending={pending}
         error={error}

@@ -24,7 +24,8 @@ type AuthContextValue = {
     fullName: string,
     email: string,
     password: string,
-    confirmPassword: string
+    confirmPassword: string,
+    userType?: 'personal' | 'business'
   ) => Promise<AuthMutationResult>
   logout: () => Promise<void>
 }
@@ -123,14 +124,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       fullName: string,
       email: string,
       password: string,
-      confirmPassword: string
+      confirmPassword: string,
+      userType: 'personal' | 'business' = 'personal'
     ): Promise<AuthMutationResult> => {
       try {
         const message = await registerAccount(
           fullName.trim(),
           email.trim(),
           password,
-          confirmPassword
+          confirmPassword,
+          userType === 'business' ? 1 : 0
         )
 
         return {

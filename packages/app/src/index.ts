@@ -1,5 +1,5 @@
 export { AuthLoginScreen } from './screens/auth/login-screen'
 export type { AuthLoginScreenProps } from './screens/auth/login-screen'
 export { AuthRegisterScreen } from './screens/auth/register-screen'
-export type { AuthRegisterScreenProps } from './screens/auth/register-screen'
+export type { AuthRegisterScreenProps, UserType } from './screens/auth/register-screen'
 export { AuthShell } from './screens/auth/auth-shell'

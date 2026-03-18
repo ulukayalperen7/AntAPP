@@ -33,6 +33,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [userType, setUserType] = useState<'personal' | 'business'>('personal')
 
   useEffect(() => {
     try {
@@ -86,6 +87,7 @@ export default function RegisterPage() {
     formData.append('userName', fullName)
     formData.append('password', password)
     formData.append('confirmPassword', confirmPassword)
+    formData.append('userType', userType)
 
     startTransition(() => {
       formAction(formData)
@@ -131,6 +133,7 @@ export default function RegisterPage() {
       email={email}
       password={password}
       confirmPassword={confirmPassword}
+      userType={userType}
       onFullNameChange={(value) => {
         setFullName(value)
         setHasEditedSinceSubmit(true)
@@ -147,6 +150,7 @@ export default function RegisterPage() {
         setConfirmPassword(value)
         setHasEditedSinceSubmit(true)
       }}
+      onUserTypeChange={setUserType}
       onSubmit={handleSubmit}
       pending={pending}
       error={state?.ok === false && !hasEditedSinceSubmit ? state.message : null}
