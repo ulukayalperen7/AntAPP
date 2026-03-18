@@ -56,17 +56,7 @@ export function AppSidebar({
           gap="$2"
         >
           <XStack alignItems="center" gap="$2" overflow="hidden">
-            <XStack
-              width={32}
-              height={32}
-              borderRadius="$full"
-              backgroundColor="$primary"
-              alignItems="center"
-              justifyContent="center"
-              flexShrink={0}
-            >
-              <img src="/ant-logo.png" alt="" style={{ width: 26, height: 26, objectFit: 'contain' }} />
-            </XStack>
+            <img src="/ant-logo.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }} />
             {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
           </XStack>
           {onToggle && !collapsed && (
