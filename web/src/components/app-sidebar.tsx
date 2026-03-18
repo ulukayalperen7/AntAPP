@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
-import { Globe, Route, Users, Bookmark, Settings } from 'lucide-react'
+import { Globe, Route, Users, Bookmark, Settings, LogOut } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Explore', href: '/', Icon: Globe },
@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { label: 'Saved', href: '/saved', Icon: Bookmark },
 ]
 
-export function AppSidebar({ userName }: { userName?: string }) {
+export function AppSidebar({ userName, onLogout }: { userName?: string; onLogout?: () => void }) {
   const pathname = usePathname()
 
   return (
@@ -100,6 +100,22 @@ export function AppSidebar({ userName }: { userName?: string }) {
             <Text variant="caption" muted>Explorer</Text>
           </YStack>
         </XStack>
+
+        {onLogout && (
+          <XStack
+            paddingHorizontal="$3"
+            paddingVertical="$2.5"
+            borderRadius="$3"
+            gap="$2.5"
+            alignItems="center"
+            hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            cursor="pointer"
+            onPress={onLogout}
+          >
+            <LogOut size={18} color="var(--color-error500, #DC2626)" />
+            <Text variant="body" color="$error500" fontSize="$3">Sign Out</Text>
+          </XStack>
+        )}
       </YStack>
     </YStack>
   )
