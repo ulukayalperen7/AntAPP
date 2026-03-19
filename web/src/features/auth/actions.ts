@@ -25,8 +25,25 @@ function cookieOpts(maxAge: number) {
 function readBackendError(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
   const d = data as Record<string, unknown>
+
+  // Try to get a direct message first
   const message = d['message'] ?? d['Message']
-  return typeof message === 'string' && message.length > 0 ? message : null
+  if (typeof message === 'string' && message.length > 0) return message
+
+  // If no direct message, check for ASP.NET Core Validation errors
+  const errors = d['errors'] ?? d['Errors']
+  if (errors && typeof errors === 'object') {
+    const errorEntries = Object.entries(errors as Record<string, string[]>)
+    if (errorEntries.length > 0) {
+      // Return the first error message found
+      const [field, messages] = errorEntries[0]
+      if (Array.isArray(messages) && messages.length > 0) {
+        return messages[0]
+      }
+    }
+  }
+
+  return null
 }
 
 async function parseError(res: Response): Promise<string> {
@@ -100,8 +117,9 @@ export async function register(
       cache: 'no-store',
     })
     if (!res.ok) return { ok: false, message: await parseError(res) }
-    const message = await res.json()
-    return { ok: true, message: typeof message === 'string' ? message : 'Registration successful.' }
+    const resData = await res.json()
+    const message = resData.message ?? (typeof resData === 'string' ? resData : 'Registration successful.')
+    return { ok: true, message: message }
   } catch {
     return { ok: false, message: 'Network error' }
   }

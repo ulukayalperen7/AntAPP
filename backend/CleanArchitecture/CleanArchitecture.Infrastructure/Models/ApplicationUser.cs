@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace CleanArchitecture.Infrastructure.Models
 {
+    // for authentication 
     public class ApplicationUser : IdentityUser<Guid>
     {
         public UserTypeEnum UserType { get; set; }

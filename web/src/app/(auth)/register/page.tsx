@@ -114,7 +114,7 @@ export default function RegisterPage() {
       >
         <VStack gap="$4" alignItems="center">
           <Text variant="bodyLarge" align="center" color="$success500">
-            Account created successfully. Follow the confirmation instructions before signing in.
+            Account created successfully!
           </Text>
           <Text variant="body" align="center" muted>
             {state.message}

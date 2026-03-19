@@ -12,7 +12,7 @@ namespace CleanArchitecture.Core.DTOs.Account
         [EmailAddress]
         public string Email { get; set; }
         [Required]
-        [MinLength(6)]
+        [MinLength(3)]
         public string UserName { get; set; }
 
         [Required]
