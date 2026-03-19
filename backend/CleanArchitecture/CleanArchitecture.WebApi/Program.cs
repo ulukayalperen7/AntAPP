@@ -57,7 +57,7 @@ else
 
 app.UseRouting();
 app.UseCors(options => options
-    .WithOrigins("http://localhost:3000", "https://localhost:3000")
+    .WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:8081", "http://172.20.10.2:8081", "http://172.20.10.2:3000")
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());

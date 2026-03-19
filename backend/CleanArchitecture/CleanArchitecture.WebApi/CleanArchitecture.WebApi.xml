@@ -4,6 +4,60 @@
         <name>CleanArchitecture.WebApi</name>
     </assembly>
     <members>
+        <member name="T:CleanArchitecture.WebApi.Controllers.AccountController">
+            <summary>
+            Controller for handling user account operations such as login, registration, and password management.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.Login(CleanArchitecture.Core.DTOs.Account.AuthenticationRequest)">
+            <summary>
+            Authenticates a user and returns an access token and a refresh token.
+            </summary>
+            <param name="request">The login credentials (email and password).</param>
+            <returns>Authentication details including the JWT access token and refresh token cookie.</returns>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.RefreshToken(CleanArchitecture.Core.DTOs.Account.RefreshTokenRequest)">
+            <summary>
+            Refreshes the expired access token using a valid refresh token.
+            </summary>
+            <param name="request">Optional request body containing the refresh token (if not in cookies).</param>
+            <returns>New authentication response with updated tokens.</returns>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.Logout">
+            <summary>
+            Logs out the user by deleting the refresh token cookie.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.Me">
+            <summary>
+            Retrieves the current authenticated user's information from the JWT claims.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.ConfirmEmailAsync(System.String,System.String)">
+            <summary>
+            Confirms a user's email address using the userId and a generated confirmation code.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.ForgotPassword(CleanArchitecture.Core.DTOs.Account.ForgotPasswordRequest)">
+            <summary>
+            Initiates the password reset process by sending a token to the user's email.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.ResetPassword(CleanArchitecture.Core.DTOs.Account.ResetPasswordRequest)">
+            <summary>
+            Resets the user's password using a valid token.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.GenerateIPAddress">
+            <summary>
+            Generates or retrieves the client's IP address for security tracking and token generation.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.AccountController.SetRefreshTokenCookie(System.String)">
+            <summary>
+            Appends a secure, HTTP-only refresh token cookie to the response.
+            </summary>
+        </member>
         <member name="T:CleanArchitecture.WebApi.Controllers.v1.AdminCollectionController">
             <summary>
             Admin-only collection endpoints. No ownership checks are enforced —
