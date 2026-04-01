@@ -84,12 +84,22 @@ namespace CleanArchitecture.Infrastructure.Contexts
                 entity.HasIndex(u => u.UserName).IsUnique();
             });
 
+            // Enable PostGIS for geospatial functionality (Spot.Location)
+            builder.HasPostgresExtension("postgis");
+
             // Many-to-many: Route <-> Tag (via RouteTag bridge table)
             builder.Entity<RouteTag>()
                 .HasKey(rt => new { rt.RouteId, rt.TagId });
 
-            builder.Entity<RouteSpot>()
-                .HasKey(rs => new { rs.RouteId, rs.SpotId });
+            // Junction table for Routes and Spots
+            builder.Entity<RouteSpot>(entity =>
+            {
+                // Prevent duplicate spots in the same route
+                entity.HasKey(rs => new { rs.RouteId, rs.SpotId });
+
+                // Ensures every spot within a route has a strict, unique order (1, 2, 3...)
+                entity.HasIndex(rs => new { rs.RouteId, rs.SpotOrder }).IsUnique();
+            });
 
             builder.Entity<CollectionRoute>()
                 .HasKey(cr => new { cr.CollectionId, cr.RouteId });
