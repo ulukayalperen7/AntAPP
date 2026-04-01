@@ -1,6 +1,8 @@
 using CleanArchitecture.Core.Entities;
 using CleanArchitecture.Core.Interfaces.Repositories;
 using CleanArchitecture.Infrastructure.Contexts;
+using CleanArchitecture.Infrastructure.Repository;
+using CleanArchitecture.Infrastructure.Contexts;
 
 namespace CleanArchitecture.Infrastructure.Repositories
 {

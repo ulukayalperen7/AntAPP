@@ -1,4 +1,5 @@
 using CleanArchitecture.Core.Features.Routes.Commands.CreateRoute;
+using CleanArchitecture.Core.Features.Routes.Queries.GetRouteById;
 using CleanArchitecture.Core.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,17 @@ namespace CleanArchitecture.WebApi.Controllers.v1
         public async Task<IActionResult> Post(CreateRouteCommand command)
         {
             return Ok(await Mediator.Send(command));
+        }
+
+        /// <summary>
+        /// GET ROUTE DETAILS (GET) - Fetch a complete route including its ordered sequence of stops (Spots).
+        /// This is public (anyone can view a route).
+        /// </summary>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<GetRouteByIdViewModel>))]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            return Ok(await Mediator.Send(new GetRouteByIdQuery { Id = id }));
         }
     }
 }

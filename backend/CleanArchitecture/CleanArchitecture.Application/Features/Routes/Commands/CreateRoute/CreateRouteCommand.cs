@@ -71,7 +71,7 @@ namespace CleanArchitecture.Core.Features.Routes.Commands.CreateRoute
                 Title = request.Title,
                 Description = request.Description,
                 ThumbnailUrl = request.ThumbnailUrl,
-                RouteType = RouteTypeEnum.Community,
+                RouteType = RouteTypeEnum.Walking,
                 IsPublic = true,
                 RouteTags = new List<RouteTag>(),
                 RouteSpots = new List<RouteSpot>()
