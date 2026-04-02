@@ -82,6 +82,18 @@
             This is public (anyone can view a route).
             </summary>
         </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.Get(CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes.GetPagedRoutesQuery)">
+            <summary>
+            GET ROUTES (GET) - Fetch a paginated list of routes for the Explore feed.
+            Supports filtering by CategoryId and SearchTerm.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.GetNearby(System.Double,System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            GET NEARBY ROUTES (GET) - Fetch a list of routes near a specific location.
+            Uses PostGIS spatial queries under the hood. Radius is in meters (default 5000 = 5km).
+            </summary>
+        </member>
         <member name="T:CleanArchitecture.WebApi.Controllers.v1.SpotController">
             <summary>
             Controller for managing standalone points of interest (Spots).
