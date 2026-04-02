@@ -188,6 +188,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("SpotId");
 
+                    b.HasIndex("RouteId", "SpotOrder")
+                        .IsUnique();
+
                     b.ToTable("RouteSpots");
                 });
 

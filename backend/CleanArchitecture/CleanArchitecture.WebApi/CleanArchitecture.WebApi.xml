@@ -65,6 +65,46 @@
             SECURITY: Every action requires the "Admin" role.
             </summary>
         </member>
+        <member name="T:CleanArchitecture.WebApi.Controllers.v1.RouteController">
+            <summary>
+            Controller for managing visual journeys (Routes) composed of multiple Spots.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.Post(CleanArchitecture.Core.Features.Routes.Commands.CreateRoute.CreateRouteCommand)">
+            <summary>
+            CREATE ROUTE (POST) - Register a new route.
+            Ensure the JSON payload contains at least 2 Spots.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.Get(System.Guid)">
+            <summary>
+            GET ROUTE DETAILS (GET) - Fetch a complete route including its ordered sequence of stops (Spots).
+            This is public (anyone can view a route).
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.Get(CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes.GetPagedRoutesQuery)">
+            <summary>
+            GET ROUTES (GET) - Fetch a paginated list of routes for the Explore feed.
+            Supports filtering by CategoryId and SearchTerm.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.RouteController.GetNearby(System.Double,System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            GET NEARBY ROUTES (GET) - Fetch a list of routes near a specific location.
+            Uses PostGIS spatial queries under the hood. Radius is in meters (default 5000 = 5km).
+            </summary>
+        </member>
+        <member name="T:CleanArchitecture.WebApi.Controllers.v1.SpotController">
+            <summary>
+            Controller for managing standalone points of interest (Spots).
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.v1.SpotController.Post(CleanArchitecture.Core.Features.Spots.Commands.CreateSpot.CreateSpotCommand)">
+            <summary>
+            CREATE SPOT (POST) - Register a new physical location in the system.
+            Requires the user to be authenticated.
+            </summary>
+        </member>
         <member name="T:CleanArchitecture.WebApi.Controllers.v1.TagController">
             <summary>
             This controller handles all requests related to Tags (labels like Nature, Food, Historical).
