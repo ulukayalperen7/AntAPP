@@ -3,6 +3,8 @@ using CleanArchitecture.Core;
 using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces;
 using CleanArchitecture.Infrastructure;
+using CleanArchitecture.Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore;
 using CleanArchitecture.WebApi.Extensions;
 using CleanArchitecture.WebApi.Services;
 using Microsoft.AspNetCore.Builder;
@@ -35,6 +37,9 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     string[] roles = [RoleNames.BasicUser, RoleNames.BusinessUser, RoleNames.Admin];
     foreach (var role in roles)
