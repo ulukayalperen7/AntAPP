@@ -38,6 +38,12 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
         public string ThumbnailUrl { get; set; }
         public Guid AuthorUserId { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// The computed average rating (0.0 to 5.0) of the route.
+        /// Optimized by avoiding expensive grouping operations and returning pre-aggregated data.
+        /// </summary>
+        public double AverageRating { get; set; }
     }
 
     public class GetPagedRoutesQueryHandler : IRequestHandler<GetPagedRoutesQuery, PagedResponse<RouteListViewModel>>
@@ -70,7 +76,11 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
                 Description = r.Description,
                 ThumbnailUrl = r.ThumbnailUrl,
                 AuthorUserId = r.AuthorUserId,
-                CreatedAt = r.CreatedAt
+                CreatedAt = r.CreatedAt,
+                
+                // Dynamically compute the average based on cached aggregates to prevent database overhead.
+                // Math.Round ensures a clean representation like 4.5 for UI stars.
+                AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
             }).ToList();
 
             return new PagedResponse<RouteListViewModel>(viewModelList, validFilter.PageNumber, validFilter.PageSize)

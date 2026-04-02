@@ -29,6 +29,12 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetRouteById
         /// The sequential list of stops (Places) on this journey.
         /// </summary>
         public List<RouteSpotDto> Stops { get; set; }
+
+        /// <summary>
+        /// The computed average rating (0.0 to 5.0) of the route.
+        /// Optimized by avoiding expensive grouping operations and returning pre-aggregated data.
+        /// </summary>
+        public double AverageRating { get; set; }
     }
 
     public class RouteSpotDto
@@ -66,6 +72,10 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetRouteById
                 Title = route.Title,
                 Description = route.Description,
                 ThumbnailUrl = route.ThumbnailUrl,
+                
+                // Dynamically compute the average based on cached aggregates to prevent database overhead.
+                // Math.Round ensures a clean representation like 4.5 for UI stars.
+                AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
                 
                 // Map the RouteSpots into the DTO and sort them by the strict SpotOrder!
                 Stops = route.RouteSpots.OrderBy(rs => rs.SpotOrder).Select(rs => new RouteSpotDto
