@@ -9,10 +9,10 @@ namespace CleanArchitecture.Core.Entities
         public string UserName { get; set; }
         public string ProfilePhotoUrl { get; set; }
 
-        // navigation properties
         public virtual ICollection<Route> AuthoredRoutes { get; set; }
         public virtual ICollection<Collection> Collections { get; set; }
         public virtual ICollection<RouteRating> RouteRatings { get; set; }
         public virtual ICollection<SpotRating> SpotRatings { get; set; }
+        public virtual ICollection<Spot> OwnedSpots { get; set; }
     }
 }

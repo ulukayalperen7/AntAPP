@@ -91,14 +91,18 @@ namespace CleanArchitecture.Infrastructure.Contexts
             builder.Entity<RouteTag>()
                 .HasKey(rt => new { rt.RouteId, rt.TagId });
 
-            // Junction table for Routes and Spots
             builder.Entity<RouteSpot>(entity =>
             {
-                // Prevent duplicate spots in the same route
-                entity.HasKey(rs => new { rs.RouteId, rs.SpotId });
-
-                // Ensures every spot within a route has a strict, unique order (1, 2, 3...)
+                entity.HasKey(rs => rs.Id);
                 entity.HasIndex(rs => new { rs.RouteId, rs.SpotOrder }).IsUnique();
+            });
+
+            builder.Entity<Spot>(entity =>
+            {
+                entity.HasOne(s => s.OwnerUser)
+                    .WithMany(u => u.OwnedSpots)
+                    .HasForeignKey(s => s.OwnerUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<CollectionRoute>()

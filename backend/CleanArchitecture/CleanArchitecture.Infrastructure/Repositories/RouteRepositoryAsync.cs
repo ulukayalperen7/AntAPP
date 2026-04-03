@@ -1,18 +1,17 @@
 using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.Repositories;
 using CleanArchitecture.Infrastructure.Contexts;
 using CleanArchitecture.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Infrastructure.Repositories
 {
-    /// <summary>
-    /// Implementation of the Route repository. 
-    /// Inherits standard CRUD operations from GenericRepositoryAsync.
-    /// </summary>
     public class RouteRepositoryAsync : GenericRepositoryAsync<Route>, IRouteRepositoryAsync
     {
         private readonly ApplicationDbContext _dbContext;
@@ -32,53 +31,105 @@ namespace CleanArchitecture.Infrastructure.Repositories
                 .FirstOrDefaultAsync(r => r.Id == routeId);
         }
 
-        private IQueryable<Route> GetFilteredRoutesQuery(Guid? categoryId, string searchTerm)
+        public async Task<Route> GetRouteWithTrackingAsync(Guid routeId)
         {
-            var query = _dbContext.Routes.AsNoTracking().Where(r => r.IsPublic);
+            return await _dbContext.Routes
+                .AsTracking()
+                .Include(r => r.RouteSpots)
+                .Include(r => r.RouteTags)
+                .FirstOrDefaultAsync(r => r.Id == routeId);
+        }
+
+        private IQueryable<Route> BuildFilteredQuery(
+            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            double? nearLat, double? nearLng, double? radiusKm,
+            Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
+        {
+            var query = _dbContext.Routes.AsNoTracking().Where(r => !r.IsDeleted);
+
+            if (!string.IsNullOrEmpty(visibility))
+            {
+                query = visibility.ToLower() switch
+                {
+                    "public" => query.Where(r => r.IsPublic),
+                    "draft" => query.Where(r => !r.IsPublic),
+                    _ => query.Where(r => r.IsPublic)
+                };
+            }
+            else
+            {
+                query = query.Where(r => r.IsPublic);
+            }
+
+            if (authorId.HasValue)
+                query = query.Where(r => r.AuthorUserId == authorId.Value);
+
+            if (contentType.HasValue)
+                query = query.Where(r => r.ContentType == contentType.Value);
 
             if (categoryId.HasValue)
-            {
                 query = query.Where(r => r.RouteTags.Any(rt => rt.TagId == categoryId.Value));
-            }
+
+            if (tagIds != null && tagIds.Count > 0)
+                query = query.Where(r => r.RouteTags.Any(rt => tagIds.Contains(rt.TagId)));
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                query = query.Where(r => r.Title.ToLower().Contains(searchTerm.ToLower()) 
-                                      || r.Description.ToLower().Contains(searchTerm.ToLower()));
+                var term = searchTerm.ToLower();
+                query = query.Where(r => r.Title.ToLower().Contains(term)
+                                      || r.Description.ToLower().Contains(term));
+            }
+
+            if (nearLat.HasValue && nearLng.HasValue && radiusKm.HasValue)
+            {
+                var radiusMeters = radiusKm.Value * 1000;
+                var point = new Point(nearLng.Value, nearLat.Value) { SRID = 4326 };
+                query = query.Where(r => r.RouteSpots.Any(rs => rs.Spot.Location.Distance(point) <= radiusMeters));
             }
 
             return query;
         }
 
-        public async Task<System.Collections.Generic.IReadOnlyList<Route>> GetPagedRoutesAsync(int pageNumber, int pageSize, Guid? categoryId, string searchTerm)
+        public async Task<IReadOnlyList<Route>> GetPagedRoutesAsync(
+            int pageNumber, int pageSize,
+            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            string sort,
+            double? nearLat, double? nearLng, double? radiusKm,
+            Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
         {
-            var query = GetFilteredRoutesQuery(categoryId, searchTerm);
+            var query = BuildFilteredQuery(searchTerm, categoryId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType);
+
+            query = sort?.ToLower() switch
+            {
+                "rating" => query.OrderByDescending(r => r.RatingCount == 0 ? 0 : r.RatingSum / (double)r.RatingCount),
+                "oldest" => query.OrderBy(r => r.CreatedAt),
+                _ => query.OrderByDescending(r => r.CreatedAt)
+            };
 
             return await query
-                .OrderByDescending(r => r.CreatedAt)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalRoutesCountAsync(Guid? categoryId, string searchTerm)
+        public async Task<int> GetTotalRoutesCountAsync(
+            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            double? nearLat, double? nearLng, double? radiusKm,
+            Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
         {
-            var query = GetFilteredRoutesQuery(categoryId, searchTerm);
-            return await query.CountAsync();
+            return await BuildFilteredQuery(searchTerm, categoryId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType).CountAsync();
         }
 
-        public async Task<System.Collections.Generic.IReadOnlyList<Route>> GetNearbyRoutesAsync(double latitude, double longitude, double radiusInMeters, int pageNumber, int pageSize)
+        public async Task<IReadOnlyList<Route>> GetNearbyRoutesAsync(double latitude, double longitude, double radiusInMeters, int pageNumber, int pageSize)
         {
-            var targetLocation = new NetTopologySuite.Geometries.Point(longitude, latitude) { SRID = 4326 };
+            var targetLocation = new Point(longitude, latitude) { SRID = 4326 };
 
-            var routes = await _dbContext.Routes.AsNoTracking()
-                .Where(r => r.IsPublic && r.RouteSpots.Any(rs => rs.Spot.Location.Distance(targetLocation) <= radiusInMeters))
+            return await _dbContext.Routes.AsNoTracking()
+                .Where(r => r.IsPublic && !r.IsDeleted && r.RouteSpots.Any(rs => rs.Spot.Location.Distance(targetLocation) <= radiusInMeters))
                 .OrderBy(r => r.RouteSpots.Min(rs => rs.Spot.Location.Distance(targetLocation)))
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-
-            return routes;
         }
     }
 }
