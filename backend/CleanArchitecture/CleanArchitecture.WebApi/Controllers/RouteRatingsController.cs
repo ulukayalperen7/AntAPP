@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CleanArchitecture.WebApi.Controllers
 {
     [ApiVersion("1.0")]
-    public class RouteRatingController : BaseApiController
+    public class RouteRatingsController : BaseApiController
     {
         [HttpPut]
         [Authorize]

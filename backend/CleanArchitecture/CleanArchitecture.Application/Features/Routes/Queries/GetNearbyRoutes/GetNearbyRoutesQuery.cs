@@ -11,7 +11,7 @@ using NetTopologySuite.Geometries;
 
 namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
 {
-    public class GetNearbyRoutesQuery : IRequest<Response<IEnumerable<RouteListViewModel>>>
+    public class GetNearbyRoutesQuery : IRequest<Response<IEnumerable<RouteListNearbyViewModel>>>
     {
         public double Latitude { get; set; }
         public double Longitude { get; set; }
@@ -28,7 +28,7 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
     /// <summary>
     /// ViewModel for list representations of Routes.
     /// </summary>
-    public class RouteListViewModel
+    public class RouteListNearbyViewModel
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
@@ -44,7 +44,7 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
         public double AverageRating { get; set; }
     }
 
-    public class GetNearbyRoutesQueryHandler : IRequestHandler<GetNearbyRoutesQuery, Response<IEnumerable<RouteListViewModel>>>
+    public class GetNearbyRoutesQueryHandler : IRequestHandler<GetNearbyRoutesQuery, Response<IEnumerable<RouteListNearbyViewModel>>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
 
@@ -53,7 +53,7 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
             _routeRepository = routeRepository;
         }
 
-        public async Task<Response<IEnumerable<RouteListViewModel>>> Handle(GetNearbyRoutesQuery request, CancellationToken cancellationToken)
+        public async Task<Response<IEnumerable<RouteListNearbyViewModel>>> Handle(GetNearbyRoutesQuery request, CancellationToken cancellationToken)
         {
             var validFilter = new CleanArchitecture.Core.Filters.RequestParameter(request.PageNumber, request.PageSize);
             
@@ -65,7 +65,7 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
                 validFilter.PageSize);
 
             // Manual mapping
-            var viewModelList = routes.Select(r => new RouteListViewModel
+            var viewModelList = routes.Select(r => new RouteListNearbyViewModel
             {
                 Id = r.Id,
                 Title = r.Title,
@@ -79,7 +79,7 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetNearbyRoutes
                 AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
             }).ToList();
 
-            return new Response<IEnumerable<RouteListViewModel>>(viewModelList, message: $"Found {viewModelList.Count} nearby route(s).");
+            return new Response<IEnumerable<RouteListNearbyViewModel>>(viewModelList, message: $"Found {viewModelList.Count} nearby route(s).");
         }
     }
 }

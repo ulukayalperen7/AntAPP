@@ -1,6 +1,4 @@
-
-using CleanArchitecture.Core.Entities;
-using CleanArchitecture.Core.Exceptions;
+using CleanArchitecture.Core.Enums;
 using CleanArchitecture.Core.Interfaces.Repositories;
 using CleanArchitecture.Core.Wrappers;
 using MediatR;
@@ -14,22 +12,20 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
 {
     public class GetPagedRoutesQuery : IRequest<PagedResponse<RouteListViewModel>>
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
-        /// <summary>
-        /// Optional: Filter by Category Tag
-        /// </summary>
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 20;
+        public string Search { get; set; }
         public Guid? CategoryId { get; set; }
-        /// <summary>
-        /// Optional: Filter by Title or Description
-        /// </summary>
-        public string SearchTerm { get; set; }
+        public List<Guid> TagIds { get; set; }
+        public string Sort { get; set; }
+        public double? NearLat { get; set; }
+        public double? NearLng { get; set; }
+        public double? RadiusKm { get; set; }
+        public Guid? AuthorId { get; set; }
+        public string Visibility { get; set; }
+        public string Type { get; set; }
     }
 
-    /// <summary>
-    /// A lighter representation of the Route, used for lists/feeds.
-    /// Does not include the massive array of spots.
-    /// </summary>
     public class RouteListViewModel
     {
         public Guid Id { get; set; }
@@ -37,12 +33,9 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
         public Guid AuthorUserId { get; set; }
+        public string ContentType { get; set; }
+        public bool IsPublic { get; set; }
         public DateTime CreatedAt { get; set; }
-
-        /// <summary>
-        /// The computed average rating (0.0 to 5.0) of the route.
-        /// Optimized by avoiding expensive grouping operations and returning pre-aggregated data.
-        /// </summary>
         public double AverageRating { get; set; }
     }
 
@@ -57,18 +50,27 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
 
         public async Task<PagedResponse<RouteListViewModel>> Handle(GetPagedRoutesQuery request, CancellationToken cancellationToken)
         {
-            // Validate Paging parameters
             var validFilter = new CleanArchitecture.Core.Filters.RequestParameter(request.PageNumber, request.PageSize);
-            
-            var routes = await _routeRepository.GetPagedRoutesAsync(
-                validFilter.PageNumber, 
-                validFilter.PageSize, 
-                request.CategoryId, 
-                request.SearchTerm);
-                
-            var totalRecords = await _routeRepository.GetTotalRoutesCountAsync(request.CategoryId, request.SearchTerm);
 
-            // Manual mapping
+            RouteContentTypeEnum? contentType = request.Type?.ToLower() switch
+            {
+                "official" => RouteContentTypeEnum.Official,
+                "community" => RouteContentTypeEnum.Community,
+                "sponsored" => RouteContentTypeEnum.Sponsored,
+                _ => null
+            };
+
+            var routes = await _routeRepository.GetPagedRoutesAsync(
+                validFilter.PageNumber, validFilter.PageSize,
+                request.Search, request.CategoryId, request.TagIds, request.Sort,
+                request.NearLat, request.NearLng, request.RadiusKm,
+                request.AuthorId, request.Visibility, contentType);
+
+            var totalRecords = await _routeRepository.GetTotalRoutesCountAsync(
+                request.Search, request.CategoryId, request.TagIds,
+                request.NearLat, request.NearLng, request.RadiusKm,
+                request.AuthorId, request.Visibility, contentType);
+
             var viewModelList = routes.Select(r => new RouteListViewModel
             {
                 Id = r.Id,
@@ -76,10 +78,9 @@ namespace CleanArchitecture.Core.Features.Routes.Queries.GetPagedRoutes
                 Description = r.Description,
                 ThumbnailUrl = r.ThumbnailUrl,
                 AuthorUserId = r.AuthorUserId,
+                ContentType = r.ContentType.ToString(),
+                IsPublic = r.IsPublic,
                 CreatedAt = r.CreatedAt,
-                
-                // Dynamically compute the average based on cached aggregates to prevent database overhead.
-                // Math.Round ensures a clean representation like 4.5 for UI stars.
                 AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
             }).ToList();
 

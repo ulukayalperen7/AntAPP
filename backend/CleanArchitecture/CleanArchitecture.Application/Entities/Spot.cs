@@ -12,15 +12,13 @@ namespace CleanArchitecture.Core.Entities
     /// </summary>
     public class Spot : BaseEntity
     {
+        public Guid? OwnerUserId { get; set; }
+        public virtual User OwnerUser { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
         public string PhotoUrl { get; set; }
-        
-        /// <summary>
-        /// Geospatial coordinate mapping to a PostGIS geometry type in the database.
-        /// </summary>
         public Point Location { get; set; }
-        
         public bool IsActive { get; set; }
 
         public long RatingSum { get; set; }

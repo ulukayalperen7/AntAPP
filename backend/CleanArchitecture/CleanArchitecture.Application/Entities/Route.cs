@@ -29,14 +29,8 @@ namespace CleanArchitecture.Core.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        /// <summary>
-        /// Defines if this is a standard 'Community' route or an 'Official' admin-verified route.
-        /// </summary>
         public RouteTypeEnum RouteType { get; set; }
-        
-        /// <summary>
-        /// True if the route is public, false if private to the author.
-        /// </summary>
+        public RouteContentTypeEnum ContentType { get; set; }
         public bool IsPublic { get; set; }
 
         public long RatingSum { get; set; }
