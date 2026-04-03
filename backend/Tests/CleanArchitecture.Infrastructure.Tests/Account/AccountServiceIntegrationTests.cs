@@ -14,12 +14,12 @@ using Moq;
 
 namespace CleanArchitecture.Infrastructure.Tests.Account;
 
-public class AccountServiceIntegrationTests : IAsyncDisposable
+public class AuthServiceIntegrationTests : IAsyncDisposable
 {
     private readonly ServiceProvider _serviceProvider;
     private readonly List<Guid> _createdUserIds = new();
 
-    public AccountServiceIntegrationTests()
+    public AuthServiceIntegrationTests()
     {
         var configuration = new ConfigurationBuilder()
             .SetBasePath(FindWebApiProjectDirectory())
@@ -45,7 +45,7 @@ public class AccountServiceIntegrationTests : IAsyncDisposable
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        services.AddTransient<IAccountService, AccountService>();
+        services.AddTransient<IAuthService, AuthService>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -57,7 +57,7 @@ public class AccountServiceIntegrationTests : IAsyncDisposable
         await EnsureRolesExistAsync(scope.ServiceProvider);
         SetHttpContext(scope.ServiceProvider);
 
-        var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
+        var accountService = scope.ServiceProvider.GetRequiredService<IAuthService>();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var request = CreateRegisterRequest();
 
@@ -88,7 +88,7 @@ public class AccountServiceIntegrationTests : IAsyncDisposable
             await EnsureRolesExistAsync(registerScope.ServiceProvider);
             SetHttpContext(registerScope.ServiceProvider);
             await registerScope.ServiceProvider
-                .GetRequiredService<IAccountService>()
+                .GetRequiredService<IAuthService>()
                 .RegisterAsync(request, "http://localhost:3000");
         }
 
@@ -111,7 +111,7 @@ public class AccountServiceIntegrationTests : IAsyncDisposable
         using var loginScope = _serviceProvider.CreateScope();
         SetHttpContext(loginScope.ServiceProvider);
         var response = await loginScope.ServiceProvider
-            .GetRequiredService<IAccountService>()
+            .GetRequiredService<IAuthService>()
             .AuthenticateAsync(new AuthenticationRequest
             {
                 Email = request.Email,

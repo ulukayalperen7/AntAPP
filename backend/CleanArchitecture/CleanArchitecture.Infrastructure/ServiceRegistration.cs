@@ -42,7 +42,8 @@ namespace CleanArchitecture.Infrastructure
 
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             #region Services
-            services.AddTransient<IAccountService, AccountService>();
+            services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IIdentityService, IdentityService>();
             #endregion
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>

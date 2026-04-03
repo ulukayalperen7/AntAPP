@@ -1,11 +1,9 @@
-﻿using CleanArchitecture.Core.DTOs.Account;
-using CleanArchitecture.Core.DTOs.Email;
-using CleanArchitecture.Core.Wrappers;
+using CleanArchitecture.Core.DTOs.Account;
 using System.Threading.Tasks;
 
 namespace CleanArchitecture.Core.Interfaces
 {
-    public interface IAccountService
+    public interface IAuthService
     {
         Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request, string ipAddress);
         Task<AuthenticationResponse> RefreshTokenAsync(string token, string ipAddress);
