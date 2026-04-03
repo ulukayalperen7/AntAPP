@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Button, Input, XStack } from '@antapp/ui'
+import React, { useRef, useState } from 'react'
+import { Button, Input, XStack, isWeb } from '@antapp/ui'
 import { AuthField, AuthFooterLink, AuthNotice, AuthShell } from './auth-shell'
 
 export type AuthLoginScreenProps = {
@@ -28,6 +28,17 @@ export function AuthLoginScreen({
   mascot,
 }: AuthLoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false)
+  const passwordInputRef = useRef<any>(null)
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((current) => !current)
+
+    if (isWeb) {
+      requestAnimationFrame(() => {
+        passwordInputRef.current?.focus?.()
+      })
+    }
+  }
 
   return (
     <AuthShell
@@ -67,14 +78,20 @@ export function AuthLoginScreen({
       <AuthField label="Password">
         <XStack position="relative" alignItems="center">
           <Input
+            ref={passwordInputRef}
             flex={1}
             value={password}
             onChangeText={onPasswordChange}
             secureTextEntry={!showPassword}
+            {...(isWeb ? { type: showPassword ? 'text' : 'password' } : {})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            autoComplete="current-password"
             placeholder="Enter your password"
             variant="filled"
             size="lg"
-            paddingRight="$12"
+            paddingRight="$14"
             disabled={pending}
             onSubmitEditing={onSubmit}
           />
@@ -84,8 +101,11 @@ export function AuthLoginScreen({
             position="absolute"
             right="$3"
             top="$2.5"
-            onPress={() => setShowPassword((current) => !current)}
+            zIndex={2}
+            onMouseDown={isWeb ? (event) => event.preventDefault() : undefined}
+            onPress={togglePasswordVisibility}
             disabled={pending}
+            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? 'Hide' : 'Show'}
           </Button>

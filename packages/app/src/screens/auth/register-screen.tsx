@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Button, Input, Text, XStack, YStack } from '@antapp/ui'
+import React, { useRef, useState } from 'react'
+import { Button, Input, Text, XStack, YStack, isWeb } from '@antapp/ui'
 import { AuthField, AuthFooterLink, AuthNotice, AuthShell } from './auth-shell'
 
 export type UserType = 'personal' | 'business'
@@ -103,6 +103,28 @@ export function AuthRegisterScreen({
 }: AuthRegisterScreenProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const passwordInputRef = useRef<any>(null)
+  const confirmPasswordInputRef = useRef<any>(null)
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((current) => !current)
+
+    if (isWeb) {
+      requestAnimationFrame(() => {
+        passwordInputRef.current?.focus?.()
+      })
+    }
+  }
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((current) => !current)
+
+    if (isWeb) {
+      requestAnimationFrame(() => {
+        confirmPasswordInputRef.current?.focus?.()
+      })
+    }
+  }
 
   return (
     <AuthShell
@@ -155,14 +177,20 @@ export function AuthRegisterScreen({
       <AuthField label="Password">
         <XStack position="relative" alignItems="center">
           <Input
+            ref={passwordInputRef}
             flex={1}
             value={password}
             onChangeText={onPasswordChange}
             secureTextEntry={!showPassword}
+            {...(isWeb ? { type: showPassword ? 'text' : 'password' } : {})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            autoComplete="new-password"
             placeholder="Create a password"
             variant="filled"
             size="lg"
-            paddingRight="$12"
+            paddingRight="$14"
             disabled={pending}
           />
           <Button
@@ -171,8 +199,11 @@ export function AuthRegisterScreen({
             position="absolute"
             right="$3"
             top="$2.5"
-            onPress={() => setShowPassword((current) => !current)}
+            zIndex={2}
+            onMouseDown={isWeb ? (event) => event.preventDefault() : undefined}
+            onPress={togglePasswordVisibility}
             disabled={pending}
+            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? 'Hide' : 'Show'}
           </Button>
@@ -182,14 +213,20 @@ export function AuthRegisterScreen({
       <AuthField label="Confirm Password">
         <XStack position="relative" alignItems="center">
           <Input
+            ref={confirmPasswordInputRef}
             flex={1}
             value={confirmPassword}
             onChangeText={onConfirmPasswordChange}
             secureTextEntry={!showConfirmPassword}
+            {...(isWeb ? { type: showConfirmPassword ? 'text' : 'password' } : {})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            autoComplete="new-password"
             placeholder="Re-enter your password"
             variant="filled"
             size="lg"
-            paddingRight="$12"
+            paddingRight="$14"
             disabled={pending}
             onSubmitEditing={onSubmit}
           />
@@ -199,8 +236,11 @@ export function AuthRegisterScreen({
             position="absolute"
             right="$3"
             top="$2.5"
-            onPress={() => setShowConfirmPassword((current) => !current)}
+            zIndex={2}
+            onMouseDown={isWeb ? (event) => event.preventDefault() : undefined}
+            onPress={toggleConfirmPasswordVisibility}
             disabled={pending}
+            accessibilityLabel={showConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}
           >
             {showConfirmPassword ? 'Hide' : 'Show'}
           </Button>
