@@ -18,10 +18,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Add configurations
-builder.Configuration.AddJsonFile("appsettings.json");
-builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true);
-
 // Add services to the container.
 builder.Services.AddApplicationLayer();
 builder.Services.AddPersistenceInfrastructure(builder.Configuration);
