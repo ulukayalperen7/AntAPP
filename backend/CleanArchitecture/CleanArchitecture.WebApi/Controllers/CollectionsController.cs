@@ -15,20 +15,13 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.WebApi.Controllers.v1
+namespace CleanArchitecture.WebApi.Controllers
 {
-    /// <summary>
-    /// User-facing collection endpoints. All actions are scoped to the authenticated user.
-    /// The user ID is always extracted from the JWT "uid" claim — never passed as a parameter.
-    /// Also exposes /api/me/saved-routes as a mobile-friendly shortcut for the default "Saved Routes" collection.
-    /// </summary>
     [Route("api/me/collections")]
     [ApiVersion("1.0")]
     [Authorize]
-    public class UserCollectionController : BaseApiController
+    public class CollectionsController : BaseApiController
     {
-        // GET /api/me/collections?pageNumber=1&pageSize=10
-        // Returns the authenticated user's collections with route counts.
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<CollectionViewModel>))]
         public async Task<IActionResult> GetAll([FromQuery] GetCollectionsParameter filter)
@@ -41,18 +34,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             }));
         }
 
-        // POST /api/me/collections
-        // Body: { name, isPublic, description, thumbnailUrl }
-        // Creates a new collection owned by the authenticated user. Returns the new collection ID.
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Create(CreateCollectionCommand command)
-        {
-            return Ok(await Mediator.Send(command));
-        }
-
-        // GET /api/me/collections/{id}
-        // Returns collection detail with its route list. Only works for collections the user owns.
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CollectionDetailViewModel))]
         public async Task<IActionResult> GetById(Guid id)
@@ -64,9 +45,13 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             }));
         }
 
-        // PUT /api/me/collections/{id}
-        // Body: { name, isPublic, description, thumbnailUrl }
-        // Updates a collection the user owns. Returns the collection ID.
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
+        public async Task<IActionResult> Create(CreateCollectionCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> Update(Guid id, UpdateCollectionCommand command)
@@ -76,8 +61,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             return Ok(await Mediator.Send(command));
         }
 
-        // DELETE /api/me/collections/{id}
-        // Deletes a collection the user owns. Returns the deleted collection ID.
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> Delete(Guid id)
@@ -89,9 +72,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             }));
         }
 
-        // POST /api/me/collections/{id}/routes
-        // Body: { routeId }
-        // Adds a route to the user's collection. Fails if the route is already in the collection.
         [HttpPost("{id}/routes")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> AddRoute(Guid id, AddRouteToCollectionCommand command)
@@ -101,8 +81,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             return Ok(await Mediator.Send(command));
         }
 
-        // DELETE /api/me/collections/{id}/routes/{routeId}
-        // Removes a route from the user's collection.
         [HttpDelete("{id}/routes/{routeId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> RemoveRoute(Guid id, Guid routeId)
@@ -115,10 +93,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             }));
         }
 
-        // POST /api/me/saved-routes
-        // Body: { routeId }
-        // Mobile shortcut: saves a route to the user's default "Saved Routes" collection.
-        // The default collection is auto-created on first use.
         [HttpPost("~/api/me/saved-routes")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> SaveRoute(SaveRouteCommand command)
@@ -126,8 +100,6 @@ namespace CleanArchitecture.WebApi.Controllers.v1
             return Ok(await Mediator.Send(command));
         }
 
-        // DELETE /api/me/saved-routes/{routeId}
-        // Mobile shortcut: removes a route from the user's default "Saved Routes" collection.
         [HttpDelete("~/api/me/saved-routes/{routeId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> UnsaveRoute(Guid routeId)
