@@ -24,9 +24,11 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         public string Title { get; set; }
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
+        public Guid AuthorUserId { get; set; }
+        public Ant.Core.Enums.RouteContentTypeEnum ContentType { get; set; }
+        public bool IsPublic { get; set; }
         
-        /// <summary>
-        /// The sequential list of stops (Places) on this journey.
+        /// <summary>        /// The sequential list of stops (Places) on this journey.
         /// </summary>
         public List<RouteSpotDto> Stops { get; set; }
 
@@ -72,6 +74,9 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
                 Title = route.Title,
                 Description = route.Description,
                 ThumbnailUrl = route.ThumbnailUrl,
+                AuthorUserId = route.AuthorUserId,
+                ContentType = route.ContentType,
+                IsPublic = route.IsPublic,
                 
                 // Dynamically compute the average based on cached aggregates to prevent database overhead.
                 // Math.Round ensures a clean representation like 4.5 for UI stars.

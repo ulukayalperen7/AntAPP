@@ -16,12 +16,17 @@ export default async function RouteDetailPage({
   ])
 
   if (routeResult.status === 'rejected') {
+    const err = routeResult.reason as Error
+    // Dev: throw so Next.js error overlay shows the real message
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error(`getRouteById failed: ${err?.message ?? String(err)}`)
+    }
     notFound()
   }
 
-  const route = routeResult.value
+  const route = (routeResult as PromiseFulfilledResult<typeof routeResult extends PromiseFulfilledResult<infer T> ? T : never>).value as Awaited<ReturnType<typeof getRouteById>>
   const currentUser = userResult.status === 'fulfilled' ? userResult.value : null
-  const isOwner = !!(currentUser && (route as any).authorUserId === currentUser.id)
+  const isOwner = !!(currentUser && route.authorUserId === currentUser.id)
 
   return <RouteDetailClient route={route} isOwner={isOwner} />
 }
