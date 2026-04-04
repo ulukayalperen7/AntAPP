@@ -47224,15 +47224,36 @@ function Button2({
   disabled = false,
   variant = "solid",
   size: size7 = "md",
+  accessibilityLabel,
+  accessibilityRole,
+  role,
+  "aria-label": ariaLabel,
   ...rest
 }) {
   const theme = (0, import_core71.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
-  return /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(ButtonFrame, { variant, size: size7, disabled: disabled || loading, loading, ...rest, children: [
-    loading ? /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-    children != null && /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ButtonLabel, { variant, size: size7, children }),
-    !loading && iconAfter
-  ] });
+  const isDisabled = disabled || loading;
+  return /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(
+    ButtonFrame,
+    {
+      variant,
+      size: size7,
+      disabled: isDisabled,
+      loading,
+      tag: import_core71.isWeb ? "button" : void 0,
+      type: import_core71.isWeb ? "button" : void 0,
+      role: import_core71.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
+      accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
+      accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
+      ...rest,
+      children: [
+        loading ? /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ButtonLabel, { variant, size: size7, children }),
+        !loading && iconAfter
+      ]
+    }
+  );
 }
 __name(Button2, "Button");
 
@@ -47247,6 +47268,7 @@ var Input2 = (0, import_core71.styled)(Input, {
   backgroundColor: "$backgroundStrong",
   color: "$color",
   placeholderTextColor: "$placeholderColor",
+  selectionColor: "$primary",
   paddingHorizontal: "$3",
   focusStyle: {
     borderColor: "$primary",
@@ -47322,6 +47344,7 @@ __name(Field, "Field");
 var Text11 = (0, import_core71.styled)(Text10, {
   color: "$color",
   fontFamily: "$body",
+  userSelect: "text",
   variants: {
     variant: {
       heading1: {
@@ -47736,8 +47759,31 @@ var IconButtonFrame = (0, import_core71.styled)(XStack, {
     variant: "ghost"
   }
 });
-function IconButton({ children, variant = "ghost", size: size7 = "md", ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(IconButtonFrame, { variant, size: size7, ...rest, children });
+function IconButton({
+  children,
+  variant = "ghost",
+  size: size7 = "md",
+  accessibilityLabel,
+  accessibilityRole,
+  role,
+  "aria-label": ariaLabel,
+  ...rest
+}) {
+  return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(
+    IconButtonFrame,
+    {
+      variant,
+      size: size7,
+      tag: import_core71.isWeb ? "button" : void 0,
+      type: import_core71.isWeb ? "button" : void 0,
+      role: import_core71.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
+      accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
+      accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
+      ...rest,
+      children
+    }
+  );
 }
 __name(IconButton, "IconButton");
 

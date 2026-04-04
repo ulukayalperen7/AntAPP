@@ -9,6 +9,7 @@ export const Input = styled(TamaguiInput, {
   backgroundColor: '$backgroundStrong',
   color: '$color',
   placeholderTextColor: '$placeholderColor',
+  selectionColor: '$primary',
   paddingHorizontal: '$3',
 
   focusStyle: {

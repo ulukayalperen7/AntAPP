@@ -1,5 +1,5 @@
 import React from 'react'
-import { styled, GetProps, XStack } from 'tamagui'
+import { styled, GetProps, XStack, isWeb } from 'tamagui'
 
 const IconButtonFrame = styled(XStack, {
   alignItems: 'center',
@@ -54,9 +54,28 @@ export type IconButtonProps = Omit<GetProps<typeof IconButtonFrame>, 'variant'> 
   children: React.ReactNode
 }
 
-export function IconButton({ children, variant = 'ghost', size = 'md', ...rest }: IconButtonProps) {
+export function IconButton({
+  children,
+  variant = 'ghost',
+  size = 'md',
+  accessibilityLabel,
+  accessibilityRole,
+  role,
+  'aria-label': ariaLabel,
+  ...rest
+}: IconButtonProps) {
   return (
-    <IconButtonFrame variant={variant} size={size} {...rest}>
+    <IconButtonFrame
+      variant={variant}
+      size={size}
+      tag={isWeb ? 'button' : undefined}
+      type={isWeb ? 'button' : undefined}
+      role={isWeb ? (role ?? accessibilityRole ?? 'button') : role}
+      aria-label={isWeb ? (ariaLabel ?? accessibilityLabel) : ariaLabel}
+      accessibilityRole={isWeb ? undefined : (accessibilityRole ?? 'button')}
+      accessibilityLabel={isWeb ? undefined : accessibilityLabel}
+      {...rest}
+    >
       {children}
     </IconButtonFrame>
   )

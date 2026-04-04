@@ -48435,6 +48435,7 @@
               "backgroundColor": "$backgroundStrong",
               "color": "$color",
               "placeholderTextColor": "$placeholderColor",
+              "selectionColor": "$primary",
               "paddingHorizontal": "$3",
               "focusStyle": {
                 "borderColor": "$primary",
@@ -60202,6 +60203,7 @@
               "unstyled": false,
               "color": "$color",
               "fontFamily": "$body",
+              "userSelect": "text",
               "variant": "body",
               "weight": "regular",
               "align": "left"

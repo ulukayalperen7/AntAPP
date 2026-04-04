@@ -3,6 +3,7 @@ import { styled, GetProps, Text as TamaguiText } from 'tamagui'
 export const Text = styled(TamaguiText, {
   color: '$color',
   fontFamily: '$body',
+  userSelect: 'text',
 
   variants: {
     variant: {

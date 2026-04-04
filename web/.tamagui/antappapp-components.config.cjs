@@ -22837,15 +22837,36 @@ function Button({
   disabled = false,
   variant = "solid",
   size: size3 = "md",
+  accessibilityLabel,
+  accessibilityRole,
+  role,
+  "aria-label": ariaLabel,
   ...rest
 }) {
   const theme = (0, import_core9.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(ButtonFrame, { variant, size: size3, disabled: disabled || loading, loading, ...rest, children: [
-    loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-    children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, children }),
-    !loading && iconAfter
-  ] });
+  const isDisabled = disabled || loading;
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+    ButtonFrame,
+    {
+      variant,
+      size: size3,
+      disabled: isDisabled,
+      loading,
+      tag: import_core9.isWeb ? "button" : void 0,
+      type: import_core9.isWeb ? "button" : void 0,
+      role: import_core9.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      "aria-label": import_core9.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
+      accessibilityRole: import_core9.isWeb ? void 0 : accessibilityRole ?? "button",
+      accessibilityLabel: import_core9.isWeb ? void 0 : accessibilityLabel,
+      ...rest,
+      children: [
+        loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, children }),
+        !loading && iconAfter
+      ]
+    }
+  );
 }
 __name(Button, "Button");
 
@@ -22860,6 +22881,7 @@ var Input2 = (0, import_core9.styled)(Input, {
   backgroundColor: "$backgroundStrong",
   color: "$color",
   placeholderTextColor: "$placeholderColor",
+  selectionColor: "$primary",
   paddingHorizontal: "$3",
   focusStyle: {
     borderColor: "$primary",
@@ -22924,6 +22946,7 @@ var Input2 = (0, import_core9.styled)(Input, {
 var Text4 = (0, import_core9.styled)(Text3, {
   color: "$color",
   fontFamily: "$body",
+  userSelect: "text",
   variants: {
     variant: {
       heading1: {
