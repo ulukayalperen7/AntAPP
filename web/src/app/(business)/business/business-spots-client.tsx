@@ -269,7 +269,7 @@ export default function BusinessSpotsClient({
                 User
               </Button>
               <Button
-                variant="ghost"
+                variant="solid"
                 size="sm"
                 disabled
                 icon={<Building2 size={14} color="#FFFFFF" />}
@@ -287,7 +287,7 @@ export default function BusinessSpotsClient({
                 </Button>
               )}
               <Button
-                variant="ghost"
+                variant="solid"
                 size="sm"
                 onPress={handleLogout}
                 loading={isLoggingOut}

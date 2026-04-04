@@ -4,10 +4,11 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
 import { useTheme } from 'tamagui'
-import { Globe, Route, Bookmark, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Globe, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Explore', href: '/', Icon: Globe },
+  { label: 'Spots', href: '/spots', Icon: MapPinned },
   { label: 'My Routes', href: '/profile', Icon: Route },
   { label: 'Saved', href: '/saved', Icon: Bookmark },
 ]

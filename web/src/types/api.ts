@@ -126,6 +126,37 @@ export type CollectionDetail = {
   routes: RouteListItem[]
 }
 
+export type AdminCollection = {
+  id: string
+  userId: string
+  name: string
+  isDefault: boolean
+  isPublic: boolean
+  description: string | null
+  thumbnailUrl: string | null
+  routeCount: number
+  createdAt: string
+}
+
+export type AdminCollectionRouteItem = {
+  routeId: string
+  title: string | null
+  thumbnailUrl: string | null
+  savedAt: string
+}
+
+export type AdminCollectionDetail = {
+  id: string
+  userId: string
+  name: string
+  isDefault: boolean
+  isPublic: boolean
+  description: string | null
+  thumbnailUrl: string | null
+  createdAt: string
+  routes: AdminCollectionRouteItem[]
+}
+
 // ─── Spots ──────────────────────────────────────────────
 
 export type SpotListItem = {
@@ -136,12 +167,20 @@ export type SpotListItem = {
   latitude: number
   longitude: number
   averageRating: number
-  isActive: boolean
 }
 
 export type SpotDetail = SpotListItem & {
-  ownerUserId: string | null
+  ratingCount: number
   createdAt: string
+}
+
+export type SpotRouteItem = {
+  id: string
+  title: string
+  description: string | null
+  thumbnailUrl: string | null
+  authorUserId: string
+  averageRating: number
 }
 
 export type BusinessSpotItem = {

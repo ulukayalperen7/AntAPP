@@ -307,6 +307,11 @@ export default function RouteDetailClient({
                           style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginTop: 8 }}
                         />
                       )}
+                      <XStack justifyContent="flex-end" marginTop="$1">
+                        <Button variant="outline" size="sm" onPress={() => router.push(`/spots/${stop.spotId}`)}>
+                          Open Spot
+                        </Button>
+                      </XStack>
                     </YStack>
                   </XStack>
                 ))}
