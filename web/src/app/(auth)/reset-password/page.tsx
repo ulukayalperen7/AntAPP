@@ -1,121 +1,144 @@
-'use client';
-import "./_page.css"
+'use client'
 
-const _cn19 = "is_Text font_body _col-primary _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-5 _lh-f-lineHeigh112924 ";
-const _cn18 = "is_View _pos-relative _fd-row _jc-center ";
-const _cn17 = "is_Text font_body _col-error500 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
-const _cn16 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
-const _cn15 = "is_View _pos-relative _fd-column _gap-t-space-1--53 ";
-const _cn14 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
-const _cn13 = "is_View _pos-relative _fd-column _gap-t-space-1--53 ";
-const _cn12 = "is_Text font_body _col-warning500 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
-const _cn11 = "is_View _pos-relative _fd-column _bg-warning50 _btlr-t-radius-3 _btrr-t-radius-3 _bbrr-t-radius-3 _bblr-t-radius-3 _paddingTop-t-space-3 _paddingRight-t-space-3 _paddingBottom-t-space-3 _paddingLeft-t-space-3 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-warning200 _brc-warning200 _borderBottomColor-warning200 _borderLeftColor-warning200 _bbs-solid _bts-solid _bls-solid _brs-solid ";
-const _cn10 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-5 _lh-f-lineHeigh112924 ";
-const _cn1 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-8 _lh-f-lineHeigh112927 _ls--0--3px ";
-const _cn0 = "is_View _pos-relative _fd-column _gap-t-space-1 ";
-const _cn9 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _fs-f-size-5 _lh-f-lineHeigh112924 _textAlign-center ";
-const _cn8 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _fs-f-size-8 _lh-f-lineHeigh112927 _ls--0--3px _textAlign-center ";
-const _cn7 = "is_View _pos-relative _fd-column _gap-t-space-2 _ai-center ";
-const _cn6 = "is_View _pos-relative _fd-row _w-64px _h-64px _btlr-t-radius-fu3456 _btrr-t-radius-fu3456 _bbrr-t-radius-fu3456 _bblr-t-radius-fu3456 _bg-success50 _ai-center _jc-center ";
-const _cn5 = "is_View _pos-relative _fd-column _gap-t-space-4 _ai-center ";
-const _cn4 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
-const _cn3 = "is_View _pos-relative _fd-row _ai-center _gap-t-space-2 _jc-center _marginBottom-t-space-2 ";
-const _cn2 = "is_View _pos-relative _fd-column _w-10037 _maw-400px _bg-backgroundS110634794 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _paddingTop-t-space-6 _paddingRight-t-space-6 _paddingBottom-t-space-6 _paddingLeft-t-space-6 _gap-t-space-5 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
-const _cn = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _mih-100vh _bg-background _ai-center _jc-center _paddingTop-t-space-6 _paddingRight-t-space-6 _paddingBottom-t-space-6 _paddingLeft-t-space-6 ";
-import { useActionState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
-import { YStack, XStack, Text, Button, Input } from '@antapp/ui';
-import { resetPassword } from '@/features/auth/actions';
-import { Lock, CheckCircle2 } from 'lucide-react';
-import Link from 'next/link';
+import { useActionState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
+import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
+import { resetPassword } from '@/features/auth/actions'
+import { Lock, CheckCircle2 } from 'lucide-react'
+import Link from 'next/link'
+
 function ResetPasswordForm() {
-  const searchParams = useSearchParams();
-  const email = searchParams.get('email') ?? '';
-  const token = searchParams.get('token') ?? '';
-  const router = useRouter();
-  const [error, action, isPending] = useActionState<string | null | undefined, FormData>(resetPassword, undefined);
-  const success = error === null;
-  return <div className={_cn}>
-      <div className={_cn2}>
-        {/* Logo */}
-        <div className={_cn3}>
-          <img src="/ant-logo.png" alt="" style={{
-          width: 32,
-          height: 32,
-          objectFit: 'contain'
-        }} />
-          <span className={_cn4}>AntAPP</span>
-        </div>
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email') ?? ''
+  const token = searchParams.get('token') ?? ''
+  const router = useRouter()
 
-        {success ? <div className={_cn5}>
-            <div className={_cn6}>
+  const [error, action, isPending] = useActionState<string | null | undefined, FormData>(resetPassword, undefined)
+  const success = error === null
+
+  return (
+    <YStack flex={1} minHeight="100vh" backgroundColor="$background" alignItems="center" justifyContent="center" padding="$6">
+      <YStack
+        width="100%"
+        maxWidth={400}
+        backgroundColor="$backgroundStrong"
+        borderRadius="$4"
+        padding="$6"
+        gap="$5"
+        borderWidth={1}
+        borderColor="$borderColor"
+      >
+        {/* Logo */}
+        <XStack alignItems="center" gap="$2" justifyContent="center" marginBottom="$2">
+          <img src="/ant-logo.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          <Text variant="heading4" color="$color">AntAPP</Text>
+        </XStack>
+
+        {success ? (
+          <YStack gap="$4" alignItems="center">
+            <XStack
+              width={64}
+              height={64}
+              borderRadius="$full"
+              backgroundColor="$success50"
+              alignItems="center"
+              justifyContent="center"
+            >
               <CheckCircle2 size={32} color="var(--color-success500, #22C55E)" />
-            </div>
-            <div className={_cn7}>
-              <span className={_cn8}>Password Reset!</span>
-              <span className={_cn9}>
+            </XStack>
+            <YStack gap="$2" alignItems="center">
+              <Text variant="heading3" align="center">Password Reset!</Text>
+              <Text variant="body" muted align="center">
                 Your password has been updated successfully.
-              </span>
-            </div>
+              </Text>
+            </YStack>
             <Button variant="solid" size="md" width="100%" onPress={() => router.push('/login')}>
               Go to Login
             </Button>
-          </div> : <>
-            <div className={_cn0}>
-              <span className={_cn1}>Reset Password</span>
-              <span className={_cn10}>Enter your new password below.</span>
-            </div>
+          </YStack>
+        ) : (
+          <>
+            <YStack gap="$1">
+              <Text variant="heading3">Reset Password</Text>
+              <Text variant="body" muted>Enter your new password below.</Text>
+            </YStack>
 
-            {(!email || !token) && <div className={_cn11}>
-                <span className={_cn12}>
+            {(!email || !token) && (
+              <YStack
+                backgroundColor="$warning50"
+                borderRadius="$3"
+                padding="$3"
+                borderWidth={1}
+                borderColor="$warning200"
+              >
+                <Text variant="caption" color="$warning500">
                   Invalid or expired reset link. Please request a new one.
-                </span>
-              </div>}
+                </Text>
+              </YStack>
+            )}
 
-            <form action={action} style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16
-        }}>
+            <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <input type="hidden" name="email" value={email} />
               <input type="hidden" name="token" value={token} />
 
-              <div className={_cn13}>
-                <span className={_cn14}>New Password</span>
-                <Input name="password" secureTextEntry placeholder="••••••••" variant="outline" size="md" error={!!error} />
-              </div>
+              <YStack gap="$1.5">
+                <Text variant="label" color="$mutedForeground">New Password</Text>
+                <Input
+                  name="password"
+                  secureTextEntry
+                  placeholder="••••••••"
+                  variant="outline"
+                  size="md"
+                  error={!!error}
+                />
+              </YStack>
 
-              <div className={_cn15}>
-                <span className={_cn16}>Confirm Password</span>
-                <Input name="confirmPassword" secureTextEntry placeholder="••••••••" variant="outline" size="md" error={!!error} />
-              </div>
+              <YStack gap="$1.5">
+                <Text variant="label" color="$mutedForeground">Confirm Password</Text>
+                <Input
+                  name="confirmPassword"
+                  secureTextEntry
+                  placeholder="••••••••"
+                  variant="outline"
+                  size="md"
+                  error={!!error}
+                />
+              </YStack>
 
-              {error && <span className={_cn17}>{error}</span>}
+              {error && (
+                <Text variant="caption" color="$error500">{error}</Text>
+              )}
 
-              <Button variant="solid" size="md" loading={isPending} disabled={isPending || !email || !token} icon={<Lock size={16} color="#fff" />}
-          // @ts-ignore — web-only HTML type attribute
-          htmlType="submit">
+              <Button
+                variant="solid"
+                size="md"
+                loading={isPending}
+                disabled={isPending || !email || !token}
+                icon={<Lock size={16} color="#fff" />}
+                // @ts-ignore — web-only HTML type attribute
+                htmlType="submit"
+              >
                 Set New Password
               </Button>
             </form>
 
-            <div className={_cn18}>
-              <Link href="/forgot-password" style={{
-            textDecoration: 'none'
-          }}>
-                <span className={_cn19}>Request a new reset link</span>
+            <XStack justifyContent="center">
+              <Link href="/forgot-password" style={{ textDecoration: 'none' }}>
+                <Text variant="body" color="$primary">Request a new reset link</Text>
               </Link>
-            </div>
-          </>}
-      </div>
-    </div>;
+            </XStack>
+          </>
+        )}
+      </YStack>
+    </YStack>
+  )
 }
+
 export default function ResetPasswordPage() {
-  return <Suspense fallback={<div style={{
-    minHeight: '100vh',
-    background: '#F8F9FA'
-  }} />}>
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F8F9FA' }} />}>
       <ResetPasswordForm />
-    </Suspense>;
+    </Suspense>
+  )
 }
