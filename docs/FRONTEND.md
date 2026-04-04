@@ -32,7 +32,7 @@
 packages/ui/          ← @antapp/ui  — tasarım sisteminin tek kaynağı
 packages/app/         ← @antapp/app — platform-agnostic paylaşımlı ekranlar
 web/                  ← Next.js 16  — @antapp/ui'yi tüketir
-mobile/user/          ← Expo 55     — @antapp/ui'yi tüketir
+mobile/               ← Expo 55     — @antapp/ui'yi tüketir
 ```
 
 **Altın Kural:** Bütün UI, `@antapp/ui`'den import edilir. `react-native`'den `StyleSheet`, `View`, `Text`, `Pressable` gibi primitive'ler direkt import edilmez; onların yerine Tamagui primitive'leri ve `@antapp/ui` komponentleri kullanılır.
@@ -689,7 +689,7 @@ Root provider `defaultTheme="light"` kullanır. Dark mode toggle `NextThemeProvi
 
 ### TamaguiProvider
 
-`mobile/user/src/app/_layout.tsx` — `defaultTheme` `useColorScheme`'den gelir:
+`mobile/src/app/_layout.tsx` — `defaultTheme` `useColorScheme`'den gelir:
 
 ```tsx
 <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? 'light'}>

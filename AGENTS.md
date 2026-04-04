@@ -35,7 +35,7 @@ AntAPP/
 │       ├── features/auth/           # Auth Server Actions, types
 │       ├── providers/               # TamaguiProvider
 │       └── lib/api.ts               # Fetch wrapper
-├── mobile/user/                     # Expo (@antapp/mobile-user)
+├── mobile/                          # Expo (@antapp/mobile-user)
 ├── packages/
 │   ├── ui/                          # @antapp/ui — Tamagui config + components
 │   └── app/                         # @antapp/app — Shared screens (Solito)
@@ -66,7 +66,7 @@ cd web && npm run dev
 ```bash
 npm run mobile       # from root
 # or
-cd mobile/user && npx expo start
+cd mobile && npx expo start
 ```
 
 ### Build Check
@@ -92,7 +92,7 @@ cp web/.env.example web/.env.local
 
 ### Mobile
 ```bash
-cp mobile/user/.env.example mobile/user/.env.local
+cp mobile/.env.example mobile/.env.local
 # EXPO_PUBLIC_API_URL=http://<local-ip>:5000/api  ← use machine IP for physical device
 ```
 

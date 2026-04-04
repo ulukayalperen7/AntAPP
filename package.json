@@ -4,12 +4,12 @@
   "private": true,
   "workspaces": [
     "web",
-    "mobile/*",
+    "mobile",
     "packages/*"
   ],
   "scripts": {
     "web": "npm run dev --workspace=web",
-    "mobile": "npm run start --workspace=mobile/user"
+    "mobile": "npm run start --workspace=mobile"
   },
   "devDependencies": {
     "@expo/metro-runtime": "^55.0.6",
