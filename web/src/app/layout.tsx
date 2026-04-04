@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { TamaguiProvider } from '../providers/tamagui-provider'
 import './globals.css'
-import './tamagui.css'
+import './tamagui.generated.css'
 
 export const metadata: Metadata = {
   title: 'AntAPP',

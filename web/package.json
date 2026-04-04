@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "predev": "tamagui generate-css",
+    "dev": "next dev --turbopack",
+    "build": "tamagui build --target web ./src -- next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@antapp/app": "^0.0.1",
     "@antapp/ui": "^0.0.1",
-    "@tamagui/next-plugin": "^2.0.0-rc.22",
     "@tamagui/next-theme": "^2.0.0-rc.22",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
@@ -20,6 +20,7 @@
     "solito": "^5.0.0"
   },
   "devDependencies": {
+    "@tamagui/cli": "^2.0.0-rc.22",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
