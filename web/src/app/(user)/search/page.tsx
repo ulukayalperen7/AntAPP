@@ -1,60 +1,70 @@
 'use client'
 
-import { useState } from 'react'
-import { YStack, XStack, Text, FilterChip, RouteCard, SearchInput, RatingDisplay, Divider } from '@antapp/ui'
+import { useState, useTransition, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { YStack, XStack, Text, FilterChip, RouteCard, SearchInput, Divider } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
-import { Map, Search, Bookmark, MapPin } from 'lucide-react'
+import type { RouteListItem, Tag, RouteContentType } from '@/types/api'
+import { getRoutes, getTags } from '@/features/routes/actions'
+import { Map } from 'lucide-react'
+import { useEffect } from 'react'
 
-const CATEGORIES = ['Nature', 'History', 'Food', 'Entertainment']
-const DIFFICULTIES = ['Easy', 'Mid', 'Hard']
-
-const RESULTS: RouteCardData[] = [
-  {
-    id: '1',
-    title: 'Crystal Peak Ridge',
-    location: 'Taurus Mountains',
-    rating: 4.9,
-    distance: '12.4 km',
-    duration: '3.5 hrs',
-    category: 'Nature',
-    difficulty: 'hard',
-    isOfficial: true,
-  },
-  {
-    id: '2',
-    title: 'Forgotten Ruins Walk',
-    location: 'Perge, Turkey',
-    rating: 4.6,
-    distance: '5.8 km',
-    duration: '1.2 hrs',
-    category: 'History',
-    difficulty: 'moderate',
-  },
-  {
-    id: '3',
-    title: 'Old Town Foodie Trail',
-    location: 'Kaleiçi, Turkey',
-    rating: 4.5,
-    distance: '2.5 km',
-    duration: '2.0 hrs',
-    category: 'Food',
-  },
-  {
-    id: '4',
-    title: 'Neon Nightlife Route',
-    location: 'City Center',
-    rating: 4.8,
-    distance: '4.2 km',
-    duration: '4.0 hrs',
-    category: 'Entertainment',
-    difficulty: 'easy',
-  },
+const ROUTE_TYPES: { label: string; value: RouteContentType | '' }[] = [
+  { label: 'All Types', value: '' },
+  { label: 'Official', value: 'Official' },
+  { label: 'Community', value: 'Community' },
 ]
 
+function routeToCardData(route: RouteListItem): RouteCardData {
+  return {
+    id: route.id,
+    title: route.title,
+    description: route.description ?? undefined,
+    image: route.thumbnailUrl ?? undefined,
+    rating: route.averageRating > 0 ? route.averageRating : undefined,
+    contentType: route.contentType,
+    isOfficial: route.contentType === 'Official',
+  }
+}
+
 export default function SearchPage() {
-  const [activeCategory, setActiveCategory] = useState<string | null>('Nature')
-  const [activeDifficulty, setActiveDifficulty] = useState<string | null>('Easy')
-  const [routeType, setRouteType] = useState<'official' | 'community'>('official')
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
+  const [search, setSearch] = useState('')
+  const [activeTagId, setActiveTagId] = useState<string | null>(null)
+  const [routeType, setRouteType] = useState<RouteContentType | ''>('')
+  const [tags, setTags] = useState<Tag[]>([])
+  const [results, setResults] = useState<RouteListItem[]>([])
+  const [totalResults, setTotalResults] = useState(0)
+
+  // Load tags once
+  useEffect(() => {
+    getTags(100).then(setTags).catch(() => {})
+  }, [])
+
+  const fetchResults = useCallback(() => {
+    startTransition(async () => {
+      try {
+        const res = await getRoutes({
+          search: search || undefined,
+          tagIds: activeTagId ? [activeTagId] : undefined,
+          type: routeType ? routeType.toLowerCase() as 'official' | 'community' | 'sponsored' : undefined,
+          pageSize: 20,
+        })
+        setResults(res.data)
+        setTotalResults(res.totalRecords)
+      } catch {
+        setResults([])
+        setTotalResults(0)
+      }
+    })
+  }, [search, activeTagId, routeType])
+
+  // Fetch on filter change
+  useEffect(() => {
+    fetchResults()
+  }, [fetchResults])
 
   return (
     <XStack gap="$5" flex={1} flexWrap="wrap">
@@ -62,129 +72,94 @@ export default function SearchPage() {
       <YStack width={220} gap="$5" $md={{ display: 'none' }}>
         <XStack justifyContent="space-between" alignItems="center">
           <Text variant="heading3">Filters</Text>
-          <Text variant="caption" color="$primary" cursor="pointer" fontWeight="600">RESET ALL</Text>
+          <Text
+            variant="caption"
+            color="$primary"
+            cursor="pointer"
+            fontWeight="600"
+            onPress={() => {
+              setActiveTagId(null)
+              setRouteType('')
+              setSearch('')
+            }}
+          >
+            RESET ALL
+          </Text>
         </XStack>
 
+        {/* Search */}
         <YStack gap="$2">
-          <Text variant="label" color="$mutedForeground">Category</Text>
-          <YStack gap="$1">
-            {CATEGORIES.map((cat) => (
-              <XStack
-                key={cat}
-                paddingVertical="$2"
-                paddingHorizontal="$3"
-                borderRadius="$3"
-                backgroundColor={activeCategory === cat ? '$ant50' : 'transparent'}
-                hoverStyle={{ backgroundColor: '$backgroundHover' }}
-                cursor="pointer"
-                onPress={() => setActiveCategory(activeCategory === cat ? null : cat)}
-                gap="$2"
-                alignItems="center"
-              >
-                <Text variant="body" color={activeCategory === cat ? '$primary' : '$color'} weight={activeCategory === cat ? 'semibold' : 'regular'}>
-                  {cat}
-                </Text>
-              </XStack>
-            ))}
+          <Text variant="label" color="$mutedForeground">Search</Text>
+          <SearchInput
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search routes..."
+          />
+        </YStack>
+
+        <Divider />
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <YStack gap="$2">
+            <Text variant="label" color="$mutedForeground">Tags</Text>
+            <YStack gap="$1">
+              {tags.filter((t) => t.isActive).map((tag) => (
+                <XStack
+                  key={tag.id}
+                  paddingVertical="$2"
+                  paddingHorizontal="$3"
+                  borderRadius="$3"
+                  backgroundColor={activeTagId === tag.id ? '$ant50' : 'transparent'}
+                  hoverStyle={{ backgroundColor: '$backgroundHover' }}
+                  cursor="pointer"
+                  onPress={() => setActiveTagId(activeTagId === tag.id ? null : tag.id)}
+                  gap="$2"
+                  alignItems="center"
+                >
+                  <Text
+                    variant="body"
+                    color={activeTagId === tag.id ? '$primary' : '$color'}
+                    weight={activeTagId === tag.id ? 'semibold' : 'regular'}
+                  >
+                    {tag.name}
+                  </Text>
+                </XStack>
+              ))}
+            </YStack>
           </YStack>
-        </YStack>
+        )}
 
         <Divider />
 
-        <YStack gap="$2">
-          <Text variant="label" color="$mutedForeground">Difficulty Level</Text>
-          <XStack gap="$2" flexWrap="wrap">
-            {DIFFICULTIES.map((d) => (
-              <FilterChip
-                key={d}
-                active={activeDifficulty === d}
-                onPress={() => setActiveDifficulty(activeDifficulty === d ? null : d)}
-              >
-                {d}
-              </FilterChip>
-            ))}
-          </XStack>
-        </YStack>
-
-        <Divider />
-
-        <YStack gap="$2">
-          <XStack justifyContent="space-between">
-            <Text variant="label" color="$mutedForeground">Distance</Text>
-            <Text variant="caption" color="$primary">0 - 50 km</Text>
-          </XStack>
-          <YStack height={4} backgroundColor="$muted" borderRadius="$full">
-            <YStack height={4} width="60%" backgroundColor="$primary" borderRadius="$full" />
-          </YStack>
-        </YStack>
-
-        <Divider />
-
-        <YStack gap="$2">
-          <XStack justifyContent="space-between">
-            <Text variant="label" color="$mutedForeground">Duration</Text>
-            <Text variant="caption" color="$primary">0 - 5+ hrs</Text>
-          </XStack>
-          <YStack height={4} backgroundColor="$muted" borderRadius="$full">
-            <YStack height={4} width="50%" backgroundColor="$primary" borderRadius="$full" />
-          </YStack>
-        </YStack>
-
-        <Divider />
-
-        <YStack gap="$2">
-          <Text variant="label" color="$mutedForeground">Minimum Rating</Text>
-          <RatingDisplay value={4} />
-          <Text variant="caption" muted>4.0 & Up</Text>
-        </YStack>
-
-        <Divider />
-
+        {/* Route Type */}
         <YStack gap="$2">
           <Text variant="label" color="$mutedForeground">Route Type</Text>
           <YStack gap="$1.5">
-            <XStack
-              gap="$2"
-              alignItems="center"
-              cursor="pointer"
-              onPress={() => setRouteType('official')}
-            >
+            {ROUTE_TYPES.map((rt) => (
               <XStack
-                width={18}
-                height={18}
-                borderRadius="$full"
-                borderWidth={2}
-                borderColor={routeType === 'official' ? '$primary' : '$borderColor'}
+                key={rt.value || 'all'}
+                gap="$2"
                 alignItems="center"
-                justifyContent="center"
+                cursor="pointer"
+                onPress={() => setRouteType(rt.value)}
               >
-                {routeType === 'official' && (
-                  <YStack width={10} height={10} borderRadius="$full" backgroundColor="$primary" />
-                )}
+                <XStack
+                  width={18}
+                  height={18}
+                  borderRadius="$full"
+                  borderWidth={2}
+                  borderColor={routeType === rt.value ? '$primary' : '$borderColor'}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  {routeType === rt.value && (
+                    <YStack width={10} height={10} borderRadius="$full" backgroundColor="$primary" />
+                  )}
+                </XStack>
+                <Text variant="body">{rt.label}</Text>
               </XStack>
-              <Text variant="body">Official Routes</Text>
-            </XStack>
-            <XStack
-              gap="$2"
-              alignItems="center"
-              cursor="pointer"
-              onPress={() => setRouteType('community')}
-            >
-              <XStack
-                width={18}
-                height={18}
-                borderRadius="$full"
-                borderWidth={2}
-                borderColor={routeType === 'community' ? '$primary' : '$borderColor'}
-                alignItems="center"
-                justifyContent="center"
-              >
-                {routeType === 'community' && (
-                  <YStack width={10} height={10} borderRadius="$full" backgroundColor="$primary" />
-                )}
-              </XStack>
-              <Text variant="body">Community Routes</Text>
-            </XStack>
+            ))}
           </YStack>
         </YStack>
       </YStack>
@@ -194,17 +169,33 @@ export default function SearchPage() {
         <XStack justifyContent="space-between" alignItems="center">
           <XStack gap="$2" alignItems="center">
             <Text variant="heading4" weight="bold">Results</Text>
-            <Text variant="body" muted>{RESULTS.length} routes found</Text>
+            {!isPending && (
+              <Text variant="body" muted>
+                {totalResults > 0 ? `${totalResults} routes found` : 'No routes found'}
+              </Text>
+            )}
+            {isPending && <Text variant="body" muted>Searching...</Text>}
           </XStack>
         </XStack>
 
-        <XStack flexWrap="wrap" gap="$4">
-          {RESULTS.map((route) => (
-            <YStack key={route.id} flex={1} minWidth={220} maxWidth="50%">
-              <RouteCard data={route} />
-            </YStack>
-          ))}
-        </XStack>
+        {results.length > 0 ? (
+          <XStack flexWrap="wrap" gap="$4">
+            {results.map((route) => (
+              <YStack key={route.id} flex={1} minWidth={220} maxWidth="50%">
+                <RouteCard
+                  data={routeToCardData(route)}
+                  onPress={() => router.push(`/routes/${route.id}`)}
+                />
+              </YStack>
+            ))}
+          </XStack>
+        ) : !isPending ? (
+          <YStack alignItems="center" justifyContent="center" padding="$10" gap="$3">
+            <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
+            <Text variant="heading4" muted align="center">No routes found</Text>
+            <Text variant="body" muted align="center">Try adjusting your filters or search term.</Text>
+          </YStack>
+        ) : null}
       </YStack>
 
       {/* Map Placeholder */}

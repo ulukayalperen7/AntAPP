@@ -10,7 +10,8 @@ import {
 import { decodeJwtPayload, getTokenRoles, isJwtExpired } from '@/features/auth/jwt'
 import { canAccessPath, getLandingPathByRoles } from '@/features/auth/roles'
 
-const PUBLIC_PATHS = ['/login', '/register']
+const PUBLIC_PATHS = ['/login', '/register', '/forgot-password', '/reset-password', '/confirm-email']
+
 
 type RefreshResponse = {
   jwToken: string

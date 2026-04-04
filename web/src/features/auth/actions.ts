@@ -126,8 +126,77 @@ export async function register(
 }
 
 export async function logout() {
+  const jar = await cookies()
+  const accessToken = jar.get(ACCESS_TOKEN_COOKIE)?.value
+  try {
+    await fetch(`${API_URL}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      cache: 'no-store',
+    })
+  } catch {
+    // Logout devam etmeli — network hatası cookie'leri silmeyi engellemez
+  }
   await clearAuthCookies()
   redirect('/login')
+}
+
+export async function forgotPassword(
+  _prevState: string | null | undefined,
+  formData: FormData
+): Promise<string | null | undefined> {
+  const email = formData.get('email') as string
+  try {
+    const res = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+      cache: 'no-store',
+    })
+    if (!res.ok) return await parseError(res)
+    return null // başarı
+  } catch {
+    return 'Network error'
+  }
+}
+
+export async function resetPassword(
+  _prevState: string | null | undefined,
+  formData: FormData
+): Promise<string | null | undefined> {
+  const email = formData.get('email') as string
+  const token = formData.get('token') as string
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  try {
+    const res = await fetch(`${API_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, token, password, confirmPassword }),
+      cache: 'no-store',
+    })
+    if (!res.ok) return await parseError(res)
+    return null // başarı
+  } catch {
+    return 'Network error'
+  }
+}
+
+export async function confirmEmail(userId: string, code: string): Promise<{ ok: boolean; message: string }> {
+  try {
+    const params = new URLSearchParams({ userId, code })
+    const res = await fetch(`${API_URL}/auth/confirm-email?${params}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return { ok: false, message: await parseError(res) }
+    return { ok: true, message: 'Email confirmed successfully. You can now log in.' }
+  } catch {
+    return { ok: false, message: 'Network error' }
+  }
 }
 
 export async function refreshTokens(): Promise<string> {

@@ -38,7 +38,7 @@ const CardImage = styled(YStack, {
   },
 })
 
-const DifficultyBadge = styled(XStack, {
+const ContentTypeBadge = styled(XStack, {
   position: 'absolute',
   top: 10,
   left: 10,
@@ -47,12 +47,16 @@ const DifficultyBadge = styled(XStack, {
   borderRadius: '$2',
 
   variants: {
-    difficulty: {
-      easy: { backgroundColor: '#16A34A' },
-      moderate: { backgroundColor: '$ant500' },
-      hard: { backgroundColor: '#DC2626' },
+    type: {
+      Official: { backgroundColor: '$primary' },
+      Sponsored: { backgroundColor: '$ant500' },
+      Community: { display: 'none' },
     },
   } as const,
+
+  defaultVariants: {
+    type: 'Community',
+  },
 })
 
 const FavoriteButton = styled(XStack, {
@@ -116,11 +120,14 @@ export type RouteCardData = {
   rating?: number
   distance?: string
   duration?: string
+  /** @deprecated - backend has no difficulty field, use contentType */
   difficulty?: 'easy' | 'moderate' | 'hard'
+  contentType?: 'Community' | 'Official' | 'Sponsored'
   category?: string
   description?: string
   stopsCount?: number
   isFavorited?: boolean
+  /** @deprecated - use contentType === 'Official' */
   isOfficial?: boolean
 }
 
@@ -137,27 +144,16 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
         {data.image && (
           <Image source={{ uri: data.image }} width="100%" height="100%" resizeMode="cover" />
         )}
-        {data.difficulty && (
-          <DifficultyBadge difficulty={data.difficulty}>
-            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF" textTransform="uppercase">
-              {data.difficulty}
-            </TamaguiText>
-          </DifficultyBadge>
+        {/* ContentType badge — Official/Sponsored only */}
+        {(data.contentType === 'Official' || data.isOfficial) && (
+          <ContentTypeBadge type="Official">
+            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF">OFFICIAL</TamaguiText>
+          </ContentTypeBadge>
         )}
-        {data.isOfficial && (
-          <XStack
-            position="absolute"
-            top={10}
-            left={10}
-            paddingHorizontal="$2"
-            paddingVertical="$1"
-            borderRadius="$2"
-            backgroundColor="$primary"
-          >
-            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF">
-              OFFICIAL
-            </TamaguiText>
-          </XStack>
+        {data.contentType === 'Sponsored' && (
+          <ContentTypeBadge type="Sponsored">
+            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF">SPONSORED</TamaguiText>
+          </ContentTypeBadge>
         )}
         <FavoriteButton onPress={onFavoritePress}>
           <HeartIcon filled={!!data.isFavorited} />
