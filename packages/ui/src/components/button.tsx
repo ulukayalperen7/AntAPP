@@ -130,10 +130,18 @@ export function Button({
       size={size}
       disabled={isDisabled}
       loading={loading}
-      role={isWeb ? webRole : role}
-      aria-label={isWeb ? (ariaLabel ?? accessibilityLabel) : ariaLabel}
-      accessibilityRole={isWeb ? undefined : (accessibilityRole ?? 'button')}
-      accessibilityLabel={isWeb ? undefined : accessibilityLabel}
+      {...(isWeb
+        ? {
+            role: webRole,
+            ...((ariaLabel ?? accessibilityLabel)
+              ? { 'aria-label': ariaLabel ?? accessibilityLabel }
+              : {}),
+          }
+        : {
+            ...(role ? { role } : {}),
+            accessibilityRole: accessibilityRole ?? 'button',
+            ...(accessibilityLabel ? { accessibilityLabel } : {}),
+          })}
       {...rest}
     >
       {loading ? (

@@ -47241,10 +47241,14 @@ function Button2({
       size: size7,
       disabled: isDisabled,
       loading,
-      role: import_core71.isWeb ? webRole : role,
-      "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
-      accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
-      accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
+      ...import_core71.isWeb ? {
+        role: webRole,
+        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
+      } : {
+        ...role ? { role } : {},
+        accessibilityRole: accessibilityRole ?? "button",
+        ...accessibilityLabel ? { accessibilityLabel } : {}
+      },
       ...rest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
@@ -47774,10 +47778,14 @@ function IconButton({
     {
       variant,
       size: size7,
-      role: import_core71.isWeb ? webRole : role,
-      "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
-      accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
-      accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
+      ...import_core71.isWeb ? {
+        role: webRole,
+        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
+      } : {
+        ...role ? { role } : {},
+        accessibilityRole: accessibilityRole ?? "button",
+        ...accessibilityLabel ? { accessibilityLabel } : {}
+      },
       ...rest,
       children
     }

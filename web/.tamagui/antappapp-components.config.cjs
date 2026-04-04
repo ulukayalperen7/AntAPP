@@ -22854,10 +22854,14 @@ function Button({
       size: size3,
       disabled: isDisabled,
       loading,
-      role: import_core9.isWeb ? webRole : role,
-      "aria-label": import_core9.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
-      accessibilityRole: import_core9.isWeb ? void 0 : accessibilityRole ?? "button",
-      accessibilityLabel: import_core9.isWeb ? void 0 : accessibilityLabel,
+      ...import_core9.isWeb ? {
+        role: webRole,
+        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
+      } : {
+        ...role ? { role } : {},
+        accessibilityRole: accessibilityRole ?? "button",
+        ...accessibilityLabel ? { accessibilityLabel } : {}
+      },
       ...rest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,

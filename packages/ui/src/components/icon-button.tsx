@@ -70,10 +70,18 @@ export function IconButton({
     <IconButtonFrame
       variant={variant}
       size={size}
-      role={isWeb ? webRole : role}
-      aria-label={isWeb ? (ariaLabel ?? accessibilityLabel) : ariaLabel}
-      accessibilityRole={isWeb ? undefined : (accessibilityRole ?? 'button')}
-      accessibilityLabel={isWeb ? undefined : accessibilityLabel}
+      {...(isWeb
+        ? {
+            role: webRole,
+            ...((ariaLabel ?? accessibilityLabel)
+              ? { 'aria-label': ariaLabel ?? accessibilityLabel }
+              : {}),
+          }
+        : {
+            ...(role ? { role } : {}),
+            accessibilityRole: accessibilityRole ?? 'button',
+            ...(accessibilityLabel ? { accessibilityLabel } : {}),
+          })}
       {...rest}
     >
       {children}
