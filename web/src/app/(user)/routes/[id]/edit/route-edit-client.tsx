@@ -2,29 +2,91 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Divider } from '@antapp/ui'
-import type { RouteDetail } from '@/types/api'
-import { updateRoute, publishRoute, unpublishRoute, deleteRoute } from '@/features/routes/actions'
-import { ArrowLeft, Globe, Lock, Trash2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { YStack, XStack, Text, Button, Input, Divider, Badge } from '@antapp/ui'
+import type { RouteDetail, RouteStopItem } from '@/types/api'
+import {
+  updateRoute,
+  publishRoute,
+  unpublishRoute,
+  deleteRoute,
+  getRouteStops,
+  addRouteStop,
+  updateRouteStop,
+  deleteRouteStop,
+  reorderRouteStops,
+} from '@/features/routes/actions'
+import {
+  ArrowLeft,
+  Globe,
+  Lock,
+  Trash2,
+  CheckCircle2,
+  AlertCircle,
+  Plus,
+  ChevronUp,
+  ChevronDown,
+  Save,
+  RotateCcw,
+  MapPinned,
+} from 'lucide-react'
 
 type FeedbackState = { ok: boolean; message: string } | null
 
-export default function RouteEditClient({ route }: { route: RouteDetail }) {
+type NewStopForm = {
+  spotId: string
+  customTitle: string
+  customDescription: string
+}
+
+function createEmptyStopForm(): NewStopForm {
+  return {
+    spotId: '',
+    customTitle: '',
+    customDescription: '',
+  }
+}
+
+function reorderArray<T>(items: T[], fromIndex: number, toIndex: number) {
+  const next = [...items]
+  const [moved] = next.splice(fromIndex, 1)
+  next.splice(toIndex, 0, moved)
+  return next
+}
+
+export default function RouteEditClient({
+  route,
+  initialStops,
+}: {
+  route: RouteDetail
+  initialStops: RouteStopItem[]
+}) {
   const router = useRouter()
 
-  // Form state
   const [title, setTitle] = useState(route.title)
   const [description, setDescription] = useState(route.description ?? '')
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [isSaving, startSave] = useTransition()
 
-  // Publish/Unpublish
   const [isPublic, setIsPublic] = useState(route.isPublic)
   const [isTogglingPublish, startToggle] = useTransition()
 
-  // Delete
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [isDeleting, startDelete] = useTransition()
+
+  const [stops, setStops] = useState<RouteStopItem[]>(initialStops)
+  const [savedStops, setSavedStops] = useState<RouteStopItem[]>(initialStops)
+  const [newStop, setNewStop] = useState<NewStopForm>(createEmptyStopForm())
+  const [stopFeedback, setStopFeedback] = useState<FeedbackState>(null)
+  const [isManagingStops, startManageStops] = useTransition()
+
+  const refreshStops = async (successMessage?: string) => {
+    const nextStops = await getRouteStops(route.id)
+    setStops(nextStops)
+    setSavedStops(nextStops)
+    if (successMessage) {
+      setStopFeedback({ ok: true, message: successMessage })
+    }
+  }
 
   const handleSave = () => {
     setFeedback(null)
@@ -73,11 +135,114 @@ export default function RouteEditClient({ route }: { route: RouteDetail }) {
     })
   }
 
+  const handleStopFieldChange = (
+    stopId: string,
+    field: keyof Pick<RouteStopItem, 'customTitle' | 'customDescription'>,
+    value: string,
+  ) => {
+    setStops((prev) => prev.map((stop) => (
+      stop.id === stopId
+        ? { ...stop, [field]: value }
+        : stop
+    )))
+  }
+
+  const handleResetStop = (stopId: string) => {
+    const original = savedStops.find((stop) => stop.id === stopId)
+    if (!original) return
+
+    setStops((prev) => prev.map((stop) => (
+      stop.id === stopId ? original : stop
+    )))
+  }
+
+  const isStopDirty = (stop: RouteStopItem) => {
+    const original = savedStops.find((item) => item.id === stop.id)
+    if (!original) return false
+
+    return (original.customTitle ?? '') !== (stop.customTitle ?? '')
+      || (original.customDescription ?? '') !== (stop.customDescription ?? '')
+  }
+
+  const handleSaveStop = (stop: RouteStopItem) => {
+    setStopFeedback(null)
+    startManageStops(async () => {
+      try {
+        await updateRouteStop(route.id, stop.id, {
+          customTitle: (stop.customTitle ?? '').trim(),
+          customDescription: (stop.customDescription ?? '').trim(),
+        })
+        await refreshStops('Stop updated successfully.')
+      } catch (e) {
+        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to update stop.' })
+      }
+    })
+  }
+
+  const handleAddStop = () => {
+    setStopFeedback(null)
+
+    if (!newStop.spotId.trim()) {
+      setStopFeedback({ ok: false, message: 'Spot ID is required to add a new stop.' })
+      return
+    }
+
+    startManageStops(async () => {
+      try {
+        await addRouteStop(route.id, {
+          spotId: newStop.spotId.trim(),
+          customTitle: newStop.customTitle.trim() || undefined,
+          customDescription: newStop.customDescription.trim() || undefined,
+        })
+        setNewStop(createEmptyStopForm())
+        await refreshStops('Stop added successfully.')
+      } catch (e) {
+        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add stop.' })
+      }
+    })
+  }
+
+  const handleDeleteStop = (stopId: string) => {
+    if (!window.confirm('Remove this stop from the route?')) {
+      return
+    }
+
+    setStopFeedback(null)
+    startManageStops(async () => {
+      try {
+        await deleteRouteStop(route.id, stopId)
+        await refreshStops('Stop removed from route.')
+      } catch (e) {
+        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to remove stop.' })
+      }
+    })
+  }
+
+  const handleMoveStop = (fromIndex: number, direction: 'up' | 'down') => {
+    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
+    if (toIndex < 0 || toIndex >= stops.length) {
+      return
+    }
+
+    const nextStops = reorderArray(stops, fromIndex, toIndex)
+    setStops(nextStops)
+    setStopFeedback(null)
+
+    startManageStops(async () => {
+      try {
+        await reorderRouteStops(route.id, nextStops.map((stop) => stop.id))
+        await refreshStops('Stop order updated.')
+      } catch (e) {
+        setStops(savedStops)
+        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to reorder stops.' })
+      }
+    })
+  }
+
   const isDirty = title !== route.title || description !== (route.description ?? '')
 
   return (
-    <YStack gap="$5" flex={1} maxWidth={720}>
-      {/* Header */}
+    <YStack gap="$5" flex={1} maxWidth={860}>
       <XStack alignItems="center" gap="$3">
         <XStack
           cursor="pointer"
@@ -101,7 +266,6 @@ export default function RouteEditClient({ route }: { route: RouteDetail }) {
         </Button>
       </XStack>
 
-      {/* Route Info */}
       <YStack
         backgroundColor="$backgroundStrong"
         borderRadius="$4"
@@ -149,7 +313,7 @@ export default function RouteEditClient({ route }: { route: RouteDetail }) {
           </XStack>
         )}
 
-        <XStack gap="$2">
+        <XStack gap="$2" flexWrap="wrap">
           <Button
             variant="solid"
             size="md"
@@ -174,7 +338,281 @@ export default function RouteEditClient({ route }: { route: RouteDetail }) {
         </XStack>
       </YStack>
 
-      {/* Visibility */}
+      <YStack
+        backgroundColor="$backgroundStrong"
+        borderRadius="$4"
+        padding="$5"
+        gap="$4"
+        borderWidth={1}
+        borderColor="$borderColor"
+      >
+        <XStack justifyContent="space-between" alignItems="flex-start" gap="$3" flexWrap="wrap">
+          <YStack gap="$1">
+            <Text variant="heading4">Route Stops</Text>
+            <Text variant="body" muted>
+              Add new spots, override titles and descriptions, remove stops, or change the order.
+            </Text>
+          </YStack>
+          <Badge variant="info" size="md">{stops.length} stops</Badge>
+        </XStack>
+
+        <YStack
+          gap="$3"
+          padding="$4"
+          borderRadius="$4"
+          backgroundColor="$muted"
+          borderWidth={1}
+          borderColor="$borderColor"
+        >
+          <XStack alignItems="center" gap="$2">
+            <Plus size={16} color="var(--color-primary)" />
+            <Text variant="heading4">Add Stop</Text>
+          </XStack>
+
+          <YStack gap="$3">
+            <YStack gap="$1.5">
+              <Text variant="label" color="$mutedForeground">Spot ID *</Text>
+              <Input
+                value={newStop.spotId}
+                onChangeText={(value) => setNewStop((prev) => ({ ...prev, spotId: value }))}
+                variant="outline"
+                size="md"
+                placeholder="Paste an existing Spot UUID"
+                autoCapitalize="none"
+              />
+            </YStack>
+
+            <XStack gap="$3" flexWrap="wrap">
+              <YStack flex={1} minWidth={240} gap="$1.5">
+                <Text variant="label" color="$mutedForeground">Custom Title</Text>
+                <Input
+                  value={newStop.customTitle}
+                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customTitle: value }))}
+                  variant="outline"
+                  size="md"
+                  placeholder="Optional name override"
+                />
+              </YStack>
+
+              <YStack flex={1} minWidth={240} gap="$1.5">
+                <Text variant="label" color="$mutedForeground">Custom Description</Text>
+                <Input
+                  value={newStop.customDescription}
+                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customDescription: value }))}
+                  variant="outline"
+                  size="md"
+                  placeholder="Optional description override"
+                  // @ts-ignore multiline web
+                  multiline
+                  numberOfLines={3}
+                />
+              </YStack>
+            </XStack>
+
+            <XStack justifyContent="flex-end">
+              <Button
+                variant="solid"
+                size="sm"
+                loading={isManagingStops}
+                disabled={isManagingStops}
+                onPress={handleAddStop}
+                icon={<Plus size={14} color="#FFFFFF" />}
+              >
+                Add Stop
+              </Button>
+            </XStack>
+          </YStack>
+        </YStack>
+
+        {stopFeedback && (
+          <XStack gap="$2" alignItems="center">
+            {stopFeedback.ok
+              ? <CheckCircle2 size={16} color="var(--color-success500, #22C55E)" />
+              : <AlertCircle size={16} color="var(--color-error500, #DC2626)" />
+            }
+            <Text variant="caption" color={stopFeedback.ok ? '$success500' : '$error500'}>
+              {stopFeedback.message}
+            </Text>
+          </XStack>
+        )}
+
+        {stops.length === 0 ? (
+          <YStack
+            padding="$6"
+            borderRadius="$4"
+            borderWidth={1}
+            borderStyle="dashed"
+            borderColor="$borderColor"
+            alignItems="center"
+            gap="$2"
+          >
+            <MapPinned size={28} color="var(--color-mutedForeground)" />
+            <Text variant="heading4">No stops yet</Text>
+            <Text variant="body" muted align="center">
+              Add at least one spot to turn this route into a real itinerary.
+            </Text>
+          </YStack>
+        ) : (
+          <YStack gap="$4">
+            {stops.map((stop, index) => {
+              const displayName = (stop.customTitle ?? '').trim() || stop.name
+              const displayDescription = (stop.customDescription ?? '').trim() || stop.description
+              const dirty = isStopDirty(stop)
+
+              return (
+                <XStack key={stop.id} gap="$3" alignItems="flex-start">
+                  <YStack alignItems="center" gap="$1" paddingTop="$2">
+                    <XStack
+                      width={34}
+                      height={34}
+                      borderRadius="$full"
+                      backgroundColor="$primary"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text variant="label" color="#FFFFFF">{index + 1}</Text>
+                    </XStack>
+                    {index < stops.length - 1 && (
+                      <YStack width={2} minHeight={64} backgroundColor="$borderColor" />
+                    )}
+                  </YStack>
+
+                  <YStack
+                    flex={1}
+                    gap="$4"
+                    padding="$4"
+                    borderRadius="$4"
+                    backgroundColor="$background"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <XStack justifyContent="space-between" alignItems="flex-start" gap="$3" flexWrap="wrap">
+                      <YStack gap="$1" flex={1} minWidth={220}>
+                        <Text variant="heading4">{displayName}</Text>
+                        <Text variant="caption" muted>
+                          Spot ID: {stop.spotId}
+                        </Text>
+                      </YStack>
+
+                      <XStack gap="$2" flexWrap="wrap">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={index === 0 || isManagingStops}
+                          onPress={() => handleMoveStop(index, 'up')}
+                          icon={<ChevronUp size={14} color="currentColor" />}
+                        >
+                          Up
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={index === stops.length - 1 || isManagingStops}
+                          onPress={() => handleMoveStop(index, 'down')}
+                          icon={<ChevronDown size={14} color="currentColor" />}
+                        >
+                          Down
+                        </Button>
+                      </XStack>
+                    </XStack>
+
+                    <XStack gap="$3" flexWrap="wrap">
+                      <YStack flex={1} minWidth={240} gap="$1.5">
+                        <Text variant="label" color="$mutedForeground">Custom Title</Text>
+                        <Input
+                          value={stop.customTitle ?? ''}
+                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customTitle', value)}
+                          variant="outline"
+                          size="md"
+                          placeholder={stop.name}
+                        />
+                      </YStack>
+
+                      <YStack flex={1} minWidth={240} gap="$1.5">
+                        <Text variant="label" color="$mutedForeground">Custom Description</Text>
+                        <Input
+                          value={stop.customDescription ?? ''}
+                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customDescription', value)}
+                          variant="outline"
+                          size="md"
+                          placeholder={stop.description ?? 'Optional description override'}
+                          // @ts-ignore multiline web
+                          multiline
+                          numberOfLines={3}
+                        />
+                      </YStack>
+                    </XStack>
+
+                    <YStack gap="$2">
+                      <Text variant="caption" color="$mutedForeground">Current preview</Text>
+                      <YStack
+                        gap="$2"
+                        padding="$3"
+                        borderRadius="$3"
+                        backgroundColor="$backgroundStrong"
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                      >
+                        <Text variant="label">{displayName}</Text>
+                        {displayDescription ? (
+                          <Text variant="caption" muted>{displayDescription}</Text>
+                        ) : (
+                          <Text variant="caption" muted>No description</Text>
+                        )}
+                        <XStack gap="$2" flexWrap="wrap">
+                          <Badge variant="default" size="sm">Lat {stop.latitude.toFixed(4)}</Badge>
+                          <Badge variant="default" size="sm">Lng {stop.longitude.toFixed(4)}</Badge>
+                          {dirty && <Badge variant="warning" size="sm">Unsaved changes</Badge>}
+                        </XStack>
+                      </YStack>
+                    </YStack>
+
+                    <Divider />
+
+                    <XStack justifyContent="space-between" alignItems="center" gap="$3" flexWrap="wrap">
+                      <Text variant="caption" muted>
+                        Base spot: {stop.name}
+                      </Text>
+
+                      <XStack gap="$2" flexWrap="wrap">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={!dirty || isManagingStops}
+                          onPress={() => handleResetStop(stop.id)}
+                          icon={<RotateCcw size={14} color="currentColor" />}
+                        >
+                          Reset
+                        </Button>
+                        <Button
+                          variant="solid"
+                          size="sm"
+                          loading={isManagingStops}
+                          disabled={!dirty || isManagingStops}
+                          onPress={() => handleSaveStop(stop)}
+                          icon={<Save size={14} color="#FFFFFF" />}
+                        >
+                          Save Stop
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={isManagingStops}
+                          onPress={() => handleDeleteStop(stop.id)}
+                          icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
+                        >
+                          <Text variant="label" color="$error500">Delete</Text>
+                        </Button>
+                      </XStack>
+                    </XStack>
+                  </YStack>
+                </XStack>
+              )
+            })}
+          </YStack>
+        )}
+      </YStack>
+
       <YStack
         backgroundColor="$backgroundStrong"
         borderRadius="$4"
@@ -220,7 +658,6 @@ export default function RouteEditClient({ route }: { route: RouteDetail }) {
         </XStack>
       </YStack>
 
-      {/* Danger Zone */}
       <YStack
         backgroundColor="$backgroundStrong"
         borderRadius="$4"

@@ -91,17 +91,15 @@ export type RouteDetail = {
 
 export type RouteStopItem = {
   id: string
-  routeId: string
   spotId: string
-  spotOrder: number
-  customTitle: string | null
-  customDescription: string | null
-  customPhotoUrl: string | null
-  spotName: string
-  spotDescription: string | null
-  spotPhotoUrl: string | null
+  order: number
+  name: string
+  description: string | null
+  photoUrl: string | null
   latitude: number
   longitude: number
+  customTitle: string | null
+  customDescription: string | null
 }
 
 // ─── Collections ────────────────────────────────────────
@@ -143,6 +141,18 @@ export type SpotListItem = {
 
 export type SpotDetail = SpotListItem & {
   ownerUserId: string | null
+  createdAt: string
+}
+
+export type BusinessSpotItem = {
+  id: string
+  name: string
+  description: string | null
+  photoUrl: string | null
+  latitude: number
+  longitude: number
+  isActive: boolean
+  averageRating: number
   createdAt: string
 }
 
