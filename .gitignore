@@ -46,6 +46,7 @@ BenchmarkDotNet.Artifacts/
 **/launchSettings.json
 appsettings.*.json
 !appsettings.json
+backend/swagger.json
 
 # ========================
 # MOBILE (React Native / Expo)

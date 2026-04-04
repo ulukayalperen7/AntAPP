@@ -20,11 +20,11 @@ AntAPP is a multi-platform **route planning & social platform**.
 ```
 AntAPP/
 ├── backend/                         # .NET 8 Clean Architecture
-│   └── CleanArchitecture/
-│       ├── CleanArchitecture.Application/   # CQRS, interfaces, DTOs
-│       ├── CleanArchitecture.Infrastructure/ # EF Core, services, identity
-│       ├── CleanArchitecture.Core/          # Domain entities
-│       └── CleanArchitecture.WebApi/        # API controllers, Program.cs
+│   └── Ant/
+│       ├── Ant.Application/   # CQRS, interfaces, DTOs
+│       ├── Ant.Infrastructure/ # EF Core, services, identity
+│       ├── Ant.Core/          # Domain entities
+│       └── Ant.WebApi/        # API controllers, Program.cs
 ├── web/                             # Next.js 16 (@antapp/web)
 │   └── src/
 │       ├── app/
@@ -50,9 +50,9 @@ AntAPP/
 ### Backend
 ```bash
 cd backend
-dotnet run --project CleanArchitecture/CleanArchitecture.WebApi
+dotnet run --project Ant/Ant.WebApi
 # or
-dotnet watch --project CleanArchitecture/CleanArchitecture.WebApi
+dotnet watch --project Ant/Ant.WebApi
 ```
 
 ### Web
@@ -72,7 +72,7 @@ cd mobile/user && npx expo start
 ### Build Check
 ```bash
 npm run build --workspace=web
-cd backend && dotnet build CleanArchitecture.sln
+cd backend && dotnet build Ant.sln
 ```
 
 ---
@@ -80,7 +80,7 @@ cd backend && dotnet build CleanArchitecture.sln
 ## Environment Setup
 
 ### Backend
-- `backend/CleanArchitecture/CleanArchitecture.WebApi/appsettings.Development.json` — gitignored, put real values here
+- `backend/Ant/Ant.WebApi/appsettings.Development.json` — gitignored, put real values here
 - See `appsettings.Development.json.example` for required keys
 - Default: `UseInMemoryDatabase: true` (no SQL Server needed)
 

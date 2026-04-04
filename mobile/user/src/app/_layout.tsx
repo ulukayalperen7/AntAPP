@@ -5,8 +5,8 @@ import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-nativ
 import { TamaguiProvider } from 'tamagui';
 import { tamaguiConfig } from '@antapp/ui';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+import { AnimatedSplashOverlay } from '@/components/icons/animated-icon';
+import AppTabs from '@/components/layout/app-tabs';
 import { AuthProvider, useAuth } from '@/features/auth/context';
 import { AuthScreen } from '@/features/auth/auth-screen';
 

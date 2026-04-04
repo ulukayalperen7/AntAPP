@@ -106,9 +106,9 @@ export default function RegisterPage() {
     return (
       <AuthShell
         title="Account Created"
-        subtitle="Your account is ready. Sign in to start exploring your next route."
+        subtitle="Check your confirmation instructions, then sign in to start exploring your next route."
         panelTitle="Discover Antalya"
-        panelDescription="Your account has been created successfully. Continue to sign in when you're ready to explore."
+        panelDescription="Your account has been created successfully. Confirm your email when you're ready, then continue to sign in."
         panelPosition="left"
         mascot={mascotEl}
       >
