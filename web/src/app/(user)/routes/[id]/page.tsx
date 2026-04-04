@@ -1,4 +1,5 @@
 import { getRouteById } from '@/features/routes/actions'
+import { getCurrentUser } from '@/features/account/actions'
 import RouteDetailClient from './route-detail-client'
 import { notFound } from 'next/navigation'
 
@@ -9,10 +10,18 @@ export default async function RouteDetailPage({
 }) {
   const { id } = await params
 
-  try {
-    const route = await getRouteById(id)
-    return <RouteDetailClient route={route} />
-  } catch {
+  const [routeResult, userResult] = await Promise.allSettled([
+    getRouteById(id),
+    getCurrentUser(),
+  ])
+
+  if (routeResult.status === 'rejected') {
     notFound()
   }
+
+  const route = routeResult.value
+  const currentUser = userResult.status === 'fulfilled' ? userResult.value : null
+  const isOwner = !!(currentUser && (route as any).authorUserId === currentUser.id)
+
+  return <RouteDetailClient route={route} isOwner={isOwner} />
 }

@@ -80,8 +80,11 @@ export type RouteDetail = {
   title: string
   description: string | null
   thumbnailUrl: string | null
-  stops: RouteStop[]
+  authorUserId: string
+  isPublic: boolean
+  contentType: RouteContentType
   averageRating: number
+  stops: RouteStop[]
 }
 
 // ─── Route Stops (standalone) ───────────────────────────

@@ -1,10 +1,12 @@
 'use client'
 
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Avatar, RouteCard, StatBox } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { CurrentUser, RouteListItem } from '@/types/api'
-import { Plus, Share2 } from 'lucide-react'
+import { publishRoute, unpublishRoute } from '@/features/routes/actions'
+import { Plus, Share2, Globe, Lock, Pencil } from 'lucide-react'
 
 function routeToCardData(route: RouteListItem): RouteCardData {
   return {
@@ -16,6 +18,99 @@ function routeToCardData(route: RouteListItem): RouteCardData {
     contentType: route.contentType,
     isOfficial: route.contentType === 'Official',
   }
+}
+
+function RouteActionCard({
+  route,
+  onPress,
+}: {
+  route: RouteListItem
+  onPress: () => void
+}) {
+  const router = useRouter()
+  const [isPublic, setIsPublic] = useState(route.isPublic)
+  const [isToggling, startToggle] = useTransition()
+
+  const handleTogglePublish = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    startToggle(async () => {
+      try {
+        if (isPublic) {
+          await unpublishRoute(route.id)
+          setIsPublic(false)
+        } else {
+          await publishRoute(route.id)
+          setIsPublic(true)
+        }
+      } catch { /* ignore */ }
+    })
+  }
+
+  return (
+    <YStack flex={1} minWidth={260} maxWidth="50%" position="relative">
+      <RouteCard
+        data={routeToCardData(route)}
+        onPress={onPress}
+      />
+      {/* Overlay action bar */}
+      <XStack
+        position="absolute"
+        bottom="$0"
+        left="$0"
+        right="$0"
+        backgroundColor="rgba(0,0,0,0.65)"
+        borderBottomLeftRadius="$4"
+        borderBottomRightRadius="$4"
+        paddingHorizontal="$3"
+        paddingVertical="$2"
+        gap="$2"
+        justifyContent="flex-end"
+        alignItems="center"
+      >
+        {/* Publish status badge */}
+        <XStack
+          flex={1}
+          alignItems="center"
+          gap="$1.5"
+        >
+          {isPublic
+            ? <Globe size={13} color="#4ade80" />
+            : <Lock size={13} color="#d1d5db" />
+          }
+          <Text variant="caption" color={isPublic ? '#4ade80' : '#d1d5db'} fontSize="$2">
+            {isPublic ? 'Public' : 'Private'}
+          </Text>
+        </XStack>
+
+        {/* Toggle publish */}
+        <XStack
+          cursor="pointer"
+          padding="$1.5"
+          borderRadius="$2"
+          backgroundColor="rgba(255,255,255,0.1)"
+          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+          onPress={(e: any) => handleTogglePublish(e)}
+          opacity={isToggling ? 0.5 : 1}
+        >
+          <Text variant="caption" color="#FFFFFF" fontSize="$2">
+            {isPublic ? 'Unpublish' : 'Publish'}
+          </Text>
+        </XStack>
+
+        {/* Edit */}
+        <XStack
+          cursor="pointer"
+          padding="$1.5"
+          borderRadius="$2"
+          backgroundColor="rgba(255,255,255,0.1)"
+          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+          onPress={() => router.push(`/routes/${route.id}/edit`)}
+        >
+          <Pencil size={14} color="#FFFFFF" />
+        </XStack>
+      </XStack>
+    </YStack>
+  )
 }
 
 export default function ProfileClient({
@@ -37,6 +132,8 @@ export default function ProfileClient({
   }
 
   const initials = user.userName?.slice(0, 2).toUpperCase() ?? 'U'
+  const publicCount = routes.filter((r) => r.isPublic).length
+  const privateCount = routes.length - publicCount
 
   return (
     <YStack gap="$5" flex={1}>
@@ -73,7 +170,9 @@ export default function ProfileClient({
 
       {/* Stats */}
       <XStack gap="$3" flexWrap="wrap">
-        <StatBox value={routes.length} label="Routes Created" />
+        <StatBox value={routes.length} label="Routes" />
+        {publicCount > 0 && <StatBox value={publicCount} label="Public" />}
+        {privateCount > 0 && <StatBox value={privateCount} label="Private" />}
       </XStack>
 
       {/* My Routes */}
@@ -93,14 +192,13 @@ export default function ProfileClient({
         {routes.length > 0 ? (
           <XStack flexWrap="wrap" gap="$4">
             {routes.map((route) => (
-              <YStack key={route.id} flex={1} minWidth={260} maxWidth="50%">
-                <RouteCard
-                  data={routeToCardData(route)}
-                  onPress={() => router.push(`/routes/${route.id}`)}
-                />
-              </YStack>
+              <RouteActionCard
+                key={route.id}
+                route={route}
+                onPress={() => router.push(`/routes/${route.id}`)}
+              />
             ))}
-            {/* Create Route Card */}
+            {/* Create placeholder */}
             <YStack
               flex={1}
               minWidth={260}
