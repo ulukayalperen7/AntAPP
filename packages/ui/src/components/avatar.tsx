@@ -36,7 +36,7 @@ export function Avatar({ size = 'md', initials, src, ...rest }: AvatarProps) {
   return (
     <AvatarFrame size={size} {...rest}>
       {src ? (
-        <Image source={{ uri: src }} width="100%" height="100%" resizeMode="cover" />
+        <Image source={{ uri: src }} width="100%" height="100%" objectFit="cover" />
       ) : initials ? (
         <TamaguiText fontSize={initialsSize[size]} fontWeight="600" color="$mutedForeground">
           {initials}

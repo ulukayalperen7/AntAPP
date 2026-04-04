@@ -47689,7 +47689,7 @@ var AvatarFrame2 = (0, import_core71.styled)(XStack, {
 });
 var initialsSize = { sm: "$2", md: "$3", lg: "$5", xl: "$7" };
 function Avatar2({ size: size7 = "md", initials, src, ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(AvatarFrame2, { size: size7, ...rest, children: src ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Image, { source: { uri: src }, width: "100%", height: "100%", resizeMode: "cover" }) : initials ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text10, { fontSize: initialsSize[size7], fontWeight: "600", color: "$mutedForeground", children: initials }) : null });
+  return /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(AvatarFrame2, { size: size7, ...rest, children: src ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Image, { source: { uri: src }, width: "100%", height: "100%", objectFit: "cover" }) : initials ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text10, { fontSize: initialsSize[size7], fontWeight: "600", color: "$mutedForeground", children: initials }) : null });
 }
 __name(Avatar2, "Avatar");
 
@@ -48057,7 +48057,7 @@ __name(SmallDot, "SmallDot");
 function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest }) {
   return /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(RouteCardFrame, { orientation, ...rest, children: [
     /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(CardImage, { orientation, children: [
-      data.image && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Image, { source: { uri: data.image }, width: "100%", height: "100%", resizeMode: "cover" }),
+      data.image && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Image, { source: { uri: data.image }, width: "100%", height: "100%", objectFit: "cover" }),
       (data.contentType === "Official" || data.isOfficial) && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ContentTypeBadge, { type: "Official", children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "OFFICIAL" }) }),
       data.contentType === "Sponsored" && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ContentTypeBadge, { type: "Sponsored", children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "SPONSORED" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(FavoriteButton, { onPress: onFavoritePress, children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(HeartIcon, { filled: !!data.isFavorited }) }),

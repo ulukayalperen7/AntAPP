@@ -115,7 +115,7 @@ export default function SpotDetailClient({
           >
             <YStack height={320} backgroundColor="$muted" alignItems="center" justifyContent="center">
               {spot.photoUrl ? (
-                <Image source={{ uri: spot.photoUrl }} width="100%" height="100%" resizeMode="cover" />
+                <Image source={{ uri: spot.photoUrl }} width="100%" height="100%" objectFit="cover" />
               ) : (
                 <MapPinned size={56} color="var(--color-mutedForeground)" />
               )}

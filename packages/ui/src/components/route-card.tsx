@@ -142,7 +142,7 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
     <RouteCardFrame orientation={orientation} {...rest}>
       <CardImage orientation={orientation}>
         {data.image && (
-          <Image source={{ uri: data.image }} width="100%" height="100%" resizeMode="cover" />
+          <Image source={{ uri: data.image }} width="100%" height="100%" objectFit="cover" />
         )}
         {/* ContentType badge — Official/Sponsored only */}
         {(data.contentType === 'Official' || data.isOfficial) && (
