@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
+import { useTheme } from 'tamagui'
 import { Globe, Route, Users, Bookmark, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -27,6 +28,8 @@ export function AppSidebar({
   onToggle?: () => void
 }) {
   const pathname = usePathname()
+  const theme = useTheme()
+  const activeNavIconColor = theme.primary?.get() ?? '#EA580C'
   const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH
 
   return (
@@ -108,7 +111,7 @@ export function AppSidebar({
                   hoverStyle={{ backgroundColor: isActive ? '$ant50' : '$backgroundHover' }}
                   cursor="pointer"
                 >
-                  <item.Icon size={20} color={isActive ? 'var(--color-primary)' : 'currentColor'} strokeWidth={isActive ? 2.5 : 2} />
+                  <item.Icon size={20} color={isActive ? activeNavIconColor : 'currentColor'} strokeWidth={isActive ? 2.5 : 2} />
                   {!collapsed && (
                     <Text
                       variant="body"
