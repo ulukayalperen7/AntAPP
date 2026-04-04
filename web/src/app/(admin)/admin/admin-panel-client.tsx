@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Badge, Switch } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Badge, Switch, SearchInput } from '@antapp/ui'
 import type { AdminCollection, AdminCollectionDetail, Tag } from '@/types/api'
 import { logout } from '@/features/auth/actions'
 import {
@@ -21,6 +21,7 @@ import {
   Compass,
   FolderOpen,
   LogOut,
+  Search,
   Shield,
   Sparkles,
   Tag as TagIcon,
@@ -68,6 +69,11 @@ export default function AdminPanelClient({
   const [tags, setTags] = useState(initialTags)
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(initialCollectionDetail?.id ?? null)
   const [selectedCollectionDetail, setSelectedCollectionDetail] = useState<AdminCollectionDetail | null>(initialCollectionDetail)
+  const [collectionsQuery, setCollectionsQuery] = useState('')
+  const [tagsQuery, setTagsQuery] = useState('')
+  const [deleteConfirmCollectionId, setDeleteConfirmCollectionId] = useState<string | null>(null)
+  const [deleteConfirmTagId, setDeleteConfirmTagId] = useState<string | null>(null)
+  const [removeRouteConfirmId, setRemoveRouteConfirmId] = useState<string | null>(null)
   const [collectionForm, setCollectionForm] = useState<CollectionFormState>(() => initialCollectionDetail
     ? {
       name: initialCollectionDetail.name,
@@ -84,6 +90,8 @@ export default function AdminPanelClient({
   const refreshCollections = async (selectedId?: string | null) => {
     const result = await getAdminCollections(1, 50)
     setCollections(result.data)
+    setDeleteConfirmCollectionId(null)
+    setRemoveRouteConfirmId(null)
 
     const nextSelectedId = selectedId ?? result.data[0]?.id ?? null
     setSelectedCollectionId(nextSelectedId)
@@ -106,6 +114,7 @@ export default function AdminPanelClient({
   const refreshTags = async () => {
     const result = await getAdminTags(100)
     setTags(result)
+    setDeleteConfirmTagId(null)
   }
 
   const handleSelectCollection = (collectionId: string) => {
@@ -228,6 +237,27 @@ export default function AdminPanelClient({
     [collections],
   )
 
+  const visibleCollections = useMemo(() => {
+    const query = collectionsQuery.trim().toLowerCase()
+    if (!query) return collections
+
+    return collections.filter((collection) => {
+      const haystack = [collection.name, collection.description, collection.userId, collection.id]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return haystack.includes(query)
+    })
+  }, [collections, collectionsQuery])
+
+  const visibleTags = useMemo(() => {
+    const query = tagsQuery.trim().toLowerCase()
+    if (!query) return tags
+
+    return tags.filter((tag) => tag.name.toLowerCase().includes(query))
+  }, [tags, tagsQuery])
+
   return (
     <YStack maxWidth={1320} marginHorizontal="auto" padding="$5" gap="$5">
       <YStack
@@ -318,8 +348,15 @@ export default function AdminPanelClient({
                 <Text variant="heading3">Collections</Text>
                 <Text variant="body" muted>Select one to inspect and edit.</Text>
               </YStack>
-              <Badge variant="info" size="md">{collections.length}</Badge>
+              <Badge variant="info" size="md">{visibleCollections.length}</Badge>
             </XStack>
+
+            <SearchInput
+              value={collectionsQuery}
+              onChangeText={setCollectionsQuery}
+              placeholder="Search collections by name, user, or ID"
+              icon={<Search size={16} color="var(--color-mutedForeground)" />}
+            />
 
             {collections.length === 0 ? (
               <EmptyState
@@ -327,9 +364,15 @@ export default function AdminPanelClient({
                 title="No collections"
                 description="There are no collections to moderate yet."
               />
+            ) : visibleCollections.length === 0 ? (
+              <EmptyState
+                Icon={Search}
+                title="No matching collections"
+                description="Try a different keyword or clear the search field."
+              />
             ) : (
               <YStack gap="$3">
-                {collections.map((collection) => {
+                {visibleCollections.map((collection) => {
                   const isActive = collection.id === selectedCollectionId
 
                   return (
@@ -341,8 +384,6 @@ export default function AdminPanelClient({
                       borderColor={isActive ? '$primary' : '$borderColor'}
                       backgroundColor={isActive ? '$ant50' : '$background'}
                       gap="$3"
-                      cursor="pointer"
-                      onPress={() => handleSelectCollection(collection.id)}
                     >
                       <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
                         <YStack gap="$1" flex={1}>
@@ -363,15 +404,47 @@ export default function AdminPanelClient({
 
                       <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$2">
                         <Text variant="caption" muted>{collection.routeCount} routes</Text>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onPress={() => handleDeleteCollection(collection.id)}
-                          disabled={isPending}
-                          icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
-                        >
-                          <Text variant="label" color="$error500">Delete</Text>
-                        </Button>
+                        <XStack gap="$2" flexWrap="wrap">
+                          <Button
+                            variant={isActive ? 'solid' : 'outline'}
+                            size="sm"
+                            onPress={() => handleSelectCollection(collection.id)}
+                          >
+                            {isActive ? 'Opened' : 'Open'}
+                          </Button>
+                          {deleteConfirmCollectionId === collection.id ? (
+                            <XStack gap="$2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onPress={() => setDeleteConfirmCollectionId(null)}
+                                disabled={isPending}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                variant="solid"
+                                size="sm"
+                                onPress={() => handleDeleteCollection(collection.id)}
+                                disabled={isPending}
+                                backgroundColor="$error500"
+                                hoverStyle={{ backgroundColor: '$error400' }}
+                              >
+                                Confirm Delete
+                              </Button>
+                            </XStack>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onPress={() => setDeleteConfirmCollectionId(collection.id)}
+                              disabled={isPending}
+                              icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
+                            >
+                              <Text variant="label" color="$error500">Delete</Text>
+                            </Button>
+                          )}
+                        </XStack>
                       </XStack>
                     </YStack>
                   )
@@ -388,6 +461,13 @@ export default function AdminPanelClient({
               </YStack>
               <Sparkles size={18} color="var(--color-primary)" />
             </XStack>
+
+            <SearchInput
+              value={tagsQuery}
+              onChangeText={setTagsQuery}
+              placeholder="Search tags"
+              icon={<Search size={16} color="var(--color-mutedForeground)" />}
+            />
 
             <XStack gap="$3" flexWrap="wrap" alignItems="flex-end">
               <YStack flex={1} minWidth={220} gap="$1.5">
@@ -411,9 +491,15 @@ export default function AdminPanelClient({
                 title="No tags"
                 description="Create the first tag to start structuring route discovery."
               />
+            ) : visibleTags.length === 0 ? (
+              <EmptyState
+                Icon={Search}
+                title="No matching tags"
+                description="Try a different keyword or clear the search field."
+              />
             ) : (
               <XStack gap="$2" flexWrap="wrap">
-                {tags.map((tag) => (
+                {visibleTags.map((tag) => (
                   <XStack
                     key={tag.id}
                     alignItems="center"
@@ -424,13 +510,38 @@ export default function AdminPanelClient({
                     backgroundColor="$muted"
                   >
                     <Text variant="body">{tag.name}</Text>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onPress={() => handleDeleteTag(tag.id)}
-                      disabled={isPending}
-                      icon={<Trash2 size={12} color="var(--color-error500, #DC2626)" />}
-                    />
+                    {deleteConfirmTagId === tag.id ? (
+                      <XStack gap="$2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onPress={() => setDeleteConfirmTagId(null)}
+                          disabled={isPending}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="solid"
+                          size="sm"
+                          onPress={() => handleDeleteTag(tag.id)}
+                          disabled={isPending}
+                          backgroundColor="$error500"
+                          hoverStyle={{ backgroundColor: '$error400' }}
+                        >
+                          Delete
+                        </Button>
+                      </XStack>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onPress={() => setDeleteConfirmTagId(tag.id)}
+                        disabled={isPending}
+                        icon={<Trash2 size={12} color="var(--color-error500, #DC2626)" />}
+                      >
+                        Remove
+                      </Button>
+                    )}
                   </XStack>
                 ))}
               </XStack>
@@ -522,15 +633,47 @@ export default function AdminPanelClient({
                               <Text variant="heading4">{route.title ?? 'Untitled route'}</Text>
                               <Text variant="caption" muted>{route.routeId}</Text>
                             </YStack>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onPress={() => handleRemoveRoute(route.routeId)}
-                              disabled={isPending}
-                              icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
-                            >
-                              <Text variant="label" color="$error500">Remove</Text>
-                            </Button>
+                            <XStack gap="$2" flexWrap="wrap">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onPress={() => router.push(`/routes/${route.routeId}`)}
+                              >
+                                Open Route
+                              </Button>
+                              {removeRouteConfirmId === route.routeId ? (
+                                <XStack gap="$2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onPress={() => setRemoveRouteConfirmId(null)}
+                                    disabled={isPending}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    variant="solid"
+                                    size="sm"
+                                    onPress={() => handleRemoveRoute(route.routeId)}
+                                    disabled={isPending}
+                                    backgroundColor="$error500"
+                                    hoverStyle={{ backgroundColor: '$error400' }}
+                                  >
+                                    Confirm Remove
+                                  </Button>
+                                </XStack>
+                              ) : (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onPress={() => setRemoveRouteConfirmId(route.routeId)}
+                                  disabled={isPending}
+                                  icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
+                                >
+                                  <Text variant="label" color="$error500">Remove</Text>
+                                </Button>
+                              )}
+                            </XStack>
                           </XStack>
                           <Text variant="caption" muted>
                             Saved {new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(route.savedAt))}

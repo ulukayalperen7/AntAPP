@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Badge } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Badge, SearchInput } from '@antapp/ui'
 import type { BusinessSpotItem } from '@/types/api'
 import { logout } from '@/features/auth/actions'
 import {
@@ -20,6 +20,7 @@ import {
   LogOut,
   MapPinned,
   Plus,
+  Search,
   Shield,
   Sparkles,
   Trash2,
@@ -122,19 +123,25 @@ export default function BusinessSpotsClient({
   const [spots, setSpots] = useState(initialSpots)
   const [total, setTotal] = useState(initialTotal)
   const [feedback, setFeedback] = useState<FeedbackState>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const [createForm, setCreateForm] = useState<SpotFormState>(createEmptyForm())
   const [editingSpotId, setEditingSpotId] = useState<string | null>(null)
+  const [deleteConfirmSpotId, setDeleteConfirmSpotId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<SpotFormState>(createEmptyForm())
   const [isPending, startTransition] = useTransition()
   const [isLoggingOut, startLogoutTransition] = useTransition()
 
   const refreshSpots = async (successMessage?: string) => {
-    const result = await getBusinessSpots(1, 50)
-    setSpots(result.data)
-    setTotal(result.totalRecords)
+    try {
+      const result = await getBusinessSpots(1, 50)
+      setSpots(result.data)
+      setTotal(result.totalRecords)
 
-    if (successMessage) {
-      setFeedback({ ok: true, message: successMessage })
+      if (successMessage) {
+        setFeedback({ ok: true, message: successMessage })
+      }
+    } catch (e) {
+      setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to refresh spots.' })
     }
   }
 
@@ -172,6 +179,7 @@ export default function BusinessSpotsClient({
 
   const handleCancelEdit = () => {
     setEditingSpotId(null)
+    setDeleteConfirmSpotId(null)
     setEditForm(createEmptyForm())
   }
 
@@ -196,10 +204,6 @@ export default function BusinessSpotsClient({
   }
 
   const handleDelete = (spotId: string) => {
-    if (!window.confirm('Delete this spot? This action cannot be undone.')) {
-      return
-    }
-
     setFeedback(null)
     startTransition(async () => {
       try {
@@ -207,6 +211,7 @@ export default function BusinessSpotsClient({
         if (editingSpotId === spotId) {
           handleCancelEdit()
         }
+        setDeleteConfirmSpotId(null)
         await refreshSpots('Spot deleted successfully.')
       } catch (e) {
         setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to delete spot.' })
@@ -235,6 +240,20 @@ export default function BusinessSpotsClient({
   }, [spots])
 
   const activeCount = spots.filter((spot) => spot.isActive).length
+
+  const visibleSpots = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+    if (!query) return spots
+
+    return spots.filter((spot) => {
+      const haystack = [spot.name, spot.description, spot.id]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return haystack.includes(query)
+    })
+  }, [searchQuery, spots])
 
   return (
     <YStack maxWidth={1240} marginHorizontal="auto" padding="$5" gap="$5">
@@ -445,16 +464,29 @@ export default function BusinessSpotsClient({
             </XStack>
           </YStack>
 
-          <Button
-            variant="solid"
-            size="md"
-            onPress={handleCreate}
-            loading={isPending}
-            disabled={isPending}
-            icon={<Plus size={16} color="#FFFFFF" />}
-          >
-            Create Spot
-          </Button>
+          <XStack gap="$2" flexWrap="wrap">
+            <Button
+              variant="solid"
+              size="md"
+              onPress={handleCreate}
+              loading={isPending}
+              disabled={isPending}
+              icon={<Plus size={16} color="#FFFFFF" />}
+            >
+              Create Spot
+            </Button>
+            <Button
+              variant="outline"
+              size="md"
+              disabled={isPending}
+              onPress={() => {
+                setCreateForm(createEmptyForm())
+                setFeedback(null)
+              }}
+            >
+              Reset Form
+            </Button>
+          </XStack>
         </YStack>
 
         <YStack flex={2} minWidth={360} gap="$4">
@@ -465,8 +497,15 @@ export default function BusinessSpotsClient({
                 Copy IDs from here while editing route stops.
               </Text>
             </YStack>
-            <Badge variant="info" size="md">Showing {spots.length}</Badge>
+            <Badge variant="info" size="md">Showing {visibleSpots.length}</Badge>
           </XStack>
+
+          <SearchInput
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Search your spots by name, description, or ID"
+            icon={<Search size={16} color="var(--color-mutedForeground)" />}
+          />
 
           {spots.length === 0 ? (
             <YStack backgroundColor="$backgroundStrong" borderRadius="$4" borderWidth={1} borderColor="$borderColor">
@@ -476,9 +515,17 @@ export default function BusinessSpotsClient({
                 description="Create your first business spot to start building route-ready destinations."
               />
             </YStack>
+          ) : visibleSpots.length === 0 ? (
+            <YStack backgroundColor="$backgroundStrong" borderRadius="$4" borderWidth={1} borderColor="$borderColor">
+              <EmptyState
+                Icon={Search}
+                title="No matching spots"
+                description="Try a different keyword or clear the search to see all business spots."
+              />
+            </YStack>
           ) : (
             <YStack gap="$4">
-              {spots.map((spot) => {
+              {visibleSpots.map((spot) => {
                 const isEditing = editingSpotId === spot.id
 
                 return (
@@ -626,6 +673,13 @@ export default function BusinessSpotsClient({
                               <Button
                                 variant="outline"
                                 size="sm"
+                                onPress={() => router.push(`/spots/${spot.id}`)}
+                              >
+                                Open Spot
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onPress={() => handleCopyId(spot.id)}
                                 icon={<Copy size={14} color="currentColor" />}
                               >
@@ -639,15 +693,38 @@ export default function BusinessSpotsClient({
                               >
                                 Edit
                               </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onPress={() => handleDelete(spot.id)}
-                                disabled={isPending}
-                                icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
-                              >
-                                <Text variant="label" color="$error500">Delete</Text>
-                              </Button>
+                              {deleteConfirmSpotId === spot.id ? (
+                                <XStack gap="$2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onPress={() => setDeleteConfirmSpotId(null)}
+                                    disabled={isPending}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    variant="solid"
+                                    size="sm"
+                                    onPress={() => handleDelete(spot.id)}
+                                    disabled={isPending}
+                                    backgroundColor="$error500"
+                                    hoverStyle={{ backgroundColor: '$error400' }}
+                                  >
+                                    Confirm Delete
+                                  </Button>
+                                </XStack>
+                              ) : (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onPress={() => setDeleteConfirmSpotId(spot.id)}
+                                  disabled={isPending}
+                                  icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
+                                >
+                                  <Text variant="label" color="$error500">Delete</Text>
+                                </Button>
+                              )}
                             </XStack>
                           </>
                         )}
