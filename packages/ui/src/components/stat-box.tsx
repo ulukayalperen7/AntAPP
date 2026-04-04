@@ -1,5 +1,6 @@
 import React from 'react'
 import { GetProps, YStack, Text as TamaguiText } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 export type StatBoxProps = GetProps<typeof YStack> & {
   value: string | number
@@ -8,6 +9,8 @@ export type StatBoxProps = GetProps<typeof YStack> & {
 }
 
 export function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
+  const { rest: boxRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
     <YStack
       alignItems="center"
@@ -18,7 +21,8 @@ export function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
       backgroundColor="$backgroundStrong"
       borderRadius="$3"
       flex={1}
-      {...rest}
+      {...accessibilityProps}
+      {...boxRest}
     >
       {icon}
       <TamaguiText fontFamily="$heading" fontSize="$7" fontWeight="700" color="$color">

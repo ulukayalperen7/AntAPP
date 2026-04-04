@@ -1,5 +1,6 @@
 import React from 'react'
-import { styled, GetProps, XStack, Text as TamaguiText, Spinner, isWeb, useTheme } from 'tamagui'
+import { styled, GetProps, XStack, Text as TamaguiText, Spinner, useTheme } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const ButtonFrame = styled(XStack, {
   alignItems: 'center',
@@ -122,7 +123,16 @@ export function Button({
       : (theme.primary?.get() ?? '#EA580C')
 
   const isDisabled = disabled || loading
-  const webRole = role ?? (accessibilityRole === 'button' ? 'button' : undefined) ?? 'button'
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      'aria-label': ariaLabel,
+    },
+    { defaultRole: 'button' },
+  )
 
   return (
     <ButtonFrame
@@ -130,19 +140,8 @@ export function Button({
       size={size}
       disabled={isDisabled}
       loading={loading}
-      {...(isWeb
-        ? {
-            role: webRole,
-            ...((ariaLabel ?? accessibilityLabel)
-              ? { 'aria-label': ariaLabel ?? accessibilityLabel }
-              : {}),
-          }
-        : {
-            ...(role ? { role } : {}),
-            accessibilityRole: accessibilityRole ?? 'button',
-            ...(accessibilityLabel ? { accessibilityLabel } : {}),
-          })}
-      {...rest}
+      {...accessibilityProps}
+      {...buttonRest}
     >
       {loading ? (
         <Spinner size="small" color={spinnerColor} />

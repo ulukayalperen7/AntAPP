@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, XStack, Text as TamaguiText, Image } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const AvatarFrame = styled(XStack, {
   alignItems: 'center',
@@ -33,8 +34,10 @@ export type AvatarProps = Omit<GetProps<typeof AvatarFrame>, 'size'> & {
 }
 
 export function Avatar({ size = 'md', initials, src, ...rest }: AvatarProps) {
+  const { rest: avatarRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <AvatarFrame size={size} {...rest}>
+    <AvatarFrame size={size} {...accessibilityProps} {...avatarRest}>
       {src ? (
         <Image source={{ uri: src }} width="100%" height="100%" objectFit="cover" />
       ) : initials ? (

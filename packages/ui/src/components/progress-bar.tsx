@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, XStack, YStack } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const BarTrack = styled(XStack, {
   width: '100%',
@@ -37,9 +38,10 @@ export type ProgressBarProps = Omit<GetProps<typeof BarTrack>, 'size'> & {
 
 export function ProgressBar({ value, max = 100, size = 'md', color, ...rest }: ProgressBarProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  const { rest: trackRest, accessibilityProps } = splitAccessibilityProps(rest)
 
   return (
-    <BarTrack size={size} {...rest}>
+    <BarTrack size={size} {...accessibilityProps} {...trackRest}>
       <BarFill
         width={`${percentage}%`}
         {...(color ? { backgroundColor: color } : {})}

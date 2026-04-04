@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, XStack, Text as TamaguiText } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const ChipFrame = styled(XStack, {
   alignItems: 'center',
@@ -52,8 +53,10 @@ export type FilterChipProps = Omit<GetProps<typeof ChipFrame>, 'active'> & {
 }
 
 export function FilterChip({ active = false, icon, children, ...rest }: FilterChipProps) {
+  const { rest: chipRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <ChipFrame active={active} {...rest}>
+    <ChipFrame active={active} {...accessibilityProps} {...chipRest}>
       {icon}
       <ChipLabel active={active}>{children}</ChipLabel>
     </ChipFrame>

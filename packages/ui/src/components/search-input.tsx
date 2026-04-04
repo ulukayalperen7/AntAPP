@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, XStack, YStack, Input as TamaguiInput } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const SearchFrame = styled(XStack, {
   alignItems: 'center',
@@ -72,10 +73,12 @@ function DefaultSearchIcon() {
 }
 
 export function SearchInput({ size = 'md', icon, iconAfter, ...rest }: SearchInputProps) {
+  const { rest: inputRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
     <SearchFrame size={size}>
       {icon ?? <DefaultSearchIcon />}
-      <SearchInputField {...rest} />
+      <SearchInputField {...accessibilityProps} {...inputRest} />
       {iconAfter}
     </SearchFrame>
   )

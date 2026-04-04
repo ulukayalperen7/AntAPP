@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, XStack, Text as TamaguiText } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const BadgeFrame = styled(XStack, {
   alignItems: 'center',
@@ -71,8 +72,10 @@ export type BadgeProps = Omit<GetProps<typeof BadgeFrame>, 'variant'> & {
 }
 
 export function Badge({ children, variant = 'default', size = 'md', ...rest }: BadgeProps) {
+  const { rest: badgeRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <BadgeFrame variant={variant} size={size} {...rest}>
+    <BadgeFrame variant={variant} size={size} {...accessibilityProps} {...badgeRest}>
       <BadgeLabel variant={variant} size={size}>
         {children}
       </BadgeLabel>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { styled, GetProps, YStack, XStack, Text as TamaguiText, Image } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const RouteCardFrame = styled(YStack, {
   backgroundColor: '$card',
@@ -138,8 +139,10 @@ export type RouteCardProps = Omit<GetProps<typeof RouteCardFrame>, 'orientation'
 }
 
 export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...rest }: RouteCardProps) {
+  const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <RouteCardFrame orientation={orientation} {...rest}>
+    <RouteCardFrame orientation={orientation} {...accessibilityProps} {...cardRest}>
       <CardImage orientation={orientation}>
         {data.image && (
           <Image source={{ uri: data.image }} width="100%" height="100%" objectFit="cover" />

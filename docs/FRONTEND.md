@@ -774,6 +774,9 @@ Shared screen'ler:
 // @antapp/ui'den import et
 import { Button, Card, Text } from '@antapp/ui'
 
+// Shared wrapper component'lerde accessibility prop'larını
+// web için aria-*'ya map ederek geçir
+
 // styled() ile komponent yaz
 const MyBox = styled(YStack, {
   backgroundColor: '$card',
@@ -800,6 +803,10 @@ const color = theme.primary?.get() ?? '#EA580C'
 
 // react-native primitive'leri — asla (fonts.native.ts hariç)
 import { View, Text, StyleSheet, Pressable } from 'react-native'
+
+// Shared wrapper'larda accessibilityLabel/accessibilityRole'u
+// doğrudan XStack/YStack'e yayma — web'de DOM warning üretir
+;<XStack accessibilityLabel="Open menu" accessibilityRole="button" />
 
 // Platform import — sadece fonts.native.ts'te
 import { Platform } from 'react-native'  // ❌ başka dosyada

@@ -22745,6 +22745,61 @@ var tamaguiConfig = createTamagui({
   }
 });
 
+// ../packages/ui/src/components/accessibility-props.ts
+function splitAccessibilityProps(props, options) {
+  const {
+    role,
+    accessibilityRole,
+    accessibilityLabel,
+    accessibilityHint,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    importantForAccessibility,
+    accessibilityElementsHidden,
+    testID,
+    nativeID,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-live": ariaLive,
+    "aria-hidden": ariaHidden,
+    "data-testid": dataTestId,
+    ...rest
+  } = props;
+  if (import_core9.isWeb) {
+    const webRole = role ?? accessibilityRole ?? options?.defaultRole;
+    const webAriaHidden = ariaHidden ?? accessibilityElementsHidden ?? (importantForAccessibility === "no-hide-descendants" ? true : void 0);
+    const webAriaLive = ariaLive ?? (accessibilityLiveRegion === "none" ? "off" : accessibilityLiveRegion);
+    return {
+      rest,
+      accessibilityProps: {
+        ...webRole ? { role: webRole } : {},
+        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {},
+        ...ariaLabelledBy ?? accessibilityLabelledBy ? { "aria-labelledby": ariaLabelledBy ?? accessibilityLabelledBy } : {},
+        ...webAriaLive ? { "aria-live": webAriaLive } : {},
+        ...webAriaHidden !== void 0 ? { "aria-hidden": webAriaHidden } : {},
+        ...nativeID ? { id: nativeID } : {},
+        ...dataTestId ?? testID ? { "data-testid": dataTestId ?? testID } : {}
+      }
+    };
+  }
+  return {
+    rest,
+    accessibilityProps: {
+      ...role ? { role } : {},
+      ...accessibilityRole ?? options?.defaultRole ? { accessibilityRole: accessibilityRole ?? options?.defaultRole } : {},
+      ...accessibilityLabel ? { accessibilityLabel } : {},
+      ...accessibilityHint ? { accessibilityHint } : {},
+      ...accessibilityLabelledBy ? { accessibilityLabelledBy } : {},
+      ...accessibilityLiveRegion ? { accessibilityLiveRegion } : {},
+      ...importantForAccessibility ? { importantForAccessibility } : {},
+      ...accessibilityElementsHidden !== void 0 ? { accessibilityElementsHidden } : {},
+      ...nativeID ? { nativeID } : {},
+      ...testID ? { testID } : {}
+    }
+  };
+}
+__name(splitAccessibilityProps, "splitAccessibilityProps");
+
 // ../packages/ui/src/components/button.tsx
 var import_jsx_runtime4 = require("react/jsx-runtime");
 var ButtonFrame = (0, import_core9.styled)(XStack, {
@@ -22846,7 +22901,16 @@ function Button({
   const theme = (0, import_core9.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
   const isDisabled = disabled || loading;
-  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      "aria-label": ariaLabel
+    },
+    { defaultRole: "button" }
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
     ButtonFrame,
     {
@@ -22854,15 +22918,8 @@ function Button({
       size: size3,
       disabled: isDisabled,
       loading,
-      ...import_core9.isWeb ? {
-        role: webRole,
-        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
-      } : {
-        ...role ? { role } : {},
-        accessibilityRole: accessibilityRole ?? "button",
-        ...accessibilityLabel ? { accessibilityLabel } : {}
-      },
-      ...rest,
+      ...accessibilityProps,
+      ...buttonRest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
         children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, children }),

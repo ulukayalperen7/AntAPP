@@ -47132,6 +47132,61 @@ var tamaguiConfig = createTamagui({
   }
 });
 
+// ../packages/ui/src/components/accessibility-props.ts
+function splitAccessibilityProps(props, options) {
+  const {
+    role,
+    accessibilityRole,
+    accessibilityLabel,
+    accessibilityHint,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    importantForAccessibility,
+    accessibilityElementsHidden,
+    testID,
+    nativeID,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-live": ariaLive,
+    "aria-hidden": ariaHidden,
+    "data-testid": dataTestId,
+    ...rest
+  } = props;
+  if (import_core71.isWeb) {
+    const webRole = role ?? accessibilityRole ?? options?.defaultRole;
+    const webAriaHidden = ariaHidden ?? accessibilityElementsHidden ?? (importantForAccessibility === "no-hide-descendants" ? true : void 0);
+    const webAriaLive = ariaLive ?? (accessibilityLiveRegion === "none" ? "off" : accessibilityLiveRegion);
+    return {
+      rest,
+      accessibilityProps: {
+        ...webRole ? { role: webRole } : {},
+        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {},
+        ...ariaLabelledBy ?? accessibilityLabelledBy ? { "aria-labelledby": ariaLabelledBy ?? accessibilityLabelledBy } : {},
+        ...webAriaLive ? { "aria-live": webAriaLive } : {},
+        ...webAriaHidden !== void 0 ? { "aria-hidden": webAriaHidden } : {},
+        ...nativeID ? { id: nativeID } : {},
+        ...dataTestId ?? testID ? { "data-testid": dataTestId ?? testID } : {}
+      }
+    };
+  }
+  return {
+    rest,
+    accessibilityProps: {
+      ...role ? { role } : {},
+      ...accessibilityRole ?? options?.defaultRole ? { accessibilityRole: accessibilityRole ?? options?.defaultRole } : {},
+      ...accessibilityLabel ? { accessibilityLabel } : {},
+      ...accessibilityHint ? { accessibilityHint } : {},
+      ...accessibilityLabelledBy ? { accessibilityLabelledBy } : {},
+      ...accessibilityLiveRegion ? { accessibilityLiveRegion } : {},
+      ...importantForAccessibility ? { importantForAccessibility } : {},
+      ...accessibilityElementsHidden !== void 0 ? { accessibilityElementsHidden } : {},
+      ...nativeID ? { nativeID } : {},
+      ...testID ? { testID } : {}
+    }
+  };
+}
+__name(splitAccessibilityProps, "splitAccessibilityProps");
+
 // ../packages/ui/src/components/button.tsx
 var import_jsx_runtime102 = require("react/jsx-runtime");
 var ButtonFrame = (0, import_core71.styled)(XStack, {
@@ -47233,7 +47288,16 @@ function Button2({
   const theme = (0, import_core71.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
   const isDisabled = disabled || loading;
-  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      "aria-label": ariaLabel
+    },
+    { defaultRole: "button" }
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(
     ButtonFrame,
     {
@@ -47241,15 +47305,8 @@ function Button2({
       size: size7,
       disabled: isDisabled,
       loading,
-      ...import_core71.isWeb ? {
-        role: webRole,
-        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
-      } : {
-        ...role ? { role } : {},
-        accessibilityRole: accessibilityRole ?? "button",
-        ...accessibilityLabel ? { accessibilityLabel } : {}
-      },
-      ...rest,
+      ...accessibilityProps,
+      ...buttonRest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
         children != null && /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ButtonLabel, { variant, size: size7, children }),
@@ -47560,7 +47617,8 @@ var BadgeLabel = (0, import_core71.styled)(Text10, {
   }
 });
 function Badge({ children, variant = "default", size: size7 = "md", ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(BadgeFrame, { variant, size: size7, ...rest, children: /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(BadgeLabel, { variant, size: size7, children }) });
+  const { rest: badgeRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(BadgeFrame, { variant, size: size7, ...accessibilityProps, ...badgeRest, children: /* @__PURE__ */ (0, import_jsx_runtime105.jsx)(BadgeLabel, { variant, size: size7, children }) });
 }
 __name(Badge, "Badge");
 
@@ -47715,7 +47773,8 @@ var AvatarFrame2 = (0, import_core71.styled)(XStack, {
 });
 var initialsSize = { sm: "$2", md: "$3", lg: "$5", xl: "$7" };
 function Avatar2({ size: size7 = "md", initials, src, ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(AvatarFrame2, { size: size7, ...rest, children: src ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Image, { source: { uri: src }, width: "100%", height: "100%", objectFit: "cover" }) : initials ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text10, { fontSize: initialsSize[size7], fontWeight: "600", color: "$mutedForeground", children: initials }) : null });
+  const { rest: avatarRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(AvatarFrame2, { size: size7, ...accessibilityProps, ...avatarRest, children: src ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Image, { source: { uri: src }, width: "100%", height: "100%", objectFit: "cover" }) : initials ? /* @__PURE__ */ (0, import_jsx_runtime109.jsx)(Text10, { fontSize: initialsSize[size7], fontWeight: "600", color: "$mutedForeground", children: initials }) : null });
 }
 __name(Avatar2, "Avatar");
 
@@ -47772,21 +47831,23 @@ function IconButton({
   "aria-label": ariaLabel,
   ...rest
 }) {
-  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      "aria-label": ariaLabel
+    },
+    { defaultRole: "button" }
+  );
   return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(
     IconButtonFrame,
     {
       variant,
       size: size7,
-      ...import_core71.isWeb ? {
-        role: webRole,
-        ...ariaLabel ?? accessibilityLabel ? { "aria-label": ariaLabel ?? accessibilityLabel } : {}
-      } : {
-        ...role ? { role } : {},
-        accessibilityRole: accessibilityRole ?? "button",
-        ...accessibilityLabel ? { accessibilityLabel } : {}
-      },
-      ...rest,
+      ...accessibilityProps,
+      ...buttonRest,
       children
     }
   );
@@ -47857,9 +47918,10 @@ function DefaultSearchIcon() {
 }
 __name(DefaultSearchIcon, "DefaultSearchIcon");
 function SearchInput({ size: size7 = "md", icon, iconAfter, ...rest }) {
+  const { rest: inputRest, accessibilityProps } = splitAccessibilityProps(rest);
   return /* @__PURE__ */ (0, import_jsx_runtime111.jsxs)(SearchFrame, { size: size7, children: [
     icon ?? /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(DefaultSearchIcon, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(SearchInputField, { ...rest }),
+    /* @__PURE__ */ (0, import_jsx_runtime111.jsx)(SearchInputField, { ...accessibilityProps, ...inputRest }),
     iconAfter
   ] });
 }
@@ -47906,7 +47968,8 @@ var ChipLabel = (0, import_core71.styled)(Text10, {
   }
 });
 function FilterChip({ active = false, icon, children, ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(ChipFrame, { active, ...rest, children: [
+  const { rest: chipRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime112.jsxs)(ChipFrame, { active, ...accessibilityProps, ...chipRest, children: [
     icon,
     /* @__PURE__ */ (0, import_jsx_runtime112.jsx)(ChipLabel, { active, children })
   ] });
@@ -47929,7 +47992,8 @@ function StarShape({ filled, size: size7 = 10 }) {
 }
 __name(StarShape, "StarShape");
 function RatingDisplay({ value, maxStars = 5, showValue = true, starSize = 10, ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(XStack, { alignItems: "center", gap: "$1.5", ...rest, children: [
+  const { rest: ratingRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime113.jsxs)(XStack, { alignItems: "center", gap: "$1.5", ...accessibilityProps, ...ratingRest, children: [
     /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(XStack, { gap: "$1", alignItems: "center", children: Array.from({ length: maxStars }, (_, i) => /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(StarShape, { filled: i < Math.round(value), size: starSize }, i)) }),
     showValue && /* @__PURE__ */ (0, import_jsx_runtime113.jsx)(Text10, { fontSize: "$4", fontWeight: "600", color: "$color", children: value.toFixed(1) })
   ] });
@@ -47961,7 +48025,8 @@ var BarFill = (0, import_core71.styled)(YStack, {
 });
 function ProgressBar({ value, max: max2 = 100, size: size7 = "md", color, ...rest }) {
   const percentage = Math.min(Math.max(value / max2 * 100, 0), 100);
-  return /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(BarTrack, { size: size7, ...rest, children: /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(
+  const { rest: trackRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(BarTrack, { size: size7, ...accessibilityProps, ...trackRest, children: /* @__PURE__ */ (0, import_jsx_runtime114.jsx)(
     BarFill,
     {
       width: `${percentage}%`,
@@ -47974,6 +48039,7 @@ __name(ProgressBar, "ProgressBar");
 // ../packages/ui/src/components/stat-box.tsx
 var import_jsx_runtime115 = require("react/jsx-runtime");
 function StatBox({ value, label, icon, ...rest }) {
+  const { rest: boxRest, accessibilityProps } = splitAccessibilityProps(rest);
   return /* @__PURE__ */ (0, import_jsx_runtime115.jsxs)(
     YStack,
     {
@@ -47985,7 +48051,8 @@ function StatBox({ value, label, icon, ...rest }) {
       backgroundColor: "$backgroundStrong",
       borderRadius: "$3",
       flex: 1,
-      ...rest,
+      ...accessibilityProps,
+      ...boxRest,
       children: [
         icon,
         /* @__PURE__ */ (0, import_jsx_runtime115.jsx)(Text10, { fontFamily: "$heading", fontSize: "$7", fontWeight: "700", color: "$color", children: value }),
@@ -48107,7 +48174,8 @@ function SmallDot({ color = "$mutedForeground" }) {
 }
 __name(SmallDot, "SmallDot");
 function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(RouteCardFrame, { orientation, ...rest, children: [
+  const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(RouteCardFrame, { orientation, ...accessibilityProps, ...cardRest, children: [
     /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(CardImage, { orientation, children: [
       data.image && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Image, { source: { uri: data.image }, width: "100%", height: "100%", objectFit: "cover" }),
       (data.contentType === "Official" || data.isOfficial) && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ContentTypeBadge, { type: "Official", children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "OFFICIAL" }) }),

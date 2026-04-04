@@ -1,5 +1,6 @@
 import React from 'react'
-import { styled, GetProps, XStack, isWeb } from 'tamagui'
+import { styled, GetProps, XStack } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
 const IconButtonFrame = styled(XStack, {
   alignItems: 'center',
@@ -64,25 +65,23 @@ export function IconButton({
   'aria-label': ariaLabel,
   ...rest
 }: IconButtonProps) {
-  const webRole = role ?? (accessibilityRole === 'button' ? 'button' : undefined) ?? 'button'
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      'aria-label': ariaLabel,
+    },
+    { defaultRole: 'button' },
+  )
 
   return (
     <IconButtonFrame
       variant={variant}
       size={size}
-      {...(isWeb
-        ? {
-            role: webRole,
-            ...((ariaLabel ?? accessibilityLabel)
-              ? { 'aria-label': ariaLabel ?? accessibilityLabel }
-              : {}),
-          }
-        : {
-            ...(role ? { role } : {}),
-            accessibilityRole: accessibilityRole ?? 'button',
-            ...(accessibilityLabel ? { accessibilityLabel } : {}),
-          })}
-      {...rest}
+      {...accessibilityProps}
+      {...buttonRest}
     >
       {children}
     </IconButtonFrame>
