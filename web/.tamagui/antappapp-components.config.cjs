@@ -22846,6 +22846,7 @@ function Button({
   const theme = (0, import_core9.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
   const isDisabled = disabled || loading;
+  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
   return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
     ButtonFrame,
     {
@@ -22853,9 +22854,7 @@ function Button({
       size: size3,
       disabled: isDisabled,
       loading,
-      tag: import_core9.isWeb ? "button" : void 0,
-      type: import_core9.isWeb ? "button" : void 0,
-      role: import_core9.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      role: import_core9.isWeb ? webRole : role,
       "aria-label": import_core9.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
       accessibilityRole: import_core9.isWeb ? void 0 : accessibilityRole ?? "button",
       accessibilityLabel: import_core9.isWeb ? void 0 : accessibilityLabel,

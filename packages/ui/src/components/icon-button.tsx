@@ -64,13 +64,13 @@ export function IconButton({
   'aria-label': ariaLabel,
   ...rest
 }: IconButtonProps) {
+  const webRole = role ?? (accessibilityRole === 'button' ? 'button' : undefined) ?? 'button'
+
   return (
     <IconButtonFrame
       variant={variant}
       size={size}
-      tag={isWeb ? 'button' : undefined}
-      type={isWeb ? 'button' : undefined}
-      role={isWeb ? (role ?? accessibilityRole ?? 'button') : role}
+      role={isWeb ? webRole : role}
       aria-label={isWeb ? (ariaLabel ?? accessibilityLabel) : ariaLabel}
       accessibilityRole={isWeb ? undefined : (accessibilityRole ?? 'button')}
       accessibilityLabel={isWeb ? undefined : accessibilityLabel}

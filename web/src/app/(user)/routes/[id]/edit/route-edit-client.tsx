@@ -1,713 +1,553 @@
-'use client'
+'use client';
+import "./_route-edit-client.css"
 
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Divider, Badge } from '@antapp/ui'
-import type { RouteDetail, RouteStopItem } from '@/types/api'
-import {
-  updateRoute,
-  publishRoute,
-  unpublishRoute,
-  deleteRoute,
-  getRouteStops,
-  addRouteStop,
-  updateRouteStop,
-  deleteRouteStop,
-  reorderRouteStops,
-} from '@/features/routes/actions'
-import {
-  ArrowLeft,
-  Globe,
-  Lock,
-  Trash2,
-  CheckCircle2,
-  AlertCircle,
-  Plus,
-  ChevronUp,
-  ChevronDown,
-  Save,
-  RotateCcw,
-  MapPinned,
-} from 'lucide-react'
-
-type FeedbackState = { ok: boolean; message: string } | null
-
+const _cn86 = "is_Text font_body _col-FFFFFF35 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn85 = "is_View _pos-relative _fd-row _gap-t-space-2 ";
+const _cn84 = "is_Text font_body _col-error500 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn83 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn82 = "is_Text font_body _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn81 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _gap-t-space-0--53 ";
+const _cn80 = "is_View _pos-relative _fd-row _gap-t-space-4 _ai-center _fwr-wrap ";
+const _cn79 = "is_Divider is_View _fd-column _h-1px _w-10037 _bg-borderColor ";
+const _cn78 = "is_Text font_heading _col-error500 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn77 = "is_View _pos-relative _fd-column _bg-backgroundS110634794 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _paddingTop-t-space-5 _paddingRight-t-space-5 _paddingBottom-t-space-5 _paddingLeft-t-space-5 _gap-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-error200 _brc-error200 _borderBottomColor-error200 _borderLeftColor-error200 _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn76 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn75 = "is_Text font_body _col-color _ff-f-family _userSelect-text _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 _fontWeight-600 ";
+const _cn74 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _gap-t-space-0--53 ";
+const _cn73 = "is_View _pos-relative _fd-row _btlr-t-radius-3 _btrr-t-radius-3 _bbrr-t-radius-3 _bblr-t-radius-3 _paddingTop-t-space-4 _paddingRight-t-space-4 _paddingBottom-t-space-4 _paddingLeft-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _gap-t-space-3 _ai-center _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn72 = "is_View _btc-success200 _brc-success200 _borderBottomColor-success200 _borderLeftColor-success200 _pos-relative _fd-row _btlr-t-radius-3 _btrr-t-radius-3 _bbrr-t-radius-3 _bblr-t-radius-3 _paddingTop-t-space-4 _paddingRight-t-space-4 _paddingBottom-t-space-4 _paddingLeft-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _gap-t-space-3 _ai-center _bbs-solid _bts-solid _bls-solid _brs-solid _bg-success50 ";
+const _cn71 = "is_View _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _pos-relative _fd-row _btlr-t-radius-3 _btrr-t-radius-3 _bbrr-t-radius-3 _bblr-t-radius-3 _paddingTop-t-space-4 _paddingRight-t-space-4 _paddingBottom-t-space-4 _paddingLeft-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _gap-t-space-3 _ai-center _bbs-solid _bts-solid _bls-solid _brs-solid _bg-muted ";
+const _cn70 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn69 = "is_View _pos-relative _fd-column _bg-backgroundS110634794 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _paddingTop-t-space-5 _paddingRight-t-space-5 _paddingBottom-t-space-5 _paddingLeft-t-space-5 _gap-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn68 = "is_Text font_body _col-error500 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn67 = "is_View _pos-relative _fd-row _gap-t-space-2 _fwr-wrap ";
+const _cn66 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn65 = "is_View _pos-relative _fd-row _jc-space-betwe3241 _ai-center _gap-t-space-3 _fwr-wrap ";
+const _cn64 = "is_Divider is_View _fd-column _h-1px _w-10037 _bg-borderColor ";
+const _cn63 = "is_View _pos-relative _fd-row _gap-t-space-2 _fwr-wrap ";
+const _cn62 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn61 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn60 = "is_Text font_body _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn59 = "is_View _pos-relative _fd-column _gap-t-space-2 _paddingTop-t-space-3 _paddingRight-t-space-3 _paddingBottom-t-space-3 _paddingLeft-t-space-3 _btlr-t-radius-3 _btrr-t-radius-3 _bbrr-t-radius-3 _bblr-t-radius-3 _bg-backgroundS110634794 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn58 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn57 = "is_View _pos-relative _fd-column _gap-t-space-2 ";
+const _cn56 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn55 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _miw-240px _gap-t-space-1--53 ";
+const _cn54 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn53 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _miw-240px _gap-t-space-1--53 ";
+const _cn52 = "is_View _pos-relative _fd-row _gap-t-space-3 _fwr-wrap ";
+const _cn51 = "is_View _pos-relative _fd-row _gap-t-space-2 _fwr-wrap ";
+const _cn50 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn49 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn48 = "is_View _pos-relative _fd-column _gap-t-space-1 _flexGrow-1 _flexShrink-1 _fb-auto _miw-220px ";
+const _cn47 = "is_View _pos-relative _fd-row _jc-space-betwe3241 _ai-flex-start _gap-t-space-3 _fwr-wrap ";
+const _cn46 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _gap-t-space-4 _paddingTop-t-space-4 _paddingRight-t-space-4 _paddingBottom-t-space-4 _paddingLeft-t-space-4 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _bg-background _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn45 = "is_View _pos-relative _fd-column _w-2px _mih-64px _bg-borderColor ";
+const _cn44 = "is_Text font_body _col-FFFFFF35 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn43 = "is_View _pos-relative _fd-row _w-34px _h-34px _btlr-t-radius-fu3456 _btrr-t-radius-fu3456 _bbrr-t-radius-fu3456 _bblr-t-radius-fu3456 _bg-primary _ai-center _jc-center ";
+const _cn42 = "is_View _pos-relative _fd-column _ai-center _gap-t-space-1 _paddingTop-t-space-2 ";
+const _cn41 = "is_View _pos-relative _fd-row _gap-t-space-3 _ai-flex-start ";
+const _cn40 = "is_View _pos-relative _fd-column _gap-t-space-4 ";
+const _cn39 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _fs-f-size-5 _lh-f-lineHeigh112924 _textAlign-center ";
+const _cn38 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn37 = "is_View _pos-relative _fd-column _paddingTop-t-space-6 _paddingRight-t-space-6 _paddingBottom-t-space-6 _paddingLeft-t-space-6 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _bts-dashed _brs-dashed _bbs-dashed _bls-dashed _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _ai-center _gap-t-space-2 ";
+const _cn36 = "is_Text font_body _col-color _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn35 = "is_Text font_body _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 _col-success500 ";
+const _cn34 = "is_Text font_body _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 _col-error500 ";
+const _cn33 = "is_View _pos-relative _fd-row _gap-t-space-2 _ai-center ";
+const _cn32 = "is_View _pos-relative _fd-row _jc-flex-end ";
+const _cn31 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn30 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _miw-240px _gap-t-space-1--53 ";
+const _cn29 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn28 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto _miw-240px _gap-t-space-1--53 ";
+const _cn27 = "is_View _pos-relative _fd-row _gap-t-space-3 _fwr-wrap ";
+const _cn26 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn25 = "is_View _pos-relative _fd-column _gap-t-space-1--53 ";
+const _cn24 = "is_View _pos-relative _fd-column _gap-t-space-3 ";
+const _cn23 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn22 = "is_View _pos-relative _fd-row _ai-center _gap-t-space-2 ";
+const _cn21 = "is_View _pos-relative _fd-column _gap-t-space-3 _paddingTop-t-space-4 _paddingRight-t-space-4 _paddingBottom-t-space-4 _paddingLeft-t-space-4 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _bg-muted _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn20 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-5 _lh-f-lineHeigh112924 ";
+const _cn19 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn18 = "is_View _pos-relative _fd-column _gap-t-space-1 ";
+const _cn17 = "is_View _pos-relative _fd-row _jc-space-betwe3241 _ai-flex-start _gap-t-space-3 _fwr-wrap ";
+const _cn16 = "is_View _pos-relative _fd-column _bg-backgroundS110634794 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _paddingTop-t-space-5 _paddingRight-t-space-5 _paddingBottom-t-space-5 _paddingLeft-t-space-5 _gap-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn15 = "is_View _pos-relative _fd-row _gap-t-space-2 _fwr-wrap ";
+const _cn14 = "is_Text font_body _col-color _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
+const _cn13 = "is_Text font_body _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 _col-success500 ";
+const _cn12 = "is_Text font_body _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 _col-error500 ";
+const _cn11 = "is_View _pos-relative _fd-row _gap-t-space-2 _ai-center ";
+const _cn10 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn1 = "is_View _pos-relative _fd-column _gap-t-space-1--53 ";
+const _cn0 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-4 _lh-f-lineHeigh112923 ";
+const _cn9 = "is_View _pos-relative _fd-column _gap-t-space-1--53 ";
+const _cn8 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-600 _textAlign-left _fs-f-size-7 _lh-f-lineHeigh112926 _ls--0--2px ";
+const _cn7 = "is_View _pos-relative _fd-column _bg-backgroundS110634794 _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _paddingTop-t-space-5 _paddingRight-t-space-5 _paddingBottom-t-space-5 _paddingLeft-t-space-5 _gap-t-space-4 _btw-1px _brw-1px _borderBottomWidth-1px _borderLeftWidth-1px _btc-borderColor _brc-borderColor _borderBottomColor-borderColor _borderLeftColor-borderColor _bbs-solid _bts-solid _bls-solid _brs-solid ";
+const _cn6 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-5 _lh-f-lineHeigh112924 _maw-10037 _ox-hidden _oy-hidden _textOverflow-ellipsis _ws-nowrap ";
+const _cn5 = "is_Text font_heading _col-color _ff-f-family _userSelect-text _fontWeight-700 _textAlign-left _fs-f-size-9 _lh-f-lineHeigh112928 _ls--0--4px ";
+const _cn4 = "is_View _pos-relative _fd-column _flexGrow-1 _flexShrink-1 _fb-auto ";
+const _cn3 = "is_View _pos-relative _fd-row _cur-pointer _paddingTop-t-space-2 _paddingRight-t-space-2 _paddingBottom-t-space-2 _paddingLeft-t-space-2 _btlr-t-radius-fu3456 _btrr-t-radius-fu3456 _bbrr-t-radius-fu3456 _bblr-t-radius-fu3456 _bg-0hover-backgroundH3423444 ";
+const _cn2 = "is_View _pos-relative _fd-row _ai-center _gap-t-space-3 ";
+const _cn = "is_View _pos-relative _fd-column _gap-t-space-5 _flexGrow-1 _flexShrink-1 _fb-auto _maw-860px ";
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { YStack, XStack, Text, Button, Input, Divider, Badge } from '@antapp/ui';
+import type { RouteDetail, RouteStopItem } from '@/types/api';
+import { updateRoute, publishRoute, unpublishRoute, deleteRoute, getRouteStops, addRouteStop, updateRouteStop, deleteRouteStop, reorderRouteStops } from '@/features/routes/actions';
+import { ArrowLeft, Globe, Lock, Trash2, CheckCircle2, AlertCircle, Plus, ChevronUp, ChevronDown, Save, RotateCcw, MapPinned } from 'lucide-react';
+type FeedbackState = {
+  ok: boolean;
+  message: string;
+} | null;
 type NewStopForm = {
-  spotId: string
-  customTitle: string
-  customDescription: string
-}
-
+  spotId: string;
+  customTitle: string;
+  customDescription: string;
+};
 function createEmptyStopForm(): NewStopForm {
   return {
     spotId: '',
     customTitle: '',
-    customDescription: '',
-  }
+    customDescription: ''
+  };
 }
-
 function reorderArray<T>(items: T[], fromIndex: number, toIndex: number) {
-  const next = [...items]
-  const [moved] = next.splice(fromIndex, 1)
-  next.splice(toIndex, 0, moved)
-  return next
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
 }
-
 export default function RouteEditClient({
   route,
-  initialStops,
+  initialStops
 }: {
-  route: RouteDetail
-  initialStops: RouteStopItem[]
+  route: RouteDetail;
+  initialStops: RouteStopItem[];
 }) {
-  const router = useRouter()
-
-  const [title, setTitle] = useState(route.title)
-  const [description, setDescription] = useState(route.description ?? '')
-  const [feedback, setFeedback] = useState<FeedbackState>(null)
-  const [isSaving, startSave] = useTransition()
-
-  const [isPublic, setIsPublic] = useState(route.isPublic)
-  const [isTogglingPublish, startToggle] = useTransition()
-
-  const [deleteConfirm, setDeleteConfirm] = useState(false)
-  const [isDeleting, startDelete] = useTransition()
-
-  const [stops, setStops] = useState<RouteStopItem[]>(initialStops)
-  const [savedStops, setSavedStops] = useState<RouteStopItem[]>(initialStops)
-  const [newStop, setNewStop] = useState<NewStopForm>(createEmptyStopForm())
-  const [stopFeedback, setStopFeedback] = useState<FeedbackState>(null)
-  const [isManagingStops, startManageStops] = useTransition()
-
+  const router = useRouter();
+  const [title, setTitle] = useState(route.title);
+  const [description, setDescription] = useState(route.description ?? '');
+  const [feedback, setFeedback] = useState<FeedbackState>(null);
+  const [isSaving, startSave] = useTransition();
+  const [isPublic, setIsPublic] = useState(route.isPublic);
+  const [isTogglingPublish, startToggle] = useTransition();
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [isDeleting, startDelete] = useTransition();
+  const [stops, setStops] = useState<RouteStopItem[]>(initialStops);
+  const [savedStops, setSavedStops] = useState<RouteStopItem[]>(initialStops);
+  const [newStop, setNewStop] = useState<NewStopForm>(createEmptyStopForm());
+  const [stopFeedback, setStopFeedback] = useState<FeedbackState>(null);
+  const [isManagingStops, startManageStops] = useTransition();
   const refreshStops = async (successMessage?: string) => {
-    const nextStops = await getRouteStops(route.id)
-    setStops(nextStops)
-    setSavedStops(nextStops)
+    const nextStops = await getRouteStops(route.id);
+    setStops(nextStops);
+    setSavedStops(nextStops);
     if (successMessage) {
-      setStopFeedback({ ok: true, message: successMessage })
+      setStopFeedback({
+        ok: true,
+        message: successMessage
+      });
     }
-  }
-
+  };
   const handleSave = () => {
-    setFeedback(null)
+    setFeedback(null);
     if (!title.trim()) {
-      setFeedback({ ok: false, message: 'Title is required.' })
-      return
+      setFeedback({
+        ok: false,
+        message: 'Title is required.'
+      });
+      return;
     }
     startSave(async () => {
       try {
         await updateRoute(route.id, {
           title: title.trim(),
-          description: description.trim() || undefined,
-        })
-        setFeedback({ ok: true, message: 'Route updated successfully.' })
+          description: description.trim() || undefined
+        });
+        setFeedback({
+          ok: true,
+          message: 'Route updated successfully.'
+        });
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to update.' })
+        setFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to update.'
+        });
       }
-    })
-  }
-
+    });
+  };
   const handleTogglePublish = () => {
     startToggle(async () => {
       try {
         if (isPublic) {
-          await unpublishRoute(route.id)
-          setIsPublic(false)
+          await unpublishRoute(route.id);
+          setIsPublic(false);
         } else {
-          await publishRoute(route.id)
-          setIsPublic(true)
+          await publishRoute(route.id);
+          setIsPublic(true);
         }
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to change visibility.' })
+        setFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to change visibility.'
+        });
       }
-    })
-  }
-
+    });
+  };
   const handleDelete = () => {
     startDelete(async () => {
       try {
-        await deleteRoute(route.id)
-        router.replace('/profile')
+        await deleteRoute(route.id);
+        router.replace('/profile');
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to delete route.' })
-        setDeleteConfirm(false)
+        setFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to delete route.'
+        });
+        setDeleteConfirm(false);
       }
-    })
-  }
-
-  const handleStopFieldChange = (
-    stopId: string,
-    field: keyof Pick<RouteStopItem, 'customTitle' | 'customDescription'>,
-    value: string,
-  ) => {
-    setStops((prev) => prev.map((stop) => (
-      stop.id === stopId
-        ? { ...stop, [field]: value }
-        : stop
-    )))
-  }
-
+    });
+  };
+  const handleStopFieldChange = (stopId: string, field: keyof Pick<RouteStopItem, 'customTitle' | 'customDescription'>, value: string) => {
+    setStops(prev => prev.map(stop => stop.id === stopId ? {
+      ...stop,
+      [field]: value
+    } : stop));
+  };
   const handleResetStop = (stopId: string) => {
-    const original = savedStops.find((stop) => stop.id === stopId)
-    if (!original) return
-
-    setStops((prev) => prev.map((stop) => (
-      stop.id === stopId ? original : stop
-    )))
-  }
-
+    const original = savedStops.find(stop => stop.id === stopId);
+    if (!original) return;
+    setStops(prev => prev.map(stop => stop.id === stopId ? original : stop));
+  };
   const isStopDirty = (stop: RouteStopItem) => {
-    const original = savedStops.find((item) => item.id === stop.id)
-    if (!original) return false
-
-    return (original.customTitle ?? '') !== (stop.customTitle ?? '')
-      || (original.customDescription ?? '') !== (stop.customDescription ?? '')
-  }
-
+    const original = savedStops.find(item => item.id === stop.id);
+    if (!original) return false;
+    return (original.customTitle ?? '') !== (stop.customTitle ?? '') || (original.customDescription ?? '') !== (stop.customDescription ?? '');
+  };
   const handleSaveStop = (stop: RouteStopItem) => {
-    setStopFeedback(null)
+    setStopFeedback(null);
     startManageStops(async () => {
       try {
         await updateRouteStop(route.id, stop.id, {
           customTitle: (stop.customTitle ?? '').trim(),
-          customDescription: (stop.customDescription ?? '').trim(),
-        })
-        await refreshStops('Stop updated successfully.')
+          customDescription: (stop.customDescription ?? '').trim()
+        });
+        await refreshStops('Stop updated successfully.');
       } catch (e) {
-        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to update stop.' })
+        setStopFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to update stop.'
+        });
       }
-    })
-  }
-
+    });
+  };
   const handleAddStop = () => {
-    setStopFeedback(null)
-
+    setStopFeedback(null);
     if (!newStop.spotId.trim()) {
-      setStopFeedback({ ok: false, message: 'Spot ID is required to add a new stop.' })
-      return
+      setStopFeedback({
+        ok: false,
+        message: 'Spot ID is required to add a new stop.'
+      });
+      return;
     }
-
     startManageStops(async () => {
       try {
         await addRouteStop(route.id, {
           spotId: newStop.spotId.trim(),
           customTitle: newStop.customTitle.trim() || undefined,
-          customDescription: newStop.customDescription.trim() || undefined,
-        })
-        setNewStop(createEmptyStopForm())
-        await refreshStops('Stop added successfully.')
+          customDescription: newStop.customDescription.trim() || undefined
+        });
+        setNewStop(createEmptyStopForm());
+        await refreshStops('Stop added successfully.');
       } catch (e) {
-        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add stop.' })
+        setStopFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to add stop.'
+        });
       }
-    })
-  }
-
+    });
+  };
   const handleDeleteStop = (stopId: string) => {
     if (!window.confirm('Remove this stop from the route?')) {
-      return
+      return;
     }
-
-    setStopFeedback(null)
+    setStopFeedback(null);
     startManageStops(async () => {
       try {
-        await deleteRouteStop(route.id, stopId)
-        await refreshStops('Stop removed from route.')
+        await deleteRouteStop(route.id, stopId);
+        await refreshStops('Stop removed from route.');
       } catch (e) {
-        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to remove stop.' })
+        setStopFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to remove stop.'
+        });
       }
-    })
-  }
-
+    });
+  };
   const handleMoveStop = (fromIndex: number, direction: 'up' | 'down') => {
-    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
+    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1;
     if (toIndex < 0 || toIndex >= stops.length) {
-      return
+      return;
     }
-
-    const nextStops = reorderArray(stops, fromIndex, toIndex)
-    setStops(nextStops)
-    setStopFeedback(null)
-
+    const nextStops = reorderArray(stops, fromIndex, toIndex);
+    setStops(nextStops);
+    setStopFeedback(null);
     startManageStops(async () => {
       try {
-        await reorderRouteStops(route.id, nextStops.map((stop) => stop.id))
-        await refreshStops('Stop order updated.')
+        await reorderRouteStops(route.id, nextStops.map(stop => stop.id));
+        await refreshStops('Stop order updated.');
       } catch (e) {
-        setStops(savedStops)
-        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to reorder stops.' })
+        setStops(savedStops);
+        setStopFeedback({
+          ok: false,
+          message: (e as Error).message ?? 'Failed to reorder stops.'
+        });
       }
-    })
-  }
-
-  const isDirty = title !== route.title || description !== (route.description ?? '')
-
-  return (
-    <YStack gap="$5" flex={1} maxWidth={860}>
-      <XStack alignItems="center" gap="$3">
-        <XStack
-          cursor="pointer"
-          onPress={() => router.back()}
-          padding="$2"
-          borderRadius="$full"
-          hoverStyle={{ backgroundColor: '$backgroundHover' }}
-        >
+    });
+  };
+  const isDirty = title !== route.title || description !== (route.description ?? '');
+  return <div className={_cn}>
+      <div className={_cn2}>
+        <div className={_cn3} onClick={() => router.back()}>
           <ArrowLeft size={20} color="currentColor" />
-        </XStack>
-        <YStack flex={1}>
-          <Text variant="heading2">Edit Route</Text>
-          <Text variant="body" muted numberOfLines={1}>{route.title}</Text>
-        </YStack>
-        <Button
-          variant="ghost"
-          size="sm"
-          onPress={() => router.push(`/routes/${route.id}`)}
-        >
+        </div>
+        <div className={_cn4}>
+          <span className={_cn5}>Edit Route</span>
+          <span className={_cn6}>{route.title}</span>
+        </div>
+        <Button variant="ghost" size="sm" onPress={() => router.push(`/routes/${route.id}`)}>
           View Route
         </Button>
-      </XStack>
+      </div>
 
-      <YStack
-        backgroundColor="$backgroundStrong"
-        borderRadius="$4"
-        padding="$5"
-        gap="$4"
-        borderWidth={1}
-        borderColor="$borderColor"
-      >
-        <Text variant="heading4">Route Information</Text>
+      <div className={_cn7}>
+        <span className={_cn8}>Route Information</span>
 
-        <YStack gap="$1.5">
-          <Text variant="label" color="$mutedForeground">Title *</Text>
-          <Input
-            value={title}
-            onChangeText={setTitle}
-            variant="outline"
-            size="md"
-            placeholder="Route title"
-          />
-        </YStack>
+        <div className={_cn9}>
+          <span className={_cn0}>Title *</span>
+          <Input value={title} onChangeText={setTitle} variant="outline" size="md" placeholder="Route title" />
+        </div>
 
-        <YStack gap="$1.5">
-          <Text variant="label" color="$mutedForeground">Description</Text>
-          <Input
-            value={description}
-            onChangeText={setDescription}
-            variant="outline"
-            size="md"
-            placeholder="Describe your route..."
-            // @ts-ignore multiline web
-            multiline
-            numberOfLines={4}
-          />
-        </YStack>
+        <div className={_cn1}>
+          <span className={_cn10}>Description</span>
+          <Input value={description} onChangeText={setDescription} variant="outline" size="md" placeholder="Describe your route..."
+        // @ts-ignore multiline web
+        multiline numberOfLines={4} />
+        </div>
 
-        {feedback && (
-          <XStack gap="$2" alignItems="center">
-            {feedback.ok
-              ? <CheckCircle2 size={16} color="var(--color-success500, #22C55E)" />
-              : <AlertCircle size={16} color="var(--color-error500, #DC2626)" />
-            }
-            <Text variant="caption" color={feedback.ok ? '$success500' : '$error500'}>
+        {feedback && <div className={_cn11}>
+            {feedback.ok ? <CheckCircle2 size={16} color="var(--color-success500, #22C55E)" /> : <AlertCircle size={16} color="var(--color-error500, #DC2626)" />}
+            <span className={!feedback.ok ? _cn12 : feedback.ok ? _cn13 : _cn14}>
               {feedback.message}
-            </Text>
-          </XStack>
-        )}
+            </span>
+          </div>}
 
-        <XStack gap="$2" flexWrap="wrap">
-          <Button
-            variant="solid"
-            size="md"
-            loading={isSaving}
-            disabled={isSaving || !isDirty || !title.trim()}
-            onPress={handleSave}
-          >
+        <div className={_cn15}>
+          <Button variant="solid" size="md" loading={isSaving} disabled={isSaving || !isDirty || !title.trim()} onPress={handleSave}>
             Save Changes
           </Button>
-          <Button
-            variant="outline"
-            size="md"
-            disabled={isSaving}
-            onPress={() => {
-              setTitle(route.title)
-              setDescription(route.description ?? '')
-              setFeedback(null)
-            }}
-          >
+          <Button variant="outline" size="md" disabled={isSaving} onPress={() => {
+          setTitle(route.title);
+          setDescription(route.description ?? '');
+          setFeedback(null);
+        }}>
             Discard
           </Button>
-        </XStack>
-      </YStack>
+        </div>
+      </div>
 
-      <YStack
-        backgroundColor="$backgroundStrong"
-        borderRadius="$4"
-        padding="$5"
-        gap="$4"
-        borderWidth={1}
-        borderColor="$borderColor"
-      >
-        <XStack justifyContent="space-between" alignItems="flex-start" gap="$3" flexWrap="wrap">
-          <YStack gap="$1">
-            <Text variant="heading4">Route Stops</Text>
-            <Text variant="body" muted>
+      <div className={_cn16}>
+        <div className={_cn17}>
+          <div className={_cn18}>
+            <span className={_cn19}>Route Stops</span>
+            <span className={_cn20}>
               Add new spots, override titles and descriptions, remove stops, or change the order.
-            </Text>
-          </YStack>
+            </span>
+          </div>
           <Badge variant="info" size="md">{stops.length} stops</Badge>
-        </XStack>
+        </div>
 
-        <YStack
-          gap="$3"
-          padding="$4"
-          borderRadius="$4"
-          backgroundColor="$muted"
-          borderWidth={1}
-          borderColor="$borderColor"
-        >
-          <XStack alignItems="center" gap="$2">
+        <div className={_cn21}>
+          <div className={_cn22}>
             <Plus size={16} color="var(--color-primary)" />
-            <Text variant="heading4">Add Stop</Text>
-          </XStack>
+            <span className={_cn23}>Add Stop</span>
+          </div>
 
-          <YStack gap="$3">
-            <YStack gap="$1.5">
-              <Text variant="label" color="$mutedForeground">Spot ID *</Text>
-              <Input
-                value={newStop.spotId}
-                onChangeText={(value) => setNewStop((prev) => ({ ...prev, spotId: value }))}
-                variant="outline"
-                size="md"
-                placeholder="Paste an existing Spot UUID"
-                autoCapitalize="none"
-              />
-            </YStack>
+          <div className={_cn24}>
+            <div className={_cn25}>
+              <span className={_cn26}>Spot ID *</span>
+              <Input value={newStop.spotId} onChangeText={value => setNewStop(prev => ({
+              ...prev,
+              spotId: value
+            }))} variant="outline" size="md" placeholder="Paste an existing Spot UUID" autoCapitalize="none" />
+            </div>
 
-            <XStack gap="$3" flexWrap="wrap">
-              <YStack flex={1} minWidth={240} gap="$1.5">
-                <Text variant="label" color="$mutedForeground">Custom Title</Text>
-                <Input
-                  value={newStop.customTitle}
-                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customTitle: value }))}
-                  variant="outline"
-                  size="md"
-                  placeholder="Optional name override"
-                />
-              </YStack>
+            <div className={_cn27}>
+              <div className={_cn28}>
+                <span className={_cn29}>Custom Title</span>
+                <Input value={newStop.customTitle} onChangeText={value => setNewStop(prev => ({
+                ...prev,
+                customTitle: value
+              }))} variant="outline" size="md" placeholder="Optional name override" />
+              </div>
 
-              <YStack flex={1} minWidth={240} gap="$1.5">
-                <Text variant="label" color="$mutedForeground">Custom Description</Text>
-                <Input
-                  value={newStop.customDescription}
-                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customDescription: value }))}
-                  variant="outline"
-                  size="md"
-                  placeholder="Optional description override"
-                  // @ts-ignore multiline web
-                  multiline
-                  numberOfLines={3}
-                />
-              </YStack>
-            </XStack>
+              <div className={_cn30}>
+                <span className={_cn31}>Custom Description</span>
+                <Input value={newStop.customDescription} onChangeText={value => setNewStop(prev => ({
+                ...prev,
+                customDescription: value
+              }))} variant="outline" size="md" placeholder="Optional description override"
+              // @ts-ignore multiline web
+              multiline numberOfLines={3} />
+              </div>
+            </div>
 
-            <XStack justifyContent="flex-end">
-              <Button
-                variant="solid"
-                size="sm"
-                loading={isManagingStops}
-                disabled={isManagingStops}
-                onPress={handleAddStop}
-                icon={<Plus size={14} color="#FFFFFF" />}
-              >
+            <div className={_cn32}>
+              <Button variant="solid" size="sm" loading={isManagingStops} disabled={isManagingStops} onPress={handleAddStop} icon={<Plus size={14} color="#FFFFFF" />}>
                 Add Stop
               </Button>
-            </XStack>
-          </YStack>
-        </YStack>
+            </div>
+          </div>
+        </div>
 
-        {stopFeedback && (
-          <XStack gap="$2" alignItems="center">
-            {stopFeedback.ok
-              ? <CheckCircle2 size={16} color="var(--color-success500, #22C55E)" />
-              : <AlertCircle size={16} color="var(--color-error500, #DC2626)" />
-            }
-            <Text variant="caption" color={stopFeedback.ok ? '$success500' : '$error500'}>
+        {stopFeedback && <div className={_cn33}>
+            {stopFeedback.ok ? <CheckCircle2 size={16} color="var(--color-success500, #22C55E)" /> : <AlertCircle size={16} color="var(--color-error500, #DC2626)" />}
+            <span className={!stopFeedback.ok ? _cn34 : stopFeedback.ok ? _cn35 : _cn36}>
               {stopFeedback.message}
-            </Text>
-          </XStack>
-        )}
+            </span>
+          </div>}
 
-        {stops.length === 0 ? (
-          <YStack
-            padding="$6"
-            borderRadius="$4"
-            borderWidth={1}
-            borderStyle="dashed"
-            borderColor="$borderColor"
-            alignItems="center"
-            gap="$2"
-          >
+        {stops.length === 0 ? <div className={_cn37}>
             <MapPinned size={28} color="var(--color-mutedForeground)" />
-            <Text variant="heading4">No stops yet</Text>
-            <Text variant="body" muted align="center">
+            <span className={_cn38}>No stops yet</span>
+            <span className={_cn39}>
               Add at least one spot to turn this route into a real itinerary.
-            </Text>
-          </YStack>
-        ) : (
-          <YStack gap="$4">
+            </span>
+          </div> : <div className={_cn40}>
             {stops.map((stop, index) => {
-              const displayName = (stop.customTitle ?? '').trim() || stop.name
-              const displayDescription = (stop.customDescription ?? '').trim() || stop.description
-              const dirty = isStopDirty(stop)
+          const displayName = (stop.customTitle ?? '').trim() || stop.name;
+          const displayDescription = (stop.customDescription ?? '').trim() || stop.description;
+          const dirty = isStopDirty(stop);
+          return <div className={_cn41} key={stop.id}>
+                  <div className={_cn42}>
+                    <div className={_cn43}>
+                      <span className={_cn44}>{index + 1}</span>
+                    </div>
+                    {index < stops.length - 1 && <div className={_cn45} />}
+                  </div>
 
-              return (
-                <XStack key={stop.id} gap="$3" alignItems="flex-start">
-                  <YStack alignItems="center" gap="$1" paddingTop="$2">
-                    <XStack
-                      width={34}
-                      height={34}
-                      borderRadius="$full"
-                      backgroundColor="$primary"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <Text variant="label" color="#FFFFFF">{index + 1}</Text>
-                    </XStack>
-                    {index < stops.length - 1 && (
-                      <YStack width={2} minHeight={64} backgroundColor="$borderColor" />
-                    )}
-                  </YStack>
-
-                  <YStack
-                    flex={1}
-                    gap="$4"
-                    padding="$4"
-                    borderRadius="$4"
-                    backgroundColor="$background"
-                    borderWidth={1}
-                    borderColor="$borderColor"
-                  >
-                    <XStack justifyContent="space-between" alignItems="flex-start" gap="$3" flexWrap="wrap">
-                      <YStack gap="$1" flex={1} minWidth={220}>
-                        <Text variant="heading4">{displayName}</Text>
-                        <Text variant="caption" muted>
+                  <div className={_cn46}>
+                    <div className={_cn47}>
+                      <div className={_cn48}>
+                        <span className={_cn49}>{displayName}</span>
+                        <span className={_cn50}>
                           Spot ID: {stop.spotId}
-                        </Text>
-                      </YStack>
+                        </span>
+                      </div>
 
-                      <XStack gap="$2" flexWrap="wrap">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={index === 0 || isManagingStops}
-                          onPress={() => handleMoveStop(index, 'up')}
-                          icon={<ChevronUp size={14} color="currentColor" />}
-                        >
+                      <div className={_cn51}>
+                        <Button variant="outline" size="sm" disabled={index === 0 || isManagingStops} onPress={() => handleMoveStop(index, 'up')} icon={<ChevronUp size={14} color="currentColor" />}>
                           Up
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={index === stops.length - 1 || isManagingStops}
-                          onPress={() => handleMoveStop(index, 'down')}
-                          icon={<ChevronDown size={14} color="currentColor" />}
-                        >
+                        <Button variant="outline" size="sm" disabled={index === stops.length - 1 || isManagingStops} onPress={() => handleMoveStop(index, 'down')} icon={<ChevronDown size={14} color="currentColor" />}>
                           Down
                         </Button>
-                      </XStack>
-                    </XStack>
+                      </div>
+                    </div>
 
-                    <XStack gap="$3" flexWrap="wrap">
-                      <YStack flex={1} minWidth={240} gap="$1.5">
-                        <Text variant="label" color="$mutedForeground">Custom Title</Text>
-                        <Input
-                          value={stop.customTitle ?? ''}
-                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customTitle', value)}
-                          variant="outline"
-                          size="md"
-                          placeholder={stop.name}
-                        />
-                      </YStack>
+                    <div className={_cn52}>
+                      <div className={_cn53}>
+                        <span className={_cn54}>Custom Title</span>
+                        <Input value={stop.customTitle ?? ''} onChangeText={value => handleStopFieldChange(stop.id, 'customTitle', value)} variant="outline" size="md" placeholder={stop.name} />
+                      </div>
 
-                      <YStack flex={1} minWidth={240} gap="$1.5">
-                        <Text variant="label" color="$mutedForeground">Custom Description</Text>
-                        <Input
-                          value={stop.customDescription ?? ''}
-                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customDescription', value)}
-                          variant="outline"
-                          size="md"
-                          placeholder={stop.description ?? 'Optional description override'}
-                          // @ts-ignore multiline web
-                          multiline
-                          numberOfLines={3}
-                        />
-                      </YStack>
-                    </XStack>
+                      <div className={_cn55}>
+                        <span className={_cn56}>Custom Description</span>
+                        <Input value={stop.customDescription ?? ''} onChangeText={value => handleStopFieldChange(stop.id, 'customDescription', value)} variant="outline" size="md" placeholder={stop.description ?? 'Optional description override'}
+                  // @ts-ignore multiline web
+                  multiline numberOfLines={3} />
+                      </div>
+                    </div>
 
-                    <YStack gap="$2">
-                      <Text variant="caption" color="$mutedForeground">Current preview</Text>
-                      <YStack
-                        gap="$2"
-                        padding="$3"
-                        borderRadius="$3"
-                        backgroundColor="$backgroundStrong"
-                        borderWidth={1}
-                        borderColor="$borderColor"
-                      >
-                        <Text variant="label">{displayName}</Text>
-                        {displayDescription ? (
-                          <Text variant="caption" muted>{displayDescription}</Text>
-                        ) : (
-                          <Text variant="caption" muted>No description</Text>
-                        )}
-                        <XStack gap="$2" flexWrap="wrap">
+                    <div className={_cn57}>
+                      <span className={_cn58}>Current preview</span>
+                      <div className={_cn59}>
+                        <span className={_cn60}>{displayName}</span>
+                        {displayDescription ? <span className={_cn61}>{displayDescription}</span> : <span className={_cn62}>No description</span>}
+                        <div className={_cn63}>
                           <Badge variant="default" size="sm">Lat {stop.latitude.toFixed(4)}</Badge>
                           <Badge variant="default" size="sm">Lng {stop.longitude.toFixed(4)}</Badge>
                           {dirty && <Badge variant="warning" size="sm">Unsaved changes</Badge>}
-                        </XStack>
-                      </YStack>
-                    </YStack>
+                        </div>
+                      </div>
+                    </div>
 
-                    <Divider />
+                    <div className={_cn64} />
 
-                    <XStack justifyContent="space-between" alignItems="center" gap="$3" flexWrap="wrap">
-                      <Text variant="caption" muted>
+                    <div className={_cn65}>
+                      <span className={_cn66}>
                         Base spot: {stop.name}
-                      </Text>
+                      </span>
 
-                      <XStack gap="$2" flexWrap="wrap">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={!dirty || isManagingStops}
-                          onPress={() => handleResetStop(stop.id)}
-                          icon={<RotateCcw size={14} color="currentColor" />}
-                        >
+                      <div className={_cn67}>
+                        <Button variant="outline" size="sm" disabled={!dirty || isManagingStops} onPress={() => handleResetStop(stop.id)} icon={<RotateCcw size={14} color="currentColor" />}>
                           Reset
                         </Button>
-                        <Button
-                          variant="solid"
-                          size="sm"
-                          loading={isManagingStops}
-                          disabled={!dirty || isManagingStops}
-                          onPress={() => handleSaveStop(stop)}
-                          icon={<Save size={14} color="#FFFFFF" />}
-                        >
+                        <Button variant="solid" size="sm" loading={isManagingStops} disabled={!dirty || isManagingStops} onPress={() => handleSaveStop(stop)} icon={<Save size={14} color="#FFFFFF" />}>
                           Save Stop
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={isManagingStops}
-                          onPress={() => handleDeleteStop(stop.id)}
-                          icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
-                        >
-                          <Text variant="label" color="$error500">Delete</Text>
+                        <Button variant="outline" size="sm" disabled={isManagingStops} onPress={() => handleDeleteStop(stop.id)} icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}>
+                          <span className={_cn68}>Delete</span>
                         </Button>
-                      </XStack>
-                    </XStack>
-                  </YStack>
-                </XStack>
-              )
-            })}
-          </YStack>
-        )}
-      </YStack>
+                      </div>
+                    </div>
+                  </div>
+                </div>;
+        })}
+          </div>}
+      </div>
 
-      <YStack
-        backgroundColor="$backgroundStrong"
-        borderRadius="$4"
-        padding="$5"
-        gap="$4"
-        borderWidth={1}
-        borderColor="$borderColor"
-      >
-        <Text variant="heading4">Visibility</Text>
-        <XStack
-          backgroundColor={isPublic ? '$success50' : '$muted'}
-          borderRadius="$3"
-          padding="$4"
-          borderWidth={1}
-          borderColor={isPublic ? '$success200' : '$borderColor'}
-          gap="$3"
-          alignItems="center"
-        >
-          {isPublic
-            ? <Globe size={20} color="var(--color-success500, #22C55E)" />
-            : <Lock size={20} color="var(--color-mutedForeground)" />
-          }
-          <YStack flex={1} gap="$0.5">
-            <Text variant="label" weight="semibold">
+      <div className={_cn69}>
+        <span className={_cn70}>Visibility</span>
+        <div className={!isPublic ? _cn71 : isPublic ? _cn72 : _cn73}>
+          {isPublic ? <Globe size={20} color="var(--color-success500, #22C55E)" /> : <Lock size={20} color="var(--color-mutedForeground)" />}
+          <div className={_cn74}>
+            <span className={_cn75}>
               {isPublic ? 'Public' : 'Private'}
-            </Text>
-            <Text variant="caption" muted>
-              {isPublic
-                ? 'This route is visible to everyone on the platform.'
-                : 'Only you can see this route.'
-              }
-            </Text>
-          </YStack>
-          <Button
-            variant={isPublic ? 'outline' : 'solid'}
-            size="sm"
-            loading={isTogglingPublish}
-            disabled={isTogglingPublish}
-            onPress={handleTogglePublish}
-          >
+            </span>
+            <span className={_cn76}>
+              {isPublic ? 'This route is visible to everyone on the platform.' : 'Only you can see this route.'}
+            </span>
+          </div>
+          <Button variant={isPublic ? 'outline' : 'solid'} size="sm" loading={isTogglingPublish} disabled={isTogglingPublish} onPress={handleTogglePublish}>
             {isPublic ? 'Unpublish' : 'Publish'}
           </Button>
-        </XStack>
-      </YStack>
+        </div>
+      </div>
 
-      <YStack
-        backgroundColor="$backgroundStrong"
-        borderRadius="$4"
-        padding="$5"
-        gap="$4"
-        borderWidth={1}
-        borderColor="$error200"
-      >
-        <Text variant="heading4" color="$error500">Danger Zone</Text>
-        <Divider />
-        <XStack gap="$4" alignItems="center" flexWrap="wrap">
-          <YStack flex={1} gap="$0.5">
-            <Text variant="label">Delete Route</Text>
-            <Text variant="caption" muted>
+      <div className={_cn77}>
+        <span className={_cn78}>Danger Zone</span>
+        <div className={_cn79} />
+        <div className={_cn80}>
+          <div className={_cn81}>
+            <span className={_cn82}>Delete Route</span>
+            <span className={_cn83}>
               Permanently delete this route. This action cannot be undone.
-            </Text>
-          </YStack>
-          {!deleteConfirm ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={() => setDeleteConfirm(true)}
-              icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
-            >
-              <Text variant="label" color="$error500">Delete</Text>
-            </Button>
-          ) : (
-            <XStack gap="$2">
-              <Button
-                variant="outline"
-                size="sm"
-                onPress={() => setDeleteConfirm(false)}
-                disabled={isDeleting}
-              >
+            </span>
+          </div>
+          {!deleteConfirm ? <Button variant="outline" size="sm" onPress={() => setDeleteConfirm(true)} icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}>
+              <span className={_cn84}>Delete</span>
+            </Button> : <div className={_cn85}>
+              <Button variant="outline" size="sm" onPress={() => setDeleteConfirm(false)} disabled={isDeleting}>
                 Cancel
               </Button>
-              <Button
-                size="sm"
-                loading={isDeleting}
-                disabled={isDeleting}
-                onPress={handleDelete}
-                backgroundColor="$error500"
-                hoverStyle={{ backgroundColor: '$error400' }}
-              >
-                <Text variant="label" color="#FFFFFF">Confirm Delete</Text>
+              <Button size="sm" loading={isDeleting} disabled={isDeleting} onPress={handleDelete} backgroundColor="$error500" hoverStyle={{
+            backgroundColor: '$error400'
+          }}>
+                <span className={_cn86}>Confirm Delete</span>
               </Button>
-            </XStack>
-          )}
-        </XStack>
-      </YStack>
-    </YStack>
-  )
+            </div>}
+        </div>
+      </div>
+    </div>;
 }

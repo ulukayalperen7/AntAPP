@@ -1,0 +1,13 @@
+:root ._pos-relative{position:relative;}
+:root ._fd-row{flex-direction:row;}
+:root ._flexGrow-1{flex-grow:1;}
+:root ._flexShrink-1{flex-shrink:1;}
+:root ._fb-auto{flex-basis:auto;}
+:root ._mih-100vh{min-height:100vh;}
+:root ._bg-background{background-color:var(--background);}
+:root ._fd-column{flex-direction:column;}
+:root ._paddingTop-t-space-5{padding-top:var(--t-space-5);}
+:root ._paddingRight-t-space-5{padding-right:var(--t-space-5);}
+:root ._paddingBottom-t-space-5{padding-bottom:var(--t-space-5);}
+:root ._paddingLeft-t-space-5{padding-left:var(--t-space-5);}
+:root ._gap-t-space-5{gap:var(--t-space-5);}

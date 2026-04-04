@@ -47233,6 +47233,7 @@ function Button2({
   const theme = (0, import_core71.useTheme)();
   const spinnerColor = variant === "solid" ? theme.backgroundStrong?.get() ?? "#FFFFFF" : theme.primary?.get() ?? "#EA580C";
   const isDisabled = disabled || loading;
+  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
   return /* @__PURE__ */ (0, import_jsx_runtime102.jsxs)(
     ButtonFrame,
     {
@@ -47240,9 +47241,7 @@ function Button2({
       size: size7,
       disabled: isDisabled,
       loading,
-      tag: import_core71.isWeb ? "button" : void 0,
-      type: import_core71.isWeb ? "button" : void 0,
-      role: import_core71.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      role: import_core71.isWeb ? webRole : role,
       "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
       accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
       accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
@@ -47769,14 +47768,13 @@ function IconButton({
   "aria-label": ariaLabel,
   ...rest
 }) {
+  const webRole = role ?? (accessibilityRole === "button" ? "button" : void 0) ?? "button";
   return /* @__PURE__ */ (0, import_jsx_runtime110.jsx)(
     IconButtonFrame,
     {
       variant,
       size: size7,
-      tag: import_core71.isWeb ? "button" : void 0,
-      type: import_core71.isWeb ? "button" : void 0,
-      role: import_core71.isWeb ? role ?? accessibilityRole ?? "button" : role,
+      role: import_core71.isWeb ? webRole : role,
       "aria-label": import_core71.isWeb ? ariaLabel ?? accessibilityLabel : ariaLabel,
       accessibilityRole: import_core71.isWeb ? void 0 : accessibilityRole ?? "button",
       accessibilityLabel: import_core71.isWeb ? void 0 : accessibilityLabel,
