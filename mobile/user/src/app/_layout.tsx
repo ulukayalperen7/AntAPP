@@ -1,9 +1,9 @@
 import '@tamagui/native/setup-zeego';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, useColorScheme, View } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { TamaguiProvider } from 'tamagui';
-import { tamaguiConfig } from '@antapp/ui';
+import { Spinner, Text, YStack, tamaguiConfig } from '@antapp/ui';
 
 import { AnimatedSplashOverlay } from '@/components/icons/animated-icon';
 import AppTabs from '@/components/layout/app-tabs';
@@ -15,9 +15,10 @@ function AppContent() {
 
   if (status === 'loading') {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator />
-      </View>
+      <YStack flex={1} alignItems="center" justifyContent="center" gap="$3">
+        <Spinner size="large" />
+        <Text variant="body" muted>Loading AntAPP...</Text>
+      </YStack>
     );
   }
 
@@ -46,10 +47,3 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

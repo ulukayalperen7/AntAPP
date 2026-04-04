@@ -100,3 +100,19 @@ export function registerAccount(
     confirmPassword,
   })
 }
+
+export async function forgotPasswordRequest(email: string): Promise<string> {
+  const res = await fetch(`${API_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  })
+
+  if (!res.ok) {
+    throw new Error(await parseApiError(res))
+  }
+
+  return 'If an account with that email exists, a reset link has been sent.'
+}

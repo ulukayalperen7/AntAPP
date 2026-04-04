@@ -1,130 +1,176 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'expo-router'
 import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
-import type { RouteCardData } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
-
-const CATEGORIES = ['All', 'Nature', 'History', 'Food', 'Entertainment']
-
-const POPULAR_ROUTES: RouteCardData[] = [
-  {
-    id: '1',
-    title: 'Classic Kaleiçi Tour',
-    description: 'Discover the historic narrow streets, Hadrian\'s Gate, and the ancient harbor of Antalya\'s old town.',
-    rating: 4.9,
-    distance: '3.5 km',
-    duration: '2h 30m',
-    category: 'History',
-    stopsCount: 12,
-    isOfficial: true,
-  },
-  {
-    id: '2',
-    title: 'Düden Waterfall Trail',
-    rating: 4.7,
-    distance: '5.8 km',
-    duration: '4h 15m',
-    category: 'Nature',
-    difficulty: 'moderate',
-    stopsCount: 8,
-  },
-  {
-    id: '3',
-    title: 'Old Town Foodie Trail',
-    rating: 4.5,
-    distance: '2.5 km',
-    duration: '2h',
-    category: 'Food',
-    difficulty: 'easy',
-    stopsCount: 10,
-  },
-]
+import { useAuth } from '@/features/auth/context'
+import { getRoutes, getTags } from '@/features/routes/api'
+import type { RouteListItem, Tag } from '@/features/api/types'
+import { routeToCardData } from '@/features/routes/presenters'
 
 export default function HomeScreen() {
-  const [activeCategory, setActiveCategory] = useState('All')
+  const router = useRouter()
   const insets = useSafeAreaInsets()
+  const { user } = useAuth()
+  const [search, setSearch] = useState('')
+  const [activeTagId, setActiveTagId] = useState<string | null>(null)
+  const [popularRoutes, setPopularRoutes] = useState<RouteListItem[]>([])
+  const [communityRoutes, setCommunityRoutes] = useState<RouteListItem[]>([])
+  const [tags, setTags] = useState<Tag[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+
+    Promise.allSettled([
+      getRoutes({ sort: 'rating', type: 'official', pageSize: 6 }),
+      getRoutes({ sort: 'newest', type: 'community', pageSize: 6 }),
+      getTags(100),
+    ]).then((results) => {
+      if (!mounted) return
+
+      const [popularResult, communityResult, tagsResult] = results
+      setPopularRoutes(popularResult.status === 'fulfilled' ? popularResult.value.data : [])
+      setCommunityRoutes(communityResult.status === 'fulfilled' ? communityResult.value.data : [])
+      setTags(tagsResult.status === 'fulfilled' ? tagsResult.value : [])
+      setLoading(false)
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const tagList = useMemo(
+    () => [{ id: '__all__', name: 'All', isActive: true }, ...tags.filter((tag) => tag.isActive)],
+    [tags],
+  )
+
+  const filterRoutes = (routes: RouteListItem[]) => {
+    if (!activeTagId) return routes
+    return routes
+  }
 
   return (
     <YStack flex={1} backgroundColor="$background">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$4">
-          {/* Top Bar */}
+        <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$5">
           <XStack justifyContent="space-between" alignItems="center">
             <XStack alignItems="center" gap="$2">
               <XStack
-                width={32}
-                height={32}
+                width={36}
+                height={36}
                 borderRadius="$full"
                 backgroundColor="$primary"
                 alignItems="center"
                 justifyContent="center"
               >
-                <Text fontSize="$2" fontWeight="700" color="#FFFFFF">A</Text>
+                <Text variant="label" color="#FFFFFF">A</Text>
               </XStack>
-              <Text variant="heading4">AntAPP</Text>
+              <YStack gap="$0.5">
+                <Text variant="heading4">AntAPP</Text>
+                <Text variant="caption" muted>{user?.userName ?? 'Explorer'}</Text>
+              </YStack>
             </XStack>
             <XStack gap="$2" alignItems="center">
               <IconButton variant="ghost" size="sm">
-                <Feather name="bell" size={22} color="currentColor" />
+                <Feather name="bell" size={20} color="currentColor" />
               </IconButton>
-              <Avatar size="sm" initials="U" />
+              <Avatar size="sm" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'U'} />
             </XStack>
           </XStack>
 
-          {/* Search */}
-          <SearchInput placeholder="Where do you want to go?" size="md" />
-
-          {/* Category Filters */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <XStack gap="$2">
-              {CATEGORIES.map((cat) => (
-                <FilterChip
-                  key={cat}
-                  active={activeCategory === cat}
-                  onPress={() => setActiveCategory(cat)}
-                >
-                  {cat}
-                </FilterChip>
-              ))}
+          <YStack
+            backgroundColor="$ant900"
+            borderRadius="$4"
+            padding="$5"
+            gap="$2"
+            overflow="hidden"
+          >
+            <XStack
+              backgroundColor="$primary"
+              paddingHorizontal="$2.5"
+              paddingVertical="$1"
+              borderRadius="$2"
+              alignSelf="flex-start"
+            >
+              <Text variant="caption" color="#FFFFFF">EXPLORE</Text>
             </XStack>
-          </ScrollView>
+            <Text variant="heading2" color="#FFFFFF">Discover your next route</Text>
+            <Text variant="body" color="$ant200">
+              Browse official highlights and fresh community itineraries from the AntAPP network.
+            </Text>
+          </YStack>
 
-          {/* Popular Routes */}
+          <SearchInput
+            value={search}
+            onChangeText={setSearch}
+            onSubmitEditing={() => router.push(`/explore?q=${encodeURIComponent(search.trim())}`)}
+            placeholder="Search routes, places, or tags..."
+            size="md"
+          />
+
+          {tagList.length > 1 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <XStack gap="$2">
+                {tagList.map((tag) => (
+                  <FilterChip
+                    key={tag.id}
+                    active={activeTagId === (tag.id === '__all__' ? null : tag.id)}
+                    onPress={() => setActiveTagId(tag.id === '__all__' ? null : tag.id)}
+                  >
+                    {tag.name}
+                  </FilterChip>
+                ))}
+              </XStack>
+            </ScrollView>
+          ) : null}
+
           <YStack gap="$3">
             <XStack justifyContent="space-between" alignItems="center">
               <Text variant="heading3">Popular Routes</Text>
-              <Text variant="body" color="$primary">See all</Text>
+              <Text variant="body" color="$primary" onPress={() => router.push('/explore?sort=rating&type=official')}>
+                See all
+              </Text>
             </XStack>
 
             <YStack gap="$4">
-              {POPULAR_ROUTES.map((route) => (
-                <RouteCard key={route.id} data={route} />
+              {filterRoutes(popularRoutes).map((route) => (
+                <RouteCard
+                  key={route.id}
+                  data={routeToCardData(route)}
+                  onPress={() => router.push(`/routes/${route.id}`)}
+                />
               ))}
+              {!loading && popularRoutes.length === 0 ? (
+                <Text variant="body" muted>No popular routes yet.</Text>
+              ) : null}
+            </YStack>
+          </YStack>
+
+          <YStack gap="$3">
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="heading3">Community Routes</Text>
+              <Text variant="body" color="$primary" onPress={() => router.push('/explore?sort=newest&type=community')}>
+                See all
+              </Text>
+            </XStack>
+
+            <YStack gap="$4">
+              {filterRoutes(communityRoutes).map((route) => (
+                <RouteCard
+                  key={route.id}
+                  data={routeToCardData(route)}
+                  onPress={() => router.push(`/routes/${route.id}`)}
+                />
+              ))}
+              {!loading && communityRoutes.length === 0 ? (
+                <Text variant="body" muted>No community routes yet.</Text>
+              ) : null}
             </YStack>
           </YStack>
         </YStack>
       </ScrollView>
-
-      {/* Floating Map View Button */}
-      <XStack
-        position="absolute"
-        bottom={100}
-        alignSelf="center"
-        backgroundColor="$ant900"
-        paddingHorizontal="$4"
-        paddingVertical="$2.5"
-        borderRadius="$full"
-        alignItems="center"
-        gap="$2"
-        shadowColor="$shadowColor"
-        shadowOffset={{ width: 0, height: 2 }}
-        shadowOpacity={1}
-        shadowRadius={8}
-        elevation={4}
-      >
-        <Feather name="map" size={18} color="#FFFFFF" />
-        <Text variant="label" color="#FFFFFF">Map View</Text>
-      </XStack>
     </YStack>
   )
 }

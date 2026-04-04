@@ -12,6 +12,7 @@ export type AuthLoginScreenProps = {
   error?: string | null
   successMessage?: string | null
   onNavigateToRegister?: () => void
+  onNavigateToForgotPassword?: () => void
   mascot?: React.ReactNode
 }
 
@@ -25,6 +26,7 @@ export function AuthLoginScreen({
   error,
   successMessage,
   onNavigateToRegister,
+  onNavigateToForgotPassword,
   mascot,
 }: AuthLoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false)
@@ -111,6 +113,14 @@ export function AuthLoginScreen({
           </Button>
         </XStack>
       </AuthField>
+
+      {onNavigateToForgotPassword ? (
+        <XStack justifyContent="flex-end">
+          <Button variant="link" size="sm" onPress={onNavigateToForgotPassword} disabled={pending}>
+            Forgot password?
+          </Button>
+        </XStack>
+      ) : null}
 
       <Button onPress={onSubmit} loading={pending} disabled={pending} size="lg" borderRadius="$4">
         Sign In

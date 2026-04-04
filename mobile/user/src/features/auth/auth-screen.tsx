@@ -1,6 +1,11 @@
 import React, { useState } from 'react'
 import { Image } from 'expo-image'
-import { AuthLoginScreen, AuthRegisterScreen } from '@antapp/app'
+import {
+  AuthForgotPasswordScreen,
+  AuthLoginScreen,
+  AuthRegisterScreen,
+} from '@antapp/app'
+import { forgotPasswordRequest } from './api'
 import { useAuth } from './context'
 
 const mascotSource = require('@/assets/images/ant-mascot.png')
@@ -8,7 +13,7 @@ const MascotImage = () => (
   <Image source={mascotSource} style={{ width: 130, height: 130 }} contentFit="contain" />
 )
 
-type AuthMode = 'login' | 'register'
+type AuthMode = 'login' | 'register' | 'forgot'
 
 export function AuthScreen() {
   const { login, register } = useAuth()
@@ -33,6 +38,12 @@ export function AuthScreen() {
 
   const openRegister = () => {
     setMode('register')
+    setError(null)
+    setSuccessMessage(null)
+  }
+
+  const openForgotPassword = () => {
+    setMode('forgot')
     setError(null)
     setSuccessMessage(null)
   }
@@ -82,6 +93,23 @@ export function AuthScreen() {
     setPending(false)
   }
 
+  const handleForgotPassword = async () => {
+    if (pending) return
+
+    setPending(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const message = await forgotPasswordRequest(loginEmail)
+      setSuccessMessage(message)
+    } catch (forgotError) {
+      setError(forgotError instanceof Error ? forgotError.message : 'Request failed')
+    }
+
+    setPending(false)
+  }
+
   if (mode === 'register') {
     return (
       <AuthRegisterScreen
@@ -116,6 +144,25 @@ export function AuthScreen() {
     )
   }
 
+  if (mode === 'forgot') {
+    return (
+      <AuthForgotPasswordScreen
+        email={loginEmail}
+        onEmailChange={(value) => {
+          setLoginEmail(value)
+          setError(null)
+          setSuccessMessage(null)
+        }}
+        onSubmit={handleForgotPassword}
+        pending={pending}
+        error={error}
+        successMessage={successMessage}
+        onNavigateToLogin={openLogin}
+        mascot={<MascotImage />}
+      />
+    )
+  }
+
   return (
     <AuthLoginScreen
       email={loginEmail}
@@ -135,6 +182,7 @@ export function AuthScreen() {
       error={error}
       successMessage={successMessage}
       onNavigateToRegister={openRegister}
+      onNavigateToForgotPassword={openForgotPassword}
       mascot={<MascotImage />}
     />
   )
