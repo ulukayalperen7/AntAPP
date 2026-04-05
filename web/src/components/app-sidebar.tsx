@@ -7,7 +7,7 @@ import { useTheme } from 'tamagui'
 import { Globe, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { label: 'Explore', href: '/', Icon: Globe },
+  { label: 'Explore', href: '/dashboard', Icon: Globe },
   { label: 'Spots', href: '/spots', Icon: MapPinned },
   { label: 'My Routes', href: '/profile', Icon: Route },
   { label: 'Saved', href: '/saved', Icon: Bookmark },

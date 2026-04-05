@@ -84,7 +84,7 @@ function withAuthUpdates(
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
+  const isPublic = pathname === '/' || PUBLIC_PATHS.some((p) => pathname.startsWith(p))
   let accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value ?? null
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value ?? null
 
@@ -124,11 +124,18 @@ export async function proxy(request: NextRequest) {
   const landingPath = getLandingPathByRoles(roles)
 
   if (isPublic) {
-    return withAuthUpdates(
-      NextResponse.redirect(new URL(landingPath, request.url)),
-      refreshedTokens,
-      shouldClearCookies
-    )
+    // "/" is landing page, accessible to everyone
+    // But authenticated users on "/" should stay there
+    // Auth pages (/login, /register, etc.) redirect authenticated users to dashboard
+    if (pathname !== '/') {
+      return withAuthUpdates(
+        NextResponse.redirect(new URL(landingPath, request.url)),
+        refreshedTokens,
+        shouldClearCookies
+      )
+    }
+    // "/" - everyone can access (public landing page)
+    return withAuthUpdates(NextResponse.next(), refreshedTokens, shouldClearCookies)
   }
 
   if (!canAccessPath(pathname, roles)) {

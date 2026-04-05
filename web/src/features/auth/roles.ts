@@ -16,7 +16,7 @@ export function canAccessBusiness(roles: string[]): boolean {
 export function getLandingPathByRoles(roles: string[]): string {
   if (canAccessAdmin(roles)) return '/admin'
   if (canAccessBusiness(roles)) return '/business'
-  return '/'
+  return '/dashboard'
 }
 
 export function canAccessPath(pathname: string, roles: string[]): boolean {
