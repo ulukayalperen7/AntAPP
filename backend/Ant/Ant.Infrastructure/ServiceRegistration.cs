@@ -44,6 +44,7 @@ namespace Ant.Infrastructure
             #region Services
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IIdentityService, IdentityService>();
+            services.AddHttpClient<IMapRoutingService, GoogleRoutesService>();
             #endregion
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>

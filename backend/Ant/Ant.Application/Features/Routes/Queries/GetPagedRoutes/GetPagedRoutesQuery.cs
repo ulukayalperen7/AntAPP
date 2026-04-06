@@ -36,6 +36,10 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
         public string ContentType { get; set; }
         public bool IsPublic { get; set; }
         public DateTime CreatedAt { get; set; }
+        public double TotalDistanceMeters { get; set; }
+        public int EstimatedDurationSeconds { get; set; }
+        public double CenterLatitude { get; set; }
+        public double CenterLongitude { get; set; }
         public double AverageRating { get; set; }
     }
 
@@ -81,6 +85,10 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
                 ContentType = r.ContentType.ToString(),
                 IsPublic = r.IsPublic,
                 CreatedAt = r.CreatedAt,
+                TotalDistanceMeters = r.TotalDistanceMeters,
+                EstimatedDurationSeconds = r.EstimatedDurationSeconds,
+                CenterLatitude = r.CenterLocation != null ? r.CenterLocation.Y : 0,
+                CenterLongitude = r.CenterLocation != null ? r.CenterLocation.X : 0,
                 AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
             }).ToList();
 
