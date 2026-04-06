@@ -34,7 +34,7 @@ namespace Ant.Infrastructure.Services
             }
 
             // Check max distance between consecutive waypoints
-            double maxDistanceKm = _configuration.GetValue<double?>("Google:MaxRouteDistanceKm") ?? 50.0; // default 50km
+            double maxDistanceKm = _configuration.GetValue<double?>("RouteSettings:MaxRouteDistanceKm") ?? 50.0; // default 50km
             for (int i = 0; i < waypoints.Count - 1; i++)
             {
                 double dist = CalculateHaversineDistance(waypoints[i], waypoints[i+1]);

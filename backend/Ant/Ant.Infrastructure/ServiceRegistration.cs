@@ -44,7 +44,9 @@ namespace Ant.Infrastructure
             #region Services
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IIdentityService, IdentityService>();
-            services.AddHttpClient<IMapRoutingService, GoogleRoutesService>();
+            
+            // Swap to DummyMapRoutingService until a Google API key is procured
+            services.AddTransient<IMapRoutingService, DummyMapRoutingService>();
             #endregion
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>
