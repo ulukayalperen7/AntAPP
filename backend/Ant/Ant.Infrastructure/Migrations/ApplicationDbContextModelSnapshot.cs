@@ -91,6 +91,9 @@ namespace Ant.Infrastructure.Migrations
                     b.Property<Guid>("AuthorUserId")
                         .HasColumnType("uuid");
 
+                    b.Property<Point>("CenterLocation")
+                        .HasColumnType("geometry");
+
                     b.Property<int>("ContentType")
                         .HasColumnType("integer");
 
@@ -99,6 +102,12 @@ namespace Ant.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<string>("EncodedPolyline")
+                        .HasColumnType("text");
+
+                    b.Property<int>("EstimatedDurationSeconds")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -124,12 +133,19 @@ namespace Ant.Infrastructure.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<double>("TotalDistanceMeters")
+                        .HasColumnType("double precision");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorUserId");
+
+                    b.HasIndex("CenterLocation");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("CenterLocation"), "GIST");
 
                     b.ToTable("Routes");
                 });
@@ -223,6 +239,9 @@ namespace Ant.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("GooglePlaceId")
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")

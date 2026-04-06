@@ -87,6 +87,11 @@ namespace Ant.Infrastructure.Contexts
             // Enable PostGIS for geospatial functionality (Spot.Location)
             builder.HasPostgresExtension("postgis");
 
+            builder.Entity<Route>(entity =>
+            {
+                entity.HasIndex(r => r.CenterLocation).HasMethod("GIST");
+            });
+
             // Many-to-many: Route <-> Tag (via RouteTag bridge table)
             builder.Entity<RouteTag>()
                 .HasKey(rt => new { rt.RouteId, rt.TagId });
