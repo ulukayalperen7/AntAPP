@@ -19,6 +19,7 @@ namespace Ant.Core.Entities
         public string Description { get; set; }
         public string PhotoUrl { get; set; }
         public Point Location { get; set; }
+        public string GooglePlaceId { get; set; }
         public bool IsActive { get; set; }
 
         public long RatingSum { get; set; }
