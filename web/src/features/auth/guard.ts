@@ -8,8 +8,8 @@ export async function requireAuth(pathname: string) {
     redirect('/login')
   }
 
-  if (!canAccessPath(pathname, session.roles)) {
-    redirect(getLandingPathByRoles(session.roles))
+  if (!canAccessPath(pathname, session.roles, session.userName)) {
+    redirect(getLandingPathByRoles(session.roles, session.userName))
   }
 
   return session

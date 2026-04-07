@@ -4,9 +4,9 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ProgressBar } from '@antapp/ui'
 import type { RouteDetail } from '@/types/api'
-import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil } from 'lucide-react'
+import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown } from 'lucide-react'
 import { saveRoute } from '@/features/collections/actions'
-import { rateRoute, forkRoute } from '@/features/routes/actions'
+import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
 
 // ─── Star Rating Widget ───────────────────────────────────────────────────────
 
@@ -81,9 +81,11 @@ function StarRatingWidget({
 export default function RouteDetailClient({
   route,
   isOwner = false,
+  isAdmin = false,
 }: {
   route: RouteDetail
   isOwner?: boolean
+  isAdmin?: boolean
 }) {
   const router = useRouter()
 
@@ -95,6 +97,11 @@ export default function RouteDetailClient({
   // Fork state
   const [isForking, startFork] = useTransition()
   const [forkError, setForkError] = useState<string | null>(null)
+
+  // Promote state
+  const [isPromoting, startPromote] = useTransition()
+  const [promoteError, setPromoteError] = useState<string | null>(null)
+  const [isPromoted, setIsPromoted] = useState(route.contentType === 'Official')
 
   // Rating state
   const [displayRating, setDisplayRating] = useState(route.averageRating)
@@ -120,6 +127,19 @@ export default function RouteDetailClient({
         router.push(`/routes/${forkedId}`)
       } catch (e) {
         setForkError((e as Error).message ?? 'Failed to fork route')
+      }
+    })
+  }
+
+  const handlePromote = () => {
+    if (isPromoted) return
+    setPromoteError(null)
+    startPromote(async () => {
+      try {
+        await promoteRouteToOfficial(route.id)
+        setIsPromoted(true)
+      } catch (e) {
+        setPromoteError((e as Error).message ?? 'Failed to promote route')
       }
     })
   }
@@ -217,10 +237,32 @@ export default function RouteDetailClient({
                 </XStack>
               </Button>
             )}
+
+            {isAdmin && (
+              <Button
+                variant={isPromoted ? 'solid' : 'outline'}
+                size="md"
+                loading={isPromoting}
+                disabled={isPromoted || isPromoting}
+                onPress={handlePromote}
+                // @ts-ignore — web style override
+                style={{ backgroundColor: isPromoted ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.1)' }}
+              >
+                <XStack alignItems="center" gap="$1.5">
+                  <Crown size={16} color={isPromoted ? '#4CAF50' : '#FFFFFF'} />
+                  <Text variant="label" color={isPromoted ? '#4CAF50' : '#FFFFFF'}>
+                    {isPromoted ? 'Official ✓' : 'Promote'}
+                  </Text>
+                </XStack>
+              </Button>
+            )}
           </XStack>
 
           {saveError && (
             <Text variant="caption" color="$error500">{saveError}</Text>
+          )}
+          {promoteError && (
+            <Text variant="caption" color="$error500">{promoteError}</Text>
           )}
         </YStack>
       </YStack>
