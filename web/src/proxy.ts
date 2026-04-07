@@ -121,7 +121,8 @@ export async function proxy(request: NextRequest) {
   }
 
   const roles = getTokenRoles(payload)
-  const landingPath = getLandingPathByRoles(roles)
+  const username = payload?.['sub'] as string | undefined
+  const landingPath = getLandingPathByRoles(roles, username)
 
   if (isPublic) {
     // "/" is landing page, accessible to everyone
@@ -138,7 +139,7 @@ export async function proxy(request: NextRequest) {
     return withAuthUpdates(NextResponse.next(), refreshedTokens, shouldClearCookies)
   }
 
-  if (!canAccessPath(pathname, roles)) {
+  if (!canAccessPath(pathname, roles, username)) {
     return withAuthUpdates(
       NextResponse.redirect(new URL(landingPath, request.url)),
       refreshedTokens,

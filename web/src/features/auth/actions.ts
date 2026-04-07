@@ -90,7 +90,8 @@ export async function login(
   }
 
   await setAuthCookies(data.jwToken, data.refreshToken)
-  redirect(getLandingPathByRoles(data.roles))
+  const landingPath = getLandingPathByRoles(data.roles, data.userName)
+  redirect(landingPath)
 }
 
 export async function register(

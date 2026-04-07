@@ -62,9 +62,12 @@ export default function LandingPage() {
           borderBottomWidth={1}
           borderBottomColor="$borderColor"
         >
-          <Text variant="heading3" weight="bold" color="$primary">
-            AntAPP
-          </Text>
+          <XStack alignItems="center" gap="$2">
+            <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+            <Text variant="heading3" weight="bold" color="$primary">
+              AntAPP
+            </Text>
+          </XStack>
           <XStack gap="$3">
             <Button variant="ghost" size="md" onClick={() => router.push('/login')}>
               Sign In

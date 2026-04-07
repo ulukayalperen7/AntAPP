@@ -48,6 +48,15 @@ export type Tag = {
   isActive: boolean
 }
 
+// ─── Categories ─────────────────────────────────────────
+
+export type Category = {
+  id: string
+  name: string
+  description?: string
+  createdAt?: string
+}
+
 // ─── Routes ─────────────────────────────────────────────
 
 export type RouteContentType = 'Community' | 'Official' | 'Sponsored'

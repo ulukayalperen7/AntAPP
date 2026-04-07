@@ -124,3 +124,9 @@ export async function rateRoute(routeId: string, score: number): Promise<void> {
     body: JSON.stringify({ score }),
   })
 }
+
+export async function promoteRouteToOfficial(routeId: string): Promise<void> {
+  await apiFetchData<string>(`/admin/routes/${routeId}/promote`, {
+    method: 'POST',
+  })
+}

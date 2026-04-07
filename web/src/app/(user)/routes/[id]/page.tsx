@@ -27,6 +27,7 @@ export default async function RouteDetailPage({
   const route = (routeResult as PromiseFulfilledResult<typeof routeResult extends PromiseFulfilledResult<infer T> ? T : never>).value as Awaited<ReturnType<typeof getRouteById>>
   const currentUser = userResult.status === 'fulfilled' ? userResult.value : null
   const isOwner = !!(currentUser && route.authorUserId === currentUser.id)
+  const isAdmin = currentUser?.userName === 'antadmin'
 
-  return <RouteDetailClient route={route} isOwner={isOwner} />
+  return <RouteDetailClient route={route} isOwner={isOwner} isAdmin={isAdmin} />
 }
