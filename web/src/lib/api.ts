@@ -17,10 +17,14 @@ export async function apiFetch<T>(
     headers.set('Authorization', `Bearer ${token}`)
   }
 
+  const method = options?.method?.toUpperCase() || 'GET'
+  const isGet = method === 'GET'
+
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
-    cache: options?.cache ?? 'no-store',
+    cache: options?.cache ?? (isGet ? 'force-cache' : 'no-store'),
+    ...(isGet && !options?.cache ? { next: { revalidate: 60 } } : {}),
   })
 
   if (!res.ok) {

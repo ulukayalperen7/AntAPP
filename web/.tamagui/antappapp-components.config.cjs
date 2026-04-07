@@ -22892,6 +22892,7 @@ function Button({
   disabled = false,
   variant = "solid",
   size: size3 = "md",
+  color,
   accessibilityLabel,
   accessibilityRole,
   role,
@@ -22922,7 +22923,7 @@ function Button({
       ...buttonRest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, children }),
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, color, children }),
         !loading && iconAfter
       ]
     }

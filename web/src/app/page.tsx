@@ -32,7 +32,7 @@ export default function LandingPage() {
     const fetchFeaturedRoutes = async () => {
       try {
         setLoading(true)
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api'
         const res = await fetch(`${apiUrl}/routes?sort=rating&type=official&pageSize=3`, {
           cache: 'no-store',
         })
@@ -294,7 +294,6 @@ export default function LandingPage() {
                 minWidth={200}
                 gap="$3"
                 alignItems="center"
-                textAlign="center"
               >
                 <YStack
                   width={60}
@@ -306,10 +305,10 @@ export default function LandingPage() {
                 >
                   {feature.icon}
                 </YStack>
-                <Text variant="heading4" weight="semibold">
+                <Text variant="heading4" weight="semibold" textAlign="center">
                   {feature.title}
                 </Text>
-                <Text variant="caption" muted>
+                <Text variant="caption" muted textAlign="center">
                   {feature.desc}
                 </Text>
               </YStack>
