@@ -1,4 +1,5 @@
 using Ant.Core.Enums;
+using NetTopologySuite.Geometries;
 using System;
 using System.Collections.Generic;
 
@@ -40,6 +41,12 @@ namespace Ant.Core.Entities
         /// Soft delete flag to prevent permanent removal of route history.
         /// </summary>
         public bool IsDeleted { get; set; }
+
+        // Maps Workflow attributes
+        public Point CenterLocation { get; set; }
+        public string EncodedPolyline { get; set; }
+        public double TotalDistanceMeters { get; set; }
+        public int EstimatedDurationSeconds { get; set; }
 
         // Navigation properties
         public virtual ICollection<RouteTag> RouteTags { get; set; }       // Many-to-many: A route can have multiple tags

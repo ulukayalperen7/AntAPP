@@ -27,6 +27,13 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         public Guid AuthorUserId { get; set; }
         public Ant.Core.Enums.RouteContentTypeEnum ContentType { get; set; }
         public bool IsPublic { get; set; }
+
+        public string EncodedPolyline { get; set; }
+        public double TotalDistanceMeters { get; set; }
+        public int EstimatedDurationSeconds { get; set; }
+        public double CenterLatitude { get; set; }
+        public double CenterLongitude { get; set; }
+        
         
         /// <summary>        /// The sequential list of stops (Places) on this journey.
         /// </summary>
@@ -51,6 +58,7 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public string GooglePlaceId { get; set; }
     }
 
     public class GetRouteByIdQueryHandler : IRequestHandler<GetRouteByIdQuery, Response<GetRouteByIdViewModel>>
@@ -78,6 +86,12 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
                 ContentType = route.ContentType,
                 IsPublic = route.IsPublic,
                 
+                EncodedPolyline = route.EncodedPolyline,
+                TotalDistanceMeters = route.TotalDistanceMeters,
+                EstimatedDurationSeconds = route.EstimatedDurationSeconds,
+                CenterLatitude = route.CenterLocation?.Y ?? 0,
+                CenterLongitude = route.CenterLocation?.X ?? 0,
+                
                 // Dynamically compute the average based on cached aggregates to prevent database overhead.
                 // Math.Round ensures a clean representation like 4.5 for UI stars.
                 AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
@@ -95,7 +109,8 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
                     
                     // PostGIS Coordinates mapped to standard doubles for frontend consumption
                     Latitude = rs.Spot.Location.Y, 
-                    Longitude = rs.Spot.Location.X
+                    Longitude = rs.Spot.Location.X,
+                    GooglePlaceId = rs.Spot.GooglePlaceId
                 }).ToList()
             };
 
