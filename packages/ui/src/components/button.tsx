@@ -97,6 +97,7 @@ export type ButtonProps = Omit<GetProps<typeof ButtonFrame>, 'variant'> & {
   variant?: ButtonVariant
   size?: ButtonSize
   loading?: boolean
+  color?: any
   icon?: React.ReactNode
   iconAfter?: React.ReactNode
   children?: React.ReactNode
@@ -110,6 +111,7 @@ export function Button({
   disabled = false,
   variant = 'solid',
   size = 'md',
+  color,
   accessibilityLabel,
   accessibilityRole,
   role,
@@ -149,7 +151,7 @@ export function Button({
         icon
       )}
       {children != null && (
-        <ButtonLabel variant={variant} size={size}>
+        <ButtonLabel variant={variant} size={size} color={color}>
           {children}
         </ButtonLabel>
       )}

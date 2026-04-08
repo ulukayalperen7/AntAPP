@@ -32,31 +32,31 @@ export default function AdminDashboard({
     icon: React.ReactNode
     description: string
   }> = [
-    {
-      id: 'overview',
-      label: 'Overview',
-      icon: <Grid3x3 size={22} />,
-      description: 'Dashboard & analytics',
-    },
-    {
-      id: 'categories',
-      label: 'Categories',
-      icon: <Tag size={22} />,
-      description: 'Manage route categories',
-    },
-    {
-      id: 'routes',
-      label: 'Routes',
-      icon: <TrendingUp size={22} />,
-      description: 'Moderate & promote routes',
-    },
-    {
-      id: 'users',
-      label: 'Users',
-      icon: <Users size={22} />,
-      description: 'Manage user accounts',
-    },
-  ]
+      {
+        id: 'overview',
+        label: 'Overview',
+        icon: <Grid3x3 size={22} />,
+        description: 'Dashboard & analytics',
+      },
+      {
+        id: 'categories',
+        label: 'Categories',
+        icon: <Tag size={22} />,
+        description: 'Manage route categories',
+      },
+      {
+        id: 'routes',
+        label: 'Routes',
+        icon: <TrendingUp size={22} />,
+        description: 'Moderate & promote routes',
+      },
+      {
+        id: 'users',
+        label: 'Users',
+        icon: <Users size={22} />,
+        description: 'Manage user accounts',
+      },
+    ]
 
   const handleSelectSection = (sectionId: AdminSection) => {
     setActiveSection(sectionId)
@@ -72,7 +72,7 @@ export default function AdminDashboard({
   return (
     <YStack flex={1} gap="$6" padding="$6">
       {/* Header */}
-      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottomVertical="$4">
+      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottom="$4">
         <XStack alignItems="center" gap="$4" flex={1}>
           <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 40, height: 40, objectFit: 'contain' }} />
           <YStack gap="$2">
@@ -87,7 +87,7 @@ export default function AdminDashboard({
           icon={<LogOut size={16} />}
           loading={isLoggingOut}
           disabled={isLoggingOut}
-          onClick={handleLogout}
+          onPress={handleLogout}
         >
           Logout
         </Button>
@@ -122,7 +122,7 @@ export default function AdminDashboard({
                 scale: 1.02,
               }}
               pressStyle={{ scale: 0.98 }}
-              onClick={() => handleSelectSection(section.id)}
+              onPress={() => handleSelectSection(section.id)}
               borderRadius="$4"
               borderWidth={2}
             >
@@ -137,7 +137,6 @@ export default function AdminDashboard({
                 }
                 justifyContent="center"
                 alignItems="center"
-                color={activeSection === section.id ? '#FFFFFF' : '$color'}
               >
                 {section.icon}
               </YStack>

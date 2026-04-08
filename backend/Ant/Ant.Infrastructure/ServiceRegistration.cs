@@ -35,7 +35,10 @@ namespace Ant.Infrastructure
                 services.AddDbContext<ApplicationDbContext>(options =>
                options.UseNpgsql(
                    configuration.GetConnectionString("DefaultConnection"),
-                   b => b.UseNetTopologySuite().MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+                   b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                         .UseNetTopologySuite()
+                         .EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null)
+                         .CommandTimeout(60)));
             }
 
 

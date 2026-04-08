@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Ant.Application.Features.Collections.Queries.GetCollections
 {
-    public class GetCollectionsQuery : IRequest<PagedResponse<CollectionViewModel>>
+    public class GetCollectionsQuery : IRequest<Response<PagedResponse<CollectionViewModel>>>
     {
         public Guid? UserId { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
     }
 
-    public class GetCollectionsQueryHandler : IRequestHandler<GetCollectionsQuery, PagedResponse<CollectionViewModel>>
+    public class GetCollectionsQueryHandler : IRequestHandler<GetCollectionsQuery, Response<PagedResponse<CollectionViewModel>>>
     {
         private readonly ICollectionRepositoryAsync _collectionRepository;
 
@@ -26,7 +26,7 @@ namespace Ant.Application.Features.Collections.Queries.GetCollections
             _collectionRepository = collectionRepository;
         }
 
-        public async Task<PagedResponse<CollectionViewModel>> Handle(GetCollectionsQuery request, CancellationToken cancellationToken)
+        public async Task<Response<PagedResponse<CollectionViewModel>>> Handle(GetCollectionsQuery request, CancellationToken cancellationToken)
         {
             IReadOnlyList<Collection> collections;
 
@@ -51,10 +51,11 @@ namespace Ant.Application.Features.Collections.Queries.GetCollections
                 Description = c.Description,
                 ThumbnailUrl = c.ThumbnailUrl,
                 RouteCount = c.CollectionRoutes?.Count ?? 0,
-                Created = c.CreatedAt
+                CreatedAt = c.CreatedAt
             }).ToList();
 
-            return new PagedResponse<CollectionViewModel>(viewModels, request.PageNumber, request.PageSize);
+            var response = new PagedResponse<CollectionViewModel>(viewModels, request.PageNumber, request.PageSize);
+            return new Response<PagedResponse<CollectionViewModel>>(response);
         }
     }
 }

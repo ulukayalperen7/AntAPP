@@ -30,7 +30,7 @@ export function AppTopBar() {
           <Bell size={22} color="currentColor" />
         </IconButton>
 
-        <Link href="/create" style={{ textDecoration: 'none' }}>
+        <Link href="/routes/create" style={{ textDecoration: 'none' }}>
           <Button variant="solid" size="sm">
             <XStack alignItems="center" gap="$1.5">
               <Plus size={16} color="#FFFFFF" />

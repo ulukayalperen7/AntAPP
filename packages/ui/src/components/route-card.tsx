@@ -145,7 +145,8 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
     <RouteCardFrame orientation={orientation} {...accessibilityProps} {...cardRest}>
       <CardImage orientation={orientation}>
         {data.image && (
-          <Image source={{ uri: data.image }} width="100%" height="100%" objectFit="cover" />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={data.image} alt={data.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         )}
         {/* ContentType badge — Official/Sponsored only */}
         {(data.contentType === 'Official' || data.isOfficial) && (

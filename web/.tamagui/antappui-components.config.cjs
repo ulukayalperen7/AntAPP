@@ -12642,7 +12642,7 @@ var require_Image = __commonJS({
       return uri;
     }
     __name(resolveAssetUri, "resolveAssetUri");
-    var Image2 = /* @__PURE__ */ React109.forwardRef((props, ref) => {
+    var Image3 = /* @__PURE__ */ React109.forwardRef((props, ref) => {
       var _ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, blurRadius = props.blurRadius, defaultSource = props.defaultSource, draggable = props.draggable, onError = props.onError, onLayout = props.onLayout, onLoad = props.onLoad, onLoadEnd = props.onLoadEnd, onLoadStart = props.onLoadStart, pointerEvents = props.pointerEvents, source = props.source, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var ariaLabel = _ariaLabel || accessibilityLabel;
       if (process.env.NODE_ENV !== "production") {
@@ -12768,8 +12768,8 @@ var require_Image = __commonJS({
         suppressHydrationWarning: true
       }), hiddenImage, createTintColorSVG(tintColor, filterRef.current));
     });
-    Image2.displayName = "Image";
-    var ImageWithStatics = Image2;
+    Image3.displayName = "Image";
+    var ImageWithStatics = Image3;
     ImageWithStatics.getSize = function(uri, success, failure) {
       _ImageLoader.default.getSize(uri, success, failure);
     };
@@ -47279,6 +47279,7 @@ function Button2({
   disabled = false,
   variant = "solid",
   size: size7 = "md",
+  color,
   accessibilityLabel,
   accessibilityRole,
   role,
@@ -47309,7 +47310,7 @@ function Button2({
       ...buttonRest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-        children != null && /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ButtonLabel, { variant, size: size7, children }),
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime102.jsx)(ButtonLabel, { variant, size: size7, color, children }),
         !loading && iconAfter
       ]
     }
@@ -48177,7 +48178,8 @@ function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest })
   const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest);
   return /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(RouteCardFrame, { orientation, ...accessibilityProps, ...cardRest, children: [
     /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(CardImage, { orientation, children: [
-      data.image && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Image, { source: { uri: data.image }, width: "100%", height: "100%", objectFit: "cover" }),
+      data.image && // eslint-disable-next-line @next/next/no-img-element
+      /* @__PURE__ */ (0, import_jsx_runtime116.jsx)("img", { src: data.image, alt: data.title, style: { width: "100%", height: "100%", objectFit: "cover" } }),
       (data.contentType === "Official" || data.isOfficial) && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ContentTypeBadge, { type: "Official", children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "OFFICIAL" }) }),
       data.contentType === "Sponsored" && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(ContentTypeBadge, { type: "Sponsored", children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "SPONSORED" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(FavoriteButton, { onPress: onFavoritePress, children: /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(HeartIcon, { filled: !!data.isFavorited }) }),

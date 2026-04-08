@@ -12,6 +12,6 @@ namespace Ant.Application.Features.Collections.Queries.GetCollections
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
         public int RouteCount { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

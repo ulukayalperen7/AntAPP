@@ -402,7 +402,7 @@ export default function AdminPanelClient({
                         {collection.description ?? 'No description.'}
                       </Text>
 
-                      <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$2">
+                      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottom="$4">
                         <Text variant="caption" muted>{collection.routeCount} routes</Text>
                         <XStack gap="$2" flexWrap="wrap">
                           <Button

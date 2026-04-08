@@ -19,7 +19,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
       cursor="pointer"
       hoverStyle={{ borderColor: '$primary', opacity: 0.95 }}
       pressStyle={{ scale: 0.98 }}
-      onPress={() => router.push(`/saved/${collection.id}`)}
+      onPress={() => router.push(`/collections/${collection.id}`)}
     >
       {/* Thumbnail placeholder */}
       <YStack
@@ -38,32 +38,18 @@ function CollectionCard({ collection }: { collection: Collection }) {
         ) : (
           <FolderOpen size={40} color="var(--color-mutedForeground)" strokeWidth={1.5} />
         )}
-      </YStack>
-
-      <YStack padding="$4" gap="$2">
-        <XStack justifyContent="space-between" alignItems="flex-start">
-          <Text variant="heading4" flex={1} numberOfLines={1}>{collection.name}</Text>
-          <XStack alignItems="center" gap="$1" marginLeft="$2">
-            {collection.isPublic
-              ? <Globe size={14} color="var(--color-mutedForeground)" />
-              : <Lock size={14} color="var(--color-mutedForeground)" />
-            }
-          </XStack>
-        </XStack>
-
+      </YStack><YStack padding="$4" gap="$2"><XStack justifyContent="space-between" alignItems="flex-start"><Text variant="heading4" flex={1} numberOfLines={1}>{collection.name}</Text><XStack alignItems="center" gap="$1" marginLeft="$2">
+        {collection.isPublic
+          ? <Globe size={14} color="var(--color-mutedForeground)" />
+          : <Lock size={14} color="var(--color-mutedForeground)" />
+        }
+      </XStack></XStack>
         {collection.description && (
           <Text variant="caption" muted numberOfLines={2}>{collection.description}</Text>
         )}
-
-        <XStack justifyContent="space-between" alignItems="center" marginTop="$1">
-          <Text variant="caption" muted>
-            {collection.routeCount ?? 0} routes
-          </Text>
-          {collection.isDefault && (
-            <Badge variant="info" size="sm">Default</Badge>
-          )}
-        </XStack>
-      </YStack>
+        <XStack justifyContent="space-between" alignItems="center" marginTop="$1"><Text variant="caption" muted>{collection.routeCount ?? 0} routes</Text>{collection.isDefault && (
+          <Badge variant="info" size="sm">Default</Badge>
+        )}</XStack></YStack>
     </YStack>
   )
 }
@@ -89,7 +75,7 @@ export default function SavedClient({
             variant="solid"
             size="md"
             icon={<Plus size={16} color="#fff" />}
-            onPress={() => {/* TODO: create collection modal */}}
+            onPress={() => {/* TODO: create collection modal */ }}
           >
             New Collection
           </Button>
@@ -111,7 +97,7 @@ export default function SavedClient({
               <CollectionCard collection={col} />
             </YStack>
           ))}
-          {/* New Collection Card */}
+
           <YStack
             flex={1}
             minWidth={240}
@@ -126,7 +112,7 @@ export default function SavedClient({
             cursor="pointer"
             gap="$2"
             hoverStyle={{ borderColor: '$primary' }}
-            onPress={() => {/* TODO: create collection modal */}}
+            onPress={() => {/* TODO: create collection modal */ }}
           >
             <XStack
               width={48}

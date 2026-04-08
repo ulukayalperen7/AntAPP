@@ -12642,7 +12642,7 @@ var require_Image = __commonJS({
       return uri;
     }
     __name(resolveAssetUri, "resolveAssetUri");
-    var Image2 = /* @__PURE__ */ React11.forwardRef((props, ref) => {
+    var Image3 = /* @__PURE__ */ React11.forwardRef((props, ref) => {
       var _ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, blurRadius = props.blurRadius, defaultSource = props.defaultSource, draggable = props.draggable, onError = props.onError, onLayout = props.onLayout, onLoad = props.onLoad, onLoadEnd = props.onLoadEnd, onLoadStart = props.onLoadStart, pointerEvents = props.pointerEvents, source = props.source, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var ariaLabel = _ariaLabel || accessibilityLabel;
       if (process.env.NODE_ENV !== "production") {
@@ -12768,8 +12768,8 @@ var require_Image = __commonJS({
         suppressHydrationWarning: true
       }), hiddenImage, createTintColorSVG(tintColor, filterRef.current));
     });
-    Image2.displayName = "Image";
-    var ImageWithStatics = Image2;
+    Image3.displayName = "Image";
+    var ImageWithStatics = Image3;
     ImageWithStatics.getSize = function(uri, success, failure) {
       _ImageLoader.default.getSize(uri, success, failure);
     };
@@ -22892,6 +22892,7 @@ function Button({
   disabled = false,
   variant = "solid",
   size: size3 = "md",
+  color,
   accessibilityLabel,
   accessibilityRole,
   role,
@@ -22922,7 +22923,7 @@ function Button({
       ...buttonRest,
       children: [
         loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, children }),
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, color, children }),
         !loading && iconAfter
       ]
     }

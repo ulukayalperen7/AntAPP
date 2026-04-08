@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace Ant.WebApi.Controllers
 {
+    [Route("api/route-ratings")]
     [ApiVersion("1.0")]
     public class RouteRatingsController : BaseApiController
     {
         [HttpPut]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Rate(RateRouteCommand command)
+        public async Task<IActionResult> Rate([FromBody] RateRouteCommand command)
         {
             return Ok(await Mediator.Send(command));
         }

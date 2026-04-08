@@ -2,6 +2,7 @@ using Ant.Core.Entities;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
+using Ant.Application.Wrappers;
 using MediatR;
 using System;
 using System.Threading;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ant.Application.Features.Collections.Commands.CreateCollection
 {
-    public class CreateCollectionCommand : IRequest<Guid>
+    public class CreateCollectionCommand : IRequest<Response<Guid>>
     {
         public string Name { get; set; }
         public bool IsPublic { get; set; }
@@ -17,7 +18,7 @@ namespace Ant.Application.Features.Collections.Commands.CreateCollection
         public string ThumbnailUrl { get; set; }
     }
 
-    public class CreateCollectionCommandHandler : IRequestHandler<CreateCollectionCommand, Guid>
+    public class CreateCollectionCommandHandler : IRequestHandler<CreateCollectionCommand, Response<Guid>>
     {
         private readonly ICollectionRepositoryAsync _collectionRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
@@ -28,7 +29,7 @@ namespace Ant.Application.Features.Collections.Commands.CreateCollection
             _authenticatedUser = authenticatedUser;
         }
 
-        public async Task<Guid> Handle(CreateCollectionCommand request, CancellationToken cancellationToken)
+        public async Task<Response<Guid>> Handle(CreateCollectionCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
@@ -44,7 +45,7 @@ namespace Ant.Application.Features.Collections.Commands.CreateCollection
             };
 
             await _collectionRepository.AddAsync(collection);
-            return collection.Id;
+            return new Response<Guid>(collection.Id);
         }
     }
 }

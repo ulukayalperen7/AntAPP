@@ -4,5 +4,25 @@
         <name>Ant.WebApi</name>
     </assembly>
     <members>
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminAccountsController.Get">
+            <summary>
+            Get all user accounts (Admin only)
+            </summary>
+        </member>
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminAccountsController.UpdateStatus(System.Guid,Ant.Application.Features.Account.Commands.UpdateUserStatus.UpdateUserStatusCommand)">
+            <summary>
+            Update user status (Admin only)
+            </summary>
+        </member>
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminRoutesController.Get(Ant.Application.Features.Routes.Queries.GetAdminRoutes.GetAdminRoutesQuery)">
+            <summary>
+            Get all routes for management (Admin only)
+            </summary>
+        </member>
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminRoutesController.Promote(System.Guid,Ant.Application.Features.Routes.Commands.PromoteRoute.PromoteRouteCommand)">
+            <summary>
+            Promote a route (Official/Sponsored)
+            </summary>
+        </member>
     </members>
 </doc>

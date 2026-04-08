@@ -2,6 +2,7 @@ using Ant.Core.Entities;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
+using Ant.Application.Wrappers;
 using MediatR;
 using System;
 using System.Threading;
@@ -9,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Ant.Application.Features.Collections.Commands.SaveRoute
 {
-    public class SaveRouteCommand : IRequest<Guid>
+    public class SaveRouteCommand : IRequest<Response<Guid>>
     {
         public Guid RouteId { get; set; }
     }
 
-    public class SaveRouteCommandHandler : IRequestHandler<SaveRouteCommand, Guid>
+    public class SaveRouteCommandHandler : IRequestHandler<SaveRouteCommand, Response<Guid>>
     {
         private readonly ICollectionRepositoryAsync _collectionRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
@@ -25,7 +26,7 @@ namespace Ant.Application.Features.Collections.Commands.SaveRoute
             _authenticatedUser = authenticatedUser;
         }
 
-        public async Task<Guid> Handle(SaveRouteCommand request, CancellationToken cancellationToken)
+        public async Task<Response<Guid>> Handle(SaveRouteCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
@@ -35,7 +36,7 @@ namespace Ant.Application.Features.Collections.Commands.SaveRoute
 
             var existing = await _collectionRepository.GetCollectionRouteAsync(defaultCollection.Id, request.RouteId);
             if (existing != null)
-                throw new ApiException("Route is already saved.");
+                return new Response<Guid>(defaultCollection.Id);
 
             var collectionRoute = new CollectionRoute
             {
@@ -45,7 +46,7 @@ namespace Ant.Application.Features.Collections.Commands.SaveRoute
             };
 
             await _collectionRepository.AddCollectionRouteAsync(collectionRoute);
-            return defaultCollection.Id;
+            return new Response<Guid>(defaultCollection.Id);
         }
     }
 }

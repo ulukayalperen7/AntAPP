@@ -4,7 +4,8 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { createRoute } from '@/features/routes/actions'
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react'
+import SpotSelect from '@/components/spot-select'
 
 type StopEntry = {
   id: string
@@ -162,15 +163,32 @@ export default function CreateRoutePage() {
               {/* Stop fields */}
               <YStack flex={1} gap="$2">
                 <YStack gap="$1">
-                  <Text variant="caption" color="$mutedForeground">Spot ID *</Text>
-                  <Input
-                    value={stop.spotId}
-                    onChangeText={(v) => updateStop(stop.id, 'spotId', v)}
-                    variant="outline"
-                    size="md"
-                    placeholder="Paste Spot UUID..."
-                    autoCapitalize="none"
-                  />
+                  <Text variant="caption" color="$mutedForeground">Select Spot *</Text>
+                  {stop.spotId ? (
+                    <XStack
+                      backgroundColor="$primary50"
+                      padding="$2"
+                      borderRadius="$2"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      borderWidth={1}
+                      borderColor="$primary200"
+                    >
+                      <XStack gap="$2" alignItems="center">
+                        <MapPin size={14} color="var(--color-primary)" />
+                        <Text variant="label" fontWeight="600">{stop.customTitle || 'Selected Spot'}</Text>
+                      </XStack>
+                      <Button variant="ghost" size="sm" onPress={() => updateStop(stop.id, 'spotId', '')}>Change</Button>
+                    </XStack>
+                  ) : (
+                    <SpotSelect
+                      onSelect={(spot) => {
+                        updateStop(stop.id, 'spotId', spot.id)
+                        updateStop(stop.id, 'customTitle', spot.name)
+                      }}
+                      excludeIds={stops.map(s => s.spotId).filter(Boolean)}
+                    />
+                  )}
                 </YStack>
                 <XStack gap="$2">
                   <YStack flex={1} gap="$1">

@@ -196,7 +196,7 @@ export default function RouteDetailClient({
           </YStack>
 
           <XStack gap="$2.5" flexWrap="wrap" marginTop="$1">
-            <Button variant="solid" size="md" onPress={() => {}}>
+            <Button variant="solid" size="md" onPress={() => { }}>
               <XStack alignItems="center" gap="$1.5">
                 <Navigation size={16} color="#FFFFFF" />
                 <Text variant="label" color="#FFFFFF">Start Navigation</Text>
@@ -217,9 +217,13 @@ export default function RouteDetailClient({
                   ? <BookmarkCheck size={16} color="#FFFFFF" />
                   : <Bookmark size={16} color="currentColor" />
                 }
-                <Text variant="label" color={isSaved ? '#FFFFFF' : undefined}>
-                  {isSaved ? 'Saved!' : 'Save'}
-                </Text>
+                <YStack>
+                  <XStack alignItems="center" gap="$1">
+                    <Text variant="label" color={isSaved ? '#FFFFFF' : undefined}>
+                      {isSaved ? 'In Collection' : 'Save to Collection'}
+                    </Text>
+                  </XStack>
+                </YStack>
               </XStack>
             </Button>
 
@@ -421,10 +425,10 @@ export default function RouteDetailClient({
           >
             <XStack alignItems="center" gap="$2">
               <GitFork size={18} color="var(--color-primary)" />
-              <Text variant="heading4">Use This Route</Text>
+              <Text variant="heading4">Customize This Route</Text>
             </XStack>
             <Text variant="body" muted>
-              Fork this route to customize it for your own adventure.
+              Want to make changes? Fork this route to create your own editable copy in your profile.
             </Text>
             {forkError && (
               <Text variant="caption" color="$error500">{forkError}</Text>
