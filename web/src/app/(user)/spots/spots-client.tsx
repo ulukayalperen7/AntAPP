@@ -26,7 +26,8 @@ function SpotCard({ spot, onPress }: { spot: SpotListItem; onPress: () => void }
     >
       <YStack height={180} backgroundColor="$muted" justifyContent="center" alignItems="center">
         {spot.photoUrl ? (
-          <Image source={{ uri: spot.photoUrl }} width="100%" height="100%" objectFit="cover" />
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         ) : (
           <MapPinned size={36} color="var(--color-mutedForeground)" />
         )}

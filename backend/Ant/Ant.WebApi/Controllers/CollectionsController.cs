@@ -47,14 +47,14 @@ namespace Ant.WebApi.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Create(CreateCollectionCommand command)
+        public async Task<IActionResult> Create([FromBody] CreateCollectionCommand command)
         {
             return Ok(await Mediator.Send(command));
         }
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Update(Guid id, UpdateCollectionCommand command)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCollectionCommand command)
         {
             command.Id = id;
             command.UserId = GetUserId();
@@ -74,7 +74,7 @@ namespace Ant.WebApi.Controllers
 
         [HttpPost("{id}/routes")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> AddRoute(Guid id, AddRouteToCollectionCommand command)
+        public async Task<IActionResult> AddRoute(Guid id, [FromBody] AddRouteToCollectionCommand command)
         {
             command.CollectionId = id;
             command.UserId = GetUserId();
@@ -95,7 +95,7 @@ namespace Ant.WebApi.Controllers
 
         [HttpPost("~/api/me/saved-routes")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> SaveRoute(SaveRouteCommand command)
+        public async Task<IActionResult> SaveRoute([FromBody] SaveRouteCommand command)
         {
             return Ok(await Mediator.Send(command));
         }

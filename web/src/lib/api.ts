@@ -20,17 +20,21 @@ export async function apiFetch<T>(
   const method = options?.method?.toUpperCase() || 'GET'
   const isGet = method === 'GET'
 
+  console.log(`[API REQUEST] ${method} ${API_URL}${path}`)
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,
-    cache: options?.cache ?? (isGet ? 'force-cache' : 'no-store'),
-    ...(isGet && !options?.cache ? { next: { revalidate: 60 } } : {}),
+    cache: options?.cache ?? 'no-store',
+    ...(isGet && !options?.cache ? { next: { revalidate: 0 } } : {}),
   })
+
+  console.log(`[API RESPONSE] ${res.status} ${path}`)
 
   if (!res.ok) {
     let message = `API error: ${res.status} ${res.statusText}`
     try {
       const body = await res.json()
+      console.log(`[API ERROR BODY]`, body)
       if (body?.message) message = body.message
       else if (body?.errors && Array.isArray(body.errors)) message = body.errors[0]
     } catch { /* ignore */ }

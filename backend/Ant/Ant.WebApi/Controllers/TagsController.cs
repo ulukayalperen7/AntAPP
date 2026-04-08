@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ant.WebApi.Controllers
 {
+    [Route("api/tags")]
     [ApiVersion("1.0")]
     public class TagsController : BaseApiController
     {

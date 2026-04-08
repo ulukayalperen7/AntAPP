@@ -4,7 +4,7 @@
     <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FluentValidation" Version="9.1.2" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.1.2" />
     <PackageReference Include="MediatR" Version="12.4.1" />

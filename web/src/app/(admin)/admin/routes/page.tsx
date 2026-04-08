@@ -7,7 +7,7 @@ export default function AdminRoutesPage() {
 
   return (
     <YStack flex={1} gap="$6" padding="$6">
-      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottomVertical="$4">
+      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottom="$4">
         <XStack gap="$3" alignItems="center">
           <a href="/admin">
             <Button size="md" variant="ghost" icon={<ArrowLeft size={18} />}>

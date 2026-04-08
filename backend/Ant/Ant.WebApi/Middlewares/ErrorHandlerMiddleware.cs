@@ -53,7 +53,10 @@ namespace Ant.WebApi.Middlewares
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
                 }
-                var result = JsonSerializer.Serialize(errorResponse);
+                var result = JsonSerializer.Serialize(errorResponse, new JsonSerializerOptions 
+                { 
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase 
+                });
 
                 await response.WriteAsync(result);
             }

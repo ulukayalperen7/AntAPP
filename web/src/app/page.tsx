@@ -299,7 +299,8 @@ export default function LandingPage() {
                   width={60}
                   height={60}
                   borderRadius="$full"
-                  backgroundColor="$primarySoft"
+                  backgroundColor="$primary"
+                  opacity={0.15}
                   justifyContent="center"
                   alignItems="center"
                 >

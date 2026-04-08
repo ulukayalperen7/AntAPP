@@ -75,7 +75,7 @@ namespace Ant.WebApi.Controllers
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Create(CreateRouteCommand command)
+        public async Task<IActionResult> Create([FromBody] CreateRouteCommand command)
         {
             return Ok(await Mediator.Send(command));
         }
@@ -84,7 +84,7 @@ namespace Ant.WebApi.Controllers
         [HttpPatch("{routeId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Update(Guid routeId, UpdateRouteCommand command)
+        public async Task<IActionResult> Update(Guid routeId, [FromBody] UpdateRouteCommand command)
         {
             command.Id = routeId;
             return Ok(await Mediator.Send(command));

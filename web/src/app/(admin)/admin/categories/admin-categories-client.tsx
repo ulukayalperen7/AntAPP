@@ -78,13 +78,13 @@ export default function AdminCategoriesClient({
   return (
     <YStack flex={1} gap="$6" padding="$6">
       {/* Header */}
-      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottomVertical="$4">
+      <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottom="$4">
         <XStack gap="$3" alignItems="center" flex={1}>
           <Button
             size="md"
             variant="ghost"
             icon={<ArrowLeft size={18} />}
-            onClick={() => router.push('/admin')}
+            onPress={() => router.push('/admin')}
           >
             Back
           </Button>
@@ -102,7 +102,7 @@ export default function AdminCategoriesClient({
           icon={<LogOut size={16} />}
           loading={isLoggingOut}
           disabled={isLoggingOut}
-          onClick={handleLogout}
+          onPress={handleLogout}
         >
           Logout
         </Button>
@@ -134,7 +134,7 @@ export default function AdminCategoriesClient({
             <Text variant="label">Category Name *</Text>
             <Input
               value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.currentTarget.value)}
+              onChangeText={setNewCategoryName}
               placeholder="e.g. Heritage, Adventure, Food"
               variant="outline"
               size="md"
@@ -144,7 +144,7 @@ export default function AdminCategoriesClient({
             <Text variant="label">Description (optional)</Text>
             <Input
               value={newCategoryDesc}
-              onChange={(e) => setNewCategoryDesc(e.currentTarget.value)}
+              onChangeText={setNewCategoryDesc}
               placeholder="Brief description..."
               variant="outline"
               size="md"
@@ -157,14 +157,14 @@ export default function AdminCategoriesClient({
               color="#FFFFFF"
               loading={isPending}
               disabled={isPending}
-              onClick={handleAddCategory}
+              onPress={handleAddCategory}
             >
               Save Category
             </Button>
             <Button
               size="md"
               variant="ghost"
-              onClick={() => {
+              onPress={() => {
                 setShowForm(false)
                 setNewCategoryName('')
                 setNewCategoryDesc('')
@@ -181,7 +181,7 @@ export default function AdminCategoriesClient({
           icon={<Plus size={16} />}
           backgroundColor="$primary"
           color="#FFFFFF"
-          onClick={() => setShowForm(true)}
+          onPress={() => setShowForm(true)}
         >
           Add New Category
         </Button>
@@ -209,7 +209,6 @@ export default function AdminCategoriesClient({
               backgroundColor="$backgroundStrong"
               borderBottomWidth={2}
               borderBottomColor="$borderColor"
-              fontWeight="bold"
               gap="$3"
             >
               <Text flex={2} variant="label" weight="semibold">Name</Text>
@@ -238,7 +237,7 @@ export default function AdminCategoriesClient({
                         size="sm"
                         backgroundColor="$error500"
                         color="#FFFFFF"
-                        onClick={() => handleDeleteCategory(cat.id)}
+                        onPress={() => handleDeleteCategory(cat.id)}
                         loading={isPending}
                         disabled={isPending}
                       >
@@ -247,7 +246,7 @@ export default function AdminCategoriesClient({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => setDeleteConfirmId(null)}
+                        onPress={() => setDeleteConfirmId(null)}
                         disabled={isPending}
                       >
                         Cancel
@@ -258,7 +257,7 @@ export default function AdminCategoriesClient({
                       size="sm"
                       variant="ghost"
                       icon={<Trash2 size={14} />}
-                      onClick={() => setDeleteConfirmId(cat.id)}
+                      onPress={() => setDeleteConfirmId(cat.id)}
                     />
                   )}
                 </XStack>

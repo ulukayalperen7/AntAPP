@@ -1,8 +1,8 @@
 import { getCollections } from '@/features/collections/actions'
-import SavedClient from './saved-client'
+import CollectionsClient from './collections-client'
 import type { Collection } from '@/types/api'
 
-export default async function SavedPage() {
+export default async function CollectionsPage() {
   let collections: Collection[] = []
   let total = 0
   try {
@@ -11,5 +11,5 @@ export default async function SavedPage() {
     total = result.totalRecords
   } catch { /* API offline or unauthenticated */ }
 
-  return <SavedClient collections={collections} total={total} />
+  return <CollectionsClient collections={collections} total={total} />
 }

@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: 'Explore', href: '/dashboard', Icon: Globe },
   { label: 'Spots', href: '/spots', Icon: MapPinned },
   { label: 'My Routes', href: '/profile', Icon: Route },
-  { label: 'Saved', href: '/saved', Icon: Bookmark },
+  { label: 'Saved', href: '/collections', Icon: Bookmark },
 ]
 
 const EXPANDED_WIDTH = 220
