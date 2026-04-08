@@ -38,18 +38,39 @@ function CollectionCard({ collection }: { collection: Collection }) {
         ) : (
           <FolderOpen size={40} color="var(--color-mutedForeground)" strokeWidth={1.5} />
         )}
-      </YStack><YStack padding="$4" gap="$2"><XStack justifyContent="space-between" alignItems="flex-start"><Text variant="heading4" flex={1} numberOfLines={1}>{collection.name}</Text><XStack alignItems="center" gap="$1" marginLeft="$2">
-        {collection.isPublic
-          ? <Globe size={14} color="var(--color-mutedForeground)" />
-          : <Lock size={14} color="var(--color-mutedForeground)" />
-        }
-      </XStack></XStack>
+      </YStack>
+
+      <YStack padding="$4" gap="$2">
+        <XStack justifyContent="space-between" alignItems="flex-start">
+          <Text variant="heading4" flex={1} numberOfLines={1}>
+            {collection.name}
+          </Text>
+          <XStack alignItems="center" gap="$1" marginLeft="$2">
+            {collection.isPublic ? (
+              <Globe size={14} color="var(--color-mutedForeground)" />
+            ) : (
+              <Lock size={14} color="var(--color-mutedForeground)" />
+            )}
+          </XStack>
+        </XStack>
+
         {collection.description && (
-          <Text variant="caption" muted numberOfLines={2}>{collection.description}</Text>
+          <Text variant="caption" muted numberOfLines={2}>
+            {collection.description}
+          </Text>
         )}
-        <XStack justifyContent="space-between" alignItems="center" marginTop="$1"><Text variant="caption" muted>{collection.routeCount ?? 0} routes</Text>{collection.isDefault && (
-          <Badge variant="info" size="sm">Default</Badge>
-        )}</XStack></YStack>
+
+        <XStack justifyContent="space-between" alignItems="center" marginTop="$1">
+          <Text variant="caption" muted>
+            {collection.routeCount ?? 0} routes
+          </Text>
+          {collection.isDefault && (
+            <Badge variant="info" size="sm">
+              Default
+            </Badge>
+          )}
+        </XStack>
+      </YStack>
     </YStack>
   )
 }
