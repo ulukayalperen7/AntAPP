@@ -17,7 +17,7 @@ namespace Ant.Application.Features.Routes.Commands.UpdateRoute
         public string Title { get; set; }
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
-        public List<Guid> CategoryTagIds { get; set; }
+        public List<Guid> TagIds { get; set; }
     }
 
     public class UpdateRouteCommandHandler : IRequestHandler<UpdateRouteCommand, Response<Guid>>
@@ -48,13 +48,15 @@ namespace Ant.Application.Features.Routes.Commands.UpdateRoute
             if (request.Description != null) route.Description = request.Description;
             if (request.ThumbnailUrl != null) route.ThumbnailUrl = request.ThumbnailUrl;
 
-            if (request.CategoryTagIds != null)
+            // Update Tags
+            if (request.TagIds != null)
             {
                 route.RouteTags.Clear();
-                foreach (var tagId in request.CategoryTagIds)
-                    route.RouteTags.Add(new RouteTag { RouteId = route.Id, TagId = tagId });
+                foreach (var tagId in request.TagIds)
+                {
+                    route.RouteTags.Add(new RouteTag { TagId = tagId });
+                }
             }
-
             await _routeRepository.UpdateAsync(route);
             return new Response<Guid>(route.Id, message: "Route updated.");
         }

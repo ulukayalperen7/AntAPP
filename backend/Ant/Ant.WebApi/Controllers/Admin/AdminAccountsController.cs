@@ -8,7 +8,7 @@ using System;
 namespace Ant.WebApi.Controllers.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/admin/accounts")]
+    [Route("api/admin/accounts")]
     [Authorize(Roles = "Admin")]
     public class AdminAccountsController : BaseApiController
     {

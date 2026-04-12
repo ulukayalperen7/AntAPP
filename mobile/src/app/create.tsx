@@ -3,13 +3,13 @@ import { YStack, XStack, Text, Input, Field, Button, Badge, ScrollView } from '@
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 
-const CATEGORIES = ['Nature', 'History', 'Food', 'Entertainment']
+const TAGS = ['Nature', 'History', 'Food', 'Entertainment']
 const DIFFICULTIES = ['Easy', 'Moderate', 'Hard']
 
 export default function CreateScreen() {
   const [routeName, setRouteName] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('Nature')
+  const [tag, setTag] = useState('Nature')
   const [difficulty, setDifficulty] = useState('Easy')
   const insets = useSafeAreaInsets()
 
@@ -46,24 +46,24 @@ export default function CreateScreen() {
             </Field>
 
             <YStack gap="$2">
-              <Text variant="label">Category</Text>
+              <Text variant="label">Tag</Text>
               <XStack flexWrap="wrap" gap="$2">
-                {CATEGORIES.map((cat) => (
+                {TAGS.map((t) => (
                   <XStack
-                    key={cat}
+                    key={t}
                     paddingHorizontal="$3"
                     paddingVertical="$2"
                     borderRadius="$3"
-                    backgroundColor={category === cat ? '$primary' : '$muted'}
-                    onPress={() => setCategory(cat)}
+                    backgroundColor={tag === t ? '$primary' : '$muted'}
+                    onPress={() => setTag(t)}
                     cursor="pointer"
                   >
                     <Text
                       variant="label"
                       fontSize="$3"
-                      color={category === cat ? '#FFFFFF' : '$color'}
+                      color={tag === t ? '#FFFFFF' : '$color'}
                     >
-                      {cat}
+                      {t}
                     </Text>
                   </XStack>
                 ))}

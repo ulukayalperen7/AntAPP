@@ -33,6 +33,7 @@ namespace Ant.Infrastructure.Services
                 UserName = user.UserName,
                 Email = user.Email,
                 IsVerified = user.EmailConfirmed,
+                IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
                 Roles = roles.ToList()
             };
         }
@@ -51,6 +52,7 @@ namespace Ant.Infrastructure.Services
                     UserName = user.UserName,
                     Email = user.Email,
                     IsVerified = user.EmailConfirmed,
+                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
                     Roles = roles.ToList()
                 });
             }

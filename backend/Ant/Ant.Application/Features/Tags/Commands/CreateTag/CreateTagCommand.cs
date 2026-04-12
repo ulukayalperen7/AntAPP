@@ -14,6 +14,7 @@ namespace Ant.Application.Features.Tags.Commands.CreateTag
     public class CreateTagCommand : IRequest<Guid>
     {
         public string Name { get; set; }
+        public string Description { get; set; }
     }
 
     public class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, Guid>
@@ -30,6 +31,7 @@ namespace Ant.Application.Features.Tags.Commands.CreateTag
             var newTag = new Tag
             {
                 Name = request.Name,
+                Description = request.Description,
                 IsActive = true
             };
 

@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Card } from '@antapp/ui'
 import { LogOut, Grid3x3, Tag, Users, TrendingUp } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
+import { getAdminStats, type AdminStats } from '@/features/admin/dashboard-actions'
+import { useEffect } from 'react'
 
-type AdminSection = 'overview' | 'categories' | 'routes' | 'users'
+type AdminSection = 'overview' | 'tags' | 'routes' | 'users'
 
 export default function AdminDashboard({
   userName,
@@ -20,6 +22,13 @@ export default function AdminDashboard({
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<AdminSection>('overview')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [stats, setStats] = useState<AdminStats | null>(null)
+
+  useEffect(() => {
+    if (activeSection === 'overview') {
+      getAdminStats().then(setStats)
+    }
+  }, [activeSection])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -39,10 +48,10 @@ export default function AdminDashboard({
         description: 'Dashboard & analytics',
       },
       {
-        id: 'categories',
-        label: 'Categories',
+        id: 'tags',
+        label: 'Tags',
         icon: <Tag size={22} />,
-        description: 'Manage route categories',
+        description: 'Manage route tags',
       },
       {
         id: 'routes',
@@ -60,8 +69,8 @@ export default function AdminDashboard({
 
   const handleSelectSection = (sectionId: AdminSection) => {
     setActiveSection(sectionId)
-    if (sectionId === 'categories') {
-      router.push('/admin/categories')
+    if (sectionId === 'tags') {
+      router.push('/admin/tags')
     } else if (sectionId === 'routes') {
       router.push('/admin/routes')
     } else if (sectionId === 'users') {
@@ -170,16 +179,16 @@ export default function AdminDashboard({
           <Text variant="heading3">Quick Stats</Text>
           <XStack gap="$4" flexWrap="wrap">
             <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">—</Text>
+              <Text variant="heading2" color="$primary">{stats?.totalRoutes ?? '—'}</Text>
               <Text variant="caption" muted>Total Routes</Text>
             </Card>
             <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">—</Text>
+              <Text variant="heading2" color="$primary">{stats?.activeUsers ?? '—'}</Text>
               <Text variant="caption" muted>Active Users</Text>
             </Card>
             <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">—</Text>
-              <Text variant="caption" muted>Categories</Text>
+              <Text variant="heading2" color="$primary">{stats?.totalTags ?? '—'}</Text>
+              <Text variant="caption" muted>Tags</Text>
             </Card>
           </XStack>
           <YStack gap="$3" marginTop="$4">

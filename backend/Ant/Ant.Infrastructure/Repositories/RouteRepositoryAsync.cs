@@ -41,7 +41,7 @@ namespace Ant.Infrastructure.Repositories
         }
 
         private IQueryable<Route> BuildFilteredQuery(
-            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            string searchTerm, Guid? tagId, List<Guid> tagIds,
             double? nearLat, double? nearLng, double? radiusKm,
             Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
         {
@@ -67,8 +67,8 @@ namespace Ant.Infrastructure.Repositories
             if (contentType.HasValue)
                 query = query.Where(r => r.ContentType == contentType.Value);
 
-            if (categoryId.HasValue)
-                query = query.Where(r => r.RouteTags.Any(rt => rt.TagId == categoryId.Value));
+            if (tagId.HasValue)
+                query = query.Where(r => r.RouteTags.Any(rt => rt.TagId == tagId.Value));
 
             if (tagIds != null && tagIds.Count > 0)
                 query = query.Where(r => r.RouteTags.Any(rt => tagIds.Contains(rt.TagId)));
@@ -92,16 +92,16 @@ namespace Ant.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Route>> GetPagedRoutesAsync(
             int pageNumber, int pageSize,
-            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            string searchTerm, Guid? tagId, List<Guid> tagIds,
             string sort,
             double? nearLat, double? nearLng, double? radiusKm,
             Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
         {
-            var query = BuildFilteredQuery(searchTerm, categoryId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType);
+            var query = BuildFilteredQuery(searchTerm, tagId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType);
 
             query = sort?.ToLower() switch
             {
-                "rating" => query.OrderByDescending(r => r.RatingCount == 0 ? 0 : r.RatingSum / (double)r.RatingCount),
+                "rating" => query.OrderByDescending(r => r.RatingCount == 0 ? 0 : (r.RatingSum * 1.0) / r.RatingCount),
                 "oldest" => query.OrderBy(r => r.CreatedAt),
                 _ => query.OrderByDescending(r => r.CreatedAt)
             };
@@ -113,11 +113,11 @@ namespace Ant.Infrastructure.Repositories
         }
 
         public async Task<int> GetTotalRoutesCountAsync(
-            string searchTerm, Guid? categoryId, List<Guid> tagIds,
+            string searchTerm, Guid? tagId, List<Guid> tagIds,
             double? nearLat, double? nearLng, double? radiusKm,
             Guid? authorId, string visibility, RouteContentTypeEnum? contentType)
         {
-            return await BuildFilteredQuery(searchTerm, categoryId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType).CountAsync();
+            return await BuildFilteredQuery(searchTerm, tagId, tagIds, nearLat, nearLng, radiusKm, authorId, visibility, contentType).CountAsync();
         }
 
         public async Task<IReadOnlyList<Route>> GetNearbyRoutesAsync(double latitude, double longitude, double radiusInMeters, int pageNumber, int pageSize)

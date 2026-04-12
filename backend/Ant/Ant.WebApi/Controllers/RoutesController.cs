@@ -30,7 +30,7 @@ namespace Ant.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<RouteListViewModel>))]
         public async Task<IActionResult> GetAll(
             [FromQuery] string search = null,
-            [FromQuery] Guid? categoryId = null,
+            [FromQuery] Guid? tagId = null,
             [FromQuery] string tagIds = null,
             [FromQuery] string sort = null,
             [FromQuery] double? nearLat = null,
@@ -49,7 +49,7 @@ namespace Ant.WebApi.Controllers
             return Ok(await Mediator.Send(new GetPagedRoutesQuery
             {
                 Search = search,
-                CategoryId = categoryId,
+                TagId = tagId,
                 TagIds = tagIdList,
                 Sort = sort,
                 NearLat = nearLat,
