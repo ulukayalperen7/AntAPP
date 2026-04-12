@@ -79,45 +79,57 @@ export default function AdminRoutesClient({
                 ) : (
                     <YStack gap="$2" overflowX="auto">
                         <XStack padding="$3" backgroundColor="$backgroundStrong" borderBottomWidth={2} borderBottomColor="$borderColor" gap="$3">
-                            <Text flex={2} variant="label" weight="semibold">Title</Text>
-                            <Text flex={1} variant="label" weight="semibold">Visibility</Text>
-                            <Text flex={1} variant="label" weight="semibold">Type</Text>
-                            <Text flex={1} variant="label" weight="semibold">Rating</Text>
-                            <Text flex={2} variant="label" weight="semibold" textAlign="center">Moderation Actions</Text>
+                            <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Title</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Visibility</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Type</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Rating</Text></XStack>
+                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Moderation</Text></XStack>
                         </XStack>
 
-                        {routes.map((route) => (
-                            <XStack key={route.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
-                                <Text flex={2} variant="body" numberOfLines={1}>{route.title}</Text>
-                                <Text flex={1} variant="caption" muted>{route.isPublic ? 'Public' : 'Private'}</Text>
-                                <YStack flex={1}>
-                                    <Text variant="caption" weight={route.contentType !== 'Community' ? 'bold' : undefined} color={route.contentType === 'Official' ? '$primary' : (route.contentType === 'Sponsored' ? '$success600' : '$color')}>
-                                        {route.contentType}
-                                    </Text>
-                                </YStack>
-                                <XStack flex={1} alignItems="center" gap="$1">
-                                    {route.averageRating > 0 ? (
-                                        <>
-                                            <Star size={14} color="#f59e0b" fill="#f59e0b" />
-                                            <Text variant="caption">{route.averageRating.toFixed(1)}</Text>
-                                        </>
-                                    ) : (
-                                        <Text variant="caption" muted>N/A</Text>
-                                    )}
+                        {routes.map((route) => {
+                            // Map numeric enum to string if backend returned standard JSON integers
+                            const rawType = route.contentType as any;
+                            const contentTypeStr = Array.isArray(rawType)
+                                ? rawType[0]
+                                : (rawType === 1 || rawType === '1' ? 'Official' : (rawType === 2 || rawType === '2' ? 'Sponsored' : 'Community'));
+
+                            return (
+                                <XStack key={route.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
+                                    <XStack flex={2} flexBasis={0} minWidth={0}>
+                                        <Text variant="body" numberOfLines={1}>{route.title}</Text>
+                                    </XStack>
+                                    <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
+                                        <Text variant="caption" muted>{route.isPublic ? 'Public' : 'Private'}</Text>
+                                    </XStack>
+                                    <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
+                                        <Text variant="caption" weight={contentTypeStr !== 'Community' ? 'bold' : undefined} color={contentTypeStr === 'Official' ? '$primary' : (contentTypeStr === 'Sponsored' ? '$success600' : '$color')}>
+                                            {contentTypeStr}
+                                        </Text>
+                                    </XStack>
+                                    <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center" alignItems="center" gap="$1">
+                                        {route.averageRating > 0 ? (
+                                            <>
+                                                <Star size={14} color="#f59e0b" fill="#f59e0b" />
+                                                <Text variant="caption">{route.averageRating.toFixed(1)}</Text>
+                                            </>
+                                        ) : (
+                                            <Text variant="caption" muted>N/A</Text>
+                                        )}
+                                    </XStack>
+                                    <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
+                                        {contentTypeStr === 'Community' && (
+                                            <>
+                                                <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Official')} disabled={isPending}>Official</Button>
+                                                <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Sponsored')} disabled={isPending}>Sponsor</Button>
+                                            </>
+                                        )}
+                                        {contentTypeStr !== 'Community' && (
+                                            <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Community')} disabled={isPending}>Revert</Button>
+                                        )}
+                                    </XStack>
                                 </XStack>
-                                <XStack flex={2} justifyContent="center" gap="$2">
-                                    {route.contentType === 'Community' && (
-                                        <>
-                                            <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Official')} disabled={isPending}>Make Official</Button>
-                                            <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Sponsored')} disabled={isPending}>Make Sponsored</Button>
-                                        </>
-                                    )}
-                                    {route.contentType !== 'Community' && (
-                                        <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Community')} disabled={isPending}>Revert to Community</Button>
-                                    )}
-                                </XStack>
-                            </XStack>
-                        ))}
+                            );
+                        })}
                     </YStack>
                 )}
             </YStack>

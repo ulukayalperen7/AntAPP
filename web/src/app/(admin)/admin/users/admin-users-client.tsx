@@ -78,26 +78,28 @@ export default function AdminUsersClient({
                 ) : (
                     <YStack gap="$2" overflowX="auto">
                         <XStack padding="$3" backgroundColor="$backgroundStrong" borderBottomWidth={2} borderBottomColor="$borderColor" gap="$3">
-                            <Text flex={2} variant="label" weight="semibold">Email / Username</Text>
-                            <Text flex={1} variant="label" weight="semibold">Roles</Text>
-                            <Text flex={1} variant="label" weight="semibold">Status</Text>
-                            <Text flex={1} variant="label" weight="semibold" textAlign="center">Actions</Text>
+                            <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Email / Username</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Roles</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Status</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
                         </XStack>
 
                         {users.map((user) => (
                             <XStack key={user.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
-                                <YStack flex={2}>
-                                    <Text variant="body" weight="semibold">{user.email}</Text>
-                                    <Text variant="caption" muted>{user.userName}</Text>
+                                <YStack flex={2} flexBasis={0} minWidth={0}>
+                                    <Text variant="body" weight="semibold" numberOfLines={1}>{user.email}</Text>
+                                    <Text variant="caption" muted numberOfLines={1}>{user.userName}</Text>
                                 </YStack>
-                                <Text flex={1} variant="caption" muted>{user.roles.join(', ') || 'User'}</Text>
-                                <YStack flex={1}>
-                                    <Text variant="caption" color={user.isActive ? '$success600' : '$error600'} weight="semibold">
-                                        {user.isActive ? 'Active' : 'Banned / Suspended'}
+                                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
+                                    <Text variant="caption" muted textAlign="center">{user.roles.join(', ') || 'User'}</Text>
+                                </XStack>
+                                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
+                                    <Text variant="caption" color={user.isActive ? '$success600' : '$error600'} weight="semibold" textAlign="center">
+                                        {user.isActive ? 'Active' : 'Banned'}
                                     </Text>
-                                </YStack>
+                                </XStack>
 
-                                <XStack flex={1} justifyContent="center" gap="$2">
+                                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
                                     <Button
                                         size="sm"
                                         variant={user.isActive ? 'outline' : 'solid'}

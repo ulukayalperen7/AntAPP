@@ -31,14 +31,8 @@ namespace Ant.Application.Features.Admin.Queries.GetAdminStats
         public async Task<Response<AdminStatsViewModel>> Handle(GetAdminStatsQuery request, CancellationToken cancellationToken)
         {
             var routesCount = await _routeRepository.GetTotalRoutesCountAsync();
-            
-            // For tags, GetAllTags exists in application layer but repository has IGenericRepositoryAsync.GetCountAsync?
-            // Let's use GetAllAsync if count isn't direct
-            var tags = await _tagRepository.GetAllAsync();
-            var tagsCount = tags.Count;
-
-            var users = await _identityService.GetAllUsersAsync();
-            var activeUsersCount = users.Count(u => u.IsActive);
+            var tagsCount = await _tagRepository.GetCountAsync();
+            var activeUsersCount = await _identityService.GetCountAsync(isActive: true);
 
             var viewModel = new AdminStatsViewModel
             {

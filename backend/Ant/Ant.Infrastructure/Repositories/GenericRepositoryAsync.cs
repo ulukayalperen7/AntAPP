@@ -63,5 +63,10 @@ namespace Ant.Infrastructure.Repository
                  .Set<T>()
                  .ToListAsync();
         }
+
+        public async Task<int> GetCountAsync()
+        {
+            return await _dbContext.Set<T>().CountAsync();
+        }
     }
 }

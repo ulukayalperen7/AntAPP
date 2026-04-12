@@ -21,5 +21,6 @@ namespace Ant.Application.Interfaces
         Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword);
         Task UpdateUserRolesAsync(Guid userId, List<string> roles);
         Task UpdateUserStatusAsync(Guid userId, bool isActive);
+        Task<int> GetCountAsync(bool? isActive = null);
     }
 }

@@ -3,6 +3,7 @@ using Ant.Core.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,6 +107,24 @@ namespace Ant.Infrastructure.Services
             {
                 await _userManager.SetLockoutEndDateAsync(user, null);
             }
+        }
+
+        public async Task<int> GetCountAsync(bool? isActive = null)
+        {
+            var query = _userManager.Users;
+            if (isActive.HasValue)
+            {
+                var now = DateTimeOffset.UtcNow;
+                if (isActive.Value)
+                {
+                    query = query.Where(u => u.LockoutEnd == null || u.LockoutEnd <= now);
+                }
+                else
+                {
+                    query = query.Where(u => u.LockoutEnd != null && u.LockoutEnd > now);
+                }
+            }
+            return await query.CountAsync();
         }
     }
 }

@@ -211,9 +211,9 @@ export default function AdminTagsClient({
               borderBottomColor="$borderColor"
               gap="$3"
             >
-              <Text flex={2} variant="label" weight="semibold">Name</Text>
-              <Text flex={3} variant="label" weight="semibold">Description</Text>
-              <Text flex={1} variant="label" weight="semibold" textAlign="center">Actions</Text>
+              <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Name</Text></XStack>
+              <XStack flex={3} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Description</Text></XStack>
+              <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
             </XStack>
 
             {/* Table Rows */}
@@ -226,11 +226,15 @@ export default function AdminTagsClient({
                 gap="$3"
                 alignItems="center"
               >
-                <Text flex={2} variant="body">{cat.name}</Text>
-                <Text flex={3} variant="caption" muted numberOfLines={2}>
-                  {cat.description || '—'}
-                </Text>
-                <XStack flex={1} justifyContent="center">
+                <XStack flex={2} flexBasis={0} minWidth={0}>
+                  <Text variant="body">{cat.name}</Text>
+                </XStack>
+                <XStack flex={3} flexBasis={0} minWidth={0}>
+                  <Text variant="caption" muted numberOfLines={2}>
+                    {cat.description || '—'}
+                  </Text>
+                </XStack>
+                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
                   {deleteConfirmId === cat.id ? (
                     <XStack gap="$1.5" alignItems="center">
                       <Button

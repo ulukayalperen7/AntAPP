@@ -30,6 +30,13 @@ export default function AdminDashboard({
     }
   }, [activeSection])
 
+  useEffect(() => {
+    // Prefetch routes for instant navigation
+    router.prefetch('/admin/tags')
+    router.prefetch('/admin/routes')
+    router.prefetch('/admin/users')
+  }, [router])
+
   const handleLogout = async () => {
     setIsLoggingOut(true)
     await logout()
