@@ -9,10 +9,17 @@ using System.Threading.Tasks;
 namespace Ant.WebApi.Controllers.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/admin/tags")]
+    [Route("api/admin/tags")]
     [Authorize(Roles = "Admin")]
     public class AdminTagsController : BaseApiController
     {
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var response = await Mediator.Send(new Ant.Application.Features.Tags.Queries.GetAllTags.GetAllTagsQuery { PageNumber = 1, PageSize = 1000 });
+            return Ok(response);
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
         public async Task<IActionResult> Create(CreateTagCommand command)

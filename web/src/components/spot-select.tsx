@@ -99,7 +99,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                                 <MapPin size={16} color="var(--color-primary)" />
                             </YStack>
                             <YStack flex={1}>
-                                <Text variant="label" fontWeight="600">{spot.name}</Text>
+                                <Text variant="label" weight="600">{spot.name}</Text>
                                 <Text variant="caption" muted numberOfLines={1}>{spot.description}</Text>
                             </YStack>
                             <Button variant="ghost" size="sm">Add</Button>

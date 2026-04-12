@@ -82,7 +82,7 @@ export async function createRoute(data: {
   title: string
   description?: string
   thumbnailUrl?: string
-  categoryTagIds?: string[]
+  tagIds?: string[]
   spots: Array<{ spotId: string; customTitle?: string; customDescription?: string }>
 }): Promise<string> {
   return apiFetchData<string>('/routes', {

@@ -176,7 +176,7 @@ export default function CreateRoutePage() {
                     >
                       <XStack gap="$2" alignItems="center">
                         <MapPin size={14} color="var(--color-primary)" />
-                        <Text variant="label" fontWeight="600">{stop.customTitle || 'Selected Spot'}</Text>
+                        <Text variant="label" weight="600">{stop.customTitle || 'Selected Spot'}</Text>
                       </XStack>
                       <Button variant="ghost" size="sm" onPress={() => updateStop(stop.id, 'spotId', '')}>Change</Button>
                     </XStack>

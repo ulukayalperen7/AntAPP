@@ -13,7 +13,7 @@ namespace Ant.Application.Interfaces.Repositories
         Task<IReadOnlyList<Route>> GetPagedRoutesAsync(
             int pageNumber, int pageSize,
             string searchTerm = null,
-            Guid? categoryId = null,
+            Guid? tagId = null,
             List<Guid> tagIds = null,
             string sort = null,
             double? nearLat = null, double? nearLng = null, double? radiusKm = null,
@@ -22,7 +22,7 @@ namespace Ant.Application.Interfaces.Repositories
             RouteContentTypeEnum? contentType = null);
         Task<int> GetTotalRoutesCountAsync(
             string searchTerm = null,
-            Guid? categoryId = null,
+            Guid? tagId = null,
             List<Guid> tagIds = null,
             double? nearLat = null, double? nearLng = null, double? radiusKm = null,
             Guid? authorId = null,

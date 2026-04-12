@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ant.WebApi.Controllers.Admin
 {
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/admin/spots")]
+    [Route("api/admin/spots")]
     [Authorize(Roles = "Admin")]
     public class AdminSpotsController : BaseApiController
     {

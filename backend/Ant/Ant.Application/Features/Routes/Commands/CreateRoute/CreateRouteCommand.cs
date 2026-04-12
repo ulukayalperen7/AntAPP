@@ -39,7 +39,7 @@ namespace Ant.Application.Features.Routes.Commands.CreateRoute
         public string Title { get; set; }
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
-        public List<Guid> CategoryTagIds { get; set; }
+        public List<Guid> TagIds { get; set; }
         
         /// <summary>
         /// The ordered list of stops. The first item in the list is the starting point (SpotOrder = 1).
@@ -93,9 +93,9 @@ namespace Ant.Application.Features.Routes.Commands.CreateRoute
             };
 
             // Map Tags
-            if (request.CategoryTagIds != null && request.CategoryTagIds.Any())
+            if (request.TagIds != null && request.TagIds.Any())
             {
-                foreach (var tagId in request.CategoryTagIds)
+                foreach (var tagId in request.TagIds)
                 {
                     newRoute.RouteTags.Add(new RouteTag { TagId = tagId });
                 }

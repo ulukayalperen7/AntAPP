@@ -5,66 +5,66 @@ import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { Plus, Trash2, LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
-import { createAdminCategory, deleteAdminCategory, getAdminCategories } from '@/features/admin/categories-actions'
-import type { Category } from '@/types/api'
+import { createAdminTag, deleteAdminTag, getAdminTags } from '@/features/admin/tags-actions'
+import type { Tag } from '@/types/api'
 
 type FeedbackState = {
   ok: boolean
   message: string
 } | null
 
-export default function AdminCategoriesClient({
+export default function AdminTagsClient({
   userName,
   email,
-  initialCategories,
+  initialTags,
 }: {
   userName: string
   email: string
-  initialCategories: Array<Category & { id: string }>
+  initialTags: Array<Tag & { id: string }>
 }) {
   const router = useRouter()
-  const [categories, setCategories] = useState(initialCategories)
+  const [Tags, setTags] = useState(initialTags)
   const [showForm, setShowForm] = useState(false)
-  const [newCategoryName, setNewCategoryName] = useState('')
-  const [newCategoryDesc, setNewCategoryDesc] = useState('')
+  const [newTagName, setNewTagName] = useState('')
+  const [newTagDesc, setNewTagDesc] = useState('')
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [isPending, startTransition] = useTransition()
   const [isLoggingOut, startLogoutTransition] = useTransition()
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
-  const handleAddCategory = () => {
-    if (!newCategoryName.trim()) {
-      setFeedback({ ok: false, message: 'Category name is required.' })
+  const handleAddTag = () => {
+    if (!newTagName.trim()) {
+      setFeedback({ ok: false, message: 'Tag name is required.' })
       return
     }
 
     setFeedback(null)
     startTransition(async () => {
       try {
-        await createAdminCategory(newCategoryName, newCategoryDesc || undefined)
-        const updated = await getAdminCategories()
-        setCategories(updated)
-        setNewCategoryName('')
-        setNewCategoryDesc('')
+        await createAdminTag(newTagName, newTagDesc || undefined)
+        const updated = await getAdminTags()
+        setTags(updated)
+        setNewTagName('')
+        setNewTagDesc('')
         setShowForm(false)
-        setFeedback({ ok: true, message: 'Category added successfully!' })
+        setFeedback({ ok: true, message: 'Tag added successfully!' })
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add category' })
+        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add Tag' })
       }
     })
   }
 
-  const handleDeleteCategory = (id: string) => {
+  const handleDeleteTag = (id: string) => {
     setFeedback(null)
     startTransition(async () => {
       try {
-        await deleteAdminCategory(id)
-        const updated = await getAdminCategories()
-        setCategories(updated)
+        await deleteAdminTag(id)
+        const updated = await getAdminTags()
+        setTags(updated)
         setDeleteConfirmId(null)
-        setFeedback({ ok: true, message: 'Category deleted!' })
+        setFeedback({ ok: true, message: 'Tag deleted!' })
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to delete category' })
+        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to delete Tag' })
       }
     })
   }
@@ -91,7 +91,7 @@ export default function AdminCategoriesClient({
           <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
           <YStack gap="$1">
             <XStack alignItems="center" gap="$2">
-              <Text variant="heading2">Categories</Text>
+              <Text variant="heading2">Tags</Text>
             </XStack>
             <Text variant="caption" muted>{userName} ({email})</Text>
           </YStack>
@@ -126,15 +126,15 @@ export default function AdminCategoriesClient({
         </YStack>
       )}
 
-      {/* Add Category Form */}
+      {/* Add Tag Form */}
       {showForm ? (
         <YStack gap="$3" padding="$4" backgroundColor="$muted" borderRadius="$3">
-          <Text variant="heading4">Add New Category</Text>
+          <Text variant="heading4">Add New Tag</Text>
           <YStack gap="$2">
-            <Text variant="label">Category Name *</Text>
+            <Text variant="label">Tag Name *</Text>
             <Input
-              value={newCategoryName}
-              onChangeText={setNewCategoryName}
+              value={newTagName}
+              onChangeText={setNewTagName}
               placeholder="e.g. Heritage, Adventure, Food"
               variant="outline"
               size="md"
@@ -143,8 +143,8 @@ export default function AdminCategoriesClient({
           <YStack gap="$2">
             <Text variant="label">Description (optional)</Text>
             <Input
-              value={newCategoryDesc}
-              onChangeText={setNewCategoryDesc}
+              value={newTagDesc}
+              onChangeText={setNewTagDesc}
               placeholder="Brief description..."
               variant="outline"
               size="md"
@@ -157,17 +157,17 @@ export default function AdminCategoriesClient({
               color="#FFFFFF"
               loading={isPending}
               disabled={isPending}
-              onPress={handleAddCategory}
+              onPress={handleAddTag}
             >
-              Save Category
+              Save Tag
             </Button>
             <Button
               size="md"
               variant="ghost"
               onPress={() => {
                 setShowForm(false)
-                setNewCategoryName('')
-                setNewCategoryDesc('')
+                setNewTagName('')
+                setNewTagDesc('')
               }}
               disabled={isPending}
             >
@@ -183,14 +183,14 @@ export default function AdminCategoriesClient({
           color="#FFFFFF"
           onPress={() => setShowForm(true)}
         >
-          Add New Category
+          Add New Tag
         </Button>
       )}
 
-      {/* Categories Table */}
+      {/* Tags Table */}
       <YStack gap="$3">
-        <Text variant="heading3">Categories ({categories.length})</Text>
-        {categories.length === 0 ? (
+        <Text variant="heading3">Tags ({Tags.length})</Text>
+        {Tags.length === 0 ? (
           <YStack
             padding="$6"
             alignItems="center"
@@ -199,7 +199,7 @@ export default function AdminCategoriesClient({
             borderRadius="$3"
             minHeight={200}
           >
-            <Text variant="body" muted>No categories yet. Create one to get started!</Text>
+            <Text variant="body" muted>No Tags yet. Create one to get started!</Text>
           </YStack>
         ) : (
           <YStack gap="$2" overflowX="auto">
@@ -211,13 +211,13 @@ export default function AdminCategoriesClient({
               borderBottomColor="$borderColor"
               gap="$3"
             >
-              <Text flex={2} variant="label" weight="semibold">Name</Text>
-              <Text flex={3} variant="label" weight="semibold">Description</Text>
-              <Text flex={1} variant="label" weight="semibold" textAlign="center">Actions</Text>
+              <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Name</Text></XStack>
+              <XStack flex={3} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Description</Text></XStack>
+              <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
             </XStack>
 
             {/* Table Rows */}
-            {categories.map((cat) => (
+            {Tags.map((cat) => (
               <XStack
                 key={cat.id}
                 padding="$3"
@@ -226,18 +226,22 @@ export default function AdminCategoriesClient({
                 gap="$3"
                 alignItems="center"
               >
-                <Text flex={2} variant="body">{cat.name}</Text>
-                <Text flex={3} variant="caption" muted numberOfLines={2}>
-                  {cat.description || '—'}
-                </Text>
-                <XStack flex={1} justifyContent="center">
+                <XStack flex={2} flexBasis={0} minWidth={0}>
+                  <Text variant="body">{cat.name}</Text>
+                </XStack>
+                <XStack flex={3} flexBasis={0} minWidth={0}>
+                  <Text variant="caption" muted numberOfLines={2}>
+                    {cat.description || '—'}
+                  </Text>
+                </XStack>
+                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
                   {deleteConfirmId === cat.id ? (
                     <XStack gap="$1.5" alignItems="center">
                       <Button
                         size="sm"
                         backgroundColor="$error500"
                         color="#FFFFFF"
-                        onPress={() => handleDeleteCategory(cat.id)}
+                        onPress={() => handleDeleteTag(cat.id)}
                         loading={isPending}
                         disabled={isPending}
                       >

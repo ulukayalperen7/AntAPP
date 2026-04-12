@@ -124,7 +124,7 @@ export type RouteCardData = {
   /** @deprecated - backend has no difficulty field, use contentType */
   difficulty?: 'easy' | 'moderate' | 'hard'
   contentType?: 'Community' | 'Official' | 'Sponsored'
-  category?: string
+  tag?: string
   description?: string
   stopsCount?: number
   isFavorited?: boolean
@@ -181,9 +181,9 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
       </CardImage>
 
       <YStack padding="$3" gap="$1.5" flex={1}>
-        {data.category && (
+        {data.tag && (
           <TamaguiText fontSize="$2" fontWeight="600" color="$primary" textTransform="uppercase">
-            {data.category}
+            {data.tag}
           </TamaguiText>
         )}
         <TamaguiText fontFamily="$heading" fontSize="$5" fontWeight="600" color="$color" numberOfLines={2}>

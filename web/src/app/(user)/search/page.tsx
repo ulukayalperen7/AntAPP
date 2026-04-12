@@ -76,7 +76,7 @@ export default function SearchPage() {
             variant="caption"
             color="$primary"
             cursor="pointer"
-            fontWeight="600"
+            weight="600"
             onPress={() => {
               setActiveTagId(null)
               setRouteType('')

@@ -403,7 +403,7 @@ export default function RouteDetailClient({
             >
               <Text variant="heading4">Ratings</Text>
               <XStack alignItems="center" gap="$3">
-                <Text fontFamily="$heading" fontSize="$11" fontWeight="700" color="$color">
+                <Text fontFamily="$heading" fontSize="$11" weight="bold" color="$color">
                   {displayRating.toFixed(1)}
                 </Text>
                 <YStack gap="$1">

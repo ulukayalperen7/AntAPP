@@ -48203,7 +48203,7 @@ function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest })
       )
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(YStack, { padding: "$3", gap: "$1.5", flex: 1, children: [
-      data.category && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "600", color: "$primary", textTransform: "uppercase", children: data.category }),
+      data.tag && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$2", fontWeight: "600", color: "$primary", textTransform: "uppercase", children: data.tag }),
       /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontFamily: "$heading", fontSize: "$5", fontWeight: "600", color: "$color", numberOfLines: 2, children: data.title }),
       data.description && /* @__PURE__ */ (0, import_jsx_runtime116.jsx)(Text10, { fontSize: "$3", color: "$mutedForeground", numberOfLines: 2, children: data.description }),
       data.location && /* @__PURE__ */ (0, import_jsx_runtime116.jsxs)(XStack, { alignItems: "center", gap: "$1.5", children: [

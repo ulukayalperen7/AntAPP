@@ -15,7 +15,7 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 20;
         public string Search { get; set; }
-        public Guid? CategoryId { get; set; }
+        public Guid? TagId { get; set; }
         public List<Guid> TagIds { get; set; }
         public string Sort { get; set; }
         public double? NearLat { get; set; }
@@ -65,13 +65,13 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
             };
 
             var routes = await _routeRepository.GetPagedRoutesAsync(
-                validFilter.PageNumber, validFilter.PageSize,
-                request.Search, request.CategoryId, request.TagIds, request.Sort,
+                request.PageNumber, request.PageSize,
+                request.Search, request.TagId, request.TagIds, request.Sort,
                 request.NearLat, request.NearLng, request.RadiusKm,
                 request.AuthorId, request.Visibility, contentType);
 
             var totalRecords = await _routeRepository.GetTotalRoutesCountAsync(
-                request.Search, request.CategoryId, request.TagIds,
+                request.Search, request.TagId, request.TagIds,
                 request.NearLat, request.NearLng, request.RadiusKm,
                 request.AuthorId, request.Visibility, contentType);
 

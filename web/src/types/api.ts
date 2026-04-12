@@ -46,16 +46,11 @@ export type Tag = {
   id: string
   name: string
   isActive: boolean
-}
-
-// ─── Categories ─────────────────────────────────────────
-
-export type Category = {
-  id: string
-  name: string
   description?: string
   createdAt?: string
 }
+
+
 
 // ─── Routes ─────────────────────────────────────────────
 
