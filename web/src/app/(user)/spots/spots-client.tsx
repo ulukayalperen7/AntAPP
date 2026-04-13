@@ -4,11 +4,21 @@ import { useCallback, useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, SearchInput, Button, Badge, Image } from '@antapp/ui'
 import type { SpotListItem } from '@/types/api'
-import { getSpots } from '@/features/spots/actions'
+import { Compass, MapPinned, Search, Star, Heart } from 'lucide-react'
+import { getSpots, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
 import { EmptyState } from '@/components/empty-state'
-import { Compass, MapPinned, Search, Star } from 'lucide-react'
 
-function SpotCard({ spot, onPress }: { spot: SpotListItem; onPress: () => void }) {
+function SpotCard({
+  spot,
+  onPress,
+  isSaved,
+  onToggleSave
+}: {
+  spot: SpotListItem
+  onPress: () => void
+  isSaved: boolean
+  onToggleSave: (e: any) => void
+}) {
   return (
     <YStack
       flex={1}
@@ -24,7 +34,22 @@ function SpotCard({ spot, onPress }: { spot: SpotListItem; onPress: () => void }
       hoverStyle={{ borderColor: '$primary', opacity: 0.96 }}
       pressStyle={{ scale: 0.985 }}
     >
-      <YStack height={180} backgroundColor="$muted" justifyContent="center" alignItems="center">
+      <YStack height={180} backgroundColor="$muted" justifyContent="center" alignItems="center" position="relative">
+        <YStack
+          position="absolute"
+          top={12}
+          right={12}
+          zIndex={10}
+          backgroundColor={isSaved ? '#ff4757' : 'rgba(255,255,255,0.85)'}
+          borderRadius="$round"
+          padding="$2"
+          cursor="pointer"
+          onPress={onToggleSave}
+          hoverStyle={{ scale: 1.1 }}
+        >
+          <Heart size={20} color={isSaved ? 'white' : '#2f3542'} fill={isSaved ? "white" : "transparent"} />
+        </YStack>
+
         {spot.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -71,18 +96,26 @@ export default function SpotsClient({
   const [query, setQuery] = useState('')
   const [spots, setSpots] = useState(initialSpots)
   const [total, setTotal] = useState(initialTotal)
+  const [viewMode, setViewMode] = useState<'all' | 'saved'>('all')
+  const [savedSpotIds, setSavedSpotIds] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
 
-  const fetchSpots = useCallback((search: string) => {
+  const fetchSpots = useCallback((search: string, mode: 'all' | 'saved') => {
     startTransition(async () => {
       try {
-        const result = await getSpots({
-          search: search.trim() || undefined,
-          page: 1,
-          pageSize: 24,
-        })
-        setSpots(result.data)
-        setTotal(result.totalRecords)
+        if (mode === 'saved') {
+          const result = await getSavedSpots()
+          setSpots(result)
+          setTotal(result.length)
+        } else {
+          const result = await getSpots({
+            search: search.trim() || undefined,
+            page: 1,
+            pageSize: 24,
+          })
+          setSpots(result.data)
+          setTotal(result.totalRecords)
+        }
       } catch {
         setSpots([])
         setTotal(0)
@@ -90,13 +123,54 @@ export default function SpotsClient({
     })
   }, [])
 
+  const fetchSavedSpotIds = useCallback(async () => {
+    try {
+      const saved = await getSavedSpots()
+      setSavedSpotIds(new Set(saved.map((s) => s.id)))
+    } catch {
+      // Ignored
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchSavedSpotIds()
+  }, [fetchSavedSpotIds])
+
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      fetchSpots(query)
+      fetchSpots(query, viewMode)
     }, 250)
 
     return () => window.clearTimeout(timeout)
-  }, [fetchSpots, query])
+  }, [fetchSpots, query, viewMode])
+
+  const handleToggleSave = async (e: any, spotId: string) => {
+    e.stopPropagation()
+    try {
+      const isNowSaved = await toggleSpotFavorite(spotId)
+
+      setSavedSpotIds((prev) => {
+        const next = new Set(prev)
+        if (isNowSaved) {
+          next.add(spotId)
+        } else {
+          next.delete(spotId)
+
+          // If we are in saved mode, remove the card immediately
+          if (viewMode === 'saved') {
+            setSpots((current) => {
+              const refreshed = current.filter(s => s.id !== spotId)
+              setTotal(refreshed.length)
+              return refreshed
+            })
+          }
+        }
+        return next
+      })
+    } catch {
+      // Ignored
+    }
+  }
 
   return (
     <YStack gap="$5" flex={1}>
@@ -126,9 +200,28 @@ export default function SpotsClient({
               onChangeText={setQuery}
               placeholder="Search spots by name or description..."
               icon={<Search size={18} color="var(--color-mutedForeground)" />}
+              disabled={viewMode === 'saved'}
             />
           </YStack>
-          <Badge variant="info" size="md">{isPending ? 'Searching...' : `${total} spots`}</Badge>
+
+          <XStack gap="$2" backgroundColor="$muted" borderRadius="$4" padding="$1">
+            <Button
+              variant={viewMode === 'all' ? 'solid' : 'ghost'}
+              size="sm"
+              onPress={() => setViewMode('all')}
+            >
+              All Spots
+            </Button>
+            <Button
+              variant={viewMode === 'saved' ? 'solid' : 'ghost'}
+              size="sm"
+              onPress={() => setViewMode('saved')}
+            >
+              Saved Spots
+            </Button>
+          </XStack>
+
+          <Badge variant="info" size="md">{isPending ? 'Loading...' : `${total} spots`}</Badge>
         </XStack>
       </YStack>
 
@@ -155,11 +248,13 @@ export default function SpotsClient({
             </XStack>
           </XStack>
 
-          <XStack flexWrap="wrap" gap="$4">
+          <XStack gap="$4" flexWrap="wrap">
             {spots.map((spot) => (
               <SpotCard
                 key={spot.id}
                 spot={spot}
+                isSaved={savedSpotIds.has(spot.id)}
+                onToggleSave={(e) => handleToggleSave(e, spot.id)}
                 onPress={() => router.push(`/spots/${spot.id}`)}
               />
             ))}

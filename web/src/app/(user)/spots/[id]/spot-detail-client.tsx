@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Badge, Image, RouteCard, RatingDisplay } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { SpotDetail, SpotRouteItem } from '@/types/api'
-import { rateSpot } from '@/features/spots/actions'
-import { ArrowLeft, MapPinned, Route as RouteIcon, Star } from 'lucide-react'
+import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
+import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
 
 function routeToCardData(route: SpotRouteItem): RouteCardData {
   return {
@@ -91,6 +91,25 @@ export default function SpotDetailClient({
   const router = useRouter()
   const [displayRating, setDisplayRating] = useState(spot.averageRating)
   const [displayRatingCount, setDisplayRatingCount] = useState(spot.ratingCount)
+  const [isSaved, setIsSaved] = useState(false)
+  const [isSaving, startSavingTransition] = useTransition()
+
+  useEffect(() => {
+    getSavedSpots().then(spots => {
+      setIsSaved(spots.some(s => s.id === spot.id))
+    }).catch(() => { })
+  }, [spot.id])
+
+  const handleToggleSave = () => {
+    startSavingTransition(async () => {
+      try {
+        const saved = await toggleSpotFavorite(spot.id)
+        setIsSaved(saved)
+      } catch {
+        // Ignored
+      }
+    })
+  }
 
   return (
     <YStack gap="$5" flex={1}>
@@ -196,6 +215,18 @@ export default function SpotDetailClient({
             gap="$4"
           >
             <Text variant="heading4">Quick actions</Text>
+
+            <Button
+              variant={isSaved ? 'outline' : 'solid'}
+              theme={isSaved ? 'active' : undefined}
+              size="md"
+              icon={<Heart size={18} color={isSaved ? '#ff4757' : 'white'} fill={isSaved ? '#ff4757' : 'transparent'} />}
+              onPress={handleToggleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? 'Updating...' : (isSaved ? 'Saved in Favorites' : 'Save this Spot')}
+            </Button>
+
             <Button variant="outline" size="md" onPress={() => router.push('/spots')}>
               Browse More Spots
             </Button>
