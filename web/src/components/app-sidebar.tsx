@@ -9,7 +9,7 @@ import { Globe, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, Pa
 const NAV_ITEMS = [
   { label: 'Explore', href: '/dashboard', Icon: Globe },
   { label: 'Spots', href: '/spots', Icon: MapPinned },
-  { label: 'My Routes', href: '/profile', Icon: Route },
+  { label: 'My Routes', href: '/my-routes', Icon: Route },
   { label: 'Saved', href: '/collections', Icon: Bookmark },
 ]
 
