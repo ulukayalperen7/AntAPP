@@ -4,8 +4,9 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { createRoute } from '@/features/routes/actions'
-import { ArrowLeft, Plus, Trash2, MapPin } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, MapPin, Heart } from 'lucide-react'
 import SpotSelect from '@/components/spot-select'
+import { SavedSpotsPickerModal } from '@/features/spots/saved-spots-picker-modal'
 
 type StopEntry = {
   id: string
@@ -29,6 +30,26 @@ export default function CreateRoutePage() {
     { id: generateTempId(), spotId: '', customTitle: '', customDescription: '' },
   ])
   const [error, setError] = useState<string | null>(null)
+  const [showPicker, setShowPicker] = useState(false)
+
+  const handleAddFromSaved = (spots: import('@/types/api').SpotListItem[]) => {
+    if (spots.length === 0) return
+    const newStops: StopEntry[] = spots.map((spot) => ({
+      id: generateTempId(),
+      spotId: spot.id,
+      customTitle: spot.name,
+      customDescription: '',
+    }))
+    setStops((prev) => {
+      // Replace any empty trailing rows, then append the rest
+      const nonEmpty = prev.filter((s) => s.spotId.trim())
+      const tail = prev.filter((s) => !s.spotId.trim())
+      const toAdd = newStops
+      // Keep at least 2 rows after adding
+      const merged = [...nonEmpty, ...toAdd, ...tail]
+      return merged.length >= 2 ? merged : [...merged, { id: generateTempId(), spotId: '', customTitle: '', customDescription: '' }]
+    })
+  }
 
   const addStop = () => {
     setStops((prev) => [
@@ -131,11 +152,21 @@ export default function CreateRoutePage() {
         <XStack justifyContent="space-between" alignItems="center">
           <YStack>
             <Text variant="heading4">Route Stops</Text>
-            <Text variant="caption" muted>Add at least 2 stops (enter Spot IDs from the system)</Text>
+            <Text variant="caption" muted>Search spots or pick from your saved favorites</Text>
           </YStack>
-          <Button variant="outline" size="sm" icon={<Plus size={14} color="currentColor" />} onPress={addStop}>
-            Add Stop
-          </Button>
+          <XStack gap="$2">
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<Heart size={14} color="#EA580C" fill="#EA580C" />}
+              onPress={() => setShowPicker(true)}
+            >
+              Saved
+            </Button>
+            <Button variant="outline" size="sm" icon={<Plus size={14} color="currentColor" />} onPress={addStop}>
+              Add Stop
+            </Button>
+          </XStack>
         </XStack>
 
         <YStack gap="$4">
@@ -176,7 +207,7 @@ export default function CreateRoutePage() {
                     >
                       <XStack gap="$2" alignItems="center">
                         <MapPin size={14} color="var(--color-primary)" />
-                        <Text variant="label" weight="600">{stop.customTitle || 'Selected Spot'}</Text>
+                        <Text variant="label" weight="semibold">{stop.customTitle || 'Selected Spot'}</Text>
                       </XStack>
                       <Button variant="ghost" size="sm" onPress={() => updateStop(stop.id, 'spotId', '')}>Change</Button>
                     </XStack>
@@ -250,6 +281,14 @@ export default function CreateRoutePage() {
           Create Route
         </Button>
       </XStack>
+
+      {/* Saved Spots Picker Modal */}
+      <SavedSpotsPickerModal
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onAddSelected={handleAddFromSaved}
+        excludeIds={stops.map((s) => s.spotId).filter(Boolean)}
+      />
     </YStack>
   )
 }
