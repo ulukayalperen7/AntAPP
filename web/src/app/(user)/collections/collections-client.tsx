@@ -22,12 +22,12 @@ function CollectionCard({ collection }: { collection: Collection }) {
       hoverStyle={{ borderColor: '$primary', opacity: 0.95 }}
       pressStyle={{ scale: 0.985 }}
     >
-      <YStack height={140} backgroundColor="$muted" alignItems="center" justifyContent="center">
+      <YStack height={160} backgroundColor="$muted" alignItems="center" justifyContent="center">
         {collection.thumbnailUrl ? (
           <img
             src={collection.thumbnailUrl}
             alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
           <FolderOpen size={40} color="var(--color-mutedForeground)" strokeWidth={1.5} />
@@ -163,18 +163,13 @@ export default function CollectionsClient({ collections: initialCollections }: {
         <Text variant="body" muted>Save and organize your favorite routes</Text>
       </YStack>
 
-      <XStack flexWrap="wrap" gap="$4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
         {collections.map((col) => (
-          <YStack key={col.id} flex={1} minWidth={240} maxWidth="33.3%">
-            <CollectionCard collection={col} />
-          </YStack>
+          <CollectionCard key={col.id} collection={col} />
         ))}
 
         {/* New Collection card */}
         <YStack
-          flex={1}
-          minWidth={240}
-          maxWidth="33.3%"
           borderRadius="$4"
           borderWidth={2}
           borderStyle="dashed"
@@ -200,7 +195,7 @@ export default function CollectionsClient({ collections: initialCollections }: {
             <Text variant="caption" muted>Organize your saved routes</Text>
           </YStack>
         </YStack>
-      </XStack>
+      </div>
     </YStack>
   )
 }

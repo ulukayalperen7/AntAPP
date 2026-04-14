@@ -123,8 +123,8 @@ export default function SpotDetailClient({
         </YStack>
       </XStack>
 
-      <XStack gap="$5" flexWrap="wrap">
-        <YStack flex={2} minWidth={360} gap="$5">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '32px', alignItems: 'start' }}>
+        <YStack gap="$5">
           <YStack
             backgroundColor="$backgroundStrong"
             borderRadius="$4"
@@ -135,7 +135,7 @@ export default function SpotDetailClient({
             <YStack height={320} backgroundColor="$muted" alignItems="center" justifyContent="center">
               {spot.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : (
                 <MapPinned size={56} color="var(--color-mutedForeground)" />
               )}
@@ -191,16 +191,15 @@ export default function SpotDetailClient({
                 </Text>
               </YStack>
             ) : (
-              <XStack flexWrap="wrap" gap="$4">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
                 {initialRoutes.map((route) => (
-                  <YStack key={route.id} flex={1} minWidth={260} maxWidth="50%">
-                    <RouteCard
-                      data={routeToCardData(route)}
-                      onPress={() => router.push(`/routes/${route.id}`)}
-                    />
-                  </YStack>
+                  <RouteCard
+                    key={route.id}
+                    data={routeToCardData(route)}
+                    onPress={() => router.push(`/routes/${route.id}`)}
+                  />
                 ))}
-              </XStack>
+              </div>
             )}
           </YStack>
         </YStack>
@@ -261,7 +260,7 @@ export default function SpotDetailClient({
             />
           </YStack>
         </YStack>
-      </XStack>
+      </div>
     </YStack>
   )
 }

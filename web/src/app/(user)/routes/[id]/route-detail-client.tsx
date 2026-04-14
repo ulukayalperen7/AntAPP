@@ -6,6 +6,7 @@ import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ProgressBar } fro
 import type { RouteDetail } from '@/types/api'
 import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown } from 'lucide-react'
 import { saveRoute } from '@/features/collections/actions'
+import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
 
 // ─── Star Rating Widget ───────────────────────────────────────────────────────
@@ -93,6 +94,7 @@ export default function RouteDetailClient({
   const [isSaved, setIsSaved] = useState(false)
   const [isSaving, startSaving] = useTransition()
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [showCollectionModal, setShowCollectionModal] = useState(false)
 
   // Fork state
   const [isForking, startFork] = useTransition()
@@ -108,15 +110,7 @@ export default function RouteDetailClient({
 
   const handleSave = () => {
     if (isSaved) return
-    setSaveError(null)
-    startSaving(async () => {
-      try {
-        await saveRoute(route.id)
-        setIsSaved(true)
-      } catch (e) {
-        setSaveError((e as Error).message ?? 'Failed to save')
-      }
-    })
+    setShowCollectionModal(true)
   }
 
   const handleFork = () => {
@@ -280,7 +274,7 @@ export default function RouteDetailClient({
       </XStack>
 
       {/* Two Column Layout */}
-      <XStack gap="$5" flexWrap="wrap">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '32px', alignItems: 'start' }}>
         {/* Left Column */}
         <YStack flex={2} minWidth={400} gap="$5">
           {/* About */}
@@ -367,7 +361,7 @@ export default function RouteDetailClient({
         </YStack>
 
         {/* Right Sidebar */}
-        <YStack flex={1} minWidth={280} gap="$4">
+        <YStack gap="$4">
           {/* Rating Widget */}
           {!isOwner && (
             <YStack
@@ -445,7 +439,18 @@ export default function RouteDetailClient({
             </Button>
           </YStack>
         </YStack>
-      </XStack>
+      </div>
+
+      {/* Save to Collection Modal */}
+      <SaveToCollectionModal
+        routeId={route.id}
+        isOpen={showCollectionModal}
+        onClose={() => setShowCollectionModal(false)}
+        onSaved={(collectionId) => {
+          setIsSaved(true)
+          setSaveError(null)
+        }}
+      />
     </YStack>
   )
 }

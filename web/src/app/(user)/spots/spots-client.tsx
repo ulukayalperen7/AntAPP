@@ -21,9 +21,6 @@ function SpotCard({
 }) {
   return (
     <YStack
-      flex={1}
-      minWidth={260}
-      maxWidth="33.3%"
       backgroundColor="$backgroundStrong"
       borderRadius="$4"
       borderWidth={1}
@@ -34,7 +31,7 @@ function SpotCard({
       hoverStyle={{ borderColor: '$primary', opacity: 0.96 }}
       pressStyle={{ scale: 0.985 }}
     >
-      <YStack height={180} backgroundColor="$muted" justifyContent="center" alignItems="center" position="relative">
+      <YStack height={200} backgroundColor="$muted" justifyContent="center" alignItems="center" position="relative">
         <YStack
           position="absolute"
           top={12}
@@ -52,7 +49,7 @@ function SpotCard({
 
         {spot.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         ) : (
           <MapPinned size={36} color="var(--color-mutedForeground)" />
         )}
@@ -248,7 +245,7 @@ export default function SpotsClient({
             </XStack>
           </XStack>
 
-          <XStack gap="$4" flexWrap="wrap">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {spots.map((spot) => (
               <SpotCard
                 key={spot.id}
@@ -258,7 +255,7 @@ export default function SpotsClient({
                 onPress={() => router.push(`/spots/${spot.id}`)}
               />
             ))}
-          </XStack>
+          </div>
         </YStack>
       )}
     </YStack>

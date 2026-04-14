@@ -47,7 +47,7 @@ function RouteActionCard({
   }
 
   return (
-    <YStack flex={1} minWidth={260} maxWidth="50%" position="relative">
+    <YStack flex={1} position="relative">
       <RouteCard
         data={routeToCardData(route)}
         onPress={onPress}
@@ -181,7 +181,7 @@ export default function ProfileClient({
         </XStack>
 
         {routes.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {routes.map((route) => (
               <RouteActionCard
                 key={route.id}
@@ -191,9 +191,6 @@ export default function ProfileClient({
             ))}
             {/* Create placeholder */}
             <YStack
-              flex={1}
-              minWidth={260}
-              maxWidth="50%"
               borderRadius="$4"
               borderWidth={2}
               borderStyle="dashed"
@@ -219,7 +216,7 @@ export default function ProfileClient({
                 <Text variant="caption" muted>Share your latest adventure</Text>
               </YStack>
             </YStack>
-          </XStack>
+          </div>
         ) : (
           <YStack
             borderRadius="$4"

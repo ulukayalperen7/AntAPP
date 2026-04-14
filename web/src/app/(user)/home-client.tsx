@@ -133,16 +133,15 @@ export default function HomeClient({
               View All
             </Text>
           </XStack>
-          <XStack flexWrap="wrap" gap="$4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {filterRoutes(popularRoutes).map((route) => (
-              <YStack key={route.id} flex={1} minWidth={260} maxWidth="50%">
-                <RouteCard
-                  data={routeToCardData(route)}
-                  onPress={() => router.push(`/routes/${route.id}`)}
-                />
-              </YStack>
+              <RouteCard
+                key={route.id}
+                data={routeToCardData(route)}
+                onPress={() => router.push(`/routes/${route.id}`)}
+              />
             ))}
-          </XStack>
+          </div>
         </YStack>
       )}
 
@@ -160,16 +159,15 @@ export default function HomeClient({
               See More
             </Text>
           </XStack>
-          <XStack flexWrap="wrap" gap="$4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {filterRoutes(recommendedRoutes).map((route) => (
-              <YStack key={route.id} flex={1} minWidth={260} maxWidth="33.3%">
-                <RouteCard
-                  data={routeToCardData(route)}
-                  onPress={() => router.push(`/routes/${route.id}`)}
-                />
-              </YStack>
+              <RouteCard
+                key={route.id}
+                data={routeToCardData(route)}
+                onPress={() => router.push(`/routes/${route.id}`)}
+              />
             ))}
-          </XStack>
+          </div>
         </YStack>
       )}
 
