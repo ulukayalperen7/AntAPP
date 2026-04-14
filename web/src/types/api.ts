@@ -88,6 +88,11 @@ export type RouteDetail = {
   isPublic: boolean
   contentType: RouteContentType
   averageRating: number
+  encodedPolyline: string | null
+  totalDistanceMeters: number
+  estimatedDurationSeconds: number
+  centerLatitude: number
+  centerLongitude: number
   stops: RouteStop[]
 }
 
