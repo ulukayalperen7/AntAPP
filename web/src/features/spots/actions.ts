@@ -74,3 +74,15 @@ export async function deleteBusinessSpot(id: string): Promise<void> {
     method: 'DELETE',
   })
 }
+
+export async function toggleSpotFavorite(spotId: string): Promise<boolean> {
+  return apiFetchData<boolean>(`/spots/${spotId}/favorite`, {
+    method: 'POST',
+  })
+}
+
+export async function getSavedSpots(): Promise<SpotListItem[]> {
+  const result = await apiFetchData<SpotListItem[]>('/spots/favorites')
+  return result || []
+}
+

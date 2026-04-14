@@ -37,6 +37,7 @@ namespace Ant.Infrastructure.Contexts
         public DbSet<CollectionRoute> CollectionRoutes { get; set; }
         public DbSet<RouteRating> RouteRatings { get; set; }
         public DbSet<SpotRating> SpotRatings { get; set; }
+        public DbSet<SpotFavorite> SpotFavorites { get; set; }
         public DbSet<User> DomainUsers { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -136,6 +137,21 @@ namespace Ant.Infrastructure.Contexts
                 .WithMany(u => u.SpotRatings)
                 .HasForeignKey(sr => sr.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SpotFavorite>()
+                .HasKey(sf => new { sf.UserId, sf.SpotId });
+
+            builder.Entity<SpotFavorite>()
+                .HasOne(sf => sf.User)
+                .WithMany(u => u.FavoriteSpots)
+                .HasForeignKey(sf => sf.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<SpotFavorite>()
+                .HasOne(sf => sf.Spot)
+                .WithMany(s => s.FavoritedBy)
+                .HasForeignKey(sf => sf.SpotId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<IdentityRole<Guid>>(entity =>
             {

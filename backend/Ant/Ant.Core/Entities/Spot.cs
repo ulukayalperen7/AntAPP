@@ -32,5 +32,6 @@ namespace Ant.Core.Entities
         // A single Spot can be part of many Routes
         public virtual ICollection<RouteSpot> RouteSpots { get; set; }
         public virtual ICollection<SpotRating> SpotRatings { get; set; }
+        public virtual ICollection<SpotFavorite> FavoritedBy { get; set; }
     }
 }

@@ -47,7 +47,7 @@ function RouteActionCard({
   }
 
   return (
-    <YStack flex={1} minWidth={260} maxWidth="50%" position="relative">
+    <YStack flex={1} position="relative">
       <RouteCard
         data={routeToCardData(route)}
         onPress={onPress}
@@ -175,22 +175,13 @@ export default function ProfileClient({
         {privateCount > 0 && <StatBox value={privateCount} label="Private" />}
       </XStack>
 
-      {/* My Routes */}
       <YStack flex={2} gap="$4">
         <XStack justifyContent="space-between" alignItems="center">
           <Text variant="heading3">My Routes</Text>
-          <Button
-            variant="solid"
-            size="sm"
-            icon={<Plus size={16} color="#fff" />}
-            onPress={() => router.push('/routes/create')}
-          >
-            Create Route
-          </Button>
         </XStack>
 
         {routes.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
             {routes.map((route) => (
               <RouteActionCard
                 key={route.id}
@@ -200,9 +191,6 @@ export default function ProfileClient({
             ))}
             {/* Create placeholder */}
             <YStack
-              flex={1}
-              minWidth={260}
-              maxWidth="50%"
               borderRadius="$4"
               borderWidth={2}
               borderStyle="dashed"
@@ -211,24 +199,24 @@ export default function ProfileClient({
               justifyContent="center"
               minHeight={280}
               cursor="pointer"
-              hoverStyle={{ borderColor: '$primary' }}
-              gap="$2"
+              gap="$3"
               onPress={() => router.push('/routes/create')}
+              hoverStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
+              pressStyle={{ scale: 0.985 }}
             >
-              <XStack
-                width={48}
-                height={48}
-                borderRadius="$full"
+              <YStack
                 backgroundColor="$muted"
-                alignItems="center"
-                justifyContent="center"
+                borderRadius="$round"
+                padding="$3"
               >
-                <Plus size={24} color="var(--color-mutedForeground)" />
-              </XStack>
-              <Text variant="label">Create Route</Text>
-              <Text variant="caption" muted>Share your latest adventure</Text>
+                <Plus size={24} color="var(--color-primary)" />
+              </YStack>
+              <YStack alignItems="center" gap="$1">
+                <Text variant="label" color="$primary">Create Route</Text>
+                <Text variant="caption" muted>Share your latest adventure</Text>
+              </YStack>
             </YStack>
-          </XStack>
+          </div>
         ) : (
           <YStack
             borderRadius="$4"
@@ -241,21 +229,19 @@ export default function ProfileClient({
             gap="$3"
             cursor="pointer"
             onPress={() => router.push('/routes/create')}
-            hoverStyle={{ borderColor: '$primary' }}
+            hoverStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
+            pressStyle={{ scale: 0.985 }}
           >
-            <XStack
-              width={64}
-              height={64}
-              borderRadius="$full"
+            <YStack
               backgroundColor="$muted"
-              alignItems="center"
-              justifyContent="center"
+              borderRadius="$round"
+              padding="$4"
             >
-              <Plus size={32} color="var(--color-mutedForeground)" />
-            </XStack>
+              <Plus size={32} color="var(--color-primary)" />
+            </YStack>
             <YStack gap="$1" alignItems="center">
-              <Text variant="heading4">No routes yet</Text>
-              <Text variant="body" muted>Create your first route to get started</Text>
+              <Text variant="label" color="$primary">Create Route</Text>
+              <Text variant="body" muted>Share your latest adventure</Text>
             </YStack>
           </YStack>
         )}

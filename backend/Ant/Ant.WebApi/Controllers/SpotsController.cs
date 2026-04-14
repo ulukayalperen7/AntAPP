@@ -8,7 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Ant.Application.Features.Spots.Commands.ToggleSpotFavorite;
+using Ant.Application.Features.Spots.Queries.GetSavedSpots;
 
 namespace Ant.WebApi.Controllers
 {
@@ -69,6 +73,26 @@ namespace Ant.WebApi.Controllers
         public async Task<IActionResult> GetRatings(Guid spotId)
         {
             return Ok(await Mediator.Send(new GetSpotRatingsQuery { SpotId = spotId }));
+        }
+
+        // POST /api/spots/{spotId}/favorite
+        [HttpPost("{spotId}/favorite")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<bool>))]
+        public async Task<IActionResult> ToggleFavorite(Guid spotId)
+        {
+            var userId = Guid.Parse(User.FindFirstValue("uid"));
+            return Ok(await Mediator.Send(new ToggleSpotFavoriteCommand { SpotId = spotId, UserId = userId }));
+        }
+
+        // GET /api/v1/spots/favorites
+        [HttpGet("favorites")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<List<SpotListViewModel>>))]
+        public async Task<IActionResult> GetSavedSpots()
+        {
+            var userId = Guid.Parse(User.FindFirstValue("uid"));
+            return Ok(await Mediator.Send(new GetSavedSpotsQuery { UserId = userId }));
         }
     }
 }

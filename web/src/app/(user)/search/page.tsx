@@ -40,7 +40,7 @@ export default function SearchPage() {
 
   // Load tags once
   useEffect(() => {
-    getTags(100).then(setTags).catch(() => {})
+    getTags(100).then(setTags).catch(() => { })
   }, [])
 
   const fetchResults = useCallback(() => {
@@ -76,7 +76,7 @@ export default function SearchPage() {
             variant="caption"
             color="$primary"
             cursor="pointer"
-            weight="600"
+            weight="semibold"
             onPress={() => {
               setActiveTagId(null)
               setRouteType('')
@@ -179,16 +179,15 @@ export default function SearchPage() {
         </XStack>
 
         {results.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
             {results.map((route) => (
-              <YStack key={route.id} flex={1} minWidth={220} maxWidth="50%">
-                <RouteCard
-                  data={routeToCardData(route)}
-                  onPress={() => router.push(`/routes/${route.id}`)}
-                />
-              </YStack>
+              <RouteCard
+                key={route.id}
+                data={routeToCardData(route)}
+                onPress={() => router.push(`/routes/${route.id}`)}
+              />
             ))}
-          </XStack>
+          </div>
         ) : !isPending ? (
           <YStack alignItems="center" justifyContent="center" padding="$10" gap="$3">
             <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />

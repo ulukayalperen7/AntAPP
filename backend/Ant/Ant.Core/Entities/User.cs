@@ -14,5 +14,6 @@ namespace Ant.Core.Entities
         public virtual ICollection<RouteRating> RouteRatings { get; set; }
         public virtual ICollection<SpotRating> SpotRatings { get; set; }
         public virtual ICollection<Spot> OwnedSpots { get; set; }
+        public virtual ICollection<SpotFavorite> FavoriteSpots { get; set; }
     }
 }

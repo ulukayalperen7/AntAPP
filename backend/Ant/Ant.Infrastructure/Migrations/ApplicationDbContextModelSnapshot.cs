@@ -275,6 +275,24 @@ namespace Ant.Infrastructure.Migrations
                     b.ToTable("Spots");
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.SpotFavorite", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SpotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId", "SpotId");
+
+                    b.HasIndex("SpotId");
+
+                    b.ToTable("SpotFavorites");
+                });
+
             modelBuilder.Entity("Ant.Core.Entities.SpotRating", b =>
                 {
                     b.Property<Guid>("Id")
@@ -647,6 +665,25 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("OwnerUser");
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.SpotFavorite", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.Spot", "Spot")
+                        .WithMany("FavoritedBy")
+                        .HasForeignKey("SpotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.User", "User")
+                        .WithMany("FavoriteSpots")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Spot");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Ant.Core.Entities.SpotRating", b =>
                 {
                     b.HasOne("Ant.Core.Entities.Spot", "Spot")
@@ -789,6 +826,8 @@ namespace Ant.Infrastructure.Migrations
 
             modelBuilder.Entity("Ant.Core.Entities.Spot", b =>
                 {
+                    b.Navigation("FavoritedBy");
+
                     b.Navigation("RouteSpots");
 
                     b.Navigation("SpotRatings");
@@ -804,6 +843,8 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("AuthoredRoutes");
 
                     b.Navigation("Collections");
+
+                    b.Navigation("FavoriteSpots");
 
                     b.Navigation("OwnedSpots");
 
