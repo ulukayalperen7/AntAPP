@@ -12,12 +12,11 @@ import {
 } from './constants'
 import { getLandingPathByRoles } from './roles'
 
-function cookieOpts(maxAge: number) {
+function cookieOpts() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict' as const,
-    maxAge,
     path: '/',
   }
 }
@@ -58,8 +57,9 @@ async function parseError(res: Response): Promise<string> {
 
 async function setAuthCookies(accessToken: string, refreshToken: string) {
   const jar = await cookies()
-  jar.set(ACCESS_TOKEN_COOKIE, accessToken, cookieOpts(ACCESS_MAX_AGE))
-  jar.set(REFRESH_TOKEN_COOKIE, refreshToken, cookieOpts(REFRESH_MAX_AGE))
+  // By omitting maxAge/expires, they become session cookies that die when the browser closes.
+  jar.set(ACCESS_TOKEN_COOKIE, accessToken, cookieOpts())
+  jar.set(REFRESH_TOKEN_COOKIE, refreshToken, cookieOpts())
 }
 
 async function clearAuthCookies() {
@@ -142,6 +142,12 @@ export async function logout() {
     // Logout devam etmeli — network hatası cookie'leri silmeyi engellemez
   }
   await clearAuthCookies()
+
+  // Try to use API route to send Clear-Site-Data header if we could, 
+  // but in Server Actions redirect does it. To bust the Next.js RSC cache:
+  const { revalidatePath } = await import('next/cache')
+  revalidatePath('/', 'layout')
+
   redirect('/login')
 }
 
