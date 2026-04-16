@@ -14,10 +14,12 @@ namespace Ant.Infrastructure.Services
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly Ant.Infrastructure.Contexts.ApplicationDbContext _dbContext;
 
-        public IdentityService(UserManager<ApplicationUser> userManager)
+        public IdentityService(UserManager<ApplicationUser> userManager, Ant.Infrastructure.Contexts.ApplicationDbContext dbContext)
         {
             _userManager = userManager;
+            _dbContext = dbContext;
         }
 
         public async Task<UserIdentityDto> GetUserIdentityAsync(Guid userId)
@@ -41,12 +43,17 @@ namespace Ant.Infrastructure.Services
 
         public async Task<IEnumerable<UserIdentityDto>> GetAllUsersAsync()
         {
-            var users = _userManager.Users.ToList();
-            var userList = new List<UserIdentityDto>();
+            var users = await _dbContext.Users.AsNoTracking().ToListAsync();
+            var userRoles = await _dbContext.UserRoles.AsNoTracking().ToListAsync();
+            var roles = await _dbContext.Roles.AsNoTracking().ToListAsync();
+
+            var userList = new List<UserIdentityDto>(users.Count);
 
             foreach (var user in users)
             {
-                var roles = await _userManager.GetRolesAsync(user);
+                var userRoleIds = userRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId);
+                var userRoleNames = roles.Where(r => userRoleIds.Contains(r.Id)).Select(r => r.Name).ToList();
+
                 userList.Add(new UserIdentityDto
                 {
                     Id = user.Id,
@@ -54,7 +61,7 @@ namespace Ant.Infrastructure.Services
                     Email = user.Email,
                     IsVerified = user.EmailConfirmed,
                     IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
-                    Roles = roles.ToList()
+                    Roles = userRoleNames
                 });
             }
 

@@ -6,6 +6,16 @@ export type AdminStats = {
     totalRoutes: number
     activeUsers: number
     totalTags: number
+    recentRoutes: {
+        id: string
+        title: string
+        createdAt: string
+    }[]
+    topSpots: {
+        id: string
+        name: string
+        averageRating: number
+    }[]
 }
 
 export async function getAdminStats(): Promise<AdminStats | null> {

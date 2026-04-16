@@ -1,9 +1,6 @@
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
-using Ant.Core.Entities;
-using AutoMapper;
 using MediatR;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,12 +10,10 @@ namespace Ant.Application.Features.Routes.Queries.GetAdminRoutes
     public class GetAdminRoutesQueryHandler : IRequestHandler<GetAdminRoutesQuery, PagedResponse<AdminRouteViewModel>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
-        private readonly IMapper _mapper;
 
-        public GetAdminRoutesQueryHandler(IRouteRepositoryAsync routeRepository, IMapper mapper)
+        public GetAdminRoutesQueryHandler(IRouteRepositoryAsync routeRepository)
         {
             _routeRepository = routeRepository;
-            _mapper = mapper;
         }
 
         public async Task<PagedResponse<AdminRouteViewModel>> Handle(GetAdminRoutesQuery request, CancellationToken cancellationToken)

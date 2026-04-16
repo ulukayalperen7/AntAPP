@@ -3,10 +3,11 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
-import { LogOut, ArrowLeft, Star } from 'lucide-react'
+import { LogOut, ArrowLeft, Star, Map } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { promoteRoute } from '@/features/admin/routes-actions'
 import type { RouteListItem } from '@/types/api'
+import { RouteMapModal } from './route-map-modal'
 
 export default function AdminRoutesClient({
     userName,
@@ -21,6 +22,7 @@ export default function AdminRoutesClient({
     const [routes, setRoutes] = useState(initialRoutes)
     const [isPending, startTransition] = useTransition()
     const [isLoggingOut, startLogoutTransition] = useTransition()
+    const [inspectingRouteId, setInspectingRouteId] = useState<string | null>(null)
 
     const handlePromote = (id: string, newType: 'Official' | 'Sponsored' | 'Community') => {
         startTransition(async () => {
@@ -79,11 +81,13 @@ export default function AdminRoutesClient({
                 ) : (
                     <YStack gap="$2" overflowX="auto">
                         <XStack padding="$3" backgroundColor="$backgroundStrong" borderBottomWidth={2} borderBottomColor="$borderColor" gap="$3">
+                            <XStack width={60}><Text variant="label" weight="semibold">Image</Text></XStack>
                             <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Title</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Visibility</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Type</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Rating</Text></XStack>
-                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Moderation</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Map</Text></XStack>
+                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
                         </XStack>
 
                         {routes.map((route) => {
@@ -95,6 +99,16 @@ export default function AdminRoutesClient({
 
                             return (
                                 <XStack key={route.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
+                                    <XStack width={60}>
+                                        <img
+                                            src={(route.thumbnailUrl && route.thumbnailUrl.trim() !== '') ? route.thumbnailUrl : 'https://via.placeholder.com/60x40.png?text=Empty'}
+                                            alt={route.title}
+                                            style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: '4px' }}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/60x40.png?text=No+Img';
+                                            }}
+                                        />
+                                    </XStack>
                                     <XStack flex={2} flexBasis={0} minWidth={0}>
                                         <Text variant="body" numberOfLines={1}>{route.title}</Text>
                                     </XStack>
@@ -116,7 +130,11 @@ export default function AdminRoutesClient({
                                             <Text variant="caption" muted>N/A</Text>
                                         )}
                                     </XStack>
-                                    <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
+                                    <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center" alignItems="center">
+                                        <Button size="sm" variant="ghost" icon={<Map size={14} />} onPress={() => setInspectingRouteId(route.id)}>Map</Button>
+                                    </XStack>
+
+                                    <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" alignItems="center" gap="$2">
                                         {contentTypeStr === 'Community' && (
                                             <>
                                                 <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Official')} disabled={isPending}>Official</Button>
@@ -133,6 +151,14 @@ export default function AdminRoutesClient({
                     </YStack>
                 )}
             </YStack>
+
+            {/* Map Inspector Modal */}
+            {inspectingRouteId && (
+                <RouteMapModal
+                    routeId={inspectingRouteId}
+                    onClose={() => setInspectingRouteId(null)}
+                />
+            )}
         </YStack >
     )
 }

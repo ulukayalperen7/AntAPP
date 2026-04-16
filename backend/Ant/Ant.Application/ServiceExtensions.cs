@@ -1,4 +1,3 @@
-using AutoMapper.Internal;
 using Ant.Application.Behaviours;
 using FluentValidation;
 using MediatR;
@@ -13,7 +12,6 @@ namespace Ant.Application
         public static void AddApplicationLayer(this IServiceCollection services)
         {
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(cfg => cfg.Internal().MethodMappingEnabled = false, Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         }

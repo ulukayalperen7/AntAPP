@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, RouteCard, FilterChip, ScrollView } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
@@ -30,6 +30,55 @@ export default function HomeClient({
 }) {
   const router = useRouter()
   const [activeTagId, setActiveTagId] = useState<string | null>(null)
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<unknown>(null)
+  const [mapError, setMapError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const initMap = async () => {
+      if (!mapContainerRef.current || mapRef.current) return
+
+      try {
+        if (!document.querySelector('link[data-maplibre-style="true"]')) {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
+          link.dataset.maplibreStyle = 'true'
+          document.head.appendChild(link)
+        }
+
+        const maplibre = await import('maplibre-gl')
+
+        if (cancelled || !mapContainerRef.current || mapRef.current) return
+
+        const map = new maplibre.Map({
+          container: mapContainerRef.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [30.7133, 36.8969],
+          zoom: 11,
+        })
+
+        map.addControl(new maplibre.NavigationControl(), 'top-right')
+        mapRef.current = map
+      } catch {
+        if (!cancelled) {
+          setMapError('Map could not be loaded right now.')
+        }
+      }
+    }
+
+    void initMap()
+
+    return () => {
+      cancelled = true
+      if (mapRef.current && typeof mapRef.current === 'object' && 'remove' in mapRef.current) {
+        ;(mapRef.current as { remove: () => void }).remove()
+      }
+      mapRef.current = null
+    }
+  }, [])
 
   const allTag = { id: '__all__', name: 'All', isActive: true }
   const tagList = [allTag, ...tags.filter((t) => t.isActive)]
@@ -106,16 +155,29 @@ export default function HomeClient({
           height={300}
           backgroundColor="$muted"
           borderRadius="$4"
-          alignItems="center"
-          justifyContent="center"
-          borderWidth={2}
-          borderStyle="dashed"
-          borderColor="$borderColor"
-          gap="$2"
+          overflow="hidden"
         >
-          <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
-          <Text variant="body" muted>Map — Coming Soon</Text>
-          <Text variant="caption" muted>Real-time trails and traffic around you</Text>
+          <div
+            ref={mapContainerRef}
+            style={{ width: '100%', height: '100%' }}
+            aria-label="Route explorer map"
+          />
+          {mapError ? (
+            <YStack
+              position="absolute"
+              inset={0}
+              alignItems="center"
+              justifyContent="center"
+              gap="$2"
+              backgroundColor="$muted"
+              borderWidth={2}
+              borderStyle="dashed"
+              borderColor="$borderColor"
+            >
+              <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
+              <Text variant="body" muted>{mapError}</Text>
+            </YStack>
+          ) : null}
         </YStack>
       </YStack>
 

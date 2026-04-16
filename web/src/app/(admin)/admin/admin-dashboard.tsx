@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Card } from '@antapp/ui'
-import { LogOut, Grid3x3, Tag, Users, TrendingUp } from 'lucide-react'
+import { LogOut, Grid3x3, Tag, Users, TrendingUp, MapPin } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { getAdminStats, type AdminStats } from '@/features/admin/dashboard-actions'
 import { useEffect } from 'react'
 
-type AdminSection = 'overview' | 'tags' | 'routes' | 'users'
+type AdminSection = 'overview' | 'tags' | 'routes' | 'users' | 'spots'
 
 export default function AdminDashboard({
   userName,
@@ -35,6 +35,7 @@ export default function AdminDashboard({
     router.prefetch('/admin/tags')
     router.prefetch('/admin/routes')
     router.prefetch('/admin/users')
+    router.prefetch('/admin/spots')
   }, [router])
 
   const handleLogout = async () => {
@@ -72,6 +73,12 @@ export default function AdminDashboard({
         icon: <Users size={22} />,
         description: 'Manage user accounts',
       },
+      {
+        id: 'spots',
+        label: 'Spots',
+        icon: <MapPin size={22} />,
+        description: 'Manage places of interest',
+      },
     ]
 
   const handleSelectSection = (sectionId: AdminSection) => {
@@ -82,6 +89,8 @@ export default function AdminDashboard({
       router.push('/admin/routes')
     } else if (sectionId === 'users') {
       router.push('/admin/users')
+    } else if (sectionId === 'spots') {
+      router.push('/admin/spots')
     }
   }
 
@@ -182,28 +191,66 @@ export default function AdminDashboard({
 
       {/* Overview Content */}
       {activeSection === 'overview' && (
-        <YStack gap="$4">
-          <Text variant="heading3">Quick Stats</Text>
-          <XStack gap="$4" flexWrap="wrap">
-            <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">{stats?.totalRoutes ?? '—'}</Text>
-              <Text variant="caption" muted>Total Routes</Text>
-            </Card>
-            <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">{stats?.activeUsers ?? '—'}</Text>
-              <Text variant="caption" muted>Active Users</Text>
-            </Card>
-            <Card flex={1} minWidth={200} padding="$4" gap="$2">
-              <Text variant="heading2" color="$primary">{stats?.totalTags ?? '—'}</Text>
-              <Text variant="caption" muted>Tags</Text>
-            </Card>
-          </XStack>
-          <YStack gap="$3" marginTop="$4">
-            <Text variant="heading3">Navigation</Text>
-            <Text variant="body" muted>
-              Select a section from the cards above to manage different parts of the system.
-            </Text>
+        <YStack gap="$6">
+          <YStack gap="$4">
+            <Text variant="heading3">System Overview</Text>
+            <XStack gap="$4" flexWrap="wrap">
+              <Card flex={1} minWidth={150} padding="$4" gap="$2" backgroundColor="$backgroundStrong" borderColor="$borderColor" borderWidth={1}>
+                <Text variant="heading2" color="$primary">{stats?.totalRoutes ?? '—'}</Text>
+                <Text variant="caption" muted>Total Routes</Text>
+              </Card>
+              <Card flex={1} minWidth={150} padding="$4" gap="$2" backgroundColor="$backgroundStrong" borderColor="$borderColor" borderWidth={1}>
+                <Text variant="heading2" color="$primary">{stats?.activeUsers ?? '—'}</Text>
+                <Text variant="caption" muted>Active Users</Text>
+              </Card>
+              <Card flex={1} minWidth={150} padding="$4" gap="$2" backgroundColor="$backgroundStrong" borderColor="$borderColor" borderWidth={1}>
+                <Text variant="heading2" color="$primary">{stats?.totalTags ?? '—'}</Text>
+                <Text variant="caption" muted>Total Tags</Text>
+              </Card>
+            </XStack>
           </YStack>
+
+          <XStack gap="$6" flexWrap="wrap">
+            {/* Latest Routes */}
+            <YStack flex={1} minWidth={300} gap="$4">
+              <Text variant="heading3">Latest Routes</Text>
+              <YStack gap="$2">
+                {stats?.recentRoutes && stats.recentRoutes.length > 0 ? (
+                  stats.recentRoutes.map(route => (
+                    <XStack key={route.id} padding="$3" backgroundColor="$backgroundStrong" borderRadius="$3" justifyContent="space-between" alignItems="center">
+                      <YStack gap="$1">
+                        <Text weight="bold" fontSize={14}>{route.title}</Text>
+                        <Text variant="caption" muted>{new Date(route.createdAt).toLocaleDateString()}</Text>
+                      </YStack>
+                      <Button size="sm" variant="outline" onPress={() => router.push('/admin/routes')}>View in Panel</Button>
+                    </XStack>
+                  ))
+                ) : (
+                  <Text variant="caption" muted>No recent routes found.</Text>
+                )}
+              </YStack>
+            </YStack>
+
+            {/* Top Spots */}
+            <YStack flex={1} minWidth={300} gap="$4">
+              <Text variant="heading3">Top Rated Spots</Text>
+              <YStack gap="$2">
+                {stats?.topSpots && stats.topSpots.length > 0 ? (
+                  stats.topSpots.map(spot => (
+                    <XStack key={spot.id} padding="$3" backgroundColor="$backgroundStrong" borderRadius="$3" justifyContent="space-between" alignItems="center">
+                      <YStack gap="$1">
+                        <Text weight="bold" fontSize={14}>{spot.name}</Text>
+                        <Text variant="caption" color="$warning600">★ {spot.averageRating.toFixed(1)}</Text>
+                      </YStack>
+                      <Button size="sm" variant="outline" onPress={() => handleSelectSection('spots')}>Manage</Button>
+                    </XStack>
+                  ))
+                ) : (
+                  <Text variant="caption" muted>No top spots found.</Text>
+                )}
+              </YStack>
+            </YStack>
+          </XStack>
         </YStack>
       )}
     </YStack>

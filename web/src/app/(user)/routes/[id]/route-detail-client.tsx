@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ProgressBar } from '@antapp/ui'
 import type { RouteDetail } from '@/types/api'
@@ -77,6 +77,40 @@ function StarRatingWidget({
   )
 }
 
+function decodePolyline(encoded: string): Array<[number, number]> {
+  const points: Array<[number, number]> = []
+  let index = 0
+  let lat = 0
+  let lng = 0
+
+  while (index < encoded.length) {
+    let result = 0
+    let shift = 0
+    let byte = 0
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    const deltaLat = (result & 1) !== 0 ? ~(result >> 1) : result >> 1
+    lat += deltaLat
+
+    result = 0
+    shift = 0
+    do {
+      byte = encoded.charCodeAt(index++) - 63
+      result |= (byte & 0x1f) << shift
+      shift += 5
+    } while (byte >= 0x20)
+    const deltaLng = (result & 1) !== 0 ? ~(result >> 1) : result >> 1
+    lng += deltaLng
+
+    points.push([lng / 1e5, lat / 1e5])
+  }
+
+  return points
+}
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RouteDetailClient({
@@ -89,6 +123,190 @@ export default function RouteDetailClient({
   isAdmin?: boolean
 }) {
   const router = useRouter()
+  const mapContainerRef = useRef<HTMLDivElement | null>(null)
+  const mapRef = useRef<unknown>(null)
+  const [mapError, setMapError] = useState<string | null>(null)
+
+  const polylineCoordinates = useMemo(() => {
+    if (!route.encodedPolyline) return []
+    try {
+      return decodePolyline(route.encodedPolyline)
+    } catch {
+      return []
+    }
+  }, [route.encodedPolyline])
+
+  const stopCoordinates = useMemo(
+    () =>
+      route.stops
+        .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
+        .map((stop) => [stop.longitude, stop.latitude] as [number, number]),
+    [route.stops]
+  )
+
+  useEffect(() => {
+    let cancelled = false
+
+    const initMap = async () => {
+      if (!mapContainerRef.current || mapRef.current) return
+
+      try {
+        if (!document.querySelector('link[data-maplibre-style="true"]')) {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
+          link.dataset.maplibreStyle = 'true'
+          document.head.appendChild(link)
+        }
+
+        const maplibre = await import('maplibre-gl')
+        if (cancelled || !mapContainerRef.current || mapRef.current) return
+
+        const hasCenter = Number.isFinite(route.centerLatitude) && Number.isFinite(route.centerLongitude)
+        const map = new maplibre.Map({
+          container: mapContainerRef.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: hasCenter ? [route.centerLongitude, route.centerLatitude] : [30.7133, 36.8969],
+          zoom: hasCenter ? 11 : 10,
+        })
+
+        map.addControl(new maplibre.NavigationControl(), 'top-right')
+
+        map.on('load', () => {
+          if (cancelled) return
+
+          if (polylineCoordinates.length > 1) {
+            map.addSource('route-line', {
+              type: 'geojson',
+              data: {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates: polylineCoordinates,
+                },
+                properties: {},
+              },
+            })
+
+            map.addLayer({
+              id: 'route-line-layer',
+              type: 'line',
+              source: 'route-line',
+              layout: {
+                'line-cap': 'round',
+                'line-join': 'round',
+              },
+              paint: {
+                'line-color': '#FF8C00',
+                'line-width': 4,
+                'line-dasharray': [1.5, 1.5],
+              },
+            })
+          }
+
+          if (stopCoordinates.length > 0) {
+            map.addSource('route-stops', {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: stopCoordinates.map((coordinates, index) => ({
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates,
+                  },
+                  properties: {
+                    order: index + 1,
+                  },
+                })),
+              },
+            })
+
+            map.addLayer({
+              id: 'route-stops-layer',
+              type: 'circle',
+              source: 'route-stops',
+              paint: {
+                'circle-radius': 6,
+                'circle-color': '#FF8C00',
+                'circle-stroke-color': '#FFFFFF',
+                'circle-stroke-width': 2,
+              },
+            })
+
+            map.addLayer({
+              id: 'route-stops-label-layer',
+              type: 'symbol',
+              source: 'route-stops',
+              minzoom: 11,
+              layout: {
+                'text-field': ['to-string', ['get', 'order']],
+                'text-size': 11,
+                'text-font': ['Open Sans Semibold'],
+                // Keep labels readable when stops are close:
+                // default collision behavior hides overlapping labels.
+                'text-allow-overlap': false,
+                'text-ignore-placement': false,
+              },
+              paint: {
+                'text-color': '#FFFFFF',
+              },
+            })
+          }
+
+          const fitCoordinates =
+            polylineCoordinates.length > 1
+              ? polylineCoordinates
+              : stopCoordinates.length > 0
+                ? stopCoordinates
+                : []
+
+          if (fitCoordinates.length > 0) {
+            let minLon = fitCoordinates[0][0]
+            let minLat = fitCoordinates[0][1]
+            let maxLon = fitCoordinates[0][0]
+            let maxLat = fitCoordinates[0][1]
+
+            for (const [lon, lat] of fitCoordinates) {
+              if (lon < minLon) minLon = lon
+              if (lat < minLat) minLat = lat
+              if (lon > maxLon) maxLon = lon
+              if (lat > maxLat) maxLat = lat
+            }
+
+            if (minLon === maxLon && minLat === maxLat) {
+              map.setCenter([minLon, minLat])
+              map.setZoom(14)
+            } else {
+              map.fitBounds(
+                [
+                  [minLon, minLat],
+                  [maxLon, maxLat],
+                ],
+                { padding: 40, maxZoom: 14 }
+              )
+            }
+          }
+        })
+
+        mapRef.current = map
+      } catch {
+        if (!cancelled) {
+          setMapError('Route map could not be loaded right now.')
+        }
+      }
+    }
+
+    void initMap()
+
+    return () => {
+      cancelled = true
+      if (mapRef.current && typeof mapRef.current === 'object' && 'remove' in mapRef.current) {
+        ;(mapRef.current as { remove: () => void }).remove()
+      }
+      mapRef.current = null
+    }
+  }, [polylineCoordinates, route.centerLatitude, route.centerLongitude, stopCoordinates])
 
   // Save state
   const [isSaved, setIsSaved] = useState(false)
@@ -285,22 +503,35 @@ export default function RouteDetailClient({
             </YStack>
           )}
 
-          {/* Map Placeholder */}
+          {/* Route Map */}
           <YStack gap="$3">
             <Text variant="heading3">Interactive Route Map</Text>
             <YStack
               height={300}
               backgroundColor="$muted"
               borderRadius="$4"
-              alignItems="center"
-              justifyContent="center"
-              borderWidth={2}
-              borderStyle="dashed"
-              borderColor="$borderColor"
-              gap="$2"
+              overflow="hidden"
             >
-              <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
-              <Text variant="body" muted>Route Map — Coming Soon</Text>
+              <div
+                ref={mapContainerRef}
+                style={{ width: '100%', height: '100%' }}
+                aria-label="Interactive route map"
+              />
+              {mapError ? (
+                <YStack
+                  position="absolute"
+                  inset={0}
+                  alignItems="center"
+                  justifyContent="center"
+                  borderWidth={2}
+                  borderStyle="dashed"
+                  borderColor="$borderColor"
+                  gap="$2"
+                >
+                  <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
+                  <Text variant="body" muted>{mapError}</Text>
+                </YStack>
+              ) : null}
             </YStack>
           </YStack>
 
