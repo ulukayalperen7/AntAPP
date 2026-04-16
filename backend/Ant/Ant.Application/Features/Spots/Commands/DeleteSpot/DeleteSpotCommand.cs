@@ -11,6 +11,11 @@ namespace Ant.Application.Features.Spots.Commands.DeleteSpot
     public class DeleteSpotCommand : IRequest<Response<Guid>>
     {
         public Guid Id { get; set; }
+        public Guid? EnforcedOwnerUserId { get; set; }
+
+        public DeleteSpotCommand()
+        {
+        }
 
         public DeleteSpotCommand(Guid id)
         {
@@ -32,6 +37,11 @@ namespace Ant.Application.Features.Spots.Commands.DeleteSpot
             var spot = await _spotRepository.GetByIdAsync(request.Id);
             
             if (spot == null) throw new ApiException($"Spot Not Found.");
+
+            if (request.EnforcedOwnerUserId.HasValue && spot.OwnerUserId != request.EnforcedOwnerUserId.Value)
+            {
+                throw new ApiException($"Unauthorized Spot Access.");
+            }
 
             await _spotRepository.DeleteAsync(spot);
 

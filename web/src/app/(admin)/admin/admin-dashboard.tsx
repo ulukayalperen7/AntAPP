@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Card } from '@antapp/ui'
-import { LogOut, Grid3x3, Tag, Users, TrendingUp } from 'lucide-react'
+import { LogOut, Grid3x3, Tag, Users, TrendingUp, MapPin } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { getAdminStats, type AdminStats } from '@/features/admin/dashboard-actions'
 import { useEffect } from 'react'
 
-type AdminSection = 'overview' | 'tags' | 'routes' | 'users'
+type AdminSection = 'overview' | 'tags' | 'routes' | 'users' | 'spots'
 
 export default function AdminDashboard({
   userName,
@@ -35,6 +35,7 @@ export default function AdminDashboard({
     router.prefetch('/admin/tags')
     router.prefetch('/admin/routes')
     router.prefetch('/admin/users')
+    router.prefetch('/admin/spots')
   }, [router])
 
   const handleLogout = async () => {
@@ -72,6 +73,12 @@ export default function AdminDashboard({
         icon: <Users size={22} />,
         description: 'Manage user accounts',
       },
+      {
+        id: 'spots',
+        label: 'Spots',
+        icon: <MapPin size={22} />,
+        description: 'Manage places of interest',
+      },
     ]
 
   const handleSelectSection = (sectionId: AdminSection) => {
@@ -82,6 +89,8 @@ export default function AdminDashboard({
       router.push('/admin/routes')
     } else if (sectionId === 'users') {
       router.push('/admin/users')
+    } else if (sectionId === 'spots') {
+      router.push('/admin/spots')
     }
   }
 

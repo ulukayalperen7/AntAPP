@@ -19,6 +19,7 @@ namespace Ant.Application.Features.Spots.Commands.UpdateSpot
         public double Longitude { get; set; }
         public string GooglePlaceId { get; set; }
         public bool IsActive { get; set; }
+        public Guid? EnforcedOwnerUserId { get; set; }
     }
 
     public class UpdateSpotCommandHandler : IRequestHandler<UpdateSpotCommand, Response<Guid>>
@@ -37,6 +38,11 @@ namespace Ant.Application.Features.Spots.Commands.UpdateSpot
             if (spot == null)
             {
                 throw new ApiException($"Spot Not Found.");
+            }
+
+            if (request.EnforcedOwnerUserId.HasValue && spot.OwnerUserId != request.EnforcedOwnerUserId.Value)
+            {
+                throw new ApiException($"Unauthorized Spot Access.");
             }
 
             spot.Name = request.Name;
