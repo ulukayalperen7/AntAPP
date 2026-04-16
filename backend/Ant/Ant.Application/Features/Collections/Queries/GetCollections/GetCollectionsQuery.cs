@@ -29,16 +29,19 @@ namespace Ant.Application.Features.Collections.Queries.GetCollections
         public async Task<PagedResponse<CollectionViewModel>> Handle(GetCollectionsQuery request, CancellationToken cancellationToken)
         {
             IReadOnlyList<Collection> collections;
+            int totalRecords;
 
             if (request.UserId.HasValue)
             {
                 collections = await _collectionRepository.GetCollectionsByUserIdAsync(
                     request.UserId.Value, request.PageNumber, request.PageSize);
+                totalRecords = await _collectionRepository.GetCountByUserIdAsync(request.UserId.Value);
             }
             else
             {
                 collections = await _collectionRepository.GetAllCollectionsPagedAsync(
                     request.PageNumber, request.PageSize);
+                totalRecords = await _collectionRepository.GetCountAsync();
             }
 
             var viewModels = collections.Select(c => new CollectionViewModel
@@ -54,7 +57,10 @@ namespace Ant.Application.Features.Collections.Queries.GetCollections
                 CreatedAt = c.CreatedAt
             }).ToList();
 
-            return new PagedResponse<CollectionViewModel>(viewModels, request.PageNumber, request.PageSize);
+            var response = new PagedResponse<CollectionViewModel>(viewModels, request.PageNumber, request.PageSize);
+            response.TotalRecords = totalRecords;
+            response.TotalPages = (int)Math.Ceiling((double)totalRecords / request.PageSize);
+            return response;
         }
     }
 }

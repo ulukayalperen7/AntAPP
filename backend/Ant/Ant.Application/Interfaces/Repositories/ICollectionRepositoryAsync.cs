@@ -9,6 +9,7 @@ namespace Ant.Application.Interfaces.Repositories
     public interface ICollectionRepositoryAsync : IGenericRepositoryAsync<Collection>
     {
         Task<IReadOnlyList<Collection>> GetCollectionsByUserIdAsync(Guid userId, int pageNumber, int pageSize);
+        Task<int> GetCountByUserIdAsync(Guid userId);
         Task<IReadOnlyList<Collection>> GetAllCollectionsPagedAsync(int pageNumber, int pageSize);
         Task<Collection> GetCollectionWithRoutesAsync(Guid id);
         Task<Collection> GetDefaultCollectionAsync(Guid userId);

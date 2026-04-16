@@ -9,7 +9,9 @@ export default async function CollectionsPage() {
     const result = await getCollections()
     collections = result.data
     total = result.totalRecords
-  } catch { /* API offline or unauthenticated */ }
+  } catch (e) {
+    console.error('[Collections Page] Failed to fetch:', e)
+  }
 
   return <CollectionsClient collections={collections} total={total} />
 }

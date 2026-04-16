@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ProgressBar } from '@antapp/ui'
 import type { RouteDetail } from '@/types/api'
-import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown } from 'lucide-react'
+import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle } from 'lucide-react'
 import { saveRoute } from '@/features/collections/actions'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
@@ -302,7 +302,7 @@ export default function RouteDetailClient({
     return () => {
       cancelled = true
       if (mapRef.current && typeof mapRef.current === 'object' && 'remove' in mapRef.current) {
-        ;(mapRef.current as { remove: () => void }).remove()
+        ; (mapRef.current as { remove: () => void }).remove()
       }
       mapRef.current = null
     }
@@ -325,6 +325,10 @@ export default function RouteDetailClient({
 
   // Rating state
   const [displayRating, setDisplayRating] = useState(route.averageRating)
+
+  // Tour Guide Mode state
+  const [isTourMode, setIsTourMode] = useState(false)
+  const [currentStopIndex, setCurrentStopIndex] = useState(0)
 
   const handleSave = () => {
     if (isSaved) return
@@ -408,7 +412,14 @@ export default function RouteDetailClient({
           </YStack>
 
           <XStack gap="$2.5" flexWrap="wrap" marginTop="$1">
-            <Button variant="solid" size="md" onPress={() => { }}>
+            <Button variant="solid" size="md" onPress={() => {
+              if (route.stops.length > 0) {
+                setCurrentStopIndex(0)
+                setIsTourMode(true)
+              } else {
+                alert("This route has no stops.")
+              }
+            }}>
               <XStack alignItems="center" gap="$1.5">
                 <Navigation size={16} color="#FFFFFF" />
                 <Text variant="label" color="#FFFFFF">Start Navigation</Text>
@@ -682,6 +693,87 @@ export default function RouteDetailClient({
           setSaveError(null)
         }}
       />
+
+      {/* Active Tour Mode Overlay */}
+      {isTourMode && route.stops.length > 0 && (
+        <YStack
+          position="fixed"
+          top={0} left={0} right={0} bottom={0}
+          backgroundColor="$background"
+          zIndex={9999}
+          display="flex"
+          flexDirection="column"
+        >
+          {/* Header */}
+          <XStack padding="$4" justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderColor="$borderColor" backgroundColor="$backgroundStrong">
+            <YStack>
+              <Text variant="label" color="$primary" weight="bold">Route Active</Text>
+              <Text variant="heading4">{route.title}</Text>
+            </YStack>
+            <Button size="sm" variant="ghost" icon={<X size={20} />} onPress={() => setIsTourMode(false)}>Exit Tour</Button>
+          </XStack>
+
+          {/* Main Content */}
+          <YStack flex={1} overflowY="auto" alignItems="center" padding="$6">
+            <YStack width="100%" maxWidth={600} gap="$6">
+              {/* Progress Indicator */}
+              <XStack alignItems="center" justifyContent="space-between" width="100%">
+                <Text variant="label" muted>
+                  Stop {currentStopIndex + 1} of {route.stops.length}
+                </Text>
+              </XStack>
+
+              {/* Current Stop Card */}
+              <YStack backgroundColor="$backgroundStrong" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$borderColor">
+                {route.stops[currentStopIndex].photoUrl && (
+                  <img
+                    src={route.stops[currentStopIndex].photoUrl}
+                    alt={route.stops[currentStopIndex].name}
+                    style={{ width: '100%', height: 260, objectFit: 'cover' }}
+                  />
+                )}
+                <YStack padding="$5" gap="$3">
+                  <Text variant="heading2">{route.stops[currentStopIndex].name}</Text>
+                  {route.stops[currentStopIndex].description && (
+                    <Text variant="body" lineHeight="$7">{route.stops[currentStopIndex].description}</Text>
+                  )}
+                </YStack>
+              </YStack>
+
+              {/* Actions */}
+              <YStack gap="$3" marginTop="$2">
+                <Button
+                  size="lg"
+                  variant="solid"
+                  icon={<Navigation size={18} color="#FFFFFF" />}
+                  onPress={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${route.stops[currentStopIndex].latitude},${route.stops[currentStopIndex].longitude}`, '_blank')}
+                >
+                  <Text color="#FFFFFF" weight="semibold">Navigate to Stop {currentStopIndex + 1} on Maps</Text>
+                </Button>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  icon={<CheckCircle size={18} />}
+                  onPress={() => {
+                    if (currentStopIndex < route.stops.length - 1) {
+                      setCurrentStopIndex(currentStopIndex + 1)
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
+                    } else {
+                      alert("🎉 Congratulations! You completed the route!")
+                      setIsTourMode(false)
+                    }
+                  }}
+                >
+                  <Text weight="semibold">
+                    {currentStopIndex < route.stops.length - 1 ? 'Mark Arrived & Continue to Next' : 'Finish Route Checklist!'}
+                  </Text>
+                </Button>
+              </YStack>
+            </YStack>
+          </YStack>
+        </YStack>
+      )}
     </YStack>
   )
 }

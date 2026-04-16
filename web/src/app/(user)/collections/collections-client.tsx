@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import type { Collection } from '@/types/api'
@@ -143,6 +143,10 @@ export default function CollectionsClient({ collections: initialCollections }: {
   const router = useRouter()
   const [showModal, setShowModal] = useState(false)
   const [collections, setCollections] = useState(initialCollections)
+
+  useEffect(() => {
+    setCollections(initialCollections)
+  }, [initialCollections])
 
   const handleCreated = () => {
     // Refresh the page to load the new collection

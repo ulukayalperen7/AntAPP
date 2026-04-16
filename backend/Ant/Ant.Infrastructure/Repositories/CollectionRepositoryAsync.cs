@@ -31,6 +31,12 @@ namespace Ant.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<int> GetCountByUserIdAsync(Guid userId)
+        {
+            return await _context.Collections
+                .CountAsync(c => c.UserId == userId);
+        }
+
         public async Task<IReadOnlyList<Collection>> GetAllCollectionsPagedAsync(int pageNumber, int pageSize)
         {
             return await _context.Collections
