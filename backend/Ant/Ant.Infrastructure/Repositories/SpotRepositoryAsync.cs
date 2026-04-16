@@ -28,7 +28,7 @@ namespace Ant.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Spot>> GetPagedSpotsAsync(int pageNumber, int pageSize, string searchTerm = null)
         {
-            var query = _dbContext.Spots.AsNoTracking().Where(s => s.IsActive);
+            var query = _dbContext.Spots.AsNoTracking().Include(s => s.RouteSpots).Where(s => s.IsActive);
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
