@@ -222,7 +222,7 @@ export default function AdminDashboard({
                         <Text weight="bold" fontSize={14}>{route.title}</Text>
                         <Text variant="caption" muted>{new Date(route.createdAt).toLocaleDateString()}</Text>
                       </YStack>
-                      <Button size="sm" variant="outline" onPress={() => router.push(`/routes/${route.id}`)}>View</Button>
+                      <Button size="sm" variant="outline" onPress={() => router.push('/admin/routes')}>View in Panel</Button>
                     </XStack>
                   ))
                 ) : (

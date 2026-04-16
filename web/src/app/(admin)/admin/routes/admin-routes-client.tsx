@@ -79,6 +79,7 @@ export default function AdminRoutesClient({
                 ) : (
                     <YStack gap="$2" overflowX="auto">
                         <XStack padding="$3" backgroundColor="$backgroundStrong" borderBottomWidth={2} borderBottomColor="$borderColor" gap="$3">
+                            <XStack width={60}><Text variant="label" weight="semibold">Image</Text></XStack>
                             <XStack flex={2} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Title</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Visibility</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Type</Text></XStack>
@@ -95,6 +96,13 @@ export default function AdminRoutesClient({
 
                             return (
                                 <XStack key={route.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
+                                    <XStack width={60}>
+                                        <img
+                                            src={route.thumbnailUrl || 'https://via.placeholder.com/60x40.png?text=Empty'}
+                                            alt={route.title}
+                                            style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: '4px' }}
+                                        />
+                                    </XStack>
                                     <XStack flex={2} flexBasis={0} minWidth={0}>
                                         <Text variant="body" numberOfLines={1}>{route.title}</Text>
                                     </XStack>

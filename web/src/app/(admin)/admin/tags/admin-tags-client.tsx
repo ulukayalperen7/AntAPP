@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { Plus, Trash2, LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
-import { createAdminTag, deleteAdminTag, getAdminTags } from '@/features/admin/tags-actions'
+import { createAdminTag, deleteAdminTag, getAdminTags, updateAdminTag } from '@/features/admin/tags-actions'
 import type { Tag } from '@/types/api'
 
 type FeedbackState = {
@@ -25,6 +25,7 @@ export default function AdminTagsClient({
   const router = useRouter()
   const [Tags, setTags] = useState(initialTags)
   const [showForm, setShowForm] = useState(false)
+  const [editingTagId, setEditingTagId] = useState<string | null>(null)
   const [newTagName, setNewTagName] = useState('')
   const [newTagDesc, setNewTagDesc] = useState('')
   const [feedback, setFeedback] = useState<FeedbackState>(null)
@@ -41,15 +42,21 @@ export default function AdminTagsClient({
     setFeedback(null)
     startTransition(async () => {
       try {
-        await createAdminTag(newTagName, newTagDesc || undefined)
+        if (editingTagId) {
+          await updateAdminTag(editingTagId, newTagName, newTagDesc || undefined)
+        } else {
+          await createAdminTag(newTagName, newTagDesc || undefined)
+        }
+
         const updated = await getAdminTags()
         setTags(updated)
         setNewTagName('')
         setNewTagDesc('')
+        setEditingTagId(null)
         setShowForm(false)
-        setFeedback({ ok: true, message: 'Tag added successfully!' })
+        setFeedback({ ok: true, message: editingTagId ? 'Tag updated successfully!' : 'Tag added successfully!' })
       } catch (e) {
-        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add Tag' })
+        setFeedback({ ok: false, message: (e as Error).message ?? 'Failed to save Tag' })
       }
     })
   }
@@ -129,7 +136,7 @@ export default function AdminTagsClient({
       {/* Add Tag Form */}
       {showForm ? (
         <YStack gap="$3" padding="$4" backgroundColor="$muted" borderRadius="$3">
-          <Text variant="heading4">Add New Tag</Text>
+          <Text variant="heading4">{editingTagId ? 'Edit Tag' : 'Add New Tag'}</Text>
           <YStack gap="$2">
             <Text variant="label">Tag Name *</Text>
             <Input
@@ -166,6 +173,7 @@ export default function AdminTagsClient({
               variant="ghost"
               onPress={() => {
                 setShowForm(false)
+                setEditingTagId(null)
                 setNewTagName('')
                 setNewTagDesc('')
               }}
@@ -257,12 +265,26 @@ export default function AdminTagsClient({
                       </Button>
                     </XStack>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      icon={<Trash2 size={14} />}
-                      onPress={() => setDeleteConfirmId(cat.id)}
-                    />
+                    <XStack gap="$2" alignItems="center">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onPress={() => {
+                          setEditingTagId(cat.id)
+                          setNewTagName(cat.name)
+                          setNewTagDesc(cat.description || '')
+                          setShowForm(true)
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        icon={<Trash2 size={14} color="red" />}
+                        onPress={() => setDeleteConfirmId(cat.id)}
+                      />
+                    </XStack>
                   )}
                 </XStack>
               </XStack>
