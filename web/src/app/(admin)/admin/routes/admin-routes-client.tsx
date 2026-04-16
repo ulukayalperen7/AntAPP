@@ -86,7 +86,8 @@ export default function AdminRoutesClient({
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Visibility</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Type</Text></XStack>
                             <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Rating</Text></XStack>
-                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Moderation</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Map</Text></XStack>
+                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
                         </XStack>
 
                         {routes.map((route) => {
@@ -100,9 +101,12 @@ export default function AdminRoutesClient({
                                 <XStack key={route.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
                                     <XStack width={60}>
                                         <img
-                                            src={route.thumbnailUrl || 'https://via.placeholder.com/60x40.png?text=Empty'}
+                                            src={(route.thumbnailUrl && route.thumbnailUrl.trim() !== '') ? route.thumbnailUrl : 'https://via.placeholder.com/60x40.png?text=Empty'}
                                             alt={route.title}
                                             style={{ width: 60, height: 40, objectFit: 'cover', borderRadius: '4px' }}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/60x40.png?text=No+Img';
+                                            }}
                                         />
                                     </XStack>
                                     <XStack flex={2} flexBasis={0} minWidth={0}>
@@ -126,8 +130,11 @@ export default function AdminRoutesClient({
                                             <Text variant="caption" muted>N/A</Text>
                                         )}
                                     </XStack>
-                                    <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
+                                    <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center" alignItems="center">
                                         <Button size="sm" variant="ghost" icon={<Map size={14} />} onPress={() => setInspectingRouteId(route.id)}>Map</Button>
+                                    </XStack>
+
+                                    <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" alignItems="center" gap="$2">
                                         {contentTypeStr === 'Community' && (
                                             <>
                                                 <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Official')} disabled={isPending}>Official</Button>

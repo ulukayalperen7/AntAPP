@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input, Card, Anchor } from '@antapp/ui'
 import { ArrowLeft, Plus, MapPin, Edit2, Trash2, X, Save } from 'lucide-react'
 import { AdminSpotItem, createSpot, updateSpot, deleteSpot } from '@/features/admin/spots-actions'
+import { SpotMapModal } from './spot-map-modal'
 
 export default function AdminSpotsClient({
     userName,
@@ -17,9 +18,10 @@ export default function AdminSpotsClient({
     const [spots, setSpots] = useState(initialSpots)
     const [isPending, startTransition] = useTransition()
 
-    // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingSpot, setEditingSpot] = useState<AdminSpotItem | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [inspectingSpot, setInspectingSpot] = useState<AdminSpotItem | null>(null)
 
     // Form state
     const [formData, setFormData] = useState<Partial<AdminSpotItem>>({
@@ -121,7 +123,17 @@ export default function AdminSpotsClient({
             </XStack>
 
             <YStack gap="$3">
-                <Text variant="heading3">Managed Spots ({spots.length})</Text>
+                <XStack justifyContent="space-between" alignItems="center">
+                    <Text variant="heading3">Managed Spots ({spots.length})</Text>
+                    <Input
+                        placeholder="Search spots by name..."
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        width={250}
+                        size="sm"
+                        backgroundColor="$backgroundStrong"
+                    />
+                </XStack>
                 {spots.length === 0 ? (
                     <YStack padding="$6" alignItems="center" justifyContent="center" backgroundColor="$muted" borderRadius="$3" minHeight={200}>
                         <Text variant="body" muted>No spots found.</Text>
@@ -131,11 +143,13 @@ export default function AdminSpotsClient({
                         <XStack padding="$3" backgroundColor="$backgroundStrong" borderBottomWidth={2} borderBottomColor="$borderColor" gap="$3">
                             <XStack flex={3} flexBasis={0} minWidth={0}><Text variant="label" weight="semibold">Spot</Text></XStack>
                             <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Coordinates</Text></XStack>
-                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Linked Routes</Text></XStack>
-                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Status & Actions</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Linked</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Map</Text></XStack>
+                            <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Status</Text></XStack>
+                            <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center"><Text variant="label" weight="semibold">Actions</Text></XStack>
                         </XStack>
 
-                        {spots.map((spot) => (
+                        {spots.filter(s => s.name.toLowerCase().includes(searchQuery.toLowerCase())).map((spot) => (
                             <XStack key={spot.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
                                 <XStack flex={3} flexBasis={0} minWidth={0} alignItems="center" gap="$3">
                                     <YStack width={36} height={36} borderRadius="$2" overflow="hidden" backgroundColor="$muted" alignItems="center" justifyContent="center">
@@ -159,12 +173,26 @@ export default function AdminSpotsClient({
                                     <Text variant="body">{spot.routeCount}</Text>
                                 </XStack>
 
-                                <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
+                                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        icon={<MapPin size={14} />}
+                                        onPress={() => setInspectingSpot(spot)}
+                                    >
+                                        Map
+                                    </Button>
+                                </XStack>
+
+                                <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
                                     {spot.isActive ? (
                                         <Text variant="caption" color="$success600" weight="semibold">Active</Text>
                                     ) : (
                                         <Text variant="caption" color="$error600" weight="semibold">Inactive</Text>
                                     )}
+                                </XStack>
+
+                                <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
                                     <Button size="sm" variant="outline" icon={<Edit2 size={14} />} onPress={() => handleOpenModal(spot)}>Edit</Button>
                                     <Button size="sm" variant="ghost" icon={<Trash2 size={14} color="red" />} onPress={() => handleDelete(spot.id)} />
                                 </XStack>
@@ -267,6 +295,13 @@ export default function AdminSpotsClient({
                         </XStack>
                     </Card>
                 </YStack>
+            )}
+
+            {inspectingSpot && (
+                <SpotMapModal
+                    spot={inspectingSpot}
+                    onClose={() => setInspectingSpot(null)}
+                />
             )}
         </YStack>
     )

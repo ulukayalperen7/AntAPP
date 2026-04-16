@@ -51,15 +51,17 @@ export function RouteMapModal({ routeId, onClose }: { routeId: string, onClose: 
         })
 
         map.on('load', () => {
-            const coordinates = decodePolyline(detail.encodedPolyline)
+            const coordinates = decodePolyline(detail.encodedPolyline || '')
+
+            // Determine Bounds
+            const bounds = new maplibregl.LngLatBounds();
+            let hasBounds = false;
 
             if (coordinates.length > 0) {
-                // Determine Bounds
-                const bounds = new maplibregl.LngLatBounds(coordinates[0], coordinates[0]);
                 for (const coord of coordinates) {
                     bounds.extend(coord as [number, number]);
                 }
-                map.fitBounds(bounds, { padding: 50 });
+                hasBounds = true;
 
                 // Add Polyline Layer
                 map.addSource('route', {
@@ -80,10 +82,49 @@ export function RouteMapModal({ routeId, onClose }: { routeId: string, onClose: 
                     layout: { 'line-join': 'round', 'line-cap': 'round' },
                     paint: { 'line-color': '#0ea5e9', 'line-width': 4 }
                 })
+            } else if (detail.stops.length > 1) {
+                // No polyline: Fallback to drawing a dashed straight line connecting the stops and bounds from stops
+                const stopCoords = detail.stops.map(s => [s.longitude, s.latitude]);
+                for (const coord of stopCoords) {
+                    bounds.extend(coord as [number, number]);
+                }
+                hasBounds = true;
+
+                map.addSource('route-fallback', {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: stopCoords
+                        }
+                    }
+                })
+                map.addLayer({
+                    id: 'route-line-fallback',
+                    type: 'line',
+                    source: 'route-fallback',
+                    layout: { 'line-join': 'round', 'line-cap': 'round' },
+                    paint: { 'line-color': '#94a3b8', 'line-width': 3, 'line-dasharray': [2, 2] }
+                })
+            } else if (detail.stops.length === 1) {
+                bounds.extend([detail.stops[0].longitude, detail.stops[0].latitude]);
+                hasBounds = true;
             }
 
-            // Render Stops as Markers
+            if (hasBounds) {
+                map.fitBounds(bounds, { padding: 50, maxZoom: 14 });
+            }
+
+            // Render Stops as Markers with constant names
             detail.stops.forEach((stop, index) => {
+                const container = document.createElement('div')
+                container.style.display = 'flex'
+                container.style.flexDirection = 'column'
+                container.style.alignItems = 'center'
+                container.style.cursor = 'pointer'
+
                 const el = document.createElement('div')
                 el.style.width = '24px'
                 el.style.height = '24px'
@@ -99,12 +140,28 @@ export function RouteMapModal({ routeId, onClose }: { routeId: string, onClose: 
                 el.style.fontSize = '12px'
                 el.innerText = `${stop.order}`
 
-                new maplibregl.Marker(el)
+                const label = document.createElement('div')
+                label.innerText = stop.name
+                label.style.marginTop = '4px'
+                label.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'
+                label.style.padding = '2px 6px'
+                label.style.borderRadius = '4px'
+                label.style.fontSize = '11px'
+                label.style.fontWeight = '600'
+                label.style.color = '#1e293b'
+                label.style.whiteSpace = 'nowrap'
+                label.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)'
+
+                container.appendChild(el)
+                container.appendChild(label)
+
+                new maplibregl.Marker({ element: container, anchor: 'top' })
                     .setLngLat([stop.longitude, stop.latitude])
                     .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-                        <div style="padding: 4px;">
+                        <div style="padding: 4px; max-width: 200px;">
                             <strong>${stop.name}</strong>
-                            ${stop.photoUrl ? `<br/><img src="${stop.photoUrl}" style="width:100%; height:80px; object-fit:cover; margin-top:4px; border-radius:4px;"/>` : ''}
+                            ${stop.photoUrl ? `<br/><img src="${stop.photoUrl}" style="width:100%; height:120px; object-fit:cover; margin-top:8px; border-radius:4px;"/>` : ''}
+                            ${stop.description ? `<p style="margin-top:8px; font-size:12px; color:#475569;">${stop.description}</p>` : ''}
                         </div>
                     `))
                     .addTo(map)
@@ -148,12 +205,16 @@ export function RouteMapModal({ routeId, onClose }: { routeId: string, onClose: 
                     <YStack flex={1} style={{ position: 'relative' }}>
                         <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
 
-                        {/* Stats Overlay for Admin Info */}
-                        <YStack position="absolute" bottom={16} left={16} backgroundColor="$backgroundStrong" padding="$3" borderRadius="$3" borderWidth={1} borderColor="$borderColor">
-                            <Text variant="label" weight="bold">Route Stats</Text>
-                            <Text variant="caption">Distance: {Math.round(detail!.totalDistanceMeters / 1000)} km</Text>
-                            <Text variant="caption">Duration: {Math.round(detail!.estimatedDurationSeconds / 60)} mins</Text>
-                            <Text variant="caption">Stops: {detail!.stops.length}</Text>
+                        <YStack position="absolute" bottom={16} left={16} backgroundColor="$backgroundStrong" padding="$4" borderRadius="$3" borderWidth={2} borderColor="$borderColor">
+                            <Text variant="heading4" color="$primary">Route Stats</Text>
+                            <Text variant="body" weight="semibold" marginTop="$2">Distance: {detail!.encodedPolyline ? `${(detail!.totalDistanceMeters / 1000).toFixed(1)} km` : 'No Map Data'}</Text>
+                            <Text variant="body" weight="semibold">Duration: {detail!.encodedPolyline ? `${Math.round(detail!.estimatedDurationSeconds / 60)} mins` : 'No Map Data'}</Text>
+                            <Text variant="body" weight="semibold">Stops: {detail!.stops.length}</Text>
+                            {!detail!.encodedPolyline && (
+                                <Text variant="caption" color="$warning600" marginTop="$2">
+                                    Polyline not generated. Showing direct dash approximation.
+                                </Text>
+                            )}
                         </YStack>
                     </YStack>
                 )}
