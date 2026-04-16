@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Card } from '@antapp/ui'
-import { ArrowLeft, Plus, MapPin, Edit2 } from 'lucide-react'
-import type { AdminSpotItem } from '@/features/admin/spots-actions'
+import { YStack, XStack, Text, Button, Input, Card, Anchor } from '@antapp/ui'
+import { ArrowLeft, Plus, MapPin, Edit2, Trash2, X, Save } from 'lucide-react'
+import { AdminSpotItem, createSpot, updateSpot, deleteSpot } from '@/features/admin/spots-actions'
 
 export default function AdminSpotsClient({
     userName,
@@ -14,7 +14,86 @@ export default function AdminSpotsClient({
     initialSpots: AdminSpotItem[]
 }) {
     const router = useRouter()
-    const [spots] = useState(initialSpots)
+    const [spots, setSpots] = useState(initialSpots)
+    const [isPending, startTransition] = useTransition()
+
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [editingSpot, setEditingSpot] = useState<AdminSpotItem | null>(null)
+
+    // Form state
+    const [formData, setFormData] = useState<Partial<AdminSpotItem>>({
+        name: '',
+        description: '',
+        photoUrl: '',
+        latitude: 36.8848,
+        longitude: 30.7040,
+        isActive: true
+    })
+
+    const handleOpenModal = (spot: AdminSpotItem | null = null) => {
+        if (spot) {
+            setEditingSpot(spot)
+            setFormData({
+                name: spot.name,
+                description: spot.description,
+                photoUrl: spot.photoUrl,
+                latitude: spot.latitude,
+                longitude: spot.longitude,
+                isActive: spot.isActive
+            })
+        } else {
+            setEditingSpot(null)
+            setFormData({
+                name: '',
+                description: '',
+                photoUrl: '',
+                latitude: 36.8848,
+                longitude: 30.7040,
+                isActive: true
+            })
+        }
+        setIsModalOpen(true)
+    }
+
+    const handleSave = () => {
+        if (!formData.name || !formData.latitude || !formData.longitude) {
+            alert("Please fill in Name, Latitude and Longitude.")
+            return
+        }
+
+        startTransition(async () => {
+            let success = false
+            if (editingSpot) {
+                success = await updateSpot(editingSpot.id, formData)
+            } else {
+                success = await createSpot(formData)
+            }
+
+            if (success) {
+                setIsModalOpen(false)
+                router.refresh()
+                // Update local state is not strictly necessary with revalidatePath but helps for immediate feedback
+                // However, we wait for router.refresh() to finish or the transition to end.
+            } else {
+                alert("An error occurred while saving the spot.")
+            }
+        })
+    }
+
+    const handleDelete = (id: string) => {
+        if (!confirm("Are you sure you want to delete this spot?")) return
+
+        startTransition(async () => {
+            const success = await deleteSpot(id)
+            if (success) {
+                setSpots(prev => prev.filter(s => s.id !== id))
+                router.refresh()
+            } else {
+                alert("An error occurred while deleting the spot.")
+            }
+        })
+    }
 
     return (
         <YStack flex={1} gap="$6" padding="$6">
@@ -35,9 +114,7 @@ export default function AdminSpotsClient({
                 <Button
                     size="md"
                     icon={<Plus size={16} />}
-                    onPress={() => {
-                        alert("This feature will be implemented in the next step (Add New Spot Form).")
-                    }}
+                    onPress={() => handleOpenModal()}
                 >
                     Add New Spot
                 </Button>
@@ -88,13 +165,109 @@ export default function AdminSpotsClient({
                                     ) : (
                                         <Text variant="caption" color="$error600" weight="semibold">Inactive</Text>
                                     )}
-                                    <Button size="sm" variant="outline" icon={<Edit2 size={14} />} onPress={() => alert(`Edit feature for ${spot.name} is coming next!`)}>Edit</Button>
+                                    <Button size="sm" variant="outline" icon={<Edit2 size={14} />} onPress={() => handleOpenModal(spot)}>Edit</Button>
+                                    <Button size="sm" variant="ghost" icon={<Trash2 size={14} color="red" />} onPress={() => handleDelete(spot.id)} />
                                 </XStack>
                             </XStack>
                         ))}
                     </YStack>
                 )}
             </YStack>
+
+            {/* Simple Modal Overlay */}
+            {isModalOpen && (
+                <YStack
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+                    backgroundColor="rgba(0,0,0,0.6)"
+                    zIndex={9999}
+                    alignItems="center"
+                    justifyContent="center"
+                    padding="$4"
+                >
+                    <Card width="100%" maxWidth={500} padding="$6" gap="$4" elevation={10} backgroundColor="$background">
+                        <XStack justifyContent="space-between" alignItems="center">
+                            <Text variant="heading3">{editingSpot ? 'Edit Spot' : 'Add New Spot'}</Text>
+                            <Button size="sm" variant="ghost" icon={<X size={20} />} onPress={() => setIsModalOpen(false)} borderRadius="$10" />
+                        </XStack>
+
+                        <YStack gap="$4">
+                            <YStack gap="$1">
+                                <Text variant="label">Name</Text>
+                                <Input
+                                    placeholder="Enter spot name"
+                                    value={formData.name || ''}
+                                    onChangeText={(text) => setFormData({ ...formData, name: text })}
+                                />
+                            </YStack>
+
+                            <YStack gap="$1">
+                                <Text variant="label">Description</Text>
+                                <Input
+                                    placeholder="Enter description"
+                                    value={formData.description || ''}
+                                    onChangeText={(text) => setFormData({ ...formData, description: text })}
+                                    numberOfLines={3}
+                                    multiline
+                                />
+                            </YStack>
+
+                            <YStack gap="$1">
+                                <Text variant="label">Photo URL</Text>
+                                <Input
+                                    placeholder="https://example.com/photo.jpg"
+                                    value={formData.photoUrl || ''}
+                                    onChangeText={(text) => setFormData({ ...formData, photoUrl: text })}
+                                />
+                            </YStack>
+
+                            <XStack gap="$4">
+                                <YStack gap="$1" flex={1}>
+                                    <Text variant="label">Latitude</Text>
+                                    <Input
+                                        type="number"
+                                        placeholder="36.8848"
+                                        value={formData.latitude?.toString() || ''}
+                                        onChangeText={(text) => setFormData({ ...formData, latitude: parseFloat(text) || 0 })}
+                                    />
+                                </YStack>
+                                <YStack gap="$1" flex={1}>
+                                    <Text variant="label">Longitude</Text>
+                                    <Input
+                                        type="number"
+                                        placeholder="30.7040"
+                                        value={formData.longitude?.toString() || ''}
+                                        onChangeText={(text) => setFormData({ ...formData, longitude: parseFloat(text) || 0 })}
+                                    />
+                                </YStack>
+                            </XStack>
+
+                            <XStack gap="$2" alignItems="center">
+                                <Button
+                                    size="sm"
+                                    variant={formData.isActive ? 'solid' : 'outline'}
+                                    onPress={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                                >
+                                    {formData.isActive ? 'Active' : 'Inactive'}
+                                </Button>
+                                <Text variant="caption" muted>Toggle active status</Text>
+                            </XStack>
+                        </YStack>
+
+                        <XStack justifyContent="flex-end" gap="$3" marginTop="$4">
+                            <Button variant="outline" onPress={() => setIsModalOpen(false)}>Cancel</Button>
+                            <Button
+                                variant="solid"
+                                icon={<Save size={16} />}
+                                onPress={handleSave}
+                                loading={isPending}
+                                disabled={isPending}
+                            >
+                                {editingSpot ? 'Update Spot' : 'Create Spot'}
+                            </Button>
+                        </XStack>
+                    </Card>
+                </YStack>
+            )}
         </YStack>
     )
 }
