@@ -3,10 +3,11 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
-import { LogOut, ArrowLeft, Star } from 'lucide-react'
+import { LogOut, ArrowLeft, Star, Map } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { promoteRoute } from '@/features/admin/routes-actions'
 import type { RouteListItem } from '@/types/api'
+import { RouteMapModal } from './route-map-modal'
 
 export default function AdminRoutesClient({
     userName,
@@ -21,6 +22,7 @@ export default function AdminRoutesClient({
     const [routes, setRoutes] = useState(initialRoutes)
     const [isPending, startTransition] = useTransition()
     const [isLoggingOut, startLogoutTransition] = useTransition()
+    const [inspectingRouteId, setInspectingRouteId] = useState<string | null>(null)
 
     const handlePromote = (id: string, newType: 'Official' | 'Sponsored' | 'Community') => {
         startTransition(async () => {
@@ -125,6 +127,7 @@ export default function AdminRoutesClient({
                                         )}
                                     </XStack>
                                     <XStack flex={2} flexBasis={0} minWidth={0} justifyContent="center" gap="$2">
+                                        <Button size="sm" variant="ghost" icon={<Map size={14} />} onPress={() => setInspectingRouteId(route.id)}>Map</Button>
                                         {contentTypeStr === 'Community' && (
                                             <>
                                                 <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Official')} disabled={isPending}>Official</Button>
@@ -141,6 +144,14 @@ export default function AdminRoutesClient({
                     </YStack>
                 )}
             </YStack>
+
+            {/* Map Inspector Modal */}
+            {inspectingRouteId && (
+                <RouteMapModal
+                    routeId={inspectingRouteId}
+                    onClose={() => setInspectingRouteId(null)}
+                />
+            )}
         </YStack >
     )
 }
