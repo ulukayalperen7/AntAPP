@@ -3,7 +3,7 @@
 import { useState, useTransition, useEffect } from 'react'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
 import { FolderOpen, Bookmark, Check, X, Plus } from 'lucide-react'
-import { getCollections, addRouteToCollection } from '@/features/collections/actions'
+import { getCollections, addRouteToCollection, createCollection } from '@/features/collections/actions'
 import type { Collection } from '@/types/api'
 
 export function SaveToCollectionModal({
@@ -23,14 +23,41 @@ export function SaveToCollectionModal({
     const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
     const [, startTransition] = useTransition()
 
-    useEffect(() => {
-        if (!isOpen) return
+    // Create New state
+    const [isCreating, setIsCreating] = useState(false)
+    const [newName, setNewName] = useState('')
+    const [isCreatingLoading, setIsCreatingLoading] = useState(false)
+
+    const fetchCollections = () => {
         setLoading(true)
         getCollections(1, 50)
             .then((res) => setCollections(res.data))
             .catch(() => setCollections([]))
             .finally(() => setLoading(false))
+    }
+
+    useEffect(() => {
+        if (!isOpen) return
+        fetchCollections()
     }, [isOpen])
+
+    const handleCreateAndSave = async () => {
+        if (!newName.trim()) return
+        setIsCreatingLoading(true)
+        try {
+            const newId = await createCollection({ name: newName.trim() })
+            await addRouteToCollection(newId, routeId)
+            setSavedIds((prev) => new Set([...prev, newId]))
+            onSaved(newId)
+            setIsCreating(false)
+            setNewName('')
+            fetchCollections()
+        } catch {
+            // Error handling
+        } finally {
+            setIsCreatingLoading(false)
+        }
+    }
 
     if (!isOpen) return null
 
@@ -116,6 +143,7 @@ export function SaveToCollectionModal({
                                     opacity: (!!savingId && !isSaving) ? 0.6 : 1,
                                     transition: 'all 0.15s ease',
                                     textAlign: 'left',
+                                    width: '100%',
                                 }}
                             >
                                 <div style={{
@@ -130,13 +158,46 @@ export function SaveToCollectionModal({
                                     <p style={{ margin: 0, fontSize: 12, color: '#6B7280' }}>{col.routeCount} route{col.routeCount !== 1 ? 's' : ''}</p>
                                 </div>
                                 {isSaved && <Check size={18} color="#EA580C" />}
-                                {isSaving && <div style={{ width: 18, height: 18, borderRadius: '50%', borderWidth: 2, borderStyle: 'solid', borderColor: '#E5E7EB', borderTopColor: '#EA580C', animation: 'spin 0.8s linear infinite' }} />}
+                                {isSaving && <div className="loader" style={{ width: 18, height: 18, borderRadius: '50%', borderWidth: 2, borderStyle: 'solid', borderColor: '#E5E7EB', borderTopColor: '#EA580C', animation: 'spin 0.8s linear infinite' }} />}
                                 {!isSaved && !isSaving && (
                                     <Plus size={16} color="#9CA3AF" />
                                 )}
                             </button>
                         )
                     })}
+                </div>
+
+                {/* Create New Inline */}
+                <div style={{ padding: '4px 0' }}>
+                    {isCreating ? (
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <input
+                                autoFocus
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                placeholder="Collection name..."
+                                style={{ flex: 1, padding: '8px 12px', borderRadius: 8, border: '1px solid #E5E7EB', fontSize: 14 }}
+                            />
+                            <Button size="sm" variant="solid" onPress={handleCreateAndSave} disabled={isCreatingLoading}>
+                                {isCreatingLoading ? '...' : 'Create & Save'}
+                            </Button>
+                            <Button size="sm" variant="ghost" onPress={() => setIsCreating(false)}>
+                                <X size={16} />
+                            </Button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsCreating(true)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 8,
+                                background: 'none', border: 'none', color: 'var(--color-primary)',
+                                fontWeight: 500, fontSize: 14, cursor: 'pointer', padding: '4px 8px'
+                            }}
+                        >
+                            <Plus size={16} />
+                            Create New Collection
+                        </button>
+                    )}
                 </div>
 
                 {/* Footer */}
