@@ -1,12 +1,13 @@
 import '@tamagui/native/setup-zeego';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from 'expo-router';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 import { TamaguiProvider } from 'tamagui';
 import { Spinner, Text, YStack, tamaguiConfig } from '@antapp/ui';
 
 import { AnimatedSplashOverlay } from '@/components/icons/animated-icon';
-import AppTabs from '@/components/layout/app-tabs';
+import { BottomTabBar } from '@/components/layout/app-tabs';
 import { AuthProvider, useAuth } from '@/features/auth/context';
 import { AuthScreen } from '@/features/auth/auth-screen';
 
@@ -29,12 +30,13 @@ function AppContent() {
   return (
     <>
       <AnimatedSplashOverlay />
-      <AppTabs />
+      <Stack screenOptions={{ headerShown: false }} />
+      <BottomTabBar />
     </>
   );
 }
 
-export default function TabLayout() {
+export default function RootLayout() {
   const colorScheme = useColorScheme();
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? 'light'}>

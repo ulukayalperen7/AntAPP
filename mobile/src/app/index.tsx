@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'expo-router'
-import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
+import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { WebView } from 'react-native-webview'
@@ -86,27 +86,21 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$5">
           <XStack justifyContent="space-between" alignItems="center">
-            <XStack alignItems="center" gap="$2">
-              <XStack
-                width={36}
-                height={36}
-                borderRadius="$full"
-                backgroundColor="$primary"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text variant="label" color="#FFFFFF">A</Text>
-              </XStack>
-              <YStack gap="$0.5">
-                <Text variant="heading4">AntAPP</Text>
-                <Text variant="caption" muted>{user?.userName ?? 'Explorer'}</Text>
-              </YStack>
-            </XStack>
-            <XStack gap="$2" alignItems="center">
-              <IconButton variant="ghost" size="sm">
-                <Feather name="bell" size={20} color="currentColor" />
-              </IconButton>
-              <Avatar size="sm" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'U'} />
+            <YStack gap="$0.5">
+              <Text variant="heading3">Hello, {user?.userName ?? 'Explorer'}</Text>
+              <Text variant="caption" muted>What will you discover today?</Text>
+            </YStack>
+            <XStack
+              width={36}
+              height={36}
+              borderRadius="$full"
+              backgroundColor="$primary"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Text variant="label" color="#FFFFFF">
+                {user?.userName?.charAt(0)?.toUpperCase() ?? 'A'}
+              </Text>
             </XStack>
           </XStack>
 
