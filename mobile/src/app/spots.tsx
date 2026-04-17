@@ -59,7 +59,7 @@ function SpotCard({
           <Badge variant="default" size="sm">Lng {spot.longitude.toFixed(3)}</Badge>
           {spot.averageRating > 0 ? (
             <XStack alignItems="center" gap="$1">
-              <RatingDisplay value={spot.averageRating} size="sm" />
+              <RatingDisplay value={spot.averageRating} />
               <Text variant="caption" muted>{spot.averageRating.toFixed(1)}</Text>
             </XStack>
           ) : null}

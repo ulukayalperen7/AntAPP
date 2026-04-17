@@ -3,10 +3,13 @@ import { useRouter } from 'expo-router'
 import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
+import MapLibreGL from '@maplibre/maplibre-react-native'
 import { useAuth } from '@/features/auth/context'
 import { getRoutes, getTags } from '@/features/routes/api'
 import type { RouteListItem, Tag } from '@/features/api/types'
 import { routeToCardData } from '@/features/routes/presenters'
+
+MapLibreGL.setAccessToken(null)
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -125,6 +128,26 @@ export default function HomeScreen() {
               </XStack>
             </ScrollView>
           ) : null}
+
+          {/* Discovery Map */}
+          <YStack gap="$2">
+            <Text variant="heading3">Interactive Route Explorer</Text>
+            <YStack height={220} borderRadius="$4" overflow="hidden" backgroundColor="$muted">
+              <MapLibreGL.MapView
+                style={{ flex: 1 }}
+                mapStyle="https://tiles.openfreemap.org/styles/liberty"
+                attributionEnabled={false}
+                logoEnabled={false}
+              >
+                <MapLibreGL.Camera
+                  centerCoordinate={[30.7133, 36.8969]}
+                  zoomLevel={10}
+                  animationMode="moveTo"
+                  animationDuration={0}
+                />
+              </MapLibreGL.MapView>
+            </YStack>
+          </YStack>
 
           <YStack gap="$3">
             <XStack justifyContent="space-between" alignItems="center">

@@ -8,6 +8,7 @@ import type { RouteDetail } from '@/features/api/types'
 import { getRouteById, rateRoute, forkRoute } from '@/features/routes/api'
 import { useAuth } from '@/features/auth/context'
 import { SaveToCollectionModal } from '@/components/modals/save-to-collection-modal'
+import { RouteMap } from '@/components/map/route-map'
 
 function RouteRatingWidget({
   routeId,
@@ -216,6 +217,14 @@ export default function RouteDetailScreen() {
               <Text variant="body" color="$mutedForeground">{route.description}</Text>
             </YStack>
           ) : null}
+
+          {/* Interactive Map */}
+          <YStack paddingHorizontal="$4" paddingBottom="$4" gap="$2">
+            <Text variant="heading3">Interactive Route Map</Text>
+            <YStack height={240} borderRadius="$4" overflow="hidden" backgroundColor="$muted">
+              <RouteMap route={route} />
+            </YStack>
+          </YStack>
 
           {/* Stops */}
           <YStack marginHorizontal="$4" marginBottom="$4" gap="$3">

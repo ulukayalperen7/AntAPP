@@ -311,7 +311,7 @@ export default function SpotDetailScreen() {
                       ) : null}
                       {route.averageRating > 0 ? (
                         <XStack alignItems="center" gap="$1">
-                          <RatingDisplay value={route.averageRating} size="sm" />
+                          <RatingDisplay value={route.averageRating} />
                           <Text variant="caption" muted>{route.averageRating.toFixed(1)}</Text>
                         </XStack>
                       ) : null}
