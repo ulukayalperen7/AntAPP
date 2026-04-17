@@ -1,5 +1,5 @@
 import { apiFetchData, apiFetchPaged } from '@/features/api/client'
-import type { PagedApiResponse, RouteDetail, RouteListItem, Tag } from '@/features/api/types'
+import type { PagedApiResponse, RouteDetail, RouteListItem, RouteStopItem, Tag } from '@/features/api/types'
 
 export type GetRoutesParams = {
   search?: string
@@ -41,5 +41,84 @@ export async function rateRoute(routeId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/routes/${routeId}/rating`, {
     method: 'PUT',
     body: JSON.stringify({ score }),
+  })
+}
+
+export async function createRoute(data: {
+  title: string
+  description?: string
+  thumbnailUrl?: string
+  tagIds?: string[]
+  spots: Array<{ spotId: string; customTitle?: string; customDescription?: string }>
+}): Promise<string> {
+  return apiFetchData<string>('/routes', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateRoute(id: string, data: {
+  title?: string
+  description?: string
+  thumbnailUrl?: string
+}): Promise<string> {
+  return apiFetchData<string>(`/routes/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteRoute(id: string): Promise<void> {
+  await apiFetchData<string>(`/routes/${id}`, { method: 'DELETE' })
+}
+
+export async function publishRoute(id: string): Promise<void> {
+  await apiFetchData<string>(`/routes/${id}/publish`, { method: 'POST' })
+}
+
+export async function unpublishRoute(id: string): Promise<void> {
+  await apiFetchData<string>(`/routes/${id}/unpublish`, { method: 'POST' })
+}
+
+export async function forkRoute(id: string): Promise<string> {
+  return apiFetchData<string>(`/routes/${id}/fork`, { method: 'POST' })
+}
+
+export async function getRouteStops(routeId: string): Promise<RouteStopItem[]> {
+  return apiFetchData<RouteStopItem[]>(`/routes/${routeId}/stops`)
+}
+
+export async function addRouteStop(routeId: string, data: {
+  spotId: string
+  customTitle?: string
+  customDescription?: string
+  order?: number
+}): Promise<string> {
+  return apiFetchData<string>(`/routes/${routeId}/stops`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateRouteStop(routeId: string, routeStopId: string, data: {
+  customTitle?: string
+  customDescription?: string
+}): Promise<string> {
+  return apiFetchData<string>(`/routes/${routeId}/stops/${routeStopId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteRouteStop(routeId: string, routeStopId: string): Promise<void> {
+  await apiFetchData<string>(`/routes/${routeId}/stops/${routeStopId}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function reorderRouteStops(routeId: string, orderedStopIds: string[]): Promise<void> {
+  await apiFetchData<string>(`/routes/${routeId}/stops/reorder`, {
+    method: 'PUT',
+    body: JSON.stringify({ orderedStopIds }),
   })
 }

@@ -52,6 +52,19 @@ export type RouteStop = {
   longitude: number
 }
 
+export type RouteStopItem = {
+  id: string
+  spotId: string
+  order: number
+  name: string
+  description: string | null
+  photoUrl: string | null
+  latitude: number
+  longitude: number
+  customTitle: string | null
+  customDescription: string | null
+}
+
 export type RouteDetail = {
   id: string
   title: string
@@ -61,7 +74,36 @@ export type RouteDetail = {
   isPublic: boolean
   contentType: RouteContentType
   averageRating: number
+  encodedPolyline: string | null
+  totalDistanceMeters: number
+  estimatedDurationSeconds: number
+  centerLatitude: number
+  centerLongitude: number
   stops: RouteStop[]
+}
+
+export type SpotListItem = {
+  id: string
+  name: string
+  description: string | null
+  photoUrl: string | null
+  latitude: number
+  longitude: number
+  averageRating: number
+}
+
+export type SpotDetail = SpotListItem & {
+  ratingCount: number
+  createdAt: string
+}
+
+export type SpotRouteItem = {
+  id: string
+  title: string
+  description: string | null
+  thumbnailUrl: string | null
+  authorUserId: string
+  averageRating: number
 }
 
 export type Collection = {

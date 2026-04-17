@@ -5,3 +5,7 @@ export type { AuthRegisterScreenProps, UserType } from './screens/auth/register-
 export { AuthForgotPasswordScreen } from './screens/auth/forgot-password-screen'
 export type { AuthForgotPasswordScreenProps } from './screens/auth/forgot-password-screen'
 export { AuthShell } from './screens/auth/auth-shell'
+export { AuthResetPasswordScreen } from './screens/auth/reset-password-screen'
+export type { AuthResetPasswordScreenProps } from './screens/auth/reset-password-screen'
+export { AuthConfirmEmailScreen } from './screens/auth/confirm-email-screen'
+export type { AuthConfirmEmailScreenProps } from './screens/auth/confirm-email-screen'

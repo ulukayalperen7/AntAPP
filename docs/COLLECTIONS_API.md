@@ -6,10 +6,12 @@ Route collections allow users to organize saved routes into groups (e.g. "Weeken
 
 ## Authentication
 
-| Scope | Requirement |
-|-------|-------------|
-| User API (`/api/me/…`) | Bearer token (any authenticated user) |
-| Admin API (`/api/admin/…`) | Bearer token with **Admin** role |
+
+| Scope                      | Requirement                           |
+| -------------------------- | ------------------------------------- |
+| User API (`/api/me/…`)     | Bearer token (any authenticated user) |
+| Admin API (`/api/admin/…`) | Bearer token with **Admin** role      |
+
 
 User endpoints extract the user ID from the JWT `uid` claim — it is never passed as a parameter.
 
@@ -303,15 +305,18 @@ GET /api/admin/users/{userId}/collections?pageNumber=1&pageSize=10
 
 All errors are returned as `ApiException` with a descriptive message:
 
-| Scenario | Message |
-|----------|---------|
-| Collection not found | `"Collection not found."` |
-| Ownership mismatch (user API) | `"Collection not found."` |
-| Route already in collection | `"Route is already in this collection."` |
-| Route not in collection | `"Route is not in this collection."` |
-| Route already saved (shortcut) | `"Route is already saved."` |
-| Route not saved (shortcut) | `"Route is not saved."` |
-| No default collection (unsave) | `"No saved routes collection found."` |
-| Not authenticated | `"Authentication required."` |
+
+| Scenario                       | Message                                  |
+| ------------------------------ | ---------------------------------------- |
+| Collection not found           | `"Collection not found."`                |
+| Ownership mismatch (user API)  | `"Collection not found."`                |
+| Route already in collection    | `"Route is already in this collection."` |
+| Route not in collection        | `"Route is not in this collection."`     |
+| Route already saved (shortcut) | `"Route is already saved."`              |
+| Route not saved (shortcut)     | `"Route is not saved."`                  |
+| No default collection (unsave) | `"No saved routes collection found."`    |
+| Not authenticated              | `"Authentication required."`             |
+
 
 > **Note:** Ownership mismatches intentionally return "Collection not found" to avoid leaking the existence of other users' collections.
+

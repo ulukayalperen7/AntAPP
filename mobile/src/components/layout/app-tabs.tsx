@@ -29,6 +29,10 @@ export default function AppTabs() {
         />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="spots">
+        <NativeTabs.Trigger.Label>Spots</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="create">
         <NativeTabs.Trigger.Label>Create</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>

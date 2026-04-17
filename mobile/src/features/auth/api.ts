@@ -101,6 +101,34 @@ export function registerAccount(
   })
 }
 
+export async function confirmEmail(userId: string, code: string): Promise<void> {
+  const res = await fetch(
+    `${API_URL}/auth/confirm-email?userId=${encodeURIComponent(userId)}&code=${encodeURIComponent(code)}`,
+    { method: 'GET' }
+  )
+
+  if (!res.ok) {
+    throw new Error(await parseApiError(res))
+  }
+}
+
+export async function resetPassword(data: {
+  email: string
+  token: string
+  password: string
+  confirmPassword: string
+}): Promise<void> {
+  const res = await fetch(`${API_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+
+  if (!res.ok) {
+    throw new Error(await parseApiError(res))
+  }
+}
+
 export async function forgotPasswordRequest(email: string): Promise<string> {
   const res = await fetch(`${API_URL}/auth/forgot-password`, {
     method: 'POST',
