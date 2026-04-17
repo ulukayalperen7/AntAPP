@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec b/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
+index 79adbdd..cf7b4f9 100644
+--- a/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
++++ b/node_modules/react-native-ios-context-menu/react-native-ios-context-menu.podspec
+@@ -116,7 +116,6 @@ Pod::Spec.new do |s|
+     compiler_flags << ' ' << fabric_compiler_flags
+ 
+     s.dependency 'React-RCTFabric'
+-    s.dependency 'RCT-Folly', folly_version
+   end
+ 
+   unless defined?(install_modules_dependencies)

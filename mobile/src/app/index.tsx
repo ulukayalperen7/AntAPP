@@ -3,13 +3,40 @@ import { useRouter } from 'expo-router'
 import { YStack, XStack, Text, SearchInput, FilterChip, RouteCard, ScrollView, Avatar, IconButton } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
-import MapLibreGL from '@maplibre/maplibre-react-native'
+import { WebView } from 'react-native-webview'
 import { useAuth } from '@/features/auth/context'
 import { getRoutes, getTags } from '@/features/routes/api'
 import type { RouteListItem, Tag } from '@/features/api/types'
 import { routeToCardData } from '@/features/routes/presenters'
 
-MapLibreGL.setAccessToken(null)
+const DISCOVERY_MAP_HTML = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body, #map { width: 100%; height: 100%; }
+    .maplibregl-ctrl-bottom-left,
+    .maplibregl-ctrl-bottom-right,
+    .maplibregl-ctrl-top-left { display: none; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    new maplibregl.Map({
+      container: 'map',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
+      center: [30.7133, 36.8969],
+      zoom: 10,
+      attributionControl: false
+    });
+  </script>
+</body>
+</html>`
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -133,19 +160,13 @@ export default function HomeScreen() {
           <YStack gap="$2">
             <Text variant="heading3">Interactive Route Explorer</Text>
             <YStack height={220} borderRadius="$4" overflow="hidden" backgroundColor="$muted">
-              <MapLibreGL.MapView
+              <WebView
+                source={{ html: DISCOVERY_MAP_HTML }}
                 style={{ flex: 1 }}
-                mapStyle="https://tiles.openfreemap.org/styles/liberty"
-                attributionEnabled={false}
-                logoEnabled={false}
-              >
-                <MapLibreGL.Camera
-                  centerCoordinate={[30.7133, 36.8969]}
-                  zoomLevel={10}
-                  animationMode="moveTo"
-                  animationDuration={0}
-                />
-              </MapLibreGL.MapView>
+                scrollEnabled={false}
+                javaScriptEnabled
+                originWhitelist={['*']}
+              />
             </YStack>
           </YStack>
 

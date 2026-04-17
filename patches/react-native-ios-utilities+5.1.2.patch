@@ -1,0 +1,12 @@
+diff --git a/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec b/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
+index 3d5ed71..0e82336 100644
+--- a/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
++++ b/node_modules/react-native-ios-utilities/react-native-ios-utilities.podspec
+@@ -102,7 +102,6 @@ Pod::Spec.new do |s|
+     compiler_flags << ' ' << fabric_compiler_flags
+ 
+     s.dependency 'React-RCTFabric'
+-    s.dependency 'RCT-Folly', folly_version
+   end
+ 
+   unless defined?(install_modules_dependencies)

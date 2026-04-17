@@ -1,12 +1,6 @@
 import React, { useMemo } from 'react'
-import MapLibreGL from '@maplibre/maplibre-react-native'
-import { StyleSheet } from 'react-native'
+import { WebView } from 'react-native-webview'
 import type { RouteDetail } from '@/features/api/types'
-
-MapLibreGL.setAccessToken(null)
-
-const STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty'
-const LINE_COLOR = '#FF8C00'
 
 function decodePolyline(encoded: string): Array<[number, number]> {
   const points: Array<[number, number]> = []
@@ -40,104 +34,125 @@ function decodePolyline(encoded: string): Array<[number, number]> {
   return points
 }
 
-function getBounds(coords: Array<[number, number]>): {
-  ne: [number, number]
-  sw: [number, number]
-} | null {
-  if (coords.length < 2) return null
-  let minLon = coords[0][0], minLat = coords[0][1]
-  let maxLon = coords[0][0], maxLat = coords[0][1]
-  for (const [lon, lat] of coords) {
-    if (lon < minLon) minLon = lon
-    if (lat < minLat) minLat = lat
-    if (lon > maxLon) maxLon = lon
-    if (lat > maxLat) maxLat = lat
-  }
-  return { ne: [maxLon, maxLat], sw: [minLon, minLat] }
+function buildMapHTML(options: {
+  center: [number, number]
+  zoom: number
+  polyline: Array<[number, number]>
+  stops: Array<{ lng: number; lat: number; order: number }>
+}): string {
+  const data = JSON.stringify(options)
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; }
+    .maplibregl-ctrl-bottom-left,
+    .maplibregl-ctrl-bottom-right,
+    .maplibregl-ctrl-top-left { display: none; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var options = ${data};
+    var map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://tiles.openfreemap.org/styles/liberty',
+      center: options.center,
+      zoom: options.zoom,
+      attributionControl: false
+    });
+
+    map.on('load', function() {
+      if (options.polyline.length > 1) {
+        map.addSource('route-line', {
+          type: 'geojson',
+          data: { type: 'Feature', geometry: { type: 'LineString', coordinates: options.polyline }, properties: {} }
+        });
+        map.addLayer({
+          id: 'route-line-layer',
+          type: 'line',
+          source: 'route-line',
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': '#FF8C00', 'line-width': 4, 'line-dasharray': [1.5, 1.5] }
+        });
+      }
+
+      if (options.stops.length > 0) {
+        map.addSource('route-stops', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features: options.stops.map(function(s) {
+              return { type: 'Feature', geometry: { type: 'Point', coordinates: [s.lng, s.lat] }, properties: { order: s.order } };
+            })
+          }
+        });
+        map.addLayer({
+          id: 'route-stops-circle',
+          type: 'circle',
+          source: 'route-stops',
+          paint: { 'circle-radius': 8, 'circle-color': '#FF8C00', 'circle-stroke-color': '#FFFFFF', 'circle-stroke-width': 2 }
+        });
+        map.addLayer({
+          id: 'route-stops-label',
+          type: 'symbol',
+          source: 'route-stops',
+          minzoom: 11,
+          layout: { 'text-field': ['to-string', ['get', 'order']], 'text-size': 11, 'text-font': ['Open Sans Semibold'], 'text-allow-overlap': false },
+          paint: { 'text-color': '#FFFFFF' }
+        });
+      }
+
+      var fitCoords = options.polyline.length > 1 ? options.polyline : options.stops.map(function(s) { return [s.lng, s.lat]; });
+      if (fitCoords.length > 1) {
+        var lons = fitCoords.map(function(c) { return c[0]; });
+        var lats = fitCoords.map(function(c) { return c[1]; });
+        map.fitBounds(
+          [[Math.min.apply(null, lons), Math.min.apply(null, lats)], [Math.max.apply(null, lons), Math.max.apply(null, lats)]],
+          { padding: 40, maxZoom: 14, duration: 0 }
+        );
+      }
+    });
+  </script>
+</body>
+</html>`
 }
 
 export function RouteMap({ route }: { route: RouteDetail }) {
-  const polylineCoords = useMemo(() => {
-    if (!route.encodedPolyline) return []
-    try { return decodePolyline(route.encodedPolyline) } catch { return [] }
-  }, [route.encodedPolyline])
+  const html = useMemo(() => {
+    const polyline = route.encodedPolyline
+      ? (() => { try { return decodePolyline(route.encodedPolyline) } catch { return [] } })()
+      : []
 
-  const stopCoords = useMemo(
-    () =>
-      route.stops
-        .filter((s) => Number.isFinite(s.latitude) && Number.isFinite(s.longitude))
-        .map((s) => [s.longitude, s.latitude] as [number, number]),
-    [route.stops]
-  )
+    const stops = route.stops
+      .filter((s) => Number.isFinite(s.latitude) && Number.isFinite(s.longitude))
+      .map((s, i) => ({ lng: s.longitude, lat: s.latitude, order: i + 1 }))
 
-  const fitCoords = polylineCoords.length > 1 ? polylineCoords : stopCoords
-  const bounds = getBounds(fitCoords)
+    const hasCenter =
+      Number.isFinite(route.centerLatitude) && Number.isFinite(route.centerLongitude)
 
-  const hasCenter =
-    Number.isFinite(route.centerLatitude) && Number.isFinite(route.centerLongitude)
-
-  const routeLineGeoJSON: GeoJSON.Feature<GeoJSON.LineString> | null =
-    polylineCoords.length > 1
-      ? { type: 'Feature', geometry: { type: 'LineString', coordinates: polylineCoords }, properties: {} }
-      : null
-
-  const stopsGeoJSON: GeoJSON.FeatureCollection<GeoJSON.Point> = {
-    type: 'FeatureCollection',
-    features: stopCoords.map((coordinates, index) => ({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates },
-      properties: { order: index + 1 },
-    })),
-  }
+    return buildMapHTML({
+      center: hasCenter ? [route.centerLongitude, route.centerLatitude] : [30.7133, 36.8969],
+      zoom: hasCenter ? 11 : 10,
+      polyline,
+      stops,
+    })
+  }, [route])
 
   return (
-    <MapLibreGL.MapView
-      style={styles.map}
-      mapStyle={STYLE_URL}
-      attributionEnabled={false}
-      logoEnabled={false}
-    >
-      {bounds ? (
-        <MapLibreGL.Camera
-          bounds={{ ne: bounds.ne, sw: bounds.sw, paddingLeft: 40, paddingRight: 40, paddingTop: 40, paddingBottom: 40 }}
-          animationMode="moveTo"
-          animationDuration={0}
-        />
-      ) : (
-        <MapLibreGL.Camera
-          centerCoordinate={hasCenter ? [route.centerLongitude, route.centerLatitude] : [30.7133, 36.8969]}
-          zoomLevel={hasCenter ? 11 : 10}
-          animationMode="moveTo"
-          animationDuration={0}
-        />
-      )}
-
-      {routeLineGeoJSON ? (
-        <MapLibreGL.ShapeSource id="route-line" shape={routeLineGeoJSON}>
-          <MapLibreGL.LineLayer
-            id="route-line-layer"
-            style={{ lineColor: LINE_COLOR, lineWidth: 4, lineCap: 'round', lineJoin: 'round', lineDasharray: [1.5, 1.5] }}
-          />
-        </MapLibreGL.ShapeSource>
-      ) : null}
-
-      {stopCoords.length > 0 ? (
-        <MapLibreGL.ShapeSource id="route-stops" shape={stopsGeoJSON}>
-          <MapLibreGL.CircleLayer
-            id="route-stops-circle"
-            style={{ circleColor: LINE_COLOR, circleRadius: 8, circleStrokeColor: '#FFFFFF', circleStrokeWidth: 2 }}
-          />
-          <MapLibreGL.SymbolLayer
-            id="route-stops-label"
-            minZoomLevel={11}
-            style={{ textField: ['to-string', ['get', 'order']], textSize: 11, textColor: '#FFFFFF', textAllowOverlap: false }}
-          />
-        </MapLibreGL.ShapeSource>
-      ) : null}
-    </MapLibreGL.MapView>
+    <WebView
+      source={{ html }}
+      style={{ flex: 1 }}
+      scrollEnabled={false}
+      javaScriptEnabled
+      originWhitelist={['*']}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  map: { flex: 1 },
-})

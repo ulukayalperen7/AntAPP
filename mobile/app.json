@@ -3,6 +3,9 @@
     "name": "user",
     "slug": "user",
     "version": "1.0.0",
+    "autolinking": {
+      "exclude": ["react-native-ios-context-menu", "react-native-ios-utilities"]
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "antapp",
@@ -45,7 +48,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "@maplibre/maplibre-react-native",
       "expo-router",
       [
         "expo-splash-screen",

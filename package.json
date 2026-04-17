@@ -9,10 +9,12 @@
   ],
   "scripts": {
     "web": "npm run dev --workspace=web",
-    "mobile": "npm run start --workspace=mobile"
+    "mobile": "npm run start --workspace=mobile",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@expo/metro-runtime": "^55.0.6",
-    "expo-router": "~55.0.4"
+    "expo-router": "~55.0.4",
+    "patch-package": "^8.0.1"
   }
 }
