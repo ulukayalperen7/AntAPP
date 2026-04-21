@@ -401,10 +401,25 @@ export default function RouteDetailClient({
           <img
             src={route.thumbnailUrl}
             alt=""
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.45 }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center center',
+              opacity: 0.96,
+            }}
           />
         )}
-        <XStack position="absolute" top={0} left={0} right={0} bottom={0} backgroundColor="$ant800" opacity={0.5} />
+        <XStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          style={{ background: 'linear-gradient(180deg, rgba(15,23,42,0.16) 0%, rgba(15,23,42,0.44) 100%)' }}
+        />
 
         {/* Owner badge */}
         {isOwner && (

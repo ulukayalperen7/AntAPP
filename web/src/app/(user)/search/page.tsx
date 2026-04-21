@@ -360,10 +360,10 @@ export default function SearchPage() {
         display: 'grid',
         gridTemplateColumns: '280px minmax(0, 1fr) 320px',
         gap: '20px',
-        alignItems: 'start',
+        alignItems: 'stretch',
       }}
     >
-      <YStack gap="$5" $md={{ display: 'none' }}>
+      <YStack gap="$5" $md={{ display: 'none' }} style={{ alignSelf: 'start' }}>
         <XStack justifyContent="space-between" alignItems="center">
           <Text variant="heading3">Filters</Text>
           <Text
@@ -455,7 +455,7 @@ export default function SearchPage() {
         </YStack>
       </YStack>
 
-      <YStack minWidth={0} gap="$4">
+      <YStack minWidth={0} gap="$4" style={{ alignSelf: 'start' }}>
         <XStack justifyContent="space-between" alignItems="center">
           <XStack gap="$2" alignItems="center">
             <Text variant="heading4" weight="bold">Results</Text>
@@ -500,19 +500,18 @@ export default function SearchPage() {
         ) : null}
       </YStack>
 
-      <YStack minWidth={0} $md={{ display: 'none' }}>
-        <YStack
-          minHeight={260}
-          backgroundColor="$muted"
-          borderRadius="$4"
-          borderWidth={2}
-          borderStyle="dashed"
-          borderColor="$borderColor"
-          position="sticky"
-          top={80}
-          padding="$4"
-          gap="$3"
-        >
+      <YStack minWidth={0} $md={{ display: 'none' }} style={{ alignSelf: 'stretch' }}>
+        <div style={{ position: 'sticky', top: 88, height: 'fit-content' }}>
+          <YStack
+            minHeight={260}
+            backgroundColor="$muted"
+            borderRadius="$4"
+            borderWidth={2}
+            borderStyle="dashed"
+            borderColor="$borderColor"
+            padding="$4"
+            gap="$3"
+          >
           <XStack alignItems="center" justifyContent="space-between">
             <XStack alignItems="center" gap="$2">
               <Map size={18} color="var(--color-mutedForeground)" strokeWidth={1.7} />
@@ -602,7 +601,8 @@ export default function SearchPage() {
               </YStack>
             )}
           </YStack>
-        </YStack>
+          </YStack>
+        </div>
       </YStack>
     </div>
   )

@@ -4,15 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import type { Collection } from '@/types/api'
-import { FolderOpen, Plus, Globe, Lock, X } from 'lucide-react'
-import { createCollection } from '@/features/collections/actions'
-
-function initialsFromName(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return 'CL'
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-}
+import { Plus, Globe, Lock, X, Trash2, AlertTriangle } from 'lucide-react'
+import { createCollection, deleteCollection } from '@/features/collections/actions'
 
 function collectionCoverStyle(id: string) {
   const gradients = [
@@ -25,7 +18,19 @@ function collectionCoverStyle(id: string) {
   return gradients[seed % gradients.length]
 }
 
-function CollectionCard({ collection }: { collection: Collection }) {
+function stopEventPropagation(e: unknown) {
+  if (e && typeof e === 'object' && 'stopPropagation' in e && typeof (e as { stopPropagation?: unknown }).stopPropagation === 'function') {
+    ; (e as { stopPropagation: () => void }).stopPropagation()
+  }
+}
+
+function CollectionCard({
+  collection,
+  onDeleteRequest,
+}: {
+  collection: Collection
+  onDeleteRequest: (collection: Collection) => void
+}) {
   const router = useRouter()
 
   return (
@@ -55,19 +60,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
             padding="$3"
             style={{ background: collectionCoverStyle(collection.id) }}
           >
-            <XStack justifyContent="space-between" alignItems="center">
-              <XStack
-                width={36}
-                height={36}
-                borderRadius="$3"
-                alignItems="center"
-                justifyContent="center"
-                backgroundColor="rgba(255,255,255,0.18)"
-              >
-                <Text variant="label" color="#FFFFFF" weight="semibold">
-                  {initialsFromName(collection.name)}
-                </Text>
-              </XStack>
+            <XStack justifyContent="flex-end" alignItems="center">
               <XStack
                 backgroundColor="rgba(255,255,255,0.2)"
                 borderRadius="$full"
@@ -77,10 +70,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
                 <Text variant="caption" color="#FFFFFF">{collection.routeCount ?? 0} routes</Text>
               </XStack>
             </XStack>
-            <XStack alignItems="center" gap="$1.5">
-              <FolderOpen size={18} color="rgba(255,255,255,0.92)" strokeWidth={1.75} />
-              <Text variant="caption" color="rgba(255,255,255,0.92)">Collection Cover</Text>
-            </XStack>
+            <XStack />
           </YStack>
         )}
       </YStack>
@@ -99,6 +89,107 @@ function CollectionCard({ collection }: { collection: Collection }) {
 
         <XStack justifyContent="space-between" alignItems="center" marginTop="$1">
           <Text variant="caption" muted>{collection.routeCount ?? 0} routes</Text>
+          {collection.isDefault ? (
+            <Text variant="caption" color="$primary" weight="semibold">Saved Routes</Text>
+          ) : null}
+        </XStack>
+      </YStack>
+
+      {!collection.isDefault ? (
+        <XStack
+          position="absolute"
+          right="$3"
+          bottom="$3"
+          width={34}
+          height={34}
+          borderRadius="$full"
+          alignItems="center"
+          justifyContent="center"
+          cursor="pointer"
+          backgroundColor="#EA580C"
+          borderWidth={1}
+          borderColor="#C2410C"
+          style={{ boxShadow: '0 4px 12px rgba(234, 88, 12, 0.36)' }}
+          hoverStyle={{ backgroundColor: '#C2410C' }}
+          pressStyle={{ scale: 0.96 }}
+          onPress={(e) => {
+            stopEventPropagation(e)
+            onDeleteRequest(collection)
+          }}
+        >
+          <Trash2 size={16} color="#FFFFFF" />
+        </XStack>
+      ) : null}
+    </YStack>
+  )
+}
+
+function DeleteCollectionModal({
+  target,
+  deleting,
+  error,
+  onClose,
+  onConfirm,
+}: {
+  target: Collection
+  deleting: boolean
+  error: string
+  onClose: () => void
+  onConfirm: () => void
+}) {
+  return (
+    <YStack
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      zIndex={220}
+      backgroundColor="rgba(0,0,0,0.5)"
+      alignItems="center"
+      justifyContent="center"
+      style={{ backdropFilter: 'blur(4px)' }}
+      onPress={onClose}
+    >
+      <YStack
+        backgroundColor="$backgroundStrong"
+        borderRadius="$5"
+        borderWidth={1}
+        borderColor="$borderColor"
+        padding="$6"
+        gap="$4"
+        width={420}
+        maxWidth="92vw"
+        onPress={stopEventPropagation}
+      >
+        <XStack justifyContent="space-between" alignItems="center">
+          <XStack alignItems="center" gap="$2">
+            <AlertTriangle size={18} color="var(--color-error500)" />
+            <Text variant="heading3">Delete Collection</Text>
+          </XStack>
+          <XStack cursor="pointer" onPress={onClose} padding="$1">
+            <X size={20} color="currentColor" />
+          </XStack>
+        </XStack>
+
+        <YStack gap="$2">
+          <Text variant="body">
+            Delete <Text variant="body" weight="semibold">{target.name}</Text>?
+          </Text>
+          <Text variant="caption" muted>
+            This removes only the collection. Routes stay intact.
+          </Text>
+          <Text variant="caption" muted>
+            It currently contains {target.routeCount ?? 0} routes.
+          </Text>
+          {error ? <Text variant="caption" color="$error500">{error}</Text> : null}
+        </YStack>
+
+        <XStack gap="$3" justifyContent="flex-end">
+          <Button variant="ghost" size="md" onPress={onClose} disabled={deleting}>Cancel</Button>
+          <Button variant="solid" size="md" onPress={onConfirm} disabled={deleting}>
+            {deleting ? 'Deleting...' : 'Delete Collection'}
+          </Button>
         </XStack>
       </YStack>
     </YStack>
@@ -197,6 +288,9 @@ export default function CollectionsClient({ collections: initialCollections }: {
   const router = useRouter()
   const [showModal, setShowModal] = useState(false)
   const [collections, setCollections] = useState(initialCollections)
+  const [deleteTarget, setDeleteTarget] = useState<Collection | null>(null)
+  const [deleteError, setDeleteError] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     setCollections(initialCollections)
@@ -207,12 +301,41 @@ export default function CollectionsClient({ collections: initialCollections }: {
     router.refresh()
   }
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    setDeleteError('')
+    setIsDeleting(true)
+    try {
+      await deleteCollection(deleteTarget.id)
+      setCollections((prev) => prev.filter((collection) => collection.id !== deleteTarget.id))
+      setDeleteTarget(null)
+      router.refresh()
+    } catch (e: unknown) {
+      setDeleteError(e instanceof Error ? e.message : 'Failed to delete collection.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <YStack gap="$5" flex={1}>
       {showModal && (
         <NewCollectionModal
           onClose={() => setShowModal(false)}
           onCreated={handleCreated}
+        />
+      )}
+      {deleteTarget && (
+        <DeleteCollectionModal
+          target={deleteTarget}
+          deleting={isDeleting}
+          error={deleteError}
+          onClose={() => {
+            if (isDeleting) return
+            setDeleteTarget(null)
+            setDeleteError('')
+          }}
+          onConfirm={handleDelete}
         />
       )}
 
@@ -223,7 +346,15 @@ export default function CollectionsClient({ collections: initialCollections }: {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
         {collections.map((col) => (
-          <CollectionCard key={col.id} collection={col} />
+          <CollectionCard
+            key={col.id}
+            collection={col}
+            onDeleteRequest={(collection) => {
+              if (collection.isDefault) return
+              setDeleteError('')
+              setDeleteTarget(collection)
+            }}
+          />
         ))}
 
         {/* New Collection card */}
