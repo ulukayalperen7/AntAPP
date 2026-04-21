@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { XStack, YStack, Text, Input, Button } from '@antapp/ui'
-import { Search, MapPin, Check, Loader2 } from 'lucide-react'
+import { Search, MapPin, Loader2 } from 'lucide-react'
 import { getSpots } from '@/features/spots/actions'
 import type { SpotListItem } from '@/types/api'
 
@@ -99,7 +99,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                                 <MapPin size={16} color="var(--color-primary)" />
                             </YStack>
                             <YStack flex={1}>
-                                <Text variant="label" weight="600">{spot.name}</Text>
+                                <Text variant="label" weight="semibold">{spot.name}</Text>
                                 <Text variant="caption" muted numberOfLines={1}>{spot.description}</Text>
                             </YStack>
                             <Button variant="ghost" size="sm">Add</Button>
@@ -122,7 +122,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                     borderWidth={1}
                     borderColor="$borderColor"
                 >
-                    <Text variant="body" muted textAlign="center">No spots found matching "{query}"</Text>
+                    <Text variant="body" muted textAlign="center">No spots found matching &quot;{query}&quot;</Text>
                 </YStack>
             )}
         </YStack>

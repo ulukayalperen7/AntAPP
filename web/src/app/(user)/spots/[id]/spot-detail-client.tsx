@@ -1,12 +1,17 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
+import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Badge, Image, RouteCard, RatingDisplay } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Badge, RouteCard, RatingDisplay } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { SpotDetail, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
 import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
+
+type SpotPreviewMap = {
+  addControl: (control: unknown, position?: string) => void
+  remove: () => void
+}
 
 function routeToCardData(route: SpotRouteItem): RouteCardData {
   return {
@@ -58,7 +63,7 @@ function SpotRatingWidget({
             borderRadius="$2"
             cursor={submitted || isPending ? 'default' : 'pointer'}
             onPress={() => handleRate(score)}
-            // @ts-ignore web-only mouse handlers
+
             onMouseEnter={() => !submitted && !isPending && setHovered(score)}
             onMouseLeave={() => setHovered(0)}
           >
@@ -83,9 +88,11 @@ function SpotRatingWidget({
 
 export default function SpotDetailClient({
   spot,
+  routeLabel,
   initialRoutes,
 }: {
   spot: SpotDetail
+  routeLabel?: string
   initialRoutes: SpotRouteItem[]
 }) {
   const router = useRouter()
@@ -93,12 +100,77 @@ export default function SpotDetailClient({
   const [displayRatingCount, setDisplayRatingCount] = useState(spot.ratingCount)
   const [isSaved, setIsSaved] = useState(false)
   const [isSaving, startSavingTransition] = useTransition()
+  const [spotMapError, setSpotMapError] = useState<string | null>(null)
+  const spotMapContainerRef = useRef<HTMLDivElement | null>(null)
+  const spotMapRef = useRef<SpotPreviewMap | null>(null)
+  const hasValidCoordinates = Number.isFinite(spot.latitude) && Number.isFinite(spot.longitude)
 
   useEffect(() => {
     getSavedSpots().then(spots => {
       setIsSaved(spots.some(s => s.id === spot.id))
     }).catch(() => { })
   }, [spot.id])
+
+  useEffect(() => {
+    if (!hasValidCoordinates || !spotMapContainerRef.current || spotMapRef.current) return
+
+    let cancelled = false
+
+    const initSpotMap = async () => {
+      try {
+        if (!document.querySelector('link[data-maplibre-style="true"]')) {
+          const link = document.createElement('link')
+          link.rel = 'stylesheet'
+          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
+          link.dataset.maplibreStyle = 'true'
+          document.head.appendChild(link)
+        }
+
+        const maplibre = await import('maplibre-gl')
+        if (cancelled || !spotMapContainerRef.current || spotMapRef.current) return
+
+        const map = new maplibre.Map({
+          container: spotMapContainerRef.current,
+          style: 'https://tiles.openfreemap.org/styles/liberty',
+          center: [spot.longitude, spot.latitude],
+          zoom: 14,
+        })
+
+        map.addControl(new maplibre.NavigationControl(), 'top-right')
+
+        const markerEl = document.createElement('div')
+        markerEl.style.width = '16px'
+        markerEl.style.height = '16px'
+        markerEl.style.borderRadius = '50%'
+        markerEl.style.backgroundColor = '#FF8C00'
+        markerEl.style.border = '2px solid #FFFFFF'
+        markerEl.style.boxShadow = '0 2px 8px rgba(0,0,0,0.35)'
+
+        new maplibre.Marker({ element: markerEl })
+          .setLngLat([spot.longitude, spot.latitude])
+          .setPopup(new maplibre.Popup({ closeButton: false, closeOnClick: false }).setText(spot.name))
+          .addTo(map)
+          .togglePopup()
+
+        spotMapRef.current = map as unknown as SpotPreviewMap
+        setSpotMapError(null)
+      } catch {
+        if (!cancelled) {
+          setSpotMapError('Location map could not be loaded.')
+        }
+      }
+    }
+
+    void initSpotMap()
+
+    return () => {
+      cancelled = true
+      if (spotMapRef.current) {
+        spotMapRef.current.remove()
+      }
+      spotMapRef.current = null
+    }
+  }, [hasValidCoordinates, spot.latitude, spot.longitude, spot.name])
 
   const handleToggleSave = () => {
     startSavingTransition(async () => {
@@ -120,6 +192,11 @@ export default function SpotDetailClient({
         <YStack flex={1}>
           <Text variant="heading2">{spot.name}</Text>
           <Text variant="body" muted>Spot details and related routes</Text>
+          {routeLabel && routeLabel.trim() && routeLabel.trim() !== spot.name && (
+            <Text variant="caption" color="$mutedForeground">
+              This stop was labeled as &quot;{routeLabel}&quot; inside the route.
+            </Text>
+          )}
         </YStack>
       </XStack>
 
@@ -135,7 +212,17 @@ export default function SpotDetailClient({
             <YStack height={320} backgroundColor="$muted" alignItems="center" justifyContent="center">
               {spot.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <img
+                  src={spot.photoUrl}
+                  alt={spot.name}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center center',
+                    display: 'block',
+                  }}
+                />
               ) : (
                 <MapPinned size={56} color="var(--color-mutedForeground)" />
               )}
@@ -167,6 +254,55 @@ export default function SpotDetailClient({
                 <Badge variant="default" size="sm">Lng {spot.longitude.toFixed(4)}</Badge>
                 {displayRating > 0 && <Badge variant="info" size="sm">{displayRating.toFixed(1)} avg</Badge>}
               </XStack>
+            </YStack>
+          </YStack>
+
+          <YStack
+            backgroundColor="$backgroundStrong"
+            borderRadius="$4"
+            borderWidth={1}
+            borderColor="$borderColor"
+            overflow="hidden"
+          >
+            <XStack justifyContent="space-between" alignItems="center" padding="$4" borderBottomWidth={1} borderColor="$borderColor">
+              <Text variant="heading4">Location on map</Text>
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => window.open(`https://www.google.com/maps/search/?api=1&query=${spot.latitude},${spot.longitude}`, '_blank')}
+                disabled={!hasValidCoordinates}
+              >
+                Open in Maps
+              </Button>
+            </XStack>
+
+            <YStack height={220} backgroundColor="$muted" position="relative">
+              {hasValidCoordinates ? (
+                <div
+                  ref={spotMapContainerRef}
+                  style={{ width: '100%', height: '100%' }}
+                  aria-label="Spot location map preview"
+                />
+              ) : (
+                <YStack flex={1} alignItems="center" justifyContent="center" gap="$2">
+                  <MapPinned size={28} color="var(--color-mutedForeground)" />
+                  <Text variant="caption" muted>Location coordinates are unavailable for this spot.</Text>
+                </YStack>
+              )}
+
+              {spotMapError ? (
+                <YStack
+                  position="absolute"
+                  inset={0}
+                  alignItems="center"
+                  justifyContent="center"
+                  gap="$1.5"
+                  backgroundColor="rgba(255,255,255,0.86)"
+                >
+                  <MapPinned size={22} color="var(--color-mutedForeground)" />
+                  <Text variant="caption" muted>{spotMapError}</Text>
+                </YStack>
+              ) : null}
             </YStack>
           </YStack>
 

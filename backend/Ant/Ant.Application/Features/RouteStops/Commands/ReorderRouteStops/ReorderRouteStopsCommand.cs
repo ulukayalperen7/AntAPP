@@ -5,6 +5,7 @@ using Ant.Application.Wrappers;
 using MediatR;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,15 +21,18 @@ namespace Ant.Application.Features.RouteStops.Commands.ReorderRouteStops
     {
         private readonly IRouteSpotRepositoryAsync _routeSpotRepository;
         private readonly IRouteRepositoryAsync _routeRepository;
+        private readonly IMapRoutingService _mapRoutingService;
         private readonly IAuthenticatedUserService _authenticatedUser;
 
         public ReorderRouteStopsCommandHandler(
             IRouteSpotRepositoryAsync routeSpotRepository,
             IRouteRepositoryAsync routeRepository,
+            IMapRoutingService mapRoutingService,
             IAuthenticatedUserService authenticatedUser)
         {
             _routeSpotRepository = routeSpotRepository;
             _routeRepository = routeRepository;
+            _mapRoutingService = mapRoutingService;
             _authenticatedUser = authenticatedUser;
         }
 
@@ -49,7 +53,39 @@ namespace Ant.Application.Features.RouteStops.Commands.ReorderRouteStops
                 throw new ApiException("Ordered stop IDs are required.");
 
             await _routeSpotRepository.ReorderStopsAsync(request.RouteId, request.OrderedStopIds);
+            await RecomputeRouteGeometryAsync(request.RouteId, cancellationToken);
             return new Response<string>("ok", message: "Stops reordered.");
+        }
+
+        private async Task RecomputeRouteGeometryAsync(Guid routeId, CancellationToken cancellationToken)
+        {
+            var route = await _routeRepository.GetByIdAsync(routeId);
+            if (route == null) return;
+
+            var stops = await _routeSpotRepository.GetStopsForRouteAsync(routeId);
+            var waypoints = stops
+                .Where(rs => rs.Spot?.Location != null)
+                .OrderBy(rs => rs.SpotOrder)
+                .Select(rs => rs.Spot.Location)
+                .ToList();
+
+            if (waypoints.Count < 2)
+            {
+                route.EncodedPolyline = null;
+                route.TotalDistanceMeters = 0;
+                route.EstimatedDurationSeconds = 0;
+                route.CenterLocation = waypoints.Count == 1 ? waypoints[0] : null;
+            }
+            else
+            {
+                var geometry = await _mapRoutingService.GetRouteGeometryAsync(waypoints, cancellationToken);
+                route.EncodedPolyline = geometry.EncodedPolyline;
+                route.TotalDistanceMeters = geometry.DistanceMeters;
+                route.EstimatedDurationSeconds = geometry.DurationSeconds;
+                route.CenterLocation = geometry.CenterPoint;
+            }
+
+            await _routeRepository.UpdateAsync(route);
         }
     }
 }

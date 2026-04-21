@@ -31,6 +31,9 @@ namespace Ant.Application.Features.Collections.Commands.DeleteCollection
             if (request.UserId.HasValue && collection.UserId != request.UserId.Value)
                 throw new ApiException("Collection not found.");
 
+            if (collection.IsDefault)
+                throw new ApiException("Default collection cannot be deleted.");
+
             await _collectionRepository.DeleteAsync(collection);
             return collection.Id;
         }

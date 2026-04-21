@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, RouteCard, FilterChip, ScrollView } from '@antapp/ui'
+import { YStack, XStack, Text, RouteCard, FilterChip } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { RouteListItem, Tag } from '@/types/api'
 import { Map } from 'lucide-react'
@@ -89,13 +89,13 @@ export default function HomeClient({
   }
 
   return (
-    <YStack gap="$6" flex={1}>
+    <YStack gap="$4" flex={1} style={{ rowGap: 'clamp(14px, 1.8vw, 24px)' }}>
       {/* Hero Banner */}
       <YStack
         backgroundColor="$ant900"
         borderRadius="$4"
         padding="$6"
-        minHeight={200}
+        minHeight={160}
         justifyContent="center"
         position="relative"
         overflow="hidden"
@@ -131,8 +131,8 @@ export default function HomeClient({
 
       {/* Tag Filters */}
       {tagList.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <XStack gap="$2" paddingVertical="$1">
+        <div style={{ overflowX: 'auto', paddingBottom: '2px' }}>
+          <XStack gap="$2" paddingVertical="$1" style={{ width: 'max-content' }}>
             {tagList.map((tag) => (
               <FilterChip
                 key={tag.id}
@@ -143,7 +143,7 @@ export default function HomeClient({
               </FilterChip>
             ))}
           </XStack>
-        </ScrollView>
+        </div>
       )}
 
       {/* Interactive Route Explorer */}
@@ -152,7 +152,7 @@ export default function HomeClient({
           <Text variant="heading3">Interactive Route Explorer</Text>
         </XStack>
         <YStack
-          height={300}
+          height={260}
           backgroundColor="$muted"
           borderRadius="$4"
           overflow="hidden"
@@ -221,7 +221,7 @@ export default function HomeClient({
               See More
             </Text>
           </XStack>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
             {filterRoutes(recommendedRoutes).map((route) => (
               <RouteCard
                 key={route.id}

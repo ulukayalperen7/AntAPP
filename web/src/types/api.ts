@@ -73,6 +73,8 @@ export type RouteStop = {
   spotId: string
   order: number
   name: string
+  spotName?: string | null
+  customTitle?: string | null
   description: string | null
   photoUrl: string | null
   latitude: number
@@ -103,6 +105,7 @@ export type RouteStopItem = {
   spotId: string
   order: number
   name: string
+  spotName?: string | null
   description: string | null
   photoUrl: string | null
   latitude: number

@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input, Divider, Badge } from '@antapp/ui'
-import type { RouteDetail, RouteStopItem } from '@/types/api'
+import type { RouteDetail, RouteStopItem, SpotListItem } from '@/types/api'
 import {
   updateRoute,
   publishRoute,
@@ -28,7 +28,10 @@ import {
   Save,
   RotateCcw,
   MapPinned,
+  Heart,
 } from 'lucide-react'
+import SpotSelect from '@/components/spot-select'
+import { SavedSpotsPickerModal } from '@/features/spots/saved-spots-picker-modal'
 
 type FeedbackState = { ok: boolean; message: string } | null
 
@@ -44,6 +47,10 @@ function createEmptyStopForm(): NewStopForm {
     customTitle: '',
     customDescription: '',
   }
+}
+
+function uniqueSpotIds(items: string[]) {
+  return Array.from(new Set(items.filter(Boolean)))
 }
 
 function reorderArray<T>(items: T[], fromIndex: number, toIndex: number) {
@@ -76,6 +83,7 @@ export default function RouteEditClient({
   const [stops, setStops] = useState<RouteStopItem[]>(initialStops)
   const [savedStops, setSavedStops] = useState<RouteStopItem[]>(initialStops)
   const [newStop, setNewStop] = useState<NewStopForm>(createEmptyStopForm())
+  const [showSavedSpotPicker, setShowSavedSpotPicker] = useState(false)
   const [stopFeedback, setStopFeedback] = useState<FeedbackState>(null)
   const [isManagingStops, startManageStops] = useTransition()
 
@@ -183,7 +191,7 @@ export default function RouteEditClient({
     setStopFeedback(null)
 
     if (!newStop.spotId.trim()) {
-      setStopFeedback({ ok: false, message: 'Spot ID is required to add a new stop.' })
+      setStopFeedback({ ok: false, message: 'Please select a spot to add a new stop.' })
       return
     }
 
@@ -198,6 +206,25 @@ export default function RouteEditClient({
         await refreshStops('Stop added successfully.')
       } catch (e) {
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add stop.' })
+      }
+    })
+  }
+
+  const handleAddFromSaved = (pickedSpots: SpotListItem[]) => {
+    if (pickedSpots.length === 0) return
+
+    setStopFeedback(null)
+    startManageStops(async () => {
+      try {
+        for (const spot of pickedSpots) {
+          await addRouteStop(route.id, {
+            spotId: spot.id,
+            customTitle: spot.name,
+          })
+        }
+        await refreshStops(`${pickedSpots.length} stop${pickedSpots.length > 1 ? 's' : ''} added from saved spots.`)
+      } catch (e) {
+        setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add saved spots.' })
       }
     })
   }
@@ -295,7 +322,7 @@ export default function RouteEditClient({
             variant="outline"
             size="md"
             placeholder="Describe your route..."
-            // @ts-ignore multiline web
+
             multiline
             numberOfLines={4}
           />
@@ -371,15 +398,57 @@ export default function RouteEditClient({
 
           <YStack gap="$3">
             <YStack gap="$1.5">
-              <Text variant="label" color="$mutedForeground">Spot ID *</Text>
-              <Input
-                value={newStop.spotId}
-                onChangeText={(value) => setNewStop((prev) => ({ ...prev, spotId: value }))}
-                variant="outline"
-                size="md"
-                placeholder="Paste an existing Spot UUID"
-                autoCapitalize="none"
-              />
+              <XStack justifyContent="space-between" alignItems="center" gap="$2" flexWrap="wrap">
+                <Text variant="label" color="$mutedForeground">Select Spot *</Text>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  icon={<Heart size={14} color="#EA580C" fill="#EA580C" />}
+                  onPress={() => setShowSavedSpotPicker(true)}
+                  disabled={isManagingStops}
+                >
+                  Add from Saved
+                </Button>
+              </XStack>
+              {newStop.spotId ? (
+                <XStack
+                  backgroundColor="$primary50"
+                  padding="$3"
+                  borderRadius="$3"
+                  borderWidth={1}
+                  borderColor="$primary200"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  gap="$2"
+                >
+                  <YStack gap="$0.5" flex={1}>
+                    <Text variant="label" color="$primary">Spot selected</Text>
+                    <Text variant="caption" muted numberOfLines={1}>
+                      {newStop.customTitle || newStop.spotId}
+                    </Text>
+                  </YStack>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onPress={() => setNewStop(createEmptyStopForm())}
+                    disabled={isManagingStops}
+                  >
+                    Change
+                  </Button>
+                </XStack>
+              ) : (
+                <SpotSelect
+                  onSelect={(spot) => {
+                    setNewStop((prev) => ({
+                      ...prev,
+                      spotId: spot.id,
+                      customTitle: prev.customTitle.trim() ? prev.customTitle : spot.name,
+                    }))
+                    setStopFeedback(null)
+                  }}
+                  excludeIds={uniqueSpotIds(stops.map((s) => s.spotId))}
+                />
+              )}
             </YStack>
 
             <XStack gap="$3" flexWrap="wrap">
@@ -402,7 +471,7 @@ export default function RouteEditClient({
                   variant="outline"
                   size="md"
                   placeholder="Optional description override"
-                  // @ts-ignore multiline web
+
                   multiline
                   numberOfLines={3}
                 />
@@ -536,7 +605,7 @@ export default function RouteEditClient({
                           variant="outline"
                           size="md"
                           placeholder={stop.description ?? 'Optional description override'}
-                          // @ts-ignore multiline web
+
                           multiline
                           numberOfLines={3}
                         />
@@ -708,6 +777,13 @@ export default function RouteEditClient({
           )}
         </XStack>
       </YStack>
+
+      <SavedSpotsPickerModal
+        isOpen={showSavedSpotPicker}
+        onClose={() => setShowSavedSpotPicker(false)}
+        onAddSelected={handleAddFromSaved}
+        excludeIds={uniqueSpotIds(stops.map((s) => s.spotId))}
+      />
     </YStack>
   )
 }
