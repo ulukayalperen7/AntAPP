@@ -53,6 +53,8 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         
         // Combine real Spot data with optional Route-specific overrides
         public string Name { get; set; }
+        public string SpotName { get; set; }
+        public string CustomTitle { get; set; }
         public string Description { get; set; }
         public string PhotoUrl { get; set; }
         
@@ -104,6 +106,8 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
                     
                     // Business Logic: If the user provided a Custom Title for this route, use it. Otherwise, use the original Spot name.
                     Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
+                    SpotName = rs.Spot.Name,
+                    CustomTitle = rs.CustomTitle,
                     Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
                     PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
                     

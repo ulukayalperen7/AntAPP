@@ -12642,7 +12642,7 @@ var require_Image = __commonJS({
       return uri;
     }
     __name(resolveAssetUri, "resolveAssetUri");
-    var Image3 = /* @__PURE__ */ React13.forwardRef((props, ref) => {
+    var Image2 = /* @__PURE__ */ React13.forwardRef((props, ref) => {
       var _ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, blurRadius = props.blurRadius, defaultSource = props.defaultSource, draggable = props.draggable, onError = props.onError, onLayout = props.onLayout, onLoad = props.onLoad, onLoadEnd = props.onLoadEnd, onLoadStart = props.onLoadStart, pointerEvents = props.pointerEvents, source = props.source, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var ariaLabel = _ariaLabel || accessibilityLabel;
       if (process.env.NODE_ENV !== "production") {
@@ -12768,8 +12768,8 @@ var require_Image = __commonJS({
         suppressHydrationWarning: true
       }), hiddenImage, createTintColorSVG(tintColor, filterRef.current));
     });
-    Image3.displayName = "Image";
-    var ImageWithStatics = Image3;
+    Image2.displayName = "Image";
+    var ImageWithStatics = Image2;
     ImageWithStatics.getSize = function(uri, success, failure) {
       _ImageLoader.default.getSize(uri, success, failure);
     };

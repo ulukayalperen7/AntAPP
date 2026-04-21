@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ProgressBar } from '@antapp/ui'
+import { YStack, XStack, Text, Button, StatBox, RatingDisplay } from '@antapp/ui'
 import type { RouteDetail } from '@/types/api'
 import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle } from 'lucide-react'
-import { saveRoute } from '@/features/collections/actions'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
 
@@ -59,7 +58,7 @@ function StarRatingWidget({
             onPress={() => handleRate(star)}
             padding="$1"
             borderRadius="$2"
-            // @ts-ignore — web-only mouse events
+
             onMouseEnter={() => !isSubmitting && setHovered(star)}
             onMouseLeave={() => setHovered(0)}
           >
@@ -113,6 +112,22 @@ function decodePolyline(encoded: string): Array<[number, number]> {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+function getBaseSpotName(stop: RouteDetail['stops'][number]) {
+  return stop.spotName?.trim() || stop.name
+}
+
+function hasTitleOverride(stop: RouteDetail['stops'][number]) {
+  const customTitle = stop.customTitle?.trim()
+  if (!customTitle) return false
+  return customTitle !== getBaseSpotName(stop)
+}
+
+function buildSpotHref(spotId: string, routeStopName: string) {
+  const params = new URLSearchParams()
+  params.set('fromRouteName', routeStopName)
+  return `/spots/${spotId}?${params.toString()}`
+}
+
 export default function RouteDetailClient({
   route,
   isOwner = false,
@@ -136,12 +151,26 @@ export default function RouteDetailClient({
     }
   }, [route.encodedPolyline])
 
+  const stopPoints = useMemo(
+    () => route.stops
+      .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
+      .map((stop, index) => ({
+        coordinates: [stop.longitude, stop.latitude] as [number, number],
+        order: stop.order || index + 1,
+        name: stop.name,
+        spotId: stop.spotId,
+      })),
+    [route.stops],
+  )
+
   const stopCoordinates = useMemo(
-    () =>
-      route.stops
-        .filter((stop) => Number.isFinite(stop.latitude) && Number.isFinite(stop.longitude))
-        .map((stop) => [stop.longitude, stop.latitude] as [number, number]),
-    [route.stops]
+    () => stopPoints.map((point) => point.coordinates),
+    [stopPoints],
+  )
+
+  const routeLineCoordinates = useMemo(
+    () => (polylineCoordinates.length > 1 ? polylineCoordinates : stopCoordinates),
+    [polylineCoordinates, stopCoordinates],
   )
 
   useEffect(() => {
@@ -175,14 +204,14 @@ export default function RouteDetailClient({
         map.on('load', () => {
           if (cancelled) return
 
-          if (polylineCoordinates.length > 1) {
+          if (routeLineCoordinates.length > 1) {
             map.addSource('route-line', {
               type: 'geojson',
               data: {
                 type: 'Feature',
                 geometry: {
                   type: 'LineString',
-                  coordinates: polylineCoordinates,
+                  coordinates: routeLineCoordinates,
                 },
                 properties: {},
               },
@@ -204,19 +233,19 @@ export default function RouteDetailClient({
             })
           }
 
-          if (stopCoordinates.length > 0) {
+          if (stopPoints.length > 0) {
             map.addSource('route-stops', {
               type: 'geojson',
               data: {
                 type: 'FeatureCollection',
-                features: stopCoordinates.map((coordinates, index) => ({
+                features: stopPoints.map((stop) => ({
                   type: 'Feature',
                   geometry: {
                     type: 'Point',
-                    coordinates,
+                    coordinates: stop.coordinates,
                   },
                   properties: {
-                    order: index + 1,
+                    order: stop.order,
                   },
                 })),
               },
@@ -227,7 +256,7 @@ export default function RouteDetailClient({
               type: 'circle',
               source: 'route-stops',
               paint: {
-                'circle-radius': 6,
+                'circle-radius': 8,
                 'circle-color': '#FF8C00',
                 'circle-stroke-color': '#FFFFFF',
                 'circle-stroke-width': 2,
@@ -238,28 +267,22 @@ export default function RouteDetailClient({
               id: 'route-stops-label-layer',
               type: 'symbol',
               source: 'route-stops',
-              minzoom: 11,
               layout: {
                 'text-field': ['to-string', ['get', 'order']],
                 'text-size': 11,
                 'text-font': ['Open Sans Semibold'],
-                // Keep labels readable when stops are close:
-                // default collision behavior hides overlapping labels.
-                'text-allow-overlap': false,
-                'text-ignore-placement': false,
+                'text-allow-overlap': true,
+                'text-ignore-placement': true,
               },
               paint: {
                 'text-color': '#FFFFFF',
+                'text-halo-color': '#C2410C',
+                'text-halo-width': 1.25,
               },
             })
           }
 
-          const fitCoordinates =
-            polylineCoordinates.length > 1
-              ? polylineCoordinates
-              : stopCoordinates.length > 0
-                ? stopCoordinates
-                : []
+          const fitCoordinates = routeLineCoordinates.length > 0 ? routeLineCoordinates : stopCoordinates
 
           if (fitCoordinates.length > 0) {
             let minLon = fitCoordinates[0][0]
@@ -306,11 +329,11 @@ export default function RouteDetailClient({
       }
       mapRef.current = null
     }
-  }, [polylineCoordinates, route.centerLatitude, route.centerLongitude, stopCoordinates])
+  }, [route.centerLatitude, route.centerLongitude, routeLineCoordinates, stopCoordinates, stopPoints])
 
   // Save state
   const [isSaved, setIsSaved] = useState(false)
-  const [isSaving, startSaving] = useTransition()
+  const [isSaving] = useTransition()
   const [saveError, setSaveError] = useState<string | null>(null)
   const [showCollectionModal, setShowCollectionModal] = useState(false)
 
@@ -329,6 +352,7 @@ export default function RouteDetailClient({
   // Tour Guide Mode state
   const [isTourMode, setIsTourMode] = useState(false)
   const [currentStopIndex, setCurrentStopIndex] = useState(0)
+  const currentStop = route.stops[currentStopIndex] ?? route.stops[0]
 
   const handleSave = () => {
     if (isSaved) return
@@ -432,7 +456,7 @@ export default function RouteDetailClient({
               loading={isSaving}
               disabled={isSaved || isSaving}
               onPress={handleSave}
-              // @ts-ignore — web style override
+
               style={{ backgroundColor: isSaved ? 'rgba(255,255,255,0.2)' : undefined }}
             >
               <XStack alignItems="center" gap="$1.5">
@@ -455,7 +479,7 @@ export default function RouteDetailClient({
                 variant="ghost"
                 size="md"
                 onPress={() => router.push(`/routes/${route.id}/edit`)}
-                // @ts-ignore
+
                 style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
               >
                 <XStack alignItems="center" gap="$1.5">
@@ -472,7 +496,7 @@ export default function RouteDetailClient({
                 loading={isPromoting}
                 disabled={isPromoted || isPromoting}
                 onPress={handlePromote}
-                // @ts-ignore — web style override
+
                 style={{ backgroundColor: isPromoted ? 'rgba(76,175,80,0.2)' : 'rgba(255,255,255,0.1)' }}
               >
                 <XStack alignItems="center" gap="$1.5">
@@ -552,7 +576,7 @@ export default function RouteDetailClient({
               <Text variant="heading3">Route Stops ({route.stops.length})</Text>
               <YStack gap="$3">
                 {route.stops.map((stop, idx) => (
-                  <XStack key={stop.spotId} gap="$3" alignItems="flex-start">
+                  <XStack key={`${stop.spotId}-${stop.order}-${idx}`} gap="$3" alignItems="flex-start">
                     <YStack alignItems="center" gap="$1">
                       <XStack
                         width={36}
@@ -562,7 +586,7 @@ export default function RouteDetailClient({
                         alignItems="center"
                         justifyContent="center"
                       >
-                        <Text variant="label" color="#FFFFFF" fontSize="$4">{idx + 1}</Text>
+                        <Text variant="label" color="#FFFFFF" fontSize="$4">{stop.order || idx + 1}</Text>
                       </XStack>
                       {idx < route.stops.length - 1 && (
                         <YStack width={2} height={44} backgroundColor="$borderColor" />
@@ -578,6 +602,11 @@ export default function RouteDetailClient({
                       borderColor="$borderColor"
                     >
                       <Text variant="heading4">{stop.name}</Text>
+                      {hasTitleOverride(stop) && (
+                        <Text variant="caption" muted>
+                          Original spot: {getBaseSpotName(stop)}
+                        </Text>
+                      )}
                       {stop.description && (
                         <Text variant="body" muted>{stop.description}</Text>
                       )}
@@ -586,12 +615,22 @@ export default function RouteDetailClient({
                         <img
                           src={stop.photoUrl}
                           alt={stop.name}
-                          style={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 8, marginTop: 8 }}
+                          loading="lazy"
+                          decoding="async"
+                          style={{
+                            width: '100%',
+                            maxWidth: 720,
+                            height: 200,
+                            objectFit: 'cover',
+                            borderRadius: 12,
+                            marginTop: 10,
+                            display: 'block',
+                          }}
                         />
                       )}
                       <XStack justifyContent="flex-end" marginTop="$1">
-                        <Button variant="outline" size="sm" onPress={() => router.push(`/spots/${stop.spotId}`)}>
-                          Open Spot
+                        <Button variant="outline" size="sm" onPress={() => router.push(buildSpotHref(stop.spotId, stop.name))}>
+                          Open Spot Details
                         </Button>
                       </XStack>
                     </YStack>
@@ -688,7 +727,7 @@ export default function RouteDetailClient({
         routeId={route.id}
         isOpen={showCollectionModal}
         onClose={() => setShowCollectionModal(false)}
-        onSaved={(collectionId) => {
+        onSaved={() => {
           setIsSaved(true)
           setSaveError(null)
         }}
@@ -719,23 +758,28 @@ export default function RouteDetailClient({
               {/* Progress Indicator */}
               <XStack alignItems="center" justifyContent="space-between" width="100%">
                 <Text variant="label" muted>
-                  Stop {currentStopIndex + 1} of {route.stops.length}
+                  Stop {currentStop?.order || currentStopIndex + 1} of {route.stops.length}
                 </Text>
               </XStack>
 
               {/* Current Stop Card */}
               <YStack backgroundColor="$backgroundStrong" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$borderColor">
-                {route.stops[currentStopIndex].photoUrl && (
+                {currentStop?.photoUrl && (
                   <img
-                    src={route.stops[currentStopIndex].photoUrl}
-                    alt={route.stops[currentStopIndex].name}
+                    src={currentStop.photoUrl}
+                    alt={currentStop.name}
                     style={{ width: '100%', height: 260, objectFit: 'cover' }}
                   />
                 )}
                 <YStack padding="$5" gap="$3">
-                  <Text variant="heading2">{route.stops[currentStopIndex].name}</Text>
-                  {route.stops[currentStopIndex].description && (
-                    <Text variant="body" lineHeight="$7">{route.stops[currentStopIndex].description}</Text>
+                  <Text variant="heading2">{currentStop?.name}</Text>
+                  {currentStop && hasTitleOverride(currentStop) && (
+                    <Text variant="caption" muted>
+                      Original spot: {getBaseSpotName(currentStop)}
+                    </Text>
+                  )}
+                  {currentStop?.description && (
+                    <Text variant="body" lineHeight="$7">{currentStop.description}</Text>
                   )}
                 </YStack>
               </YStack>
@@ -746,9 +790,12 @@ export default function RouteDetailClient({
                   size="lg"
                   variant="solid"
                   icon={<Navigation size={18} color="#FFFFFF" />}
-                  onPress={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${route.stops[currentStopIndex].latitude},${route.stops[currentStopIndex].longitude}`, '_blank')}
+                  onPress={() => {
+                    if (!currentStop) return
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${currentStop.latitude},${currentStop.longitude}`, '_blank')
+                  }}
                 >
-                  <Text color="#FFFFFF" weight="semibold">Navigate to Stop {currentStopIndex + 1} on Maps</Text>
+                  <Text color="#FFFFFF" weight="semibold">Navigate to Stop {currentStop?.order || currentStopIndex + 1} on Maps</Text>
                 </Button>
 
                 <Button
@@ -760,7 +807,7 @@ export default function RouteDetailClient({
                       setCurrentStopIndex(currentStopIndex + 1)
                       window.scrollTo({ top: 0, behavior: 'smooth' })
                     } else {
-                      alert("🎉 Congratulations! You completed the route!")
+                      alert('Congratulations! You completed the route!')
                       setIsTourMode(false)
                     }
                   }}

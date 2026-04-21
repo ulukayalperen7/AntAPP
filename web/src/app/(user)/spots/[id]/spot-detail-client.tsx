@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Badge, Image, RouteCard, RatingDisplay } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Badge, RouteCard, RatingDisplay } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { SpotDetail, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
@@ -58,7 +58,7 @@ function SpotRatingWidget({
             borderRadius="$2"
             cursor={submitted || isPending ? 'default' : 'pointer'}
             onPress={() => handleRate(score)}
-            // @ts-ignore web-only mouse handlers
+
             onMouseEnter={() => !submitted && !isPending && setHovered(score)}
             onMouseLeave={() => setHovered(0)}
           >
@@ -83,9 +83,11 @@ function SpotRatingWidget({
 
 export default function SpotDetailClient({
   spot,
+  routeLabel,
   initialRoutes,
 }: {
   spot: SpotDetail
+  routeLabel?: string
   initialRoutes: SpotRouteItem[]
 }) {
   const router = useRouter()
@@ -120,6 +122,11 @@ export default function SpotDetailClient({
         <YStack flex={1}>
           <Text variant="heading2">{spot.name}</Text>
           <Text variant="body" muted>Spot details and related routes</Text>
+          {routeLabel && routeLabel.trim() && routeLabel.trim() !== spot.name && (
+            <Text variant="caption" color="$mutedForeground">
+              This stop was labeled as &quot;{routeLabel}&quot; inside the route.
+            </Text>
+          )}
         </YStack>
       </XStack>
 

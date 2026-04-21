@@ -20,6 +20,7 @@ namespace Ant.Application.Features.RouteStops.Queries.GetRouteStops
         public Guid SpotId { get; set; }
         public int Order { get; set; }
         public string Name { get; set; }
+        public string SpotName { get; set; }
         public string Description { get; set; }
         public string PhotoUrl { get; set; }
         public double Latitude { get; set; }
@@ -47,6 +48,7 @@ namespace Ant.Application.Features.RouteStops.Queries.GetRouteStops
                 SpotId = rs.SpotId,
                 Order = rs.SpotOrder,
                 Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
+                SpotName = rs.Spot.Name,
                 Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
                 PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
                 Latitude = rs.Spot.Location?.Y ?? 0,

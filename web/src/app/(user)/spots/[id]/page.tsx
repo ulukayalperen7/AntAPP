@@ -4,10 +4,13 @@ import SpotDetailClient from './spot-detail-client'
 
 export default async function SpotDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ fromRouteName?: string }>
 }) {
   const { id } = await params
+  const { fromRouteName } = await searchParams
 
   const [spotResult, routesResult] = await Promise.allSettled([
     getSpotById(id),
@@ -21,6 +24,7 @@ export default async function SpotDetailPage({
   return (
     <SpotDetailClient
       spot={spotResult.value}
+      routeLabel={fromRouteName}
       initialRoutes={routesResult.status === 'fulfilled' ? routesResult.value.data : []}
     />
   )

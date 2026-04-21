@@ -46,7 +46,7 @@ export function AppSidebar({
       left={0}
       zIndex={50}
       $md={{ display: 'none' }}
-      // @ts-ignore web transition
+
       style={{ transition: 'width 200ms ease' }}
     >
       <YStack gap="$1">
@@ -148,21 +148,26 @@ export function AppSidebar({
 
         <Divider marginHorizontal="$2" />
 
-        <XStack
-          paddingHorizontal={collapsed ? '$0' : '$3'}
-          paddingVertical="$2"
-          gap="$2.5"
-          alignItems="center"
-          justifyContent={collapsed ? 'center' : 'flex-start'}
-        >
-          <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} />
-          {!collapsed && (
-            <YStack flex={1}>
-              <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>
-              <Text variant="caption" muted>Explorer</Text>
-            </YStack>
-          )}
-        </XStack>
+        <Link href="/profile" style={{ textDecoration: 'none' }}>
+          <XStack
+            paddingHorizontal={collapsed ? '$0' : '$3'}
+            paddingVertical="$2"
+            gap="$2.5"
+            alignItems="center"
+            justifyContent={collapsed ? 'center' : 'flex-start'}
+            borderRadius="$3"
+            hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            cursor="pointer"
+          >
+            <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} />
+            {!collapsed && (
+              <YStack flex={1}>
+                <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>
+                <Text variant="caption" muted>Explorer</Text>
+              </YStack>
+            )}
+          </XStack>
+        </Link>
 
         {onLogout && (
           <XStack

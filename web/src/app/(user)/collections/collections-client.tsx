@@ -7,6 +7,24 @@ import type { Collection } from '@/types/api'
 import { FolderOpen, Plus, Globe, Lock, X } from 'lucide-react'
 import { createCollection } from '@/features/collections/actions'
 
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return 'CL'
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+}
+
+function collectionCoverStyle(id: string) {
+  const gradients = [
+    'linear-gradient(135deg, #0A4A7A 0%, #1E81B0 52%, #58B9E0 100%)',
+    'linear-gradient(135deg, #7A2F0A 0%, #C35B1D 55%, #F9A44B 100%)',
+    'linear-gradient(135deg, #0A6A56 0%, #0FA37F 50%, #6BE8C6 100%)',
+    'linear-gradient(135deg, #3D3D68 0%, #6262A6 52%, #9E9EEB 100%)',
+  ]
+  const seed = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  return gradients[seed % gradients.length]
+}
+
 function CollectionCard({ collection }: { collection: Collection }) {
   const router = useRouter()
 
@@ -30,7 +48,40 @@ function CollectionCard({ collection }: { collection: Collection }) {
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
-          <FolderOpen size={40} color="var(--color-mutedForeground)" strokeWidth={1.5} />
+          <YStack
+            width="100%"
+            height="100%"
+            justifyContent="space-between"
+            padding="$3"
+            style={{ background: collectionCoverStyle(collection.id) }}
+          >
+            <XStack justifyContent="space-between" alignItems="center">
+              <XStack
+                width={36}
+                height={36}
+                borderRadius="$3"
+                alignItems="center"
+                justifyContent="center"
+                backgroundColor="rgba(255,255,255,0.18)"
+              >
+                <Text variant="label" color="#FFFFFF" weight="semibold">
+                  {initialsFromName(collection.name)}
+                </Text>
+              </XStack>
+              <XStack
+                backgroundColor="rgba(255,255,255,0.2)"
+                borderRadius="$full"
+                paddingHorizontal="$2"
+                paddingVertical="$1"
+              >
+                <Text variant="caption" color="#FFFFFF">{collection.routeCount ?? 0} routes</Text>
+              </XStack>
+            </XStack>
+            <XStack alignItems="center" gap="$1.5">
+              <FolderOpen size={18} color="rgba(255,255,255,0.92)" strokeWidth={1.75} />
+              <Text variant="caption" color="rgba(255,255,255,0.92)">Collection Cover</Text>
+            </XStack>
+          </YStack>
         )}
       </YStack>
 
@@ -68,8 +119,8 @@ function NewCollectionModal({ onClose, onCreated }: { onClose: () => void; onCre
       await createCollection({ name: name.trim(), description: description.trim() || undefined })
       onCreated()
       onClose()
-    } catch (e: any) {
-      setError(e?.message ?? 'Failed to create collection.')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to create collection.')
     } finally {
       setLoading(false)
     }
@@ -86,7 +137,6 @@ function NewCollectionModal({ onClose, onCreated }: { onClose: () => void; onCre
       backgroundColor="rgba(0,0,0,0.5)"
       alignItems="center"
       justifyContent="center"
-      // @ts-ignore
       style={{ backdropFilter: 'blur(4px)' }}
       onPress={onClose}
     >
@@ -99,7 +149,11 @@ function NewCollectionModal({ onClose, onCreated }: { onClose: () => void; onCre
         gap="$4"
         width={400}
         maxWidth="90vw"
-        onPress={(e: any) => e.stopPropagation()}
+        onPress={(e: unknown) => {
+          if (e && typeof e === 'object' && 'stopPropagation' in e && typeof (e as { stopPropagation?: unknown }).stopPropagation === 'function') {
+            ;(e as { stopPropagation: () => void }).stopPropagation()
+          }
+        }}
       >
         <XStack justifyContent="space-between" alignItems="center">
           <Text variant="heading3">New Collection</Text>
@@ -167,7 +221,7 @@ export default function CollectionsClient({ collections: initialCollections }: {
         <Text variant="body" muted>Save and organize your favorite routes</Text>
       </YStack>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
         {collections.map((col) => (
           <CollectionCard key={col.id} collection={col} />
         ))}

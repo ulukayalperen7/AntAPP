@@ -12642,7 +12642,7 @@ var require_Image = __commonJS({
       return uri;
     }
     __name(resolveAssetUri, "resolveAssetUri");
-    var Image3 = /* @__PURE__ */ React91.forwardRef((props, ref) => {
+    var Image2 = /* @__PURE__ */ React91.forwardRef((props, ref) => {
       var _ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, blurRadius = props.blurRadius, defaultSource = props.defaultSource, draggable = props.draggable, onError = props.onError, onLayout = props.onLayout, onLoad = props.onLoad, onLoadEnd = props.onLoadEnd, onLoadStart = props.onLoadStart, pointerEvents = props.pointerEvents, source = props.source, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var ariaLabel = _ariaLabel || accessibilityLabel;
       if (process.env.NODE_ENV !== "production") {
@@ -12768,8 +12768,8 @@ var require_Image = __commonJS({
         suppressHydrationWarning: true
       }), hiddenImage, createTintColorSVG(tintColor, filterRef.current));
     });
-    Image3.displayName = "Image";
-    var ImageWithStatics = Image3;
+    Image2.displayName = "Image";
+    var ImageWithStatics = Image2;
     ImageWithStatics.getSize = function(uri, success, failure) {
       _ImageLoader.default.getSize(uri, success, failure);
     };
@@ -44702,8 +44702,15 @@ function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest })
   const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest);
   return /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(RouteCardFrame, { orientation, ...accessibilityProps, ...cardRest, children: [
     /* @__PURE__ */ (0, import_jsx_runtime100.jsxs)(CardImage, { orientation, children: [
-      data.image && // eslint-disable-next-line @next/next/no-img-element
-      /* @__PURE__ */ (0, import_jsx_runtime100.jsx)("img", { src: data.image, alt: data.title, style: { width: "100%", height: "100%", objectFit: "cover" } }),
+      data.image && /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(
+        Image,
+        {
+          src: data.image,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover"
+        }
+      ),
       (data.contentType === "Official" || data.isOfficial) && /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ContentTypeBadge, { type: "Official", children: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "OFFICIAL" }) }),
       data.contentType === "Sponsored" && /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(ContentTypeBadge, { type: "Sponsored", children: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(Text10, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "SPONSORED" }) }),
       /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(FavoriteButton, { onPress: onFavoritePress, children: /* @__PURE__ */ (0, import_jsx_runtime100.jsx)(HeartIcon, { filled: !!data.isFavorited }) }),
