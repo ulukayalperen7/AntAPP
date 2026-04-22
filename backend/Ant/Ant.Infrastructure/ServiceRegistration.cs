@@ -48,8 +48,8 @@ namespace Ant.Infrastructure
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IIdentityService, IdentityService>();
             
-            // Swap to DummyMapRoutingService until a Google API key is procured
-            services.AddTransient<IMapRoutingService, DummyMapRoutingService>();
+            // Use OSRM for map routing
+            services.AddHttpClient<IMapRoutingService, OsrmMapRoutingService>();
             #endregion
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>
