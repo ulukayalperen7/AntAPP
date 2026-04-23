@@ -21,6 +21,7 @@ namespace Ant.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
@@ -141,11 +142,23 @@ namespace Ant.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorUserId");
-
                     b.HasIndex("CenterLocation");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("CenterLocation"), "GIST");
+
+                    b.HasIndex("Description");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Description"), "GIN");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Description"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("Title");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "GIN");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("AuthorUserId", "CreatedAt");
+
+                    b.HasIndex("IsDeleted", "IsPublic", "CreatedAt");
 
                     b.ToTable("Routes");
                 });
@@ -270,7 +283,23 @@ namespace Ant.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerUserId");
+                    b.HasIndex("Description");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Description"), "GIN");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Description"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("Location");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
+
+                    b.HasIndex("Name");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "GIN");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Name"), new[] { "gin_trgm_ops" });
+
+                    b.HasIndex("IsActive", "CreatedAt");
+
+                    b.HasIndex("OwnerUserId", "CreatedAt");
 
                     b.ToTable("Spots");
                 });
