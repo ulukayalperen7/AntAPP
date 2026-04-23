@@ -16,9 +16,9 @@ export function AppTopBar() {
       borderBottomColor="$borderColor"
       gap="$4"
     >
-      <XStack flex={1} maxWidth={560}>
+      <XStack flex={1} maxWidth={600}>
         <SearchInput
-          placeholder="Search routes, cities, or places..."
+          placeholder="Search routes, cities, parks..."
           size="md"
           flex={1}
           icon={<Search size={18} color="var(--color-mutedForeground)" />}
