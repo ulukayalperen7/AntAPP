@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Image } from '@antapp/ui'
 import type { Collection } from '@/types/api'
 import { Plus, Globe, Lock, X, Trash2, AlertTriangle } from 'lucide-react'
 import { createCollection, deleteCollection } from '@/features/collections/actions'
@@ -47,7 +47,7 @@ function CollectionCard({
     >
       <YStack height={160} backgroundColor="$muted" alignItems="center" justifyContent="center">
         {collection.thumbnailUrl ? (
-          <img
+          <Image
             src={collection.thumbnailUrl}
             alt=""
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}

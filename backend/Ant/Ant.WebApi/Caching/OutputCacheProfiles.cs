@@ -12,6 +12,8 @@ namespace Ant.WebApi.Caching
         public const string SpotDetail = nameof(SpotDetail);
         public const string SpotRoutes = nameof(SpotRoutes);
         public const string TagsList = nameof(TagsList);
+        public const string UserCollections = nameof(UserCollections);
+        public const string UserCollectionDetail = nameof(UserCollectionDetail);
     }
 
     public static class OutputCacheTags

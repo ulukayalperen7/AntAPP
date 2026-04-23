@@ -8,9 +8,11 @@ using Ant.Application.Features.Collections.Commands.UpdateCollection;
 using Ant.Application.Features.Collections.Queries.GetCollectionById;
 using Ant.Application.Features.Collections.Queries.GetCollections;
 using Ant.Application.Wrappers;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,6 +25,7 @@ namespace Ant.WebApi.Controllers
     public class CollectionsController : BaseApiController
     {
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachePolicies.UserCollections, VaryByUserClaims = new[] { "uid" })]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<CollectionViewModel>))]
         public async Task<IActionResult> GetAll([FromQuery] GetCollectionsParameter filter)
         {
@@ -35,6 +38,7 @@ namespace Ant.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [OutputCache(PolicyName = OutputCachePolicies.UserCollectionDetail, VaryByUserClaims = new[] { "uid" })]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CollectionDetailViewModel))]
         public async Task<IActionResult> GetById(Guid id)
         {

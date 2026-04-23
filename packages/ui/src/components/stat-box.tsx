@@ -8,7 +8,7 @@ export type StatBoxProps = GetProps<typeof YStack> & {
   icon?: React.ReactNode
 }
 
-export function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
+export const StatBox = React.memo(function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
   const { rest: boxRest, accessibilityProps } = splitAccessibilityProps(rest)
 
   return (
@@ -33,4 +33,4 @@ export function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
       </TamaguiText>
     </YStack>
   )
-}
+})

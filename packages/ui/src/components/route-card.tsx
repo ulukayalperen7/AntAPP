@@ -138,7 +138,7 @@ export type RouteCardProps = Omit<GetProps<typeof RouteCardFrame>, 'orientation'
   onFavoritePress?: () => void
 }
 
-export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...rest }: RouteCardProps) {
+export const RouteCard = React.memo(function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...rest }: RouteCardProps) {
   const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest)
 
   return (
@@ -226,4 +226,4 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
       </YStack>
     </RouteCardFrame>
   )
-}
+})

@@ -7,6 +7,7 @@ using Ant.Infrastructure.Contexts;
 using Ant.WebApi.Caching;
 using Ant.WebApi.Extensions;
 using Ant.WebApi.Services;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +61,30 @@ builder.Services.AddOutputCache(options =>
         .Expire(TimeSpan.FromMinutes(10))
         .SetVaryByQuery("pageNumber", "pageSize")
         .Tag(OutputCacheTags.Tags));
+    options.AddPolicy(OutputCachePolicies.UserCollections, policy => policy
+        .Expire(TimeSpan.FromMinutes(1))
+        .SetVaryByQuery("pageNumber", "pageSize")
+        .VaryByUserClaims("uid"));
+    options.AddPolicy(OutputCachePolicies.UserCollectionDetail, policy => policy
+        .Expire(TimeSpan.FromMinutes(2))
+        .SetVaryByRouteValue("id")
+        .VaryByUserClaims("uid"));
+});
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<GzipCompressionProvider>();
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+    {
+        "application/json",
+        "text/json",
+        "text/plain",
+        "text/html",
+        "text/css",
+        "application/javascript",
+        "text/javascript"
+    });
 });
 builder.Services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 builder.Services.AddHttpContextAccessor();
@@ -95,6 +120,7 @@ else
 }
 
 app.UseRouting();
+app.UseResponseCompression();
 app.UseCors(options => options
     .WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:8081", "http://172.20.10.2:8081", "http://172.20.10.2:3000")
     .AllowAnyHeader()

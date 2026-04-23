@@ -48,8 +48,7 @@ function SpotCard({
         </YStack>
 
         {spot.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <Image src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         ) : (
           <MapPinned size={36} color="var(--color-mutedForeground)" />
         )}

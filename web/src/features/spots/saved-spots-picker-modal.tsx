@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { getSavedSpots } from '@/features/spots/actions'
 import type { SpotListItem } from '@/types/api'
 import { MapPin, Check, X, BookmarkCheck, Heart } from 'lucide-react'
+import { Image } from '@antapp/ui'
 
 export function SavedSpotsPickerModal({
     isOpen,
@@ -119,8 +120,7 @@ export function SavedSpotsPickerModal({
                                     background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
                                     {spot.photoUrl ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                        <Image src={spot.photoUrl} alt={spot.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                     ) : (
                                         <MapPin size={18} color={isSelected ? '#EA580C' : '#9CA3AF'} />
                                     )}

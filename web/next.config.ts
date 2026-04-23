@@ -28,6 +28,23 @@ const nextConfig: NextConfig = {
       'react-native-svg': '@tamagui/react-native-svg',
     },
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, must-revalidate',
+          },
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+        ],
+      },
+    ]
+  },
 }
 
 export default nextConfig

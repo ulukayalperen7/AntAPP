@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
+import { YStack, XStack, Text, Avatar, Divider, Image } from '@antapp/ui'
 import { useTheme } from 'tamagui'
 import { Globe, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
@@ -59,7 +59,7 @@ export function AppSidebar({
           gap="$2"
         >
           <XStack alignItems="center" gap="$2" overflow="hidden">
-            <img src="/ant-logo.png" alt="" style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }} />
+            <Image src="/ant-logo.png" alt="" width={32} height={32} style={{ objectFit: 'contain', flexShrink: 0 }} />
             {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
           </XStack>
           {onToggle && !collapsed && (

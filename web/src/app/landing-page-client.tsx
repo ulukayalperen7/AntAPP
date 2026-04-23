@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   Theme,
+  Image,
 } from '@antapp/ui'
 import { MapPin, Download, LogIn, Star, Users, Zap } from 'lucide-react'
 import type { RouteListItem } from '@/types/api'
@@ -33,7 +34,7 @@ export function LandingPageClient({
           borderBottomColor="$borderColor"
         >
           <XStack alignItems="center" gap="$2">
-            <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+            <Image src="/ant-logo.png" alt="AntAPP Logo" width={32} height={32} style={{ objectFit: 'contain' }} />
             <Text variant="heading3" weight="bold" color="$primary">
               AntAPP
             </Text>
@@ -158,7 +159,7 @@ export function LandingPageClient({
                     alignItems="center"
                   >
                     {route.thumbnailUrl ? (
-                      <img
+                      <Image
                         src={route.thumbnailUrl}
                         alt={route.title}
                         style={{
