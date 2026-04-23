@@ -89,6 +89,7 @@ const STYLE_KEYS = new Set([
   'fontWeight',
   'gap',
   'height',
+  'inset',
   'justifyContent',
   'left',
   'letterSpacing',
@@ -148,6 +149,7 @@ const SPACE_STYLE_KEYS = new Set([
   'columnGap',
   'gap',
   'height',
+  'inset',
   'left',
   'margin',
   'marginBottom',
@@ -562,6 +564,42 @@ function resolveStyleValue(property: string, value: any, theme: AntTheme): any {
 
 function finalizeResolvedStyle(style: AntStyleObject) {
   const nextStyle: AntStyleObject = { ...style }
+
+  if (nextStyle.paddingHorizontal !== undefined) {
+    nextStyle.paddingLeft = nextStyle.paddingHorizontal
+    nextStyle.paddingRight = nextStyle.paddingHorizontal
+    delete nextStyle.paddingHorizontal
+  }
+
+  if (nextStyle.paddingVertical !== undefined) {
+    nextStyle.paddingTop = nextStyle.paddingVertical
+    nextStyle.paddingBottom = nextStyle.paddingVertical
+    delete nextStyle.paddingVertical
+  }
+
+  if (nextStyle.marginHorizontal !== undefined) {
+    nextStyle.marginLeft = nextStyle.marginHorizontal
+    nextStyle.marginRight = nextStyle.marginHorizontal
+    delete nextStyle.marginHorizontal
+  }
+
+  if (nextStyle.marginVertical !== undefined) {
+    nextStyle.marginTop = nextStyle.marginVertical
+    nextStyle.marginBottom = nextStyle.marginVertical
+    delete nextStyle.marginVertical
+  }
+
+  if (nextStyle.inset !== undefined) {
+    nextStyle.top = nextStyle.inset
+    nextStyle.right = nextStyle.inset
+    nextStyle.bottom = nextStyle.inset
+    nextStyle.left = nextStyle.inset
+    delete nextStyle.inset
+  }
+
+  if (isWeb && typeof nextStyle.lineHeight === 'number' && nextStyle.lineHeight > 4) {
+    nextStyle.lineHeight = `${nextStyle.lineHeight}px`
+  }
 
   if (nextStyle.scale !== undefined) {
     if (isWeb) {
