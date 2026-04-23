@@ -239,3 +239,39 @@ export function FeaturedRouteCardsSkeleton() {
     </XStack>
   )
 }
+
+export function PopularRoutesSkeleton() {
+  return (
+    <YStack gap="$3">
+      <Skeleton width={140} height={24} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <RouteCardSkeleton key={index} />
+        ))}
+      </div>
+    </YStack>
+  )
+}
+
+export function RecommendedRoutesSkeleton() {
+  return (
+    <YStack gap="$3">
+      <Skeleton width={160} height={24} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <RouteCardSkeleton key={index} />
+        ))}
+      </div>
+    </YStack>
+  )
+}
+
+export function TagsSkeleton() {
+  return (
+    <XStack gap="$2" paddingVertical="$1">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Skeleton key={index} width={80} height={32} borderRadius="$full" />
+      ))}
+    </XStack>
+  )
+}
