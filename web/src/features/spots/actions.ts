@@ -35,7 +35,7 @@ export async function getSpotRoutes(spotId: string, page = 1, pageSize = 12): Pr
 export async function rateSpot(spotId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/spots/${spotId}/rating`, {
     method: 'PUT',
-    body: JSON.stringify({ score }),
+    body: JSON.stringify({ stars: score }),
   })
 }
 

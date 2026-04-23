@@ -38,10 +38,12 @@ builder.Services.AddOutputCache(options =>
     options.AddBasePolicy(policy => policy.NoCache());
     options.AddPolicy(OutputCachePolicies.RoutesList, policy => policy
         .Expire(TimeSpan.FromMinutes(1))
+        .SetVaryByHeader("Authorization")
         .SetVaryByQuery("search", "tagId", "tagIds", "sort", "nearLat", "nearLng", "radiusKm", "authorId", "visibility", "type", "page", "pageSize")
         .Tag(OutputCacheTags.Routes));
     options.AddPolicy(OutputCachePolicies.RouteDetail, policy => policy
         .Expire(TimeSpan.FromMinutes(2))
+        .SetVaryByHeader("Authorization")
         .SetVaryByRouteValue("routeId")
         .Tag(OutputCacheTags.Routes));
     options.AddPolicy(OutputCachePolicies.SpotsList, policy => policy

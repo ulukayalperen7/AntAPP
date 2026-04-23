@@ -40,7 +40,7 @@ export async function getTags(pageSize = 100): Promise<Tag[]> {
 export async function rateRoute(routeId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/routes/${routeId}/rating`, {
     method: 'PUT',
-    body: JSON.stringify({ score }),
+    body: JSON.stringify({ stars: score }),
   })
 }
 

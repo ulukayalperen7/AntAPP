@@ -146,7 +146,7 @@ export async function forkRoute(id: string): Promise<string> {
 export async function rateRoute(routeId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/routes/${routeId}/rating`, {
     method: 'PUT',
-    body: JSON.stringify({ score }),
+    body: JSON.stringify({ stars: score }),
   })
 }
 
