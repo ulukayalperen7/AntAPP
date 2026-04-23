@@ -5109,7 +5109,7 @@ var require_mergeRefs = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = mergeRefs;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     function mergeRefs() {
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
@@ -5144,13 +5144,13 @@ var require_useMergeRefs = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = useMergeRefs;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _mergeRefs = _interopRequireDefault(require_mergeRefs());
     function useMergeRefs() {
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
-      return React13.useMemo(
+      return React15.useMemo(
         () => (0, _mergeRefs.default)(...args),
         // eslint-disable-next-line
         [...args]
@@ -5168,10 +5168,10 @@ var require_useStable = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = useStable;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var UNINITIALIZED = typeof Symbol === "function" && typeof /* @__PURE__ */ Symbol() === "symbol" ? /* @__PURE__ */ Symbol() : Object.freeze({});
     function useStable(getInitialValue) {
-      var ref = React13.useRef(UNINITIALIZED);
+      var ref = React15.useRef(UNINITIALIZED);
       if (ref.current === UNINITIALIZED) {
         ref.current = getInitialValue();
       }
@@ -6087,12 +6087,12 @@ var require_useResponderEvents = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = useResponderEvents;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var ResponderSystem = _interopRequireWildcard(require_ResponderSystem());
     var emptyObject = {};
     var idCounter = 0;
     function useStable(getInitialValue) {
-      var ref = React13.useRef(null);
+      var ref = React15.useRef(null);
       if (ref.current == null) {
         ref.current = getInitialValue();
       }
@@ -6104,14 +6104,14 @@ var require_useResponderEvents = __commonJS({
         config = emptyObject;
       }
       var id = useStable(() => idCounter++);
-      var isAttachedRef = React13.useRef(false);
-      React13.useEffect(() => {
+      var isAttachedRef = React15.useRef(false);
+      React15.useEffect(() => {
         ResponderSystem.attachListeners();
         return () => {
           ResponderSystem.removeNode(id);
         };
       }, [id]);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         var _config = config, onMoveShouldSetResponder = _config.onMoveShouldSetResponder, onMoveShouldSetResponderCapture = _config.onMoveShouldSetResponderCapture, onScrollShouldSetResponder = _config.onScrollShouldSetResponder, onScrollShouldSetResponderCapture = _config.onScrollShouldSetResponderCapture, onSelectionChangeShouldSetResponder = _config.onSelectionChangeShouldSetResponder, onSelectionChangeShouldSetResponderCapture = _config.onSelectionChangeShouldSetResponderCapture, onStartShouldSetResponder = _config.onStartShouldSetResponder, onStartShouldSetResponderCapture = _config.onStartShouldSetResponderCapture;
         var requiresResponderSystem = onMoveShouldSetResponder != null || onMoveShouldSetResponderCapture != null || onScrollShouldSetResponder != null || onScrollShouldSetResponderCapture != null || onSelectionChangeShouldSetResponder != null || onSelectionChangeShouldSetResponderCapture != null || onStartShouldSetResponder != null || onStartShouldSetResponderCapture != null;
         var node = hostRef.current;
@@ -6123,10 +6123,10 @@ var require_useResponderEvents = __commonJS({
           isAttachedRef.current = false;
         }
       }, [config, hostRef, id]);
-      React13.useDebugValue({
+      React15.useDebugValue({
         isResponder: hostRef.current === ResponderSystem.getResponderNode()
       });
-      React13.useDebugValue(config);
+      React15.useDebugValue(config);
     }
     __name(useResponderEvents, "useResponderEvents");
     module2.exports = exports2.default;
@@ -6157,7 +6157,7 @@ var require_View = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var forwardedProps = _interopRequireWildcard(require_forwardedProps());
     var _pick = _interopRequireDefault(require_pick());
@@ -6177,17 +6177,17 @@ var require_View = __commonJS({
       pointerEvents: true
     });
     var pickProps = /* @__PURE__ */ __name((props) => (0, _pick.default)(props, forwardPropsList), "pickProps");
-    var View4 = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var View5 = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var hrefAttrs = props.hrefAttrs, onLayout = props.onLayout, onMoveShouldSetResponder = props.onMoveShouldSetResponder, onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture, onResponderEnd = props.onResponderEnd, onResponderGrant = props.onResponderGrant, onResponderMove = props.onResponderMove, onResponderReject = props.onResponderReject, onResponderRelease = props.onResponderRelease, onResponderStart = props.onResponderStart, onResponderTerminate = props.onResponderTerminate, onResponderTerminationRequest = props.onResponderTerminationRequest, onScrollShouldSetResponder = props.onScrollShouldSetResponder, onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture, onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder, onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture, onStartShouldSetResponder = props.onStartShouldSetResponder, onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       if (process.env.NODE_ENV !== "production") {
-        React13.Children.toArray(props.children).forEach((item) => {
+        React15.Children.toArray(props.children).forEach((item) => {
           if (typeof item === "string") {
             console.error("Unexpected text node: " + item + ". A text node cannot be a child of a <View>.");
           }
         });
       }
-      var hasTextAncestor = React13.useContext(_TextAncestorContext.default);
-      var hostRef = React13.useRef(null);
+      var hasTextAncestor = React15.useContext(_TextAncestorContext.default);
+      var hostRef = React15.useRef(null);
       var _useLocaleContext = (0, _useLocale.useLocaleContext)(), contextDirection = _useLocaleContext.direction;
       (0, _useElementLayout.default)(hostRef, onLayout);
       (0, _useResponderEvents.default)(hostRef, {
@@ -6237,7 +6237,7 @@ var require_View = __commonJS({
         writingDirection
       });
     });
-    View4.displayName = "View";
+    View5.displayName = "View";
     var styles = _StyleSheet.default.create({
       view$raw: {
         alignContent: "flex-start",
@@ -6262,7 +6262,7 @@ var require_View = __commonJS({
         display: "inline-flex"
       }
     });
-    var _default = exports2.default = View4;
+    var _default = exports2.default = View5;
     module2.exports = exports2.default;
   }
 });
@@ -6632,7 +6632,7 @@ var require_ScrollViewBase = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
@@ -6674,14 +6674,14 @@ var require_ScrollViewBase = __commonJS({
       return eventThrottle > 0 && timeSinceLastTick >= eventThrottle;
     }
     __name(shouldEmitScrollEvent, "shouldEmitScrollEvent");
-    var ScrollViewBase = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var ScrollViewBase = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var onScroll = props.onScroll, onTouchMove = props.onTouchMove, onWheel = props.onWheel, _props$scrollEnabled = props.scrollEnabled, scrollEnabled = _props$scrollEnabled === void 0 ? true : _props$scrollEnabled, _props$scrollEventThr = props.scrollEventThrottle, scrollEventThrottle = _props$scrollEventThr === void 0 ? 0 : _props$scrollEventThr, showsHorizontalScrollIndicator = props.showsHorizontalScrollIndicator, showsVerticalScrollIndicator = props.showsVerticalScrollIndicator, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var scrollState = React13.useRef({
+      var scrollState = React15.useRef({
         isScrolling: false,
         scrollLastTick: 0
       });
-      var scrollTimeout = React13.useRef(null);
-      var scrollRef = React13.useRef(null);
+      var scrollTimeout = React15.useRef(null);
+      var scrollRef = React15.useRef(null);
       function createPreventableScrollHandler(handler) {
         return (e) => {
           if (scrollEnabled) {
@@ -6732,7 +6732,7 @@ var require_ScrollViewBase = __commonJS({
       }
       __name(handleScrollEnd, "handleScrollEnd");
       var hideScrollbar = showsHorizontalScrollIndicator === false || showsVerticalScrollIndicator === false;
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, {
         onScroll: handleScroll,
         onTouchMove: createPreventableScrollHandler(onTouchMove),
         onWheel: createPreventableScrollHandler(onWheel),
@@ -8181,8 +8181,8 @@ var require_StateSafePureComponent = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _invariant = _interopRequireDefault(require_invariant());
-    var React13 = _interopRequireWildcard(require("react"));
-    var StateSafePureComponent = class extends React13.PureComponent {
+    var React15 = _interopRequireWildcard(require("react"));
+    var StateSafePureComponent = class extends React15.PureComponent {
       static {
         __name(this, "StateSafePureComponent");
       }
@@ -8420,15 +8420,15 @@ var require_VirtualizedListContext = __commonJS({
     exports2.VirtualizedListContextResetter = VirtualizedListContextResetter;
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var __DEV__ = process.env.NODE_ENV !== "production";
-    var VirtualizedListContext = exports2.VirtualizedListContext = /* @__PURE__ */ React13.createContext(null);
+    var VirtualizedListContext = exports2.VirtualizedListContext = /* @__PURE__ */ React15.createContext(null);
     if (__DEV__) {
       VirtualizedListContext.displayName = "VirtualizedListContext";
     }
     function VirtualizedListContextResetter(_ref) {
       var children = _ref.children;
-      return /* @__PURE__ */ React13.createElement(VirtualizedListContext.Provider, {
+      return /* @__PURE__ */ React15.createElement(VirtualizedListContext.Provider, {
         value: null
       }, children);
     }
@@ -8443,7 +8443,7 @@ var require_VirtualizedListContext = __commonJS({
         registerAsNestedChild: value.registerAsNestedChild,
         unregisterAsNestedChild: value.unregisterAsNestedChild
       }), [value.getScrollMetrics, value.horizontal, value.getOutermostParentListRef, value.registerAsNestedChild, value.unregisterAsNestedChild]);
-      return /* @__PURE__ */ React13.createElement(VirtualizedListContext.Provider, {
+      return /* @__PURE__ */ React15.createElement(VirtualizedListContext.Provider, {
         value: context
       }, children);
     }
@@ -8454,7 +8454,7 @@ var require_VirtualizedListContext = __commonJS({
       var context = (0, _react.useMemo)(() => currContext == null ? null : (0, _objectSpread2.default)((0, _objectSpread2.default)({}, currContext), {}, {
         cellKey
       }), [currContext, cellKey]);
-      return /* @__PURE__ */ React13.createElement(VirtualizedListContext.Provider, {
+      return /* @__PURE__ */ React15.createElement(VirtualizedListContext.Provider, {
         value: context
       }, children);
     }
@@ -8476,8 +8476,8 @@ var require_VirtualizedListCellRenderer = __commonJS({
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _VirtualizedListContext = require_VirtualizedListContext();
     var _invariant = _interopRequireDefault(require_invariant());
-    var React13 = _interopRequireWildcard(require("react"));
-    var CellRenderer = class extends React13.Component {
+    var React15 = _interopRequireWildcard(require("react"));
+    var CellRenderer = class extends React15.Component {
       static {
         __name(this, "CellRenderer");
       }
@@ -8534,7 +8534,7 @@ var require_VirtualizedListCellRenderer = __commonJS({
           console.warn("VirtualizedList: Both ListItemComponent and renderItem props are present. ListItemComponent will take precedence over renderItem.");
         }
         if (ListItemComponent) {
-          return /* @__PURE__ */ React13.createElement(ListItemComponent, {
+          return /* @__PURE__ */ React15.createElement(ListItemComponent, {
             item,
             index,
             separators: this._separators
@@ -8552,20 +8552,20 @@ var require_VirtualizedListCellRenderer = __commonJS({
       render() {
         var _this$props4 = this.props, CellRendererComponent = _this$props4.CellRendererComponent, ItemSeparatorComponent = _this$props4.ItemSeparatorComponent, ListItemComponent = _this$props4.ListItemComponent, cellKey = _this$props4.cellKey, horizontal = _this$props4.horizontal, item = _this$props4.item, index = _this$props4.index, inversionStyle = _this$props4.inversionStyle, onCellFocusCapture = _this$props4.onCellFocusCapture, onCellLayout = _this$props4.onCellLayout, renderItem = _this$props4.renderItem;
         var element = this._renderElement(renderItem, ListItemComponent, item, index);
-        var itemSeparator = /* @__PURE__ */ React13.isValidElement(ItemSeparatorComponent) ? (
+        var itemSeparator = /* @__PURE__ */ React15.isValidElement(ItemSeparatorComponent) ? (
           // $FlowFixMe[incompatible-type]
           ItemSeparatorComponent
         ) : (
           // $FlowFixMe[incompatible-type]
-          ItemSeparatorComponent && /* @__PURE__ */ React13.createElement(ItemSeparatorComponent, this.state.separatorProps)
+          ItemSeparatorComponent && /* @__PURE__ */ React15.createElement(ItemSeparatorComponent, this.state.separatorProps)
         );
         var cellStyle = inversionStyle ? horizontal ? [styles.rowReverse, inversionStyle] : [styles.columnReverse, inversionStyle] : horizontal ? [styles.row, inversionStyle] : inversionStyle;
-        var result = !CellRendererComponent ? /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({
+        var result = !CellRendererComponent ? /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({
           style: cellStyle,
           onFocusCapture: onCellFocusCapture
         }, onCellLayout && {
           onLayout: this._onLayout
-        }), element, itemSeparator) : /* @__PURE__ */ React13.createElement(CellRendererComponent, (0, _extends2.default)({
+        }), element, itemSeparator) : /* @__PURE__ */ React15.createElement(CellRendererComponent, (0, _extends2.default)({
           cellKey,
           index,
           item,
@@ -8574,7 +8574,7 @@ var require_VirtualizedListCellRenderer = __commonJS({
         }, onCellLayout && {
           onLayout: this._onLayout
         }), element, itemSeparator);
-        return /* @__PURE__ */ React13.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
+        return /* @__PURE__ */ React15.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
           cellKey: this.props.cellKey
         }, result);
       }
@@ -8770,7 +8770,7 @@ var require_VirtualizedList = __commonJS({
     var _VirtualizeUtils = require_VirtualizeUtils();
     var _invariant = _interopRequireDefault(require_invariant());
     var _nullthrows = _interopRequireDefault(require_nullthrows());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var __DEV__ = process.env.NODE_ENV !== "production";
     var ON_EDGE_REACHED_EPSILON = 1e-3;
     var _usedIndexForKey = false;
@@ -9035,15 +9035,15 @@ var require_VirtualizedList = __commonJS({
         this._defaultRenderScrollComponent = (props) => {
           var onRefresh = props.onRefresh;
           if (this._isNestedWithSameOrientation()) {
-            return /* @__PURE__ */ React13.createElement(_View.default, props);
+            return /* @__PURE__ */ React15.createElement(_View.default, props);
           } else if (onRefresh) {
             var _props$refreshing;
             (0, _invariant.default)(typeof props.refreshing === "boolean", "`refreshing` prop must be set as a boolean in order to use `onRefresh`, but got `" + JSON.stringify((_props$refreshing = props.refreshing) !== null && _props$refreshing !== void 0 ? _props$refreshing : "undefined") + "`");
             return (
               // $FlowFixMe[prop-missing] Invalid prop usage
               // $FlowFixMe[incompatible-use]
-              /* @__PURE__ */ React13.createElement(_ScrollView.default, (0, _extends2.default)({}, props, {
-                refreshControl: props.refreshControl == null ? /* @__PURE__ */ React13.createElement(
+              /* @__PURE__ */ React15.createElement(_ScrollView.default, (0, _extends2.default)({}, props, {
+                refreshControl: props.refreshControl == null ? /* @__PURE__ */ React15.createElement(
                   _RefreshControl.default,
                   {
                     refreshing: props.refreshing,
@@ -9054,7 +9054,7 @@ var require_VirtualizedList = __commonJS({
               }))
             );
           } else {
-            return /* @__PURE__ */ React13.createElement(_ScrollView.default, props);
+            return /* @__PURE__ */ React15.createElement(_ScrollView.default, props);
           }
         };
         this._onCellLayout = (e, cellKey, index) => {
@@ -9538,7 +9538,7 @@ var require_VirtualizedList = __commonJS({
             stickyHeaderIndices.push(cells.length);
           }
           var shouldListenForLayout = getItemLayout == null || debug || _this._fillRateHelper.enabled();
-          cells.push(/* @__PURE__ */ React13.createElement(_VirtualizedListCellRenderer.default, (0, _extends2.default)({
+          cells.push(/* @__PURE__ */ React15.createElement(_VirtualizedListCellRenderer.default, (0, _extends2.default)({
             CellRendererComponent,
             ItemSeparatorComponent: ii < end ? ItemSeparatorComponent : void 0,
             ListItemComponent,
@@ -9603,15 +9603,15 @@ var require_VirtualizedList = __commonJS({
           if (stickyIndicesFromProps.has(0)) {
             stickyHeaderIndices.push(0);
           }
-          var _element = /* @__PURE__ */ React13.isValidElement(ListHeaderComponent) ? ListHeaderComponent : (
+          var _element = /* @__PURE__ */ React15.isValidElement(ListHeaderComponent) ? ListHeaderComponent : (
             // $FlowFixMe[not-a-component]
             // $FlowFixMe[incompatible-type-arg]
-            /* @__PURE__ */ React13.createElement(ListHeaderComponent, null)
+            /* @__PURE__ */ React15.createElement(ListHeaderComponent, null)
           );
-          cells.push(/* @__PURE__ */ React13.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
+          cells.push(/* @__PURE__ */ React15.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
             cellKey: this._getCellKey() + "-header",
             key: "$header"
-          }, /* @__PURE__ */ React13.createElement(
+          }, /* @__PURE__ */ React15.createElement(
             _View.default,
             {
               onLayout: this._onLayoutHeader,
@@ -9623,15 +9623,15 @@ var require_VirtualizedList = __commonJS({
         }
         var itemCount = this.props.getItemCount(data);
         if (itemCount === 0 && ListEmptyComponent) {
-          var _element2 = /* @__PURE__ */ React13.isValidElement(ListEmptyComponent) ? ListEmptyComponent : (
+          var _element2 = /* @__PURE__ */ React15.isValidElement(ListEmptyComponent) ? ListEmptyComponent : (
             // $FlowFixMe[not-a-component]
             // $FlowFixMe[incompatible-type-arg]
-            /* @__PURE__ */ React13.createElement(ListEmptyComponent, null)
+            /* @__PURE__ */ React15.createElement(ListEmptyComponent, null)
           );
-          cells.push(/* @__PURE__ */ React13.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
+          cells.push(/* @__PURE__ */ React15.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
             cellKey: this._getCellKey() + "-empty",
             key: "$empty"
-          }, /* @__PURE__ */ React13.cloneElement(_element2, {
+          }, /* @__PURE__ */ React15.cloneElement(_element2, {
             onLayout: /* @__PURE__ */ __name((event) => {
               this._onLayoutEmpty(event);
               if (_element2.props.onLayout) {
@@ -9659,7 +9659,7 @@ var require_VirtualizedList = __commonJS({
               var firstMetrics = this.__getFrameMetricsApprox(section.first, this.props);
               var lastMetrics = this.__getFrameMetricsApprox(last, this.props);
               var spacerSize = lastMetrics.offset + lastMetrics.length - firstMetrics.offset;
-              cells.push(/* @__PURE__ */ React13.createElement(_View.default, {
+              cells.push(/* @__PURE__ */ React15.createElement(_View.default, {
                 key: "$spacer-" + section.first,
                 style: {
                   [spacerKey]: spacerSize
@@ -9675,15 +9675,15 @@ var require_VirtualizedList = __commonJS({
           }
         }
         if (ListFooterComponent) {
-          var _element3 = /* @__PURE__ */ React13.isValidElement(ListFooterComponent) ? ListFooterComponent : (
+          var _element3 = /* @__PURE__ */ React15.isValidElement(ListFooterComponent) ? ListFooterComponent : (
             // $FlowFixMe[not-a-component]
             // $FlowFixMe[incompatible-type-arg]
-            /* @__PURE__ */ React13.createElement(ListFooterComponent, null)
+            /* @__PURE__ */ React15.createElement(ListFooterComponent, null)
           );
-          cells.push(/* @__PURE__ */ React13.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
+          cells.push(/* @__PURE__ */ React15.createElement(_VirtualizedListContext.VirtualizedListCellContextProvider, {
             cellKey: this._getFooterCellKey(),
             key: "$footer"
-          }, /* @__PURE__ */ React13.createElement(
+          }, /* @__PURE__ */ React15.createElement(
             _View.default,
             {
               onLayout: this._onLayoutFooter,
@@ -9708,7 +9708,7 @@ var require_VirtualizedList = __commonJS({
           style: inversionStyle ? [inversionStyle, this.props.style] : this.props.style
         });
         this._hasMore = this.state.cellsAroundViewport.last < itemCount - 1;
-        var innerRet = /* @__PURE__ */ React13.createElement(_VirtualizedListContext.VirtualizedListContextProvider, {
+        var innerRet = /* @__PURE__ */ React15.createElement(_VirtualizedListContext.VirtualizedListContextProvider, {
           value: {
             cellKey: null,
             getScrollMetrics: this._getScrollMetrics,
@@ -9717,12 +9717,12 @@ var require_VirtualizedList = __commonJS({
             registerAsNestedChild: this._registerAsNestedChild,
             unregisterAsNestedChild: this._unregisterAsNestedChild
           }
-        }, /* @__PURE__ */ React13.cloneElement((this.props.renderScrollComponent || this._defaultRenderScrollComponent)(scrollProps), {
+        }, /* @__PURE__ */ React15.cloneElement((this.props.renderScrollComponent || this._defaultRenderScrollComponent)(scrollProps), {
           ref: this._captureScrollRef
         }, cells));
         var ret = innerRet;
         if (this.props.debug) {
-          return /* @__PURE__ */ React13.createElement(_View.default, {
+          return /* @__PURE__ */ React15.createElement(_View.default, {
             style: styles.debug
           }, ret, this._renderDebugOverlay());
         } else {
@@ -9810,20 +9810,20 @@ var require_VirtualizedList = __commonJS({
         var windowLen = frameLast.offset + frameLast.length - windowTop;
         var visTop = this._scrollMetrics.offset;
         var visLen = this._scrollMetrics.visibleLength;
-        return /* @__PURE__ */ React13.createElement(_View.default, {
+        return /* @__PURE__ */ React15.createElement(_View.default, {
           style: [styles.debugOverlayBase, styles.debugOverlay]
-        }, framesInLayout.map((f, ii2) => /* @__PURE__ */ React13.createElement(_View.default, {
+        }, framesInLayout.map((f, ii2) => /* @__PURE__ */ React15.createElement(_View.default, {
           key: "f" + ii2,
           style: [styles.debugOverlayBase, styles.debugOverlayFrame, {
             top: f.offset * normalize,
             height: f.length * normalize
           }]
-        })), /* @__PURE__ */ React13.createElement(_View.default, {
+        })), /* @__PURE__ */ React15.createElement(_View.default, {
           style: [styles.debugOverlayBase, styles.debugOverlayFrameLast, {
             top: windowTop * normalize,
             height: windowLen * normalize
           }]
-        }), /* @__PURE__ */ React13.createElement(_View.default, {
+        }), /* @__PURE__ */ React15.createElement(_View.default, {
           style: [styles.debugOverlayBase, styles.debugOverlayFrameVis, {
             top: visTop * normalize,
             height: visLen * normalize
@@ -10027,7 +10027,7 @@ var require_FlatList = __commonJS({
     var _deepDiffer = _interopRequireDefault(require_deepDiffer());
     var _Platform = _interopRequireDefault(require_Platform());
     var _invariant = _interopRequireDefault(require_invariant());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _VirtualizedList = _interopRequireDefault(require_VirtualizedList());
     var _VirtualizeUtils = require_VirtualizeUtils();
     var _memoizeOne = _interopRequireDefault(require_memoize_one_cjs());
@@ -10044,7 +10044,7 @@ var require_FlatList = __commonJS({
       return typeof Object(data).length === "number";
     }
     __name(isArrayLike, "isArrayLike");
-    var FlatList = class extends React13.PureComponent {
+    var FlatList = class extends React15.PureComponent {
       static {
         __name(this, "FlatList");
       }
@@ -10175,7 +10175,7 @@ var require_FlatList = __commonJS({
           var cols = numColumnsOrDefault(numColumns);
           var render = /* @__PURE__ */ __name((props) => {
             if (ListItemComponent) {
-              return /* @__PURE__ */ React13.createElement(ListItemComponent, props);
+              return /* @__PURE__ */ React15.createElement(ListItemComponent, props);
             } else if (renderItem) {
               return renderItem(props);
             } else {
@@ -10186,7 +10186,7 @@ var require_FlatList = __commonJS({
             if (cols > 1) {
               var _item2 = info.item, _index = info.index;
               (0, _invariant.default)(Array.isArray(_item2), "Expected array of items with numColumns > 1");
-              return /* @__PURE__ */ React13.createElement(_View.default, {
+              return /* @__PURE__ */ React15.createElement(_View.default, {
                 style: [styles.row, columnWrapperStyle]
               }, _item2.map((it, kk) => {
                 var element = render({
@@ -10195,7 +10195,7 @@ var require_FlatList = __commonJS({
                   index: _index * cols + kk,
                   separators: info.separators
                 });
-                return element != null ? /* @__PURE__ */ React13.createElement(React13.Fragment, {
+                return element != null ? /* @__PURE__ */ React15.createElement(React15.Fragment, {
                   key: kk
                 }, element) : null;
               }));
@@ -10285,7 +10285,7 @@ var require_FlatList = __commonJS({
         var renderer = strictMode ? this._memoizedRenderer : this._renderer;
         return (
           // $FlowFixMe[incompatible-exact] - `restProps` (`Props`) is inexact.
-          /* @__PURE__ */ React13.createElement(_VirtualizedList.default, (0, _extends2.default)({}, restProps, {
+          /* @__PURE__ */ React15.createElement(_VirtualizedList.default, (0, _extends2.default)({}, restProps, {
             getItem: this._getItem,
             getItemCount: this._getItemCount,
             keyExtractor: this._keyExtractor,
@@ -12265,16 +12265,16 @@ var require_createAnimatedComponent = __commonJS({
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs2());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _excluded = ["style"];
     function createAnimatedComponent(Component) {
-      return /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+      return /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
         var _useAnimatedProps = (0, _useAnimatedProps2.default)(props), reducedProps = _useAnimatedProps[0], callbackRef = _useAnimatedProps[1];
         var ref = (0, _useMergeRefs.default)(callbackRef, forwardedRef);
         var passthroughAnimatedPropExplicitValues = reducedProps.passthroughAnimatedPropExplicitValues, style = reducedProps.style;
         var _ref = passthroughAnimatedPropExplicitValues !== null && passthroughAnimatedPropExplicitValues !== void 0 ? passthroughAnimatedPropExplicitValues : {}, passthroughStyle = _ref.style, passthroughProps = (0, _objectWithoutPropertiesLoose2.default)(_ref, _excluded);
         var mergedStyle = [style, passthroughStyle];
-        return /* @__PURE__ */ React13.createElement(Component, (0, _extends2.default)({}, reducedProps, passthroughProps, {
+        return /* @__PURE__ */ React15.createElement(Component, (0, _extends2.default)({}, reducedProps, passthroughProps, {
           style: mergedStyle,
           ref
         }));
@@ -12294,10 +12294,10 @@ var require_AnimatedFlatList = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _FlatList = _interopRequireDefault(require_FlatList2());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
-    var FlatListWithEventThrottle = /* @__PURE__ */ React13.forwardRef((props, ref) => /* @__PURE__ */ React13.createElement(_FlatList.default, (0, _extends2.default)({
+    var FlatListWithEventThrottle = /* @__PURE__ */ React15.forwardRef((props, ref) => /* @__PURE__ */ React15.createElement(_FlatList.default, (0, _extends2.default)({
       scrollEventThrottle: 1e-4
     }, props, {
       ref
@@ -12527,7 +12527,7 @@ var require_Image = __commonJS({
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var _AssetRegistry = require_AssetRegistry();
     var _preprocess = require_preprocess();
@@ -12545,20 +12545,20 @@ var require_Image = __commonJS({
     var _filterId = 0;
     var svgDataUriPattern = /^(data:image\/svg\+xml;utf8,)(.*)/;
     function createTintColorSVG(tintColor, id) {
-      return tintColor && id != null ? /* @__PURE__ */ React13.createElement("svg", {
+      return tintColor && id != null ? /* @__PURE__ */ React15.createElement("svg", {
         style: {
           position: "absolute",
           height: 0,
           visibility: "hidden",
           width: 0
         }
-      }, /* @__PURE__ */ React13.createElement("defs", null, /* @__PURE__ */ React13.createElement("filter", {
+      }, /* @__PURE__ */ React15.createElement("defs", null, /* @__PURE__ */ React15.createElement("filter", {
         id: "tint-" + id,
         suppressHydrationWarning: true
-      }, /* @__PURE__ */ React13.createElement("feFlood", {
+      }, /* @__PURE__ */ React15.createElement("feFlood", {
         floodColor: "" + tintColor,
         key: tintColor
-      }), /* @__PURE__ */ React13.createElement("feComposite", {
+      }), /* @__PURE__ */ React15.createElement("feComposite", {
         in2: "SourceAlpha",
         operator: "in"
       })))) : null;
@@ -12642,7 +12642,7 @@ var require_Image = __commonJS({
       return uri;
     }
     __name(resolveAssetUri, "resolveAssetUri");
-    var Image2 = /* @__PURE__ */ React13.forwardRef((props, ref) => {
+    var Image2 = /* @__PURE__ */ React15.forwardRef((props, ref) => {
       var _ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, blurRadius = props.blurRadius, defaultSource = props.defaultSource, draggable = props.draggable, onError = props.onError, onLayout = props.onLayout, onLoad = props.onLoad, onLoadEnd = props.onLoadEnd, onLoadStart = props.onLoadStart, pointerEvents = props.pointerEvents, source = props.source, style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var ariaLabel = _ariaLabel || accessibilityLabel;
       if (process.env.NODE_ENV !== "production") {
@@ -12650,7 +12650,7 @@ var require_Image = __commonJS({
           throw new Error("The <Image> component cannot contain children. If you want to render content on top of the image, consider using the <ImageBackground> component or absolute positioning.");
         }
       }
-      var _React$useState = React13.useState(() => {
+      var _React$useState = React15.useState(() => {
         var uri2 = resolveAssetUri(source);
         if (uri2 != null) {
           var isLoaded = _ImageLoader.default.has(uri2);
@@ -12660,11 +12660,11 @@ var require_Image = __commonJS({
         }
         return IDLE;
       }), state = _React$useState[0], updateState = _React$useState[1];
-      var _React$useState2 = React13.useState({}), layout = _React$useState2[0], updateLayout = _React$useState2[1];
-      var hasTextAncestor = React13.useContext(_TextAncestorContext.default);
-      var hiddenImageRef = React13.useRef(null);
-      var filterRef = React13.useRef(_filterId++);
-      var requestRef = React13.useRef(null);
+      var _React$useState2 = React15.useState({}), layout = _React$useState2[0], updateLayout = _React$useState2[1];
+      var hasTextAncestor = React15.useContext(_TextAncestorContext.default);
+      var hiddenImageRef = React15.useRef(null);
+      var filterRef = React15.useRef(_filterId++);
+      var requestRef = React15.useRef(null);
       var shouldDisplaySource = state === LOADED || state === LOADING && defaultSource == null;
       var _extractNonStandardSt = extractNonStandardStyleProps(style, blurRadius, filterRef.current, props.tintColor), _resizeMode = _extractNonStandardSt[0], filter = _extractNonStandardSt[1], _tintColor = _extractNonStandardSt[2];
       var resizeMode = props.resizeMode || _resizeMode || "cover";
@@ -12703,7 +12703,7 @@ var require_Image = __commonJS({
       }
       __name(handleLayout, "handleLayout");
       var uri = resolveAssetUri(source);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         abortPendingRequest();
         if (uri != null) {
           updateState(LOADING);
@@ -12741,7 +12741,7 @@ var require_Image = __commonJS({
         __name(abortPendingRequest, "abortPendingRequest");
         return abortPendingRequest;
       }, [uri, requestRef, updateState, onError, onLoad, onLoadEnd, onLoadStart]);
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, {
         "aria-label": ariaLabel,
         onLayout: handleLayout,
         pointerEvents,
@@ -12758,7 +12758,7 @@ var require_Image = __commonJS({
             boxShadow: null
           }
         ]
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         style: [styles.image, resizeModeStyles[resizeMode], {
           backgroundImage,
           filter
@@ -12853,7 +12853,7 @@ var require_AnimatedImage = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _Image = _interopRequireDefault(require_Image());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
     var _default = exports2.default = (0, _createAnimatedComponent.default)(_Image.default);
@@ -12870,10 +12870,10 @@ var require_AnimatedScrollView = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _ScrollView = _interopRequireDefault(require_ScrollView());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
-    var ScrollViewWithEventThrottle = /* @__PURE__ */ React13.forwardRef((props, ref) => /* @__PURE__ */ React13.createElement(_ScrollView.default, (0, _extends2.default)({
+    var ScrollViewWithEventThrottle = /* @__PURE__ */ React15.forwardRef((props, ref) => /* @__PURE__ */ React15.createElement(_ScrollView.default, (0, _extends2.default)({
       scrollEventThrottle: 1e-4
     }, props, {
       ref
@@ -12899,9 +12899,9 @@ var require_VirtualizedSectionList = __commonJS({
     var _VirtualizedList = _interopRequireDefault(require_VirtualizedList());
     var _VirtualizeUtils = require_VirtualizeUtils();
     var _invariant = _interopRequireDefault(require_invariant());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _excluded = ["ItemSeparatorComponent", "SectionSeparatorComponent", "renderItem", "renderSectionFooter", "renderSectionHeader", "sections", "stickySectionHeadersEnabled"];
-    var VirtualizedSectionList = class extends React13.PureComponent {
+    var VirtualizedSectionList = class extends React15.PureComponent {
       static {
         __name(this, "VirtualizedSectionList");
       }
@@ -12963,7 +12963,7 @@ var require_VirtualizedSectionList = __commonJS({
               var renderItem = info.section.renderItem || this.props.renderItem;
               var SeparatorComponent = this._getSeparatorComponent(index, info, listItemCount);
               (0, _invariant.default)(renderItem, "no renderItem!");
-              return /* @__PURE__ */ React13.createElement(ItemWithSeparator, {
+              return /* @__PURE__ */ React15.createElement(ItemWithSeparator, {
                 SeparatorComponent,
                 LeadingSeparatorComponent: infoIndex === 0 ? this.props.SectionSeparatorComponent : void 0,
                 cellKey: info.key,
@@ -13053,7 +13053,7 @@ var require_VirtualizedSectionList = __commonJS({
           itemCount += this.props.getItemCount(section.data);
         }
         var renderItem = this._renderItem(itemCount);
-        return /* @__PURE__ */ React13.createElement(_VirtualizedList.default, (0, _extends2.default)({}, passThroughProps, {
+        return /* @__PURE__ */ React15.createElement(_VirtualizedList.default, (0, _extends2.default)({}, passThroughProps, {
           keyExtractor: this._keyExtractor,
           stickyHeaderIndices,
           renderItem,
@@ -13144,23 +13144,23 @@ var require_VirtualizedSectionList = __commonJS({
     };
     function ItemWithSeparator(props) {
       var LeadingSeparatorComponent = props.LeadingSeparatorComponent, SeparatorComponent = props.SeparatorComponent, cellKey = props.cellKey, prevCellKey = props.prevCellKey, setSelfHighlightCallback = props.setSelfHighlightCallback, updateHighlightFor = props.updateHighlightFor, setSelfUpdatePropsCallback = props.setSelfUpdatePropsCallback, updatePropsFor = props.updatePropsFor, item = props.item, index = props.index, section = props.section, inverted = props.inverted;
-      var _React$useState = React13.useState(false), leadingSeparatorHiglighted = _React$useState[0], setLeadingSeparatorHighlighted = _React$useState[1];
-      var _React$useState2 = React13.useState(false), separatorHighlighted = _React$useState2[0], setSeparatorHighlighted = _React$useState2[1];
-      var _React$useState3 = React13.useState({
+      var _React$useState = React15.useState(false), leadingSeparatorHiglighted = _React$useState[0], setLeadingSeparatorHighlighted = _React$useState[1];
+      var _React$useState2 = React15.useState(false), separatorHighlighted = _React$useState2[0], setSeparatorHighlighted = _React$useState2[1];
+      var _React$useState3 = React15.useState({
         leadingItem: props.leadingItem,
         leadingSection: props.leadingSection,
         section: props.section,
         trailingItem: props.item,
         trailingSection: props.trailingSection
       }), leadingSeparatorProps = _React$useState3[0], setLeadingSeparatorProps = _React$useState3[1];
-      var _React$useState4 = React13.useState({
+      var _React$useState4 = React15.useState({
         leadingItem: props.item,
         leadingSection: props.leadingSection,
         section: props.section,
         trailingItem: props.trailingItem,
         trailingSection: props.trailingSection
       }), separatorProps = _React$useState4[0], setSeparatorProps = _React$useState4[1];
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         setSelfHighlightCallback(cellKey, setSeparatorHighlighted);
         setSelfUpdatePropsCallback(cellKey, setSeparatorProps);
         return () => {
@@ -13201,13 +13201,13 @@ var require_VirtualizedSectionList = __commonJS({
         section,
         separators
       });
-      var leadingSeparator = LeadingSeparatorComponent != null && /* @__PURE__ */ React13.createElement(LeadingSeparatorComponent, (0, _extends2.default)({
+      var leadingSeparator = LeadingSeparatorComponent != null && /* @__PURE__ */ React15.createElement(LeadingSeparatorComponent, (0, _extends2.default)({
         highlighted: leadingSeparatorHiglighted
       }, leadingSeparatorProps));
-      var separator = SeparatorComponent != null && /* @__PURE__ */ React13.createElement(SeparatorComponent, (0, _extends2.default)({
+      var separator = SeparatorComponent != null && /* @__PURE__ */ React15.createElement(SeparatorComponent, (0, _extends2.default)({
         highlighted: separatorHighlighted
       }, separatorProps));
-      return leadingSeparator || separator ? /* @__PURE__ */ React13.createElement(_View.default, null, inverted === false ? leadingSeparator : separator, element, inverted === false ? separator : leadingSeparator) : element;
+      return leadingSeparator || separator ? /* @__PURE__ */ React15.createElement(_View.default, null, inverted === false ? leadingSeparator : separator, element, inverted === false ? separator : leadingSeparator) : element;
     }
     __name(ItemWithSeparator, "ItemWithSeparator");
     var _default = exports2.default = VirtualizedSectionList;
@@ -13226,10 +13226,10 @@ var require_SectionList = __commonJS({
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
     var _Platform = _interopRequireDefault(require_Platform());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _VirtualizedSectionList = _interopRequireDefault(require_VirtualizedSectionList());
     var _excluded = ["stickySectionHeadersEnabled"];
-    var SectionList = class extends React13.PureComponent {
+    var SectionList = class extends React15.PureComponent {
       static {
         __name(this, "SectionList");
       }
@@ -13290,7 +13290,7 @@ var require_SectionList = __commonJS({
       render() {
         var _this$props = this.props, _stickySectionHeadersEnabled = _this$props.stickySectionHeadersEnabled, restProps = (0, _objectWithoutPropertiesLoose2.default)(_this$props, _excluded);
         var stickySectionHeadersEnabled = _stickySectionHeadersEnabled !== null && _stickySectionHeadersEnabled !== void 0 ? _stickySectionHeadersEnabled : _Platform.default.OS === "ios";
-        return /* @__PURE__ */ React13.createElement(_VirtualizedSectionList.default, (0, _extends2.default)({}, restProps, {
+        return /* @__PURE__ */ React15.createElement(_VirtualizedSectionList.default, (0, _extends2.default)({}, restProps, {
           stickySectionHeadersEnabled,
           ref: this._captureRef,
           getItemCount: /* @__PURE__ */ __name((items) => items.length, "getItemCount"),
@@ -13326,10 +13326,10 @@ var require_AnimatedSectionList = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _SectionList = _interopRequireDefault(require_SectionList2());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
-    var SectionListWithEventThrottle = /* @__PURE__ */ React13.forwardRef((props, ref) => /* @__PURE__ */ React13.createElement(_SectionList.default, (0, _extends2.default)({
+    var SectionListWithEventThrottle = /* @__PURE__ */ React15.forwardRef((props, ref) => /* @__PURE__ */ React15.createElement(_SectionList.default, (0, _extends2.default)({
       scrollEventThrottle: 1e-4
     }, props, {
       ref
@@ -13350,7 +13350,7 @@ var require_Text = __commonJS({
     exports2.default = void 0;
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var forwardedProps = _interopRequireWildcard(require_forwardedProps());
     var _pick = _interopRequireDefault(require_pick());
@@ -13368,10 +13368,10 @@ var require_Text = __commonJS({
       pointerEvents: true
     });
     var pickProps = /* @__PURE__ */ __name((props) => (0, _pick.default)(props, forwardPropsList), "pickProps");
-    var Text5 = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var Text5 = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var hrefAttrs = props.hrefAttrs, numberOfLines = props.numberOfLines, onClick = props.onClick, onLayout = props.onLayout, onPress = props.onPress, onMoveShouldSetResponder = props.onMoveShouldSetResponder, onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture, onResponderEnd = props.onResponderEnd, onResponderGrant = props.onResponderGrant, onResponderMove = props.onResponderMove, onResponderReject = props.onResponderReject, onResponderRelease = props.onResponderRelease, onResponderStart = props.onResponderStart, onResponderTerminate = props.onResponderTerminate, onResponderTerminationRequest = props.onResponderTerminationRequest, onScrollShouldSetResponder = props.onScrollShouldSetResponder, onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture, onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder, onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture, onStartShouldSetResponder = props.onStartShouldSetResponder, onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture, selectable = props.selectable, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var hasTextAncestor = React13.useContext(_TextAncestorContext.default);
-      var hostRef = React13.useRef(null);
+      var hasTextAncestor = React15.useContext(_TextAncestorContext.default);
+      var hostRef = React15.useRef(null);
       var _useLocaleContext = (0, _useLocale.useLocaleContext)(), contextDirection = _useLocaleContext.direction;
       (0, _useElementLayout.default)(hostRef, onLayout);
       (0, _useResponderEvents.default)(hostRef, {
@@ -13392,7 +13392,7 @@ var require_Text = __commonJS({
         onStartShouldSetResponder,
         onStartShouldSetResponderCapture
       });
-      var handleClick = React13.useCallback((e) => {
+      var handleClick = React15.useCallback((e) => {
         if (onClick != null) {
           onClick(e);
         } else if (onPress != null) {
@@ -13436,7 +13436,7 @@ var require_Text = __commonJS({
       var element = (0, _createElement.default)(component, supportedProps, {
         writingDirection
       });
-      return hasTextAncestor ? element : /* @__PURE__ */ React13.createElement(_TextAncestorContext.default.Provider, {
+      return hasTextAncestor ? element : /* @__PURE__ */ React15.createElement(_TextAncestorContext.default.Provider, {
         value: true
       }, element);
     });
@@ -13503,7 +13503,7 @@ var require_AnimatedText = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _Text = _interopRequireDefault(require_Text());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
     var _default = exports2.default = (0, _createAnimatedComponent.default)(_Text.default);
@@ -13519,7 +13519,7 @@ var require_AnimatedView = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _View = _interopRequireDefault(require_View());
     var _createAnimatedComponent = _interopRequireDefault(require_createAnimatedComponent());
     var _default = exports2.default = (0, _createAnimatedComponent.default)(_View.default);
@@ -15979,23 +15979,23 @@ var require_AppContainer = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
-    var RootTagContext = /* @__PURE__ */ React13.createContext(null);
-    var AppContainer = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var RootTagContext = /* @__PURE__ */ React15.createContext(null);
+    var AppContainer = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var children = props.children, WrapperComponent = props.WrapperComponent;
-      var innerView = /* @__PURE__ */ React13.createElement(_View.default, {
+      var innerView = /* @__PURE__ */ React15.createElement(_View.default, {
         children,
         key: 1,
         style: styles.appContainer
       });
       if (WrapperComponent) {
-        innerView = /* @__PURE__ */ React13.createElement(WrapperComponent, null, innerView);
+        innerView = /* @__PURE__ */ React15.createElement(WrapperComponent, null, innerView);
       }
-      return /* @__PURE__ */ React13.createElement(RootTagContext.Provider, {
+      return /* @__PURE__ */ React15.createElement(RootTagContext.Provider, {
         value: props.rootTag
-      }, /* @__PURE__ */ React13.createElement(_View.default, {
+      }, /* @__PURE__ */ React15.createElement(_View.default, {
         ref: forwardedRef,
         style: styles.appContainer
       }, innerView));
@@ -17099,11 +17099,11 @@ var require_ActivityIndicator = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
     var _excluded = ["animating", "color", "hidesWhenStopped", "size", "style"];
-    var createSvgCircle = /* @__PURE__ */ __name((style) => /* @__PURE__ */ React13.createElement("circle", {
+    var createSvgCircle = /* @__PURE__ */ __name((style) => /* @__PURE__ */ React15.createElement("circle", {
       cx: "16",
       cy: "16",
       fill: "none",
@@ -17111,9 +17111,9 @@ var require_ActivityIndicator = __commonJS({
       strokeWidth: "4",
       style
     }), "createSvgCircle");
-    var ActivityIndicator2 = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var ActivityIndicator2 = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var _props$animating = props.animating, animating = _props$animating === void 0 ? true : _props$animating, _props$color = props.color, color = _props$color === void 0 ? "#1976D2" : _props$color, _props$hidesWhenStopp = props.hidesWhenStopped, hidesWhenStopped = _props$hidesWhenStopp === void 0 ? true : _props$hidesWhenStopp, _props$size = props.size, size3 = _props$size === void 0 ? "small" : _props$size, style = props.style, other = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var svg = /* @__PURE__ */ React13.createElement("svg", {
+      var svg = /* @__PURE__ */ React15.createElement("svg", {
         height: "100%",
         viewBox: "0 0 32 32",
         width: "100%"
@@ -17125,13 +17125,13 @@ var require_ActivityIndicator = __commonJS({
         strokeDasharray: 80,
         strokeDashoffset: 60
       }));
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, other, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, other, {
         "aria-valuemax": 1,
         "aria-valuemin": 0,
         ref: forwardedRef,
         role: "progressbar",
         style: [styles.container, style]
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         children: svg,
         style: [typeof size3 === "number" ? {
           height: size3,
@@ -17610,7 +17610,7 @@ var require_TouchableOpacity = __commonJS({
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
     var _usePressEvents = _interopRequireDefault(require_usePressEvents());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
@@ -17655,7 +17655,7 @@ var require_TouchableOpacity = __commonJS({
         }
       }), [delayLongPress, delayPressIn, delayPressOut, disabled, onLongPress, onPress, onPressIn, onPressOut, rejectResponderTermination, setOpacityActive, setOpacityInactive]);
       var pressEventHandlers = (0, _usePressEvents.default)(hostRef, pressConfig);
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
         accessibilityDisabled: disabled,
         focusable: !disabled && focusable !== false,
         pointerEvents: disabled ? "box-none" : void 0,
@@ -17679,7 +17679,7 @@ var require_TouchableOpacity = __commonJS({
         touchAction: "manipulation"
       }
     });
-    var MemoedTouchableOpacity = /* @__PURE__ */ React13.memo(/* @__PURE__ */ React13.forwardRef(TouchableOpacity));
+    var MemoedTouchableOpacity = /* @__PURE__ */ React15.memo(/* @__PURE__ */ React15.forwardRef(TouchableOpacity));
     MemoedTouchableOpacity.displayName = "TouchableOpacity";
     var _default = exports2.default = MemoedTouchableOpacity;
     module2.exports = exports2.default;
@@ -17694,13 +17694,13 @@ var require_Button = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _TouchableOpacity = _interopRequireDefault(require_TouchableOpacity());
     var _Text = _interopRequireDefault(require_Text());
-    var Button2 = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var Button2 = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var accessibilityLabel = props.accessibilityLabel, color = props.color, disabled = props.disabled, onPress = props.onPress, testID = props.testID, title = props.title;
-      return /* @__PURE__ */ React13.createElement(_TouchableOpacity.default, {
+      return /* @__PURE__ */ React15.createElement(_TouchableOpacity.default, {
         accessibilityLabel,
         accessibilityRole: "button",
         disabled,
@@ -17711,7 +17711,7 @@ var require_Button = __commonJS({
           backgroundColor: color
         }, disabled && styles.buttonDisabled],
         testID
-      }, /* @__PURE__ */ React13.createElement(_Text.default, {
+      }, /* @__PURE__ */ React15.createElement(_Text.default, {
         style: [styles.text, disabled && styles.textDisabled]
       }, title));
     });
@@ -17752,12 +17752,12 @@ var require_CheckBox = __commonJS({
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
     var _excluded = ["aria-readonly", "color", "disabled", "onChange", "onValueChange", "readOnly", "style", "value"];
-    var CheckBox = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var CheckBox = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var ariaReadOnly = props["aria-readonly"], color = props.color, disabled = props.disabled, onChange = props.onChange, onValueChange = props.onValueChange, readOnly = props.readOnly, style = props.style, value = props.value, other = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       function handleChange(event) {
         var value2 = event.nativeEvent.target.checked;
@@ -17766,7 +17766,7 @@ var require_CheckBox = __commonJS({
         onValueChange && onValueChange(value2);
       }
       __name(handleChange, "handleChange");
-      var fakeControl = /* @__PURE__ */ React13.createElement(_View.default, {
+      var fakeControl = /* @__PURE__ */ React15.createElement(_View.default, {
         style: [
           styles.fakeControl,
           value && styles.fakeControlChecked,
@@ -17788,7 +17788,7 @@ var require_CheckBox = __commonJS({
         style: [styles.nativeControl, styles.cursorInherit],
         type: "checkbox"
       });
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, other, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, other, {
         "aria-disabled": disabled,
         "aria-readonly": ariaReadOnly,
         style: [styles.root, style, disabled && styles.cursorDefault]
@@ -17856,7 +17856,7 @@ var require_ImageBackground = __commonJS({
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var _Image = _interopRequireDefault(require_Image());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
@@ -17865,10 +17865,10 @@ var require_ImageBackground = __commonJS({
     var ImageBackground = /* @__PURE__ */ (0, _react.forwardRef)((props, forwardedRef) => {
       var children = props.children, _props$style = props.style, style = _props$style === void 0 ? emptyObject : _props$style, imageStyle = props.imageStyle, imageRef = props.imageRef, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var _StyleSheet$flatten = _StyleSheet.default.flatten(style), height = _StyleSheet$flatten.height, width = _StyleSheet$flatten.width;
-      return /* @__PURE__ */ React13.createElement(_View.default, {
+      return /* @__PURE__ */ React15.createElement(_View.default, {
         ref: forwardedRef,
         style
-      }, /* @__PURE__ */ React13.createElement(_Image.default, (0, _extends2.default)({}, rest, {
+      }, /* @__PURE__ */ React15.createElement(_Image.default, (0, _extends2.default)({}, rest, {
         ref: imageRef,
         style: [{
           // Temporary Workaround:
@@ -17901,10 +17901,10 @@ var require_KeyboardAvoidingView = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _View = _interopRequireDefault(require_View());
     var _excluded = ["behavior", "contentContainerStyle", "keyboardVerticalOffset"];
-    var KeyboardAvoidingView = class extends React13.Component {
+    var KeyboardAvoidingView = class extends React15.Component {
       static {
         __name(this, "KeyboardAvoidingView");
       }
@@ -17927,7 +17927,7 @@ var require_KeyboardAvoidingView = __commonJS({
       }
       render() {
         var _this$props = this.props, behavior = _this$props.behavior, contentContainerStyle = _this$props.contentContainerStyle, keyboardVerticalOffset = _this$props.keyboardVerticalOffset, rest = (0, _objectWithoutPropertiesLoose2.default)(_this$props, _excluded);
-        return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({
+        return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({
           onLayout: this.onLayout
         }, rest));
       }
@@ -17945,12 +17945,12 @@ var require_ModalPortal = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _reactDom = require("react-dom");
     var _canUseDom = _interopRequireDefault(require_canUseDom());
     function ModalPortal(props) {
       var children = props.children;
-      var elementRef = React13.useRef(null);
+      var elementRef = React15.useRef(null);
       if (_canUseDom.default && !elementRef.current) {
         var element = document.createElement("div");
         if (element && document.body) {
@@ -17958,7 +17958,7 @@ var require_ModalPortal = __commonJS({
           elementRef.current = element;
         }
       }
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         if (_canUseDom.default) {
           return () => {
             if (document.body && elementRef.current) {
@@ -17984,7 +17984,7 @@ var require_ModalAnimation = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _createElement = _interopRequireDefault(require_createElement());
     var ANIMATION_DURATION = 250;
@@ -18000,11 +18000,11 @@ var require_ModalAnimation = __commonJS({
     __name(getAnimationStyle, "getAnimationStyle");
     function ModalAnimation(props) {
       var animationType = props.animationType, children = props.children, onDismiss = props.onDismiss, onShow = props.onShow, visible = props.visible;
-      var _React$useState = React13.useState(false), isRendering = _React$useState[0], setIsRendering = _React$useState[1];
-      var wasVisible = React13.useRef(false);
-      var wasRendering = React13.useRef(false);
+      var _React$useState = React15.useState(false), isRendering = _React$useState[0], setIsRendering = _React$useState[1];
+      var wasVisible = React15.useRef(false);
+      var wasRendering = React15.useRef(false);
       var isAnimated = animationType && animationType !== "none";
-      var animationEndCallback = React13.useCallback((e) => {
+      var animationEndCallback = React15.useCallback((e) => {
         if (e && e.currentTarget !== e.target) {
           return;
         }
@@ -18016,13 +18016,13 @@ var require_ModalAnimation = __commonJS({
           setIsRendering(false);
         }
       }, [onShow, visible]);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         if (wasRendering.current && !isRendering && onDismiss) {
           onDismiss();
         }
         wasRendering.current = isRendering;
       }, [isRendering, onDismiss]);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         if (visible) {
           setIsRendering(true);
         }
@@ -18123,14 +18123,14 @@ var require_ModalContent = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _View = _interopRequireDefault(require_View());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _canUseDom = _interopRequireDefault(require_canUseDom());
     var _excluded = ["active", "children", "onRequestClose", "transparent"];
-    var ModalContent = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var ModalContent = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var active = props.active, children = props.children, onRequestClose = props.onRequestClose, transparent = props.transparent, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         if (_canUseDom.default) {
           var closeOnEscape = /* @__PURE__ */ __name((e) => {
             if (active && e.key === "Escape") {
@@ -18144,15 +18144,15 @@ var require_ModalContent = __commonJS({
           return () => document.removeEventListener("keyup", closeOnEscape, false);
         }
       }, [active, onRequestClose]);
-      var style = React13.useMemo(() => {
+      var style = React15.useMemo(() => {
         return [styles.modal, transparent ? styles.modalTransparent : styles.modalOpaque];
       }, [transparent]);
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, {
         "aria-modal": true,
         ref: forwardedRef,
         role: active ? "dialog" : null,
         style
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         style: styles.container
       }, children));
     });
@@ -18188,7 +18188,7 @@ var require_ModalFocusTrap = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _View = _interopRequireDefault(require_View());
     var _createElement = _interopRequireDefault(require_createElement());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
@@ -18234,12 +18234,12 @@ var require_ModalFocusTrap = __commonJS({
     __name(focusLastDescendant, "focusLastDescendant");
     var ModalFocusTrap = /* @__PURE__ */ __name((_ref) => {
       var active = _ref.active, children = _ref.children;
-      var trapElementRef = React13.useRef();
-      var focusRef = React13.useRef({
+      var trapElementRef = React15.useRef();
+      var focusRef = React15.useRef({
         trapFocusInProgress: false,
         lastFocusedElement: null
       });
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         if (_canUseDom.default) {
           var trapFocus = /* @__PURE__ */ __name(() => {
             if (trapElementRef.current == null || focusRef.current.trapFocusInProgress || !active) {
@@ -18266,7 +18266,7 @@ var require_ModalFocusTrap = __commonJS({
           return () => document.removeEventListener("focus", trapFocus, true);
         }
       }, [active]);
-      React13.useEffect(function() {
+      React15.useEffect(function() {
         if (_canUseDom.default) {
           var lastFocusedElementOutsideTrap = document.activeElement;
           return function() {
@@ -18276,9 +18276,9 @@ var require_ModalFocusTrap = __commonJS({
           };
         }
       }, []);
-      return /* @__PURE__ */ React13.createElement(React13.Fragment, null, /* @__PURE__ */ React13.createElement(FocusBracket, null), /* @__PURE__ */ React13.createElement(_View.default, {
+      return /* @__PURE__ */ React15.createElement(React15.Fragment, null, /* @__PURE__ */ React15.createElement(FocusBracket, null), /* @__PURE__ */ React15.createElement(_View.default, {
         ref: trapElementRef
-      }, children), /* @__PURE__ */ React13.createElement(FocusBracket, null));
+      }, children), /* @__PURE__ */ React15.createElement(FocusBracket, null));
     }, "ModalFocusTrap");
     var _default = exports2.default = ModalFocusTrap;
     var styles = _StyleSheet.default.create({
@@ -18301,7 +18301,7 @@ var require_Modal = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _ModalPortal = _interopRequireDefault(require_ModalPortal());
     var _ModalAnimation = _interopRequireDefault(require_ModalAnimation());
     var _ModalContent = _interopRequireDefault(require_ModalContent());
@@ -18341,33 +18341,33 @@ var require_Modal = __commonJS({
       notifyActiveModalListeners();
     }
     __name(addActiveModal, "addActiveModal");
-    var Modal = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var Modal = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var animationType = props.animationType, children = props.children, onDismiss = props.onDismiss, onRequestClose = props.onRequestClose, onShow = props.onShow, transparent = props.transparent, _props$visible = props.visible, visible = _props$visible === void 0 ? true : _props$visible, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var modalId = React13.useMemo(() => uniqueModalIdentifier++, []);
-      var _React$useState = React13.useState(false), isActive = _React$useState[0], setIsActive = _React$useState[1];
-      var onDismissCallback = React13.useCallback(() => {
+      var modalId = React15.useMemo(() => uniqueModalIdentifier++, []);
+      var _React$useState = React15.useState(false), isActive = _React$useState[0], setIsActive = _React$useState[1];
+      var onDismissCallback = React15.useCallback(() => {
         removeActiveModal(modalId);
         if (onDismiss) {
           onDismiss();
         }
       }, [modalId, onDismiss]);
-      var onShowCallback = React13.useCallback(() => {
+      var onShowCallback = React15.useCallback(() => {
         addActiveModal(modalId, setIsActive);
         if (onShow) {
           onShow();
         }
       }, [modalId, onShow]);
-      React13.useEffect(() => {
+      React15.useEffect(() => {
         return () => removeActiveModal(modalId);
       }, [modalId]);
-      return /* @__PURE__ */ React13.createElement(_ModalPortal.default, null, /* @__PURE__ */ React13.createElement(_ModalAnimation.default, {
+      return /* @__PURE__ */ React15.createElement(_ModalPortal.default, null, /* @__PURE__ */ React15.createElement(_ModalAnimation.default, {
         animationType,
         onDismiss: onDismissCallback,
         onShow: onShowCallback,
         visible
-      }, /* @__PURE__ */ React13.createElement(_ModalFocusTrap.default, {
+      }, /* @__PURE__ */ React15.createElement(_ModalFocusTrap.default, {
         active: isActive
-      }, /* @__PURE__ */ React13.createElement(_ModalContent.default, (0, _extends2.default)({}, rest, {
+      }, /* @__PURE__ */ React15.createElement(_ModalContent.default, (0, _extends2.default)({}, rest, {
         active: isActive,
         onRequestClose,
         ref: forwardedRef,
@@ -18415,16 +18415,16 @@ var require_Picker = __commonJS({
     exports2.default = void 0;
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
     var _usePlatformMethods = _interopRequireDefault(require_usePlatformMethods());
     var _PickerItem = _interopRequireDefault(require_PickerItem());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _excluded = ["children", "enabled", "onValueChange", "selectedValue", "style", "testID", "itemStyle", "mode", "prompt"];
-    var Picker = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var Picker = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var children = props.children, enabled = props.enabled, onValueChange = props.onValueChange, selectedValue = props.selectedValue, style = props.style, testID = props.testID, itemStyle = props.itemStyle, mode = props.mode, prompt = props.prompt, other = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var hostRef = React13.useRef(null);
+      var hostRef = React15.useRef(null);
       function handleChange(e) {
         var _e$target = e.target, selectedIndex = _e$target.selectedIndex, value = _e$target.value;
         if (onValueChange) {
@@ -18885,7 +18885,7 @@ var require_Pressable = __commonJS({
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
     var _useHover = _interopRequireDefault(require_useHover());
     var _usePressEvents = _interopRequireDefault(require_usePressEvents());
@@ -18925,7 +18925,7 @@ var require_Pressable = __commonJS({
         focused,
         pressed
       };
-      var blurHandler = React13.useCallback((e) => {
+      var blurHandler = React15.useCallback((e) => {
         if (e.nativeEvent.target === hostRef.current) {
           setFocused(false);
           if (onBlur != null) {
@@ -18933,7 +18933,7 @@ var require_Pressable = __commonJS({
           }
         }
       }, [hostRef, setFocused, onBlur]);
-      var focusHandler = React13.useCallback((e) => {
+      var focusHandler = React15.useCallback((e) => {
         if (e.nativeEvent.target === hostRef.current) {
           setFocused(true);
           if (onFocus != null) {
@@ -18941,7 +18941,7 @@ var require_Pressable = __commonJS({
           }
         }
       }, [hostRef, setFocused, onFocus]);
-      var contextMenuHandler = React13.useCallback((e) => {
+      var contextMenuHandler = React15.useCallback((e) => {
         if (onContextMenuPress != null) {
           onContextMenuPress(e);
         }
@@ -18949,7 +18949,7 @@ var require_Pressable = __commonJS({
           onContextMenu(e);
         }
       }, [onContextMenu, onContextMenuPress]);
-      var keyDownHandler = React13.useCallback((e) => {
+      var keyDownHandler = React15.useCallback((e) => {
         if (onKeyDownPress != null) {
           onKeyDownPress(e);
         }
@@ -18963,7 +18963,7 @@ var require_Pressable = __commonJS({
       } else {
         _tabIndex = disabled ? -1 : 0;
       }
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
         "aria-disabled": disabled,
         onBlur: blurHandler,
         onContextMenu: contextMenuHandler,
@@ -19007,15 +19007,15 @@ var require_ProgressBar = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
     var _excluded = ["color", "indeterminate", "progress", "trackColor", "style"];
-    var ProgressBar2 = /* @__PURE__ */ React13.forwardRef((props, ref) => {
+    var ProgressBar2 = /* @__PURE__ */ React15.forwardRef((props, ref) => {
       var _props$color = props.color, color = _props$color === void 0 ? "#1976D2" : _props$color, _props$indeterminate = props.indeterminate, indeterminate = _props$indeterminate === void 0 ? false : _props$indeterminate, _props$progress = props.progress, progress = _props$progress === void 0 ? 0 : _props$progress, _props$trackColor = props.trackColor, trackColor = _props$trackColor === void 0 ? "transparent" : _props$trackColor, style = props.style, other = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
       var percentageProgress = progress * 100;
       var width = indeterminate ? "25%" : percentageProgress + "%";
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, other, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, other, {
         "aria-valuemax": 100,
         "aria-valuemin": 0,
         "aria-valuenow": indeterminate ? null : percentageProgress,
@@ -19024,7 +19024,7 @@ var require_ProgressBar = __commonJS({
         style: [styles.track, style, {
           backgroundColor: trackColor
         }]
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         style: [{
           backgroundColor: color,
           width
@@ -19074,7 +19074,7 @@ var require_SafeAreaView = __commonJS({
     exports2.default = void 0;
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
     var _View = _interopRequireDefault(require_View());
     var _canUseDom = _interopRequireDefault(require_canUseDom());
@@ -19085,9 +19085,9 @@ var require_SafeAreaView = __commonJS({
       }
       return "env";
     })();
-    var SafeAreaView = /* @__PURE__ */ React13.forwardRef((props, ref) => {
+    var SafeAreaView = /* @__PURE__ */ React15.forwardRef((props, ref) => {
       var style = props.style, rest = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, {
         ref,
         style: [styles.root, style]
       }));
@@ -19165,7 +19165,7 @@ var require_Switch = __commonJS({
     var _objectSpread2 = _interopRequireDefault(require_objectSpread2());
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var _multiplyStyleLengthValue = _interopRequireDefault(require_multiplyStyleLengthValue());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
@@ -19180,9 +19180,9 @@ var require_Switch = __commonJS({
     var defaultActiveThumbColor = "#009688";
     var defaultThumbColor = "#FAFAFA";
     var defaultDisabledThumbColor = "#BDBDBD";
-    var Switch2 = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var Switch2 = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var ariaLabel = props["aria-label"], accessibilityLabel = props.accessibilityLabel, activeThumbColor = props.activeThumbColor, activeTrackColor = props.activeTrackColor, _props$disabled = props.disabled, disabled = _props$disabled === void 0 ? false : _props$disabled, onValueChange = props.onValueChange, _props$style = props.style, style = _props$style === void 0 ? emptyObject : _props$style, thumbColor = props.thumbColor, trackColor = props.trackColor, _props$value = props.value, value = _props$value === void 0 ? false : _props$value, other = (0, _objectWithoutPropertiesLoose2.default)(props, _excluded);
-      var thumbRef = React13.useRef(null);
+      var thumbRef = React15.useRef(null);
       function handleChange(event) {
         if (onValueChange != null) {
           onValueChange(event.nativeEvent.target.checked);
@@ -19276,11 +19276,11 @@ var require_Switch = __commonJS({
         type: "checkbox",
         role: "switch"
       });
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, other, {
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, other, {
         style: rootStyle
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         style: trackStyle
-      }), /* @__PURE__ */ React13.createElement(_View.default, {
+      }), /* @__PURE__ */ React15.createElement(_View.default, {
         ref: thumbRef,
         style: thumbStyle
       }), nativeControl);
@@ -19339,7 +19339,7 @@ var require_TextInput = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = void 0;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _createElement = _interopRequireDefault(require_createElement());
     var forwardedProps = _interopRequireWildcard(require_forwardedProps());
     var _pick = _interopRequireDefault(require_pick());
@@ -19390,7 +19390,7 @@ var require_TextInput = __commonJS({
     }
     __name(isEventComposing, "isEventComposing");
     var focusTimeout = null;
-    var TextInput = /* @__PURE__ */ React13.forwardRef((props, forwardedRef) => {
+    var TextInput = /* @__PURE__ */ React15.forwardRef((props, forwardedRef) => {
       var _props$autoCapitalize = props.autoCapitalize, autoCapitalize = _props$autoCapitalize === void 0 ? "sentences" : _props$autoCapitalize, autoComplete = props.autoComplete, autoCompleteType = props.autoCompleteType, _props$autoCorrect = props.autoCorrect, autoCorrect = _props$autoCorrect === void 0 ? true : _props$autoCorrect, blurOnSubmit = props.blurOnSubmit, caretHidden = props.caretHidden, clearTextOnFocus = props.clearTextOnFocus, dir = props.dir, editable = props.editable, enterKeyHint = props.enterKeyHint, inputMode = props.inputMode, keyboardType = props.keyboardType, _props$multiline = props.multiline, multiline = _props$multiline === void 0 ? false : _props$multiline, numberOfLines = props.numberOfLines, onBlur = props.onBlur, onChange = props.onChange, onChangeText = props.onChangeText, onContentSizeChange = props.onContentSizeChange, onFocus = props.onFocus, onKeyPress = props.onKeyPress, onLayout = props.onLayout, onMoveShouldSetResponder = props.onMoveShouldSetResponder, onMoveShouldSetResponderCapture = props.onMoveShouldSetResponderCapture, onResponderEnd = props.onResponderEnd, onResponderGrant = props.onResponderGrant, onResponderMove = props.onResponderMove, onResponderReject = props.onResponderReject, onResponderRelease = props.onResponderRelease, onResponderStart = props.onResponderStart, onResponderTerminate = props.onResponderTerminate, onResponderTerminationRequest = props.onResponderTerminationRequest, onScrollShouldSetResponder = props.onScrollShouldSetResponder, onScrollShouldSetResponderCapture = props.onScrollShouldSetResponderCapture, onSelectionChange = props.onSelectionChange, onSelectionChangeShouldSetResponder = props.onSelectionChangeShouldSetResponder, onSelectionChangeShouldSetResponderCapture = props.onSelectionChangeShouldSetResponderCapture, onStartShouldSetResponder = props.onStartShouldSetResponder, onStartShouldSetResponderCapture = props.onStartShouldSetResponderCapture, onSubmitEditing = props.onSubmitEditing, placeholderTextColor = props.placeholderTextColor, _props$readOnly = props.readOnly, readOnly = _props$readOnly === void 0 ? false : _props$readOnly, returnKeyType = props.returnKeyType, rows = props.rows, _props$secureTextEntr = props.secureTextEntry, secureTextEntry = _props$secureTextEntr === void 0 ? false : _props$secureTextEntr, selection = props.selection, selectTextOnFocus = props.selectTextOnFocus, showSoftInputOnFocus = props.showSoftInputOnFocus, spellCheck = props.spellCheck;
       var type;
       var _inputMode;
@@ -19436,20 +19436,20 @@ var require_TextInput = __commonJS({
       if (secureTextEntry) {
         type = "password";
       }
-      var dimensions = React13.useRef({
+      var dimensions = React15.useRef({
         height: null,
         width: null
       });
-      var hostRef = React13.useRef(null);
-      var prevSelection = React13.useRef(null);
-      var prevSecureTextEntry = React13.useRef(false);
-      React13.useEffect(() => {
+      var hostRef = React15.useRef(null);
+      var prevSelection = React15.useRef(null);
+      var prevSecureTextEntry = React15.useRef(false);
+      React15.useEffect(() => {
         if (hostRef.current && prevSelection.current) {
           setSelection(hostRef.current, prevSelection.current);
         }
         prevSecureTextEntry.current = secureTextEntry;
       }, [secureTextEntry]);
-      var handleContentSizeChange = React13.useCallback((hostNode) => {
+      var handleContentSizeChange = React15.useCallback((hostNode) => {
         if (multiline && onContentSizeChange && hostNode != null) {
           var newHeight = hostNode.scrollHeight;
           var newWidth = hostNode.scrollWidth;
@@ -19467,7 +19467,7 @@ var require_TextInput = __commonJS({
           }
         }
       }, [multiline, onContentSizeChange]);
-      var imperativeRef = React13.useMemo(() => (hostNode) => {
+      var imperativeRef = React15.useMemo(() => (hostNode) => {
         if (hostNode != null) {
           hostNode.clear = function() {
             if (hostNode != null) {
@@ -20384,7 +20384,7 @@ var require_TouchableHighlight = __commonJS({
     var _extends2 = _interopRequireDefault(require_extends());
     var _objectWithoutPropertiesLoose2 = _interopRequireDefault(require_objectWithoutPropertiesLoose());
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
     var _usePressEvents = _interopRequireDefault(require_usePressEvents());
     var _StyleSheet = _interopRequireDefault(require_StyleSheet());
@@ -20452,14 +20452,14 @@ var require_TouchableHighlight = __commonJS({
         }
       }), [delayLongPress, delayPressIn, delayPressOut, disabled, onLongPress, onPress, onPressIn, onPressOut, rejectResponderTermination, showUnderlay, hideUnderlay]);
       var pressEventHandlers = (0, _usePressEvents.default)(hostRef, pressConfig);
-      var child = React13.Children.only(children);
-      return /* @__PURE__ */ React13.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
+      var child = React15.Children.only(children);
+      return /* @__PURE__ */ React15.createElement(_View.default, (0, _extends2.default)({}, rest, pressEventHandlers, {
         accessibilityDisabled: disabled,
         focusable: !disabled && focusable !== false,
         pointerEvents: disabled ? "box-none" : void 0,
         ref: setRef2,
         style: [styles.root, style, !disabled && styles.actionable, extraStyles && extraStyles.underlay]
-      }), /* @__PURE__ */ React13.cloneElement(child, {
+      }), /* @__PURE__ */ React15.cloneElement(child, {
         style: [child.props.style, extraStyles && extraStyles.child]
       }));
     }
@@ -20473,7 +20473,7 @@ var require_TouchableHighlight = __commonJS({
         touchAction: "manipulation"
       }
     });
-    var MemoedTouchableHighlight = /* @__PURE__ */ React13.memo(/* @__PURE__ */ React13.forwardRef(TouchableHighlight));
+    var MemoedTouchableHighlight = /* @__PURE__ */ React15.memo(/* @__PURE__ */ React15.forwardRef(TouchableHighlight));
     MemoedTouchableHighlight.displayName = "TouchableHighlight";
     var _default = exports2.default = MemoedTouchableHighlight;
     module2.exports = exports2.default;
@@ -20532,7 +20532,7 @@ var require_TouchableWithoutFeedback = __commonJS({
     exports2.__esModule = true;
     exports2.default = void 0;
     var _react = _interopRequireWildcard(require("react"));
-    var React13 = _react;
+    var React15 = _react;
     var _pick = _interopRequireDefault(require_pick());
     var _useMergeRefs = _interopRequireDefault(require_useMergeRefs());
     var _usePressEvents = _interopRequireDefault(require_usePressEvents());
@@ -20570,17 +20570,17 @@ var require_TouchableWithoutFeedback = __commonJS({
         onPressEnd: onPressOut
       }), [disabled, delayPressIn, delayPressOut, delayLongPress, onLongPress, onPress, onPressIn, onPressOut, rejectResponderTermination]);
       var pressEventHandlers = (0, _usePressEvents.default)(hostRef, pressConfig);
-      var element = React13.Children.only(props.children);
+      var element = React15.Children.only(props.children);
       var children = [element.props.children];
       var supportedProps = pickProps(props);
       supportedProps.accessibilityDisabled = disabled;
       supportedProps.focusable = !disabled && focusable !== false;
       supportedProps.ref = (0, _useMergeRefs.default)(forwardedRef, hostRef, element.ref);
       var elementProps = Object.assign(supportedProps, pressEventHandlers);
-      return /* @__PURE__ */ React13.cloneElement(element, elementProps, ...children);
+      return /* @__PURE__ */ React15.cloneElement(element, elementProps, ...children);
     }
     __name(TouchableWithoutFeedback, "TouchableWithoutFeedback");
-    var MemoedTouchableWithoutFeedback = /* @__PURE__ */ React13.memo(/* @__PURE__ */ React13.forwardRef(TouchableWithoutFeedback));
+    var MemoedTouchableWithoutFeedback = /* @__PURE__ */ React15.memo(/* @__PURE__ */ React15.forwardRef(TouchableWithoutFeedback));
     MemoedTouchableWithoutFeedback.displayName = "TouchableWithoutFeedback";
     var _default = exports2.default = MemoedTouchableWithoutFeedback;
     module2.exports = exports2.default;
@@ -20664,11 +20664,11 @@ var require_useColorScheme = __commonJS({
     var _interopRequireWildcard = require_interopRequireWildcard().default;
     exports2.__esModule = true;
     exports2.default = useColorScheme;
-    var React13 = _interopRequireWildcard(require("react"));
+    var React15 = _interopRequireWildcard(require("react"));
     var _Appearance = _interopRequireDefault(require_Appearance());
     function useColorScheme() {
-      var _React$useState = React13.useState(_Appearance.default.getColorScheme()), colorScheme = _React$useState[0], setColorScheme = _React$useState[1];
-      React13.useEffect(() => {
+      var _React$useState = React15.useState(_Appearance.default.getColorScheme()), colorScheme = _React$useState[0], setColorScheme = _React$useState[1];
+      React15.useEffect(() => {
         function listener(appearance) {
           setColorScheme(appearance.colorScheme);
         }
@@ -20874,7 +20874,7 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // ../packages/app/src/screens/auth/login-screen.tsx
-var import_react6 = require("react");
+var import_react8 = require("react");
 
 // ../node_modules/@tamagui/use-presence/dist/esm/PresenceContext.mjs
 var React = __toESM(require("react"), 1);
@@ -21086,6 +21086,46 @@ function getDefaultSizeToken(font) {
 }
 __name(getDefaultSizeToken, "getDefaultSizeToken");
 
+// ../node_modules/@tamagui/image/dist/esm/Image.mjs
+var import_web3 = require("@tamagui/web");
+var import_jsx_runtime2 = require("react/jsx-runtime");
+var StyledImage = (0, import_web3.styled)(import_web3.View, {
+  name: "Image",
+  render: "img"
+});
+var Image = StyledImage.styleable((inProps, ref) => {
+  const {
+    // exclude native only props
+    blurRadius,
+    capInsets,
+    defaultSource,
+    fadeDuration,
+    loadingIndicatorSource,
+    onLoadEnd,
+    onPartialLoad,
+    progressiveRenderingEnabled,
+    resizeMethod,
+    tintColor,
+    ...rest
+  } = inProps;
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StyledImage, {
+    ref,
+    ...rest
+  });
+}, {
+  staticConfig: {
+    memo: true
+  }
+});
+var func = /* @__PURE__ */ __name(() => {
+}, "func");
+Image.getSize = func;
+Image.getSizeWithHeaders = func;
+Image.prefetch = func;
+Image.prefetchWithMetadata = func;
+Image.abortPrefetch = func;
+Image.queryCache = func;
+
 // ../node_modules/@tamagui/focusable/dist/esm/registerFocusable.mjs
 var registerFocusable = /* @__PURE__ */ __name((id, input) => () => {
 }, "registerFocusable");
@@ -21241,7 +21281,7 @@ var styledBody = [{
 }];
 
 // ../node_modules/@tamagui/input/dist/esm/Input.mjs
-var import_jsx_runtime2 = require("react/jsx-runtime");
+var import_jsx_runtime3 = require("react/jsx-runtime");
 var StyledInput = (0, import_core6.styled)(import_core6.View, styledBody[0], styledBody[1]);
 var Input = StyledInput.styleable((props, _forwardedRef) => {
   const {
@@ -21359,7 +21399,7 @@ var Input = StyledInput.styleable((props, _forwardedRef) => {
       }
     }
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(StyledInput, {
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(StyledInput, {
     ref: composedRef,
     ...finalProps
   });
@@ -21368,7 +21408,7 @@ var Input = StyledInput.styleable((props, _forwardedRef) => {
 // ../node_modules/tamagui/dist/esm/views/Spinner.mjs
 var import_core7 = require("@tamagui/core");
 var import_react_native_web = __toESM(require_cjs(), 1);
-var import_jsx_runtime3 = require("react/jsx-runtime");
+var import_jsx_runtime4 = require("react/jsx-runtime");
 var Spinner = YStack.styleable((props, ref) => {
   const {
     size: size3,
@@ -21376,10 +21416,10 @@ var Spinner = YStack.styleable((props, ref) => {
     ...stackProps
   } = props, theme = (0, import_core7.useTheme)();
   let color = colorProp;
-  return color && color[0] === "$" && (color = (0, import_core7.variableToString)(theme[color])), /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(YStack, {
+  return color && color[0] === "$" && (color = (0, import_core7.variableToString)(theme[color])), /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(YStack, {
     ref,
     ...stackProps,
-    children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(import_react_native_web.ActivityIndicator, {
+    children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(import_react_native_web.ActivityIndicator, {
       size: size3,
       color
     })
@@ -21966,7 +22006,7 @@ function getAnimationConfigsForKeys(normalized, animations, keys, defaultAnimati
 __name(getAnimationConfigsForKeys, "getAnimationConfigsForKeys");
 
 // ../node_modules/@tamagui/animations-css/dist/esm/createAnimations.mjs
-var import_web3 = require("@tamagui/web");
+var import_web4 = require("@tamagui/web");
 var import_react3 = __toESM(require("react"), 1);
 var EXTRACT_MS_REGEX = /(\d+(?:\.\d+)?)\s*ms/;
 var EXTRACT_S_REGEX = /(\d+(?:\.\d+)?)\s*s/;
@@ -22129,7 +22169,7 @@ function createAnimations(animations) {
           clearTimeout(timeoutId), rafId !== void 0 && cancelAnimationFrame(rafId), node.removeEventListener("transitionend", onFinishAnimation), node.removeEventListener("transitioncancel", onCancelAnimation), node.style.transition = "";
         };
       }, [sendExitComplete, isExiting, stateRef, keys, normalized, defaultAnimation, props.enterStyle, props.exitStyle]), isHydrating || !hasAnimation(normalized)) return null;
-      Array.isArray(style.transform) && (style.transform = (0, import_web3.transformsToString)(style.transform));
+      Array.isArray(style.transform) && (style.transform = (0, import_web4.transformsToString)(style.transform));
       const delayStr = normalized.delay ? ` ${normalized.delay}ms` : "", durationOverride = normalized.config?.duration;
       return style.transition = keys.map((key) => {
         const propAnimation = normalized.properties[key];
@@ -22803,7 +22843,7 @@ function splitAccessibilityProps(props, options) {
 __name(splitAccessibilityProps, "splitAccessibilityProps");
 
 // ../packages/ui/src/components/button.tsx
-var import_jsx_runtime4 = require("react/jsx-runtime");
+var import_jsx_runtime5 = require("react/jsx-runtime");
 var ButtonFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   justifyContent: "center",
@@ -22914,7 +22954,7 @@ function Button({
     },
     { defaultRole: "button" }
   );
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
     ButtonFrame,
     {
       variant,
@@ -22924,8 +22964,8 @@ function Button({
       ...accessibilityProps,
       ...buttonRest,
       children: [
-        loading ? /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
-        children != null && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(ButtonLabel, { variant, size: size3, color, children }),
+        loading ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Spinner, { size: "small", color: spinnerColor }) : icon,
+        children != null && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(ButtonLabel, { variant, size: size3, color, children }),
         !loading && iconAfter
       ]
     }
@@ -22935,7 +22975,7 @@ __name(Button, "Button");
 
 // ../packages/ui/src/components/input.tsx
 var import_react4 = __toESM(require("react"));
-var import_jsx_runtime5 = require("react/jsx-runtime");
+var import_jsx_runtime6 = require("react/jsx-runtime");
 var Input2 = (0, import_core9.styled)(Input, {
   fontFamily: "$body",
   borderRadius: "$3",
@@ -23096,7 +23136,7 @@ var Text4 = (0, import_core9.styled)(Text3, {
 });
 
 // ../packages/ui/src/components/card.tsx
-var import_jsx_runtime6 = require("react/jsx-runtime");
+var import_jsx_runtime7 = require("react/jsx-runtime");
 var CardFrame = (0, import_core9.styled)(YStack, {
   backgroundColor: "$card",
   borderRadius: "$4",
@@ -23158,7 +23198,7 @@ var CardFooterFrame = (0, import_core9.styled)(XStack, {
   paddingTop: "$2"
 });
 function Card(props) {
-  return /* @__PURE__ */ (0, import_jsx_runtime6.jsx)(CardFrame, { ...props });
+  return /* @__PURE__ */ (0, import_jsx_runtime7.jsx)(CardFrame, { ...props });
 }
 __name(Card, "Card");
 Card.Header = CardHeaderFrame;
@@ -23166,7 +23206,7 @@ Card.Content = CardContentFrame;
 Card.Footer = CardFooterFrame;
 
 // ../packages/ui/src/components/badge.tsx
-var import_jsx_runtime7 = require("react/jsx-runtime");
+var import_jsx_runtime8 = require("react/jsx-runtime");
 var BadgeFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   justifyContent: "center",
@@ -23267,16 +23307,16 @@ var Divider = (0, import_core9.styled)(YStack, {
 });
 
 // ../packages/ui/src/components/form/form-field.tsx
-var import_jsx_runtime8 = require("react/jsx-runtime");
-
-// ../packages/ui/src/components/form/checkbox.tsx
 var import_jsx_runtime9 = require("react/jsx-runtime");
 
-// ../packages/ui/src/components/form/switch.tsx
+// ../packages/ui/src/components/form/checkbox.tsx
 var import_jsx_runtime10 = require("react/jsx-runtime");
 
-// ../packages/ui/src/components/avatar.tsx
+// ../packages/ui/src/components/form/switch.tsx
 var import_jsx_runtime11 = require("react/jsx-runtime");
+
+// ../packages/ui/src/components/avatar.tsx
+var import_jsx_runtime12 = require("react/jsx-runtime");
 var AvatarFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   justifyContent: "center",
@@ -23297,7 +23337,7 @@ var AvatarFrame = (0, import_core9.styled)(XStack, {
 });
 
 // ../packages/ui/src/components/icon-button.tsx
-var import_jsx_runtime12 = require("react/jsx-runtime");
+var import_jsx_runtime13 = require("react/jsx-runtime");
 var IconButtonFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   justifyContent: "center",
@@ -23341,7 +23381,7 @@ var IconButtonFrame = (0, import_core9.styled)(XStack, {
 });
 
 // ../packages/ui/src/components/search-input.tsx
-var import_jsx_runtime13 = require("react/jsx-runtime");
+var import_jsx_runtime14 = require("react/jsx-runtime");
 var SearchFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   borderRadius: "$full",
@@ -23377,7 +23417,7 @@ var SearchInputField = (0, import_core9.styled)(Input, {
 });
 
 // ../packages/ui/src/components/filter-chip.tsx
-var import_jsx_runtime14 = require("react/jsx-runtime");
+var import_jsx_runtime15 = require("react/jsx-runtime");
 var ChipFrame = (0, import_core9.styled)(XStack, {
   alignItems: "center",
   justifyContent: "center",
@@ -23418,10 +23458,10 @@ var ChipLabel = (0, import_core9.styled)(Text3, {
 });
 
 // ../packages/ui/src/components/rating-display.tsx
-var import_jsx_runtime15 = require("react/jsx-runtime");
+var import_jsx_runtime16 = require("react/jsx-runtime");
 
 // ../packages/ui/src/components/progress-bar.tsx
-var import_jsx_runtime16 = require("react/jsx-runtime");
+var import_jsx_runtime17 = require("react/jsx-runtime");
 var BarTrack = (0, import_core9.styled)(XStack, {
   width: "100%",
   backgroundColor: "$muted",
@@ -23445,10 +23485,35 @@ var BarFill = (0, import_core9.styled)(YStack, {
 });
 
 // ../packages/ui/src/components/stat-box.tsx
-var import_jsx_runtime17 = require("react/jsx-runtime");
+var import_react5 = __toESM(require("react"));
+var import_jsx_runtime18 = require("react/jsx-runtime");
+var StatBox = import_react5.default.memo(/* @__PURE__ */ __name(function StatBox2({ value, label, icon, ...rest }) {
+  const { rest: boxRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime18.jsxs)(
+    YStack,
+    {
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "$1",
+      paddingVertical: "$3",
+      paddingHorizontal: "$4",
+      backgroundColor: "$backgroundStrong",
+      borderRadius: "$3",
+      flex: 1,
+      ...accessibilityProps,
+      ...boxRest,
+      children: [
+        icon,
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Text3, { fontFamily: "$heading", fontSize: "$7", fontWeight: "700", color: "$color", children: value }),
+        /* @__PURE__ */ (0, import_jsx_runtime18.jsx)(Text3, { fontSize: "$2", fontWeight: "500", color: "$mutedForeground", textTransform: "uppercase", children: label })
+      ]
+    }
+  );
+}, "StatBox"));
 
 // ../packages/ui/src/components/route-card.tsx
-var import_jsx_runtime18 = require("react/jsx-runtime");
+var import_react6 = __toESM(require("react"));
+var import_jsx_runtime19 = require("react/jsx-runtime");
 var RouteCardFrame = (0, import_core9.styled)(YStack, {
   backgroundColor: "$card",
   borderRadius: "$4",
@@ -23510,9 +23575,116 @@ var FavoriteButton = (0, import_core9.styled)(XStack, {
   justifyContent: "center",
   cursor: "pointer"
 });
+function HeartIcon({ filled }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { alignItems: "center", justifyContent: "center", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+      YStack,
+      {
+        width: 10,
+        height: 10,
+        borderRadius: "$full",
+        backgroundColor: filled ? "$primary" : "transparent",
+        borderWidth: filled ? 0 : 1.5,
+        borderColor: "$mutedForeground"
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+      YStack,
+      {
+        width: 10,
+        height: 10,
+        borderRadius: "$full",
+        backgroundColor: filled ? "$primary" : "transparent",
+        borderWidth: filled ? 0 : 1.5,
+        borderColor: "$mutedForeground",
+        marginLeft: -4
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+      YStack,
+      {
+        position: "absolute",
+        bottom: -3,
+        width: 0,
+        height: 0,
+        borderLeftWidth: 8,
+        borderRightWidth: 8,
+        borderTopWidth: 8,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderTopColor: filled ? "$primary" : "transparent"
+      }
+    )
+  ] });
+}
+__name(HeartIcon, "HeartIcon");
+function SmallDot({ color = "$mutedForeground" }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 6, height: 6, borderRadius: "$full", backgroundColor: color });
+}
+__name(SmallDot, "SmallDot");
+var RouteCard = import_react6.default.memo(/* @__PURE__ */ __name(function RouteCard2({ data, orientation = "vertical", onFavoritePress, ...rest }) {
+  const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest);
+  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(RouteCardFrame, { orientation, ...accessibilityProps, ...cardRest, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(CardImage, { orientation, children: [
+      data.image && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        Image,
+        {
+          src: data.image,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover"
+        }
+      ),
+      (data.contentType === "Official" || data.isOfficial) && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(ContentTypeBadge, { type: "Official", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "OFFICIAL" }) }),
+      data.contentType === "Sponsored" && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(ContentTypeBadge, { type: "Sponsored", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$2", fontWeight: "700", color: "#FFFFFF", children: "SPONSORED" }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(FavoriteButton, { onPress: onFavoritePress, children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(HeartIcon, { filled: !!data.isFavorited }) }),
+      data.rating != null && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+        XStack,
+        {
+          position: "absolute",
+          top: 10,
+          right: 50,
+          paddingHorizontal: "$1.5",
+          paddingVertical: "$0.5",
+          borderRadius: "$2",
+          backgroundColor: "rgba(255,255,255,0.9)",
+          alignItems: "center",
+          gap: "$1",
+          children: [
+            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 8, height: 8, borderRadius: 2, backgroundColor: "$ant500", transform: [{ rotate: "45deg" }] }),
+            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$3", fontWeight: "600", color: "$color", children: data.rating.toFixed(1) })
+          ]
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { padding: "$3", gap: "$1.5", flex: 1, children: [
+      data.tag && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$2", fontWeight: "600", color: "$primary", textTransform: "uppercase", children: data.tag }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontFamily: "$heading", fontSize: "$5", fontWeight: "600", color: "$color", numberOfLines: 2, children: data.title }),
+      data.description && /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$3", color: "$mutedForeground", numberOfLines: 2, children: data.description }),
+      data.location && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { alignItems: "center", gap: "$1.5", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(SmallDot, { color: "$primary" }),
+        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$3", color: "$mutedForeground", children: data.location })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { alignItems: "center", gap: "$3", marginTop: "$1", children: [
+        data.distance && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { alignItems: "center", gap: "$1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(SmallDot, {}),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$3", color: "$mutedForeground", children: data.distance })
+        ] }),
+        data.duration && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { alignItems: "center", gap: "$1.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(SmallDot, {}),
+          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text3, { fontSize: "$3", color: "$mutedForeground", children: data.duration })
+        ] }),
+        data.stopsCount != null && /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(Text3, { fontSize: "$3", color: "$mutedForeground", children: [
+          data.stopsCount,
+          " Stops"
+        ] })
+      ] })
+    ] })
+  ] });
+}, "RouteCard"));
 
 // ../packages/ui/src/components/skeleton.tsx
-var import_jsx_runtime19 = require("react/jsx-runtime");
+var import_jsx_runtime20 = require("react/jsx-runtime");
 var SkeletonFrame = (0, import_core9.styled)(YStack, {
   backgroundColor: "$muted",
   borderRadius: "$3",
@@ -23541,8 +23713,8 @@ var SkeletonFrame = (0, import_core9.styled)(YStack, {
 });
 
 // ../packages/app/src/screens/auth/auth-shell.tsx
-var import_react5 = __toESM(require("react"));
-var import_jsx_runtime20 = require("react/jsx-runtime");
+var import_react7 = __toESM(require("react"));
+var import_jsx_runtime21 = require("react/jsx-runtime");
 var AUTH_PALETTE = {
   primary: "#005696",
   primaryDeep: "#0A3C63",
@@ -23565,17 +23737,17 @@ function AuthShell({
   mascot,
   children
 }) {
-  const [showDecorativeLayers, setShowDecorativeLayers] = import_react5.default.useState(!import_core9.isWeb);
+  const [showDecorativeLayers, setShowDecorativeLayers] = import_react7.default.useState(!import_core9.isWeb);
   const shellClassName = import_core9.isWeb ? "auth-shell" : void 0;
   const frameClassName = import_core9.isWeb ? `auth-shell__frame ${panelPosition === "left" ? "auth-shell__frame--panel-left" : ""}`.trim() : void 0;
   const formClassName = import_core9.isWeb ? "auth-shell__form" : void 0;
   const panelClassName = import_core9.isWeb ? "auth-shell__panel" : void 0;
   const footerClassName = import_core9.isWeb ? "auth-shell__footer" : void 0;
-  import_react5.default.useEffect(() => {
+  import_react7.default.useEffect(() => {
     if (!import_core9.isWeb) return;
     setShowDecorativeLayers(true);
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(import_core9.Theme, { name: "light_user", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(import_core9.Theme, { name: "light_user", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     YStack,
     {
       className: shellClassName,
@@ -23588,8 +23760,8 @@ function AuthShell({
       paddingVertical: "$6",
       minHeight: import_core9.isWeb ? "100vh" : void 0,
       children: [
-        showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthBackdrop, {}) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+        showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthBackdrop, {}) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
           XStack,
           {
             className: frameClassName,
@@ -23601,7 +23773,7 @@ function AuthShell({
             gap: "$5",
             zIndex: 1,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
                 YStack,
                 {
                   className: formClassName,
@@ -23612,15 +23784,15 @@ function AuthShell({
                   justifyContent: "center",
                   gap: "$5",
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { alignItems: "center", gap: "$2", paddingHorizontal: "$2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading2", align: "center", color: "$primary", children: "AntAPP" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { alignItems: "center", gap: "$2", maxWidth: 440, children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading2", align: "center", children: title }),
-                        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "bodyLarge", align: "center", muted: true, children: subtitle })
+                    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(VStack, { alignItems: "center", gap: "$2", paddingHorizontal: "$2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "heading2", align: "center", color: "$primary", children: "AntAPP" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(VStack, { alignItems: "center", gap: "$2", maxWidth: 440, children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "heading2", align: "center", children: title }),
+                        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "bodyLarge", align: "center", muted: true, children: subtitle })
                       ] })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "relative", width: "100%", children: [
-                      mascot ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "relative", width: "100%", children: [
+                      mascot ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                         YStack,
                         {
                           position: "absolute",
@@ -23631,7 +23803,7 @@ function AuthShell({
                           children: mascot
                         }
                       ) : null,
-                      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                      /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                         Card,
                         {
                           variant: "elevated",
@@ -23640,11 +23812,11 @@ function AuthShell({
                           borderRadius: "$5",
                           backgroundColor: AUTH_PALETTE.neutralStrong,
                           ...mascot ? { paddingTop: "$5", marginTop: "$9" } : {},
-                          children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(VStack, { gap: "$4", children })
+                          children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(VStack, { gap: "$4", children })
                         }
                       )
                     ] }),
-                    footer ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+                    footer ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                       XStack,
                       {
                         className: footerClassName,
@@ -23657,7 +23829,7 @@ function AuthShell({
                   ]
                 }
               ),
-              showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+              showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                 AuthVisualPanel,
                 {
                   className: panelClassName,
@@ -23674,10 +23846,10 @@ function AuthShell({
 }
 __name(AuthShell, "AuthShell");
 function AuthField({ label, error, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "label", children: label }),
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(VStack, { gap: "$2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "label", children: label }),
     children,
-    error ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "caption", color: "$error500", children: error }) : null
+    error ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "caption", color: "$error500", children: error }) : null
   ] });
 }
 __name(AuthField, "AuthField");
@@ -23685,7 +23857,7 @@ function AuthNotice({ tone, children }) {
   const backgroundColor = tone === "success" ? "$success50" : "$error50";
   const borderColor = tone === "success" ? "$success200" : "$error200";
   const textColor = tone === "success" ? "$success500" : "$error500";
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
     YStack,
     {
       padding: "$3",
@@ -23693,7 +23865,7 @@ function AuthNotice({ tone, children }) {
       borderWidth: 1,
       backgroundColor,
       borderColor,
-      children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "body", color: textColor, children })
+      children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "body", color: textColor, children })
     }
   );
 }
@@ -23703,15 +23875,15 @@ function AuthFooterLink({
   actionLabel,
   onPress
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(HStack, { gap: "$1.5", flexWrap: "wrap", justifyContent: "center", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "body", muted: true, align: "center", children: prefix }),
-    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Button, { variant: "link", size: "sm", onPress, children: actionLabel })
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(HStack, { gap: "$1.5", flexWrap: "wrap", justifyContent: "center", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "body", muted: true, align: "center", children: prefix }),
+    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { variant: "link", size: "sm", onPress, children: actionLabel })
   ] });
 }
 __name(AuthFooterLink, "AuthFooterLink");
 function AuthBackdrop() {
   const s = /* @__PURE__ */ __name((web, mob) => import_core9.isWeb ? web : mob, "s");
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     YStack,
     {
       pointerEvents: "none",
@@ -23722,12 +23894,12 @@ function AuthBackdrop() {
       left: 0,
       overflow: "hidden",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: AUTH_PALETTE.neutral }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-170, -92), left: s(-120, -76), width: s(440, 260), height: s(440, 260), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.5 }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-96, -60), right: s(36, -48), width: s(380, 240), height: s(380, 240), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.1 }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: s(32, 24), right: s(64, 20), opacity: 0.3, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(72, 48), height: s(72, 48), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-          [0, 45, 90, 135].map((deg) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: AUTH_PALETTE.neutral }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-170, -92), left: s(-120, -76), width: s(440, 260), height: s(440, 260), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.5 }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-96, -60), right: s(36, -48), width: s(380, 240), height: s(380, 240), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.1 }),
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", top: s(32, 24), right: s(64, 20), opacity: 0.3, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(72, 48), height: s(72, 48), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+          [0, 45, 90, 135].map((deg) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23743,18 +23915,18 @@ function AuthBackdrop() {
             deg
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { position: "absolute", top: s(60, 44), left: s(40, 10), opacity: 0.18, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(64, 40), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-12, -8), left: s(16, 10), width: s(36, 22), height: s(36, 22), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-8, -5), left: s(36, 22), width: s(28, 18), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "absolute", top: s(60, 44), left: s(40, 10), opacity: 0.18, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(64, 40), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-12, -8), left: s(16, 10), width: s(36, 22), height: s(36, 22), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-8, -5), left: s(36, 22), width: s(28, 18), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { position: "absolute", top: s(110, 72), right: s(180, 80), opacity: 0.12, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(52, 34), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-10, -6), left: s(12, 8), width: s(30, 18), height: s(30, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-6, -4), left: s(28, 18), width: s(22, 14), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "absolute", top: s(110, 72), right: s(180, 80), opacity: 0.12, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(52, 34), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-10, -6), left: s(12, 8), width: s(30, 18), height: s(30, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-6, -4), left: s(28, 18), width: s(22, 14), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(120, 80), left: 0, right: 0, opacity: 0.08, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: s(120, 80), left: 0, right: 0, opacity: 0.08, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23770,7 +23942,7 @@ function AuthBackdrop() {
               borderBottomColor: AUTH_PALETTE.primaryDeep
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23786,7 +23958,7 @@ function AuthBackdrop() {
               borderBottomColor: AUTH_PALETTE.primary
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23803,9 +23975,9 @@ function AuthBackdrop() {
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(90, 56), left: s(48, 12), opacity: 0.14, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(8, 5), height: s(80, 52), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 4, alignSelf: "center" }),
-          [-50, -20, 15, 45].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: s(90, 56), left: s(48, 12), opacity: 0.14, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(8, 5), height: s(80, 52), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 4, alignSelf: "center" }),
+          [-50, -20, 15, 45].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23820,9 +23992,9 @@ function AuthBackdrop() {
             i
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(84, 50), right: s(60, 18), opacity: 0.1, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(6, 4), height: s(60, 40), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 3, alignSelf: "center" }),
-          [-45, -15, 20, 50].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: s(84, 50), right: s(60, 18), opacity: 0.1, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(6, 4), height: s(60, 40), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 3, alignSelf: "center" }),
+          [-45, -15, 20, 50].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23837,16 +24009,16 @@ function AuthBackdrop() {
             i
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(100, 64), opacity: 0.15, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(40, 26), left: s(-20, -10), right: s(-20, -10), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(24, 16), left: s(-30, -14), right: s(-30, -14), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.7 }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(8, 4), left: s(-10, -6), right: s(-10, -6), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.8 }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(32, 20), backgroundColor: AUTH_PALETTE.primary, opacity: 0.5 })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(100, 64), opacity: 0.15, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", bottom: s(40, 26), left: s(-20, -10), right: s(-20, -10), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", bottom: s(24, 16), left: s(-30, -14), right: s(-30, -14), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.7 }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", bottom: s(8, 4), left: s(-10, -6), right: s(-10, -6), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.8 }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(32, 20), backgroundColor: AUTH_PALETTE.primary, opacity: 0.5 })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(68, 42), left: s(200, 100), opacity: 0.12, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(32, 20), height: s(10, 6), borderRadius: s(4, 2), backgroundColor: AUTH_PALETTE.secondary }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-16, -10), left: s(12, 8), width: s(3, 2), height: s(16, 10), backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: s(68, 42), left: s(200, 100), opacity: 0.12, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(32, 20), height: s(10, 6), borderRadius: s(4, 2), backgroundColor: AUTH_PALETTE.secondary }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { position: "absolute", top: s(-16, -10), left: s(12, 8), width: s(3, 2), height: s(16, 10), backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23868,7 +24040,7 @@ function AuthBackdrop() {
           { top: s(80, 52), left: s(180, 90), size: s(16, 10) },
           { top: s(60, 40), left: s(220, 120), size: s(12, 8) },
           { top: s(95, 62), right: s(200, 100), size: s(14, 9) }
-        ].map((bird, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+        ].map((bird, i) => /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
           XStack,
           {
             position: "absolute",
@@ -23876,7 +24048,7 @@ function AuthBackdrop() {
             ...bird.left !== void 0 ? { left: bird.left } : { right: bird.right },
             opacity: 0.12,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                 YStack,
                 {
                   width: bird.size,
@@ -23886,7 +24058,7 @@ function AuthBackdrop() {
                   transform: [{ rotate: "-25deg" }]
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
                 YStack,
                 {
                   width: bird.size,
@@ -23901,14 +24073,14 @@ function AuthBackdrop() {
           },
           i
         )),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: s(160, 130), right: s(132, 22), gap: "$2", opacity: 0.5, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(12, 8), height: s(12, 8), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(56, 36), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.6 })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", top: s(160, 130), right: s(132, 22), gap: "$2", opacity: 0.5, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(12, 8), height: s(12, 8), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(56, 36), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.6 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: s(20, 12), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(40, 24), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.5 }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(10, 6), height: s(10, 6), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary })
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: s(20, 12), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(40, 24), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.5 }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: s(10, 6), height: s(10, 6), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary })
           ] })
         ] })
       ]
@@ -23921,7 +24093,7 @@ function AuthVisualPanel({
   title,
   description
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     YStack,
     {
       className,
@@ -23936,7 +24108,7 @@ function AuthVisualPanel({
       padding: "$8",
       position: "relative",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23948,7 +24120,7 @@ function AuthVisualPanel({
             opacity: 0.24
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23961,7 +24133,7 @@ function AuthVisualPanel({
             opacity: 0.24
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23974,7 +24146,7 @@ function AuthVisualPanel({
             opacity: 0.18
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23987,7 +24159,7 @@ function AuthVisualPanel({
             opacity: 0.16
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -24000,7 +24172,7 @@ function AuthVisualPanel({
             opacity: 0.09
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -24013,7 +24185,7 @@ function AuthVisualPanel({
             opacity: 0.1
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -24026,7 +24198,7 @@ function AuthVisualPanel({
             opacity: 0.12
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           YStack,
           {
             position: "absolute",
@@ -24039,36 +24211,36 @@ function AuthVisualPanel({
             opacity: 0.2
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: 120, left: 96, gap: "$2.5", opacity: 0.84, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 92, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.74 })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", top: 120, left: 96, gap: "$2.5", opacity: 0.84, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 92, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.74 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 28, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 56, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.78 }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 })
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 28, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 56, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.78 }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: 156, right: 86, gap: "$2", opacity: 0.56, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 12, height: 12, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 68, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.84 })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { position: "absolute", bottom: 156, right: 86, gap: "$2", opacity: 0.56, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 12, height: 12, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 68, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.84 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 22, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 34, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 8, height: 8, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.84 })
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 22, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 34, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 }),
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 8, height: 8, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.84 })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(ZStack, { flex: 1, justifyContent: "space-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(VStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "label", color: AUTH_PALETTE.tertiarySoft, children: "AntAPP User Access" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$5", maxWidth: 460, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$3", alignItems: "center", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 48, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary, opacity: 0.92 }),
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 96, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.5 })
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(ZStack, { flex: 1, justifyContent: "space-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(VStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "label", color: AUTH_PALETTE.tertiarySoft, children: "AntAPP User Access" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(VStack, { gap: "$5", maxWidth: 460, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { gap: "$3", alignItems: "center", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 48, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary, opacity: 0.92 }),
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(YStack, { width: 96, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.5 })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading1", color: AUTH_PALETTE.neutralStrong, children: title }),
-              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "bodyLarge", color: AUTH_PALETTE.primarySoft, children: description })
+            /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(VStack, { gap: "$3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "heading1", color: AUTH_PALETTE.neutralStrong, children: title }),
+              /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "bodyLarge", color: AUTH_PALETTE.primarySoft, children: description })
             ] })
           ] })
         ] })
@@ -24079,7 +24251,7 @@ function AuthVisualPanel({
 __name(AuthVisualPanel, "AuthVisualPanel");
 
 // ../packages/app/src/screens/auth/login-screen.tsx
-var import_jsx_runtime21 = require("react/jsx-runtime");
+var import_jsx_runtime22 = require("react/jsx-runtime");
 function AuthLoginScreen({
   email,
   password,
@@ -24093,8 +24265,8 @@ function AuthLoginScreen({
   onNavigateToForgotPassword,
   mascot
 }) {
-  const [showPassword, setShowPassword] = (0, import_react6.useState)(false);
-  const passwordInputRef = (0, import_react6.useRef)(null);
+  const [showPassword, setShowPassword] = (0, import_react8.useState)(false);
+  const passwordInputRef = (0, import_react8.useRef)(null);
   const togglePasswordVisibility = /* @__PURE__ */ __name(() => {
     setShowPassword((current) => !current);
     if (import_core9.isWeb) {
@@ -24103,7 +24275,7 @@ function AuthLoginScreen({
       });
     }
   }, "togglePasswordVisibility");
-  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
     AuthShell,
     {
       title: "Welcome Back",
@@ -24112,7 +24284,7 @@ function AuthLoginScreen({
       panelDescription: "Plan better routes, return to saved stops faster, and keep your Antalya trips organized.",
       panelPosition: "right",
       mascot,
-      footer: onNavigateToRegister ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+      footer: onNavigateToRegister ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
         AuthFooterLink,
         {
           prefix: "Don't have an account?",
@@ -24121,9 +24293,9 @@ function AuthLoginScreen({
         }
       ) : void 0,
       children: [
-        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
           Input2,
           {
             value: email,
@@ -24137,8 +24309,8 @@ function AuthLoginScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Input2,
             {
               ref: passwordInputRef,
@@ -24159,7 +24331,7 @@ function AuthLoginScreen({
               onSubmitEditing: onSubmit
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Button,
             {
               variant: "link",
@@ -24176,8 +24348,8 @@ function AuthLoginScreen({
             }
           )
         ] }) }),
-        onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(XStack, { justifyContent: "flex-end", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { variant: "link", size: "sm", onPress: onNavigateToForgotPassword, disabled: pending, children: "Forgot password?" }) }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Sign In" })
+        onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(XStack, { justifyContent: "flex-end", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Button, { variant: "link", size: "sm", onPress: onNavigateToForgotPassword, disabled: pending, children: "Forgot password?" }) }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Sign In" })
       ]
     }
   );
@@ -24185,16 +24357,16 @@ function AuthLoginScreen({
 __name(AuthLoginScreen, "AuthLoginScreen");
 
 // ../packages/app/src/screens/auth/register-screen.tsx
-var import_react7 = require("react");
-var import_jsx_runtime22 = require("react/jsx-runtime");
+var import_react9 = require("react");
+var import_jsx_runtime23 = require("react/jsx-runtime");
 function UserTypeSelector({
   value,
   onChange,
   disabled
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(YStack, { gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Text4, { variant: "label", color: "$mutedForeground", fontSize: "$3", children: "Account Type" }),
-    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(YStack, { gap: "$2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Text4, { variant: "label", color: "$mutedForeground", fontSize: "$3", children: "Account Type" }),
+    /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
       XStack,
       {
         borderRadius: "$4",
@@ -24203,7 +24375,7 @@ function UserTypeSelector({
         overflow: "hidden",
         children: ["personal", "business"].map((type) => {
           const isActive = value === type;
-          return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
             XStack,
             {
               flex: 1,
@@ -24217,7 +24389,7 @@ function UserTypeSelector({
               onPress: () => !disabled && onChange(type),
               pressStyle: disabled ? {} : { opacity: 0.8 },
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
                   YStack,
                   {
                     width: 8,
@@ -24227,7 +24399,7 @@ function UserTypeSelector({
                     opacity: isActive ? 1 : 0.4
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
                   Text4,
                   {
                     variant: "label",
@@ -24244,7 +24416,7 @@ function UserTypeSelector({
         })
       }
     ),
-    value === "business" && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Text4, { variant: "caption", color: "$primary", fontSize: "$2", children: "Business accounts can list locations, create sponsored routes, and access analytics." })
+    value === "business" && /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Text4, { variant: "caption", color: "$primary", fontSize: "$2", children: "Business accounts can list locations, create sponsored routes, and access analytics." })
   ] });
 }
 __name(UserTypeSelector, "UserTypeSelector");
@@ -24265,10 +24437,10 @@ function AuthRegisterScreen({
   onNavigateToLogin,
   mascot
 }) {
-  const [showPassword, setShowPassword] = (0, import_react7.useState)(false);
-  const [showConfirmPassword, setShowConfirmPassword] = (0, import_react7.useState)(false);
-  const passwordInputRef = (0, import_react7.useRef)(null);
-  const confirmPasswordInputRef = (0, import_react7.useRef)(null);
+  const [showPassword, setShowPassword] = (0, import_react9.useState)(false);
+  const [showConfirmPassword, setShowConfirmPassword] = (0, import_react9.useState)(false);
+  const passwordInputRef = (0, import_react9.useRef)(null);
+  const confirmPasswordInputRef = (0, import_react9.useRef)(null);
   const togglePasswordVisibility = /* @__PURE__ */ __name(() => {
     setShowPassword((current) => !current);
     if (import_core9.isWeb) {
@@ -24285,7 +24457,7 @@ function AuthRegisterScreen({
       });
     }
   }, "toggleConfirmPasswordVisibility");
-  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
     AuthShell,
     {
       title: userType === "business" ? "Business Account" : "Create Account",
@@ -24294,7 +24466,7 @@ function AuthRegisterScreen({
       panelDescription: "Create your account, collect your favorite spots, and start building routes with a calmer rhythm.",
       panelPosition: "left",
       mascot,
-      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
         AuthFooterLink,
         {
           prefix: "Already have an account?",
@@ -24303,9 +24475,9 @@ function AuthRegisterScreen({
         }
       ) : void 0,
       children: [
-        error ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(UserTypeSelector, { value: userType, onChange: onUserTypeChange, disabled: pending }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Full Name", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+        error ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(UserTypeSelector, { value: userType, onChange: onUserTypeChange, disabled: pending }),
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Full Name", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
           Input2,
           {
             value: fullName,
@@ -24317,7 +24489,7 @@ function AuthRegisterScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
           Input2,
           {
             value: email,
@@ -24331,8 +24503,8 @@ function AuthRegisterScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             Input2,
             {
               ref: passwordInputRef,
@@ -24352,7 +24524,7 @@ function AuthRegisterScreen({
               disabled: pending
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             Button,
             {
               variant: "link",
@@ -24369,8 +24541,8 @@ function AuthRegisterScreen({
             }
           )
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             Input2,
             {
               ref: confirmPasswordInputRef,
@@ -24391,7 +24563,7 @@ function AuthRegisterScreen({
               onSubmitEditing: onSubmit
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
             Button,
             {
               variant: "link",
@@ -24408,7 +24580,7 @@ function AuthRegisterScreen({
             }
           )
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: userType === "business" ? "Create Business Account" : "Sign Up" })
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: userType === "business" ? "Create Business Account" : "Sign Up" })
       ]
     }
   );
@@ -24416,7 +24588,7 @@ function AuthRegisterScreen({
 __name(AuthRegisterScreen, "AuthRegisterScreen");
 
 // ../packages/app/src/screens/auth/forgot-password-screen.tsx
-var import_jsx_runtime23 = require("react/jsx-runtime");
+var import_jsx_runtime24 = require("react/jsx-runtime");
 function AuthForgotPasswordScreen({
   email,
   onEmailChange,
@@ -24427,7 +24599,7 @@ function AuthForgotPasswordScreen({
   onNavigateToLogin,
   mascot
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
     AuthShell,
     {
       title: "Reset Password",
@@ -24436,7 +24608,7 @@ function AuthForgotPasswordScreen({
       panelDescription: "Recover access without losing your saved routes, collections, and upcoming plans.",
       panelPosition: "right",
       mascot,
-      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
         AuthFooterLink,
         {
           prefix: "Remembered your password?",
@@ -24445,9 +24617,9 @@ function AuthForgotPasswordScreen({
         }
       ) : void 0,
       children: [
-        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
           Input2,
           {
             value: email,
@@ -24462,7 +24634,7 @@ function AuthForgotPasswordScreen({
             onSubmitEditing: onSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Send Reset Link" })
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Send Reset Link" })
       ]
     }
   );
@@ -24470,8 +24642,8 @@ function AuthForgotPasswordScreen({
 __name(AuthForgotPasswordScreen, "AuthForgotPasswordScreen");
 
 // ../packages/app/src/screens/auth/reset-password-screen.tsx
-var import_react8 = require("react");
-var import_jsx_runtime24 = require("react/jsx-runtime");
+var import_react10 = require("react");
+var import_jsx_runtime25 = require("react/jsx-runtime");
 function AuthResetPasswordScreen({
   email = "",
   token = "",
@@ -24480,11 +24652,11 @@ function AuthResetPasswordScreen({
   onNavigateToForgotPassword,
   mascot
 }) {
-  const [password, setPassword] = (0, import_react8.useState)("");
-  const [confirmPassword, setConfirmPassword] = (0, import_react8.useState)("");
-  const [error, setError] = (0, import_react8.useState)(null);
-  const [success, setSuccess] = (0, import_react8.useState)(false);
-  const [isPending, startTransition] = (0, import_react8.useTransition)();
+  const [password, setPassword] = (0, import_react10.useState)("");
+  const [confirmPassword, setConfirmPassword] = (0, import_react10.useState)("");
+  const [error, setError] = (0, import_react10.useState)(null);
+  const [success, setSuccess] = (0, import_react10.useState)(false);
+  const [isPending, startTransition] = (0, import_react10.useTransition)();
   const invalidLink = !email || !token;
   const handleSubmit = /* @__PURE__ */ __name(() => {
     setError(null);
@@ -24506,7 +24678,7 @@ function AuthResetPasswordScreen({
     });
   }, "handleSubmit");
   if (success) {
-    return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
       AuthShell,
       {
         title: "Password Reset!",
@@ -24514,7 +24686,7 @@ function AuthResetPasswordScreen({
         panelTitle: "Back on track",
         panelDescription: "Your account is secured. Pick up where you left off.",
         mascot,
-        footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
           AuthFooterLink,
           {
             prefix: "Ready to continue?",
@@ -24522,11 +24694,11 @@ function AuthResetPasswordScreen({
             onPress: onNavigateToLogin
           }
         ) : void 0,
-        children: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onPress: onNavigateToLogin, size: "lg", borderRadius: "$4", children: "Go to Sign In" }) : null
+        children: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(Button, { onPress: onNavigateToLogin, size: "lg", borderRadius: "$4", children: "Go to Sign In" }) : null
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime25.jsxs)(
     AuthShell,
     {
       title: "Reset Password",
@@ -24534,7 +24706,7 @@ function AuthResetPasswordScreen({
       panelTitle: "Secure your trail",
       panelDescription: "Choose a strong password to keep your routes, collections, and profile safe.",
       mascot,
-      footer: onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+      footer: onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
         AuthFooterLink,
         {
           prefix: "Link expired?",
@@ -24543,9 +24715,9 @@ function AuthResetPasswordScreen({
         }
       ) : void 0,
       children: [
-        invalidLink ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: "Invalid or expired reset link. Please request a new password reset." }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthField, { label: "New Password", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        invalidLink ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthNotice, { tone: "error", children: "Invalid or expired reset link. Please request a new password reset." }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthField, { label: "New Password", children: /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
           Input2,
           {
             value: password,
@@ -24558,7 +24730,7 @@ function AuthResetPasswordScreen({
             onSubmitEditing: handleSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
           Input2,
           {
             value: confirmPassword,
@@ -24571,7 +24743,7 @@ function AuthResetPasswordScreen({
             onSubmitEditing: handleSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
           Button,
           {
             onPress: handleSubmit,
@@ -24589,8 +24761,8 @@ function AuthResetPasswordScreen({
 __name(AuthResetPasswordScreen, "AuthResetPasswordScreen");
 
 // ../packages/app/src/screens/auth/confirm-email-screen.tsx
-var import_react9 = require("react");
-var import_jsx_runtime25 = require("react/jsx-runtime");
+var import_react11 = require("react");
+var import_jsx_runtime26 = require("react/jsx-runtime");
 function AuthConfirmEmailScreen({
   userId,
   code,
@@ -24598,9 +24770,9 @@ function AuthConfirmEmailScreen({
   onNavigateToApp,
   mascot
 }) {
-  const [status, setStatus] = (0, import_react9.useState)("loading");
-  const [message, setMessage] = (0, import_react9.useState)("");
-  (0, import_react9.useEffect)(() => {
+  const [status, setStatus] = (0, import_react11.useState)("loading");
+  const [message, setMessage] = (0, import_react11.useState)("");
+  (0, import_react11.useEffect)(() => {
     if (!userId || !code) {
       setStatus("error");
       setMessage("Invalid or expired confirmation link.");
@@ -24616,7 +24788,7 @@ function AuthConfirmEmailScreen({
   }, [userId, code]);
   const isSuccess = status === "success";
   const isError = status === "error";
-  return /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(
     AuthShell,
     {
       title: status === "loading" ? "Confirming your email\u2026" : isSuccess ? "Email Confirmed!" : "Confirmation Failed",
@@ -24624,9 +24796,9 @@ function AuthConfirmEmailScreen({
       panelTitle: isSuccess ? "You are all set!" : "Verify your account",
       panelDescription: isSuccess ? "Your email is confirmed. Explore routes and build your adventure." : "A confirmed email keeps your account secure and allows you to recover access.",
       mascot,
-      children: isSuccess ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(Button, { onPress: onNavigateToApp, size: "lg", borderRadius: "$4", children: "Start Exploring" }) : isError ? /* @__PURE__ */ (0, import_jsx_runtime25.jsxs)(import_jsx_runtime25.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthNotice, { tone: "error", children: message }),
-        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(Button, { onPress: onNavigateToApp, variant: "outline", size: "lg", borderRadius: "$4", children: "Go to App" })
+      children: isSuccess ? /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(Button, { onPress: onNavigateToApp, size: "lg", borderRadius: "$4", children: "Start Exploring" }) : isError ? /* @__PURE__ */ (0, import_jsx_runtime26.jsxs)(import_jsx_runtime26.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(AuthNotice, { tone: "error", children: message }),
+        /* @__PURE__ */ (0, import_jsx_runtime26.jsx)(Button, { onPress: onNavigateToApp, variant: "outline", size: "lg", borderRadius: "$4", children: "Go to App" })
       ] }) : null
     }
   );

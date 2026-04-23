@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Ant.Application;
 using Ant.Core.Enums;
 using Ant.Application.Interfaces;
@@ -63,12 +64,10 @@ builder.Services.AddOutputCache(options =>
         .Tag(OutputCacheTags.Tags));
     options.AddPolicy(OutputCachePolicies.UserCollections, policy => policy
         .Expire(TimeSpan.FromMinutes(1))
-        .SetVaryByQuery("pageNumber", "pageSize")
-        .VaryByUserClaims("uid"));
+        .SetVaryByQuery("pageNumber", "pageSize"));
     options.AddPolicy(OutputCachePolicies.UserCollectionDetail, policy => policy
         .Expire(TimeSpan.FromMinutes(2))
-        .SetVaryByRouteValue("id")
-        .VaryByUserClaims("uid"));
+        .SetVaryByRouteValue("id"));
 });
 builder.Services.AddResponseCompression(options =>
 {

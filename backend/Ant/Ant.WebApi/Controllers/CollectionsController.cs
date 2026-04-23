@@ -25,7 +25,7 @@ namespace Ant.WebApi.Controllers
     public class CollectionsController : BaseApiController
     {
         [HttpGet]
-        [OutputCache(PolicyName = OutputCachePolicies.UserCollections, VaryByUserClaims = new[] { "uid" })]
+        [OutputCache(PolicyName = OutputCachePolicies.UserCollections)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<CollectionViewModel>))]
         public async Task<IActionResult> GetAll([FromQuery] GetCollectionsParameter filter)
         {
@@ -38,7 +38,7 @@ namespace Ant.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        [OutputCache(PolicyName = OutputCachePolicies.UserCollectionDetail, VaryByUserClaims = new[] { "uid" })]
+        [OutputCache(PolicyName = OutputCachePolicies.UserCollectionDetail)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CollectionDetailViewModel))]
         public async Task<IActionResult> GetById(Guid id)
         {
