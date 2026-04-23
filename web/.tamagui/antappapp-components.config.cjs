@@ -6844,7 +6844,7 @@ var require_ScrollView = __commonJS({
     var _excluded = ["contentContainerStyle", "horizontal", "onContentSizeChange", "refreshControl", "stickyHeaderIndices", "pagingEnabled", "forwardedRef", "keyboardDismissMode", "onScroll", "centerContent"];
     var emptyObject = {};
     var IS_ANIMATING_TOUCH_START_THRESHOLD_MS = 16;
-    var ScrollView = class extends _react.default.Component {
+    var ScrollView2 = class extends _react.default.Component {
       static {
         __name(this, "ScrollView");
       }
@@ -7410,7 +7410,7 @@ var require_ScrollView = __commonJS({
       }
     });
     var ForwardedScrollView = /* @__PURE__ */ _react.default.forwardRef((props, forwardedRef) => {
-      return /* @__PURE__ */ _react.default.createElement(ScrollView, (0, _extends2.default)({}, props, {
+      return /* @__PURE__ */ _react.default.createElement(ScrollView2, (0, _extends2.default)({}, props, {
         forwardedRef
       }));
     });
