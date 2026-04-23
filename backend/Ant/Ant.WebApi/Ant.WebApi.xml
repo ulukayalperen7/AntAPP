@@ -19,7 +19,7 @@
             Get all routes for management (Admin only)
             </summary>
         </member>
-        <member name="M:Ant.WebApi.Controllers.Admin.AdminRoutesController.Promote(System.Guid,Ant.Application.Features.Routes.Commands.PromoteRoute.PromoteRouteCommand)">
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminRoutesController.Promote(System.Guid,Microsoft.AspNetCore.OutputCaching.IOutputCacheStore,Ant.Application.Features.Routes.Commands.PromoteRoute.PromoteRouteCommand)">
             <summary>
             Promote a route (Official/Sponsored)
             </summary>
