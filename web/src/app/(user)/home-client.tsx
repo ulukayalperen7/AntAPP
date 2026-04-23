@@ -12,6 +12,7 @@ type HomeClientProps = {
   mode: FeedMode
   timelineRoutes: RouteListItem[]
   spotlightRoutes: RouteListItem[]
+  currentUserName?: string | null
 }
 
 const PAGE_COPY: Record<FeedMode, {
@@ -92,11 +93,32 @@ function getAuthor(route: RouteListItem) {
     }
   }
 
+  const displayName = route.authorUserName?.trim() || 'Route Explorer'
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((chunk) => chunk[0]?.toUpperCase())
+    .join('')
+    || 'RE'
+
   return {
-    name: 'Route Explorer',
+    name: displayName,
     role: 'Community creator',
-    initials: 'RE',
+    initials,
   }
+}
+
+function getInitials(name?: string | null) {
+  const value = name?.trim()
+  if (!value) return 'AN'
+
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((chunk) => chunk[0]?.toUpperCase())
+    .join('')
 }
 
 function StoryCard({
@@ -295,16 +317,16 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
         <XStack gap="$3" alignItems="center">
           <XStack alignItems="center" gap="$1.5">
             <ThumbsUp size={14} color="var(--color-primary)" />
-            <Text variant="caption" muted>{12 + Math.round(route.averageRating * 3)} reacts</Text>
+            <Text variant="caption" muted>0 reacts</Text>
           </XStack>
           <XStack alignItems="center" gap="$1.5">
             <MessageCircle size={14} color="var(--color-mutedForeground)" />
-            <Text variant="caption" muted>{4 + (route.title.length % 9)} comments</Text>
+            <Text variant="caption" muted>0 comments</Text>
           </XStack>
         </XStack>
         <XStack alignItems="center" gap="$1.5">
           <Send size={14} color="var(--color-mutedForeground)" />
-          <Text variant="caption" muted>{1 + (route.title.length % 4)} shares</Text>
+          <Text variant="caption" muted>0 shares</Text>
         </XStack>
       </XStack>
 
@@ -316,9 +338,9 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
         gap="$2"
         flexWrap="wrap"
       >
-        <Button variant="ghost" size="sm" icon={<ThumbsUp size={16} color="currentColor" />}>Like</Button>
-        <Button variant="ghost" size="sm" icon={<MessageCircle size={16} color="currentColor" />}>Comment</Button>
-        <Button variant="ghost" size="sm" icon={<Share2 size={16} color="currentColor" />}>Share</Button>
+        <Button variant="ghost" size="sm" disabled icon={<ThumbsUp size={16} color="currentColor" />}>Like</Button>
+        <Button variant="ghost" size="sm" disabled icon={<MessageCircle size={16} color="currentColor" />}>Comment</Button>
+        <Button variant="ghost" size="sm" disabled icon={<Share2 size={16} color="currentColor" />}>Share</Button>
       </XStack>
     </Card>
   )
@@ -344,8 +366,9 @@ function RightRailCard({
   )
 }
 
-export default function HomeClient({ mode, timelineRoutes, spotlightRoutes }: HomeClientProps) {
+export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, currentUserName }: HomeClientProps) {
   const copy = PAGE_COPY[mode]
+  const composerInitials = getInitials(currentUserName)
 
   return (
     <XStack gap="$5" alignItems="flex-start" $md={{ flexDirection: 'column' }}>
@@ -378,7 +401,7 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes }: Ho
 
         <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
           <XStack gap="$3" alignItems="center">
-            <Avatar size="lg" initials="AE" />
+            <Avatar size="lg" initials={composerInitials} />
             <XStack
               flex={1}
               minHeight={48}
@@ -514,7 +537,7 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes }: Ho
         <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
           <YStack gap="$2.5">
             <Link href="/routes/create" style={{ textDecoration: 'none' }}>
-              <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create route post</Button>
+              <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create route</Button>
             </Link>
             <Link href="/my-routes" style={{ textDecoration: 'none' }}>
               <Button variant="outline" size="sm" icon={<Sparkles size={14} color="currentColor" />}>Manage my routes</Button>

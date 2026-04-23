@@ -110,6 +110,7 @@ namespace Ant.Infrastructure.Repositories
             };
 
             return await query
+                .Include(r => r.AuthorUser)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

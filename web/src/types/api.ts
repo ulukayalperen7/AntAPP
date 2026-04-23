@@ -63,6 +63,7 @@ export type RouteListItem = {
   description: string | null
   thumbnailUrl: string | null
   authorUserId: string
+  authorUserName?: string | null
   contentType: RouteContentType
   isPublic: boolean
   createdAt: string
