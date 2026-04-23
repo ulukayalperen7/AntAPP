@@ -51,7 +51,7 @@ async function request<T>(path: string, options?: ApiFetchOptions): Promise<T> {
   return res.json() as Promise<T>
 }
 
-export function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+export function apiFetch<T>(path: string, options?: ApiFetchOptions): Promise<T> {
   return request<T>(path, { ...options, includeAuth: true })
 }
 
@@ -62,7 +62,7 @@ export function publicApiFetch<T>(path: string, options?: Omit<ApiFetchOptions, 
 /** Unwraps Response<T> wrapper from backend and returns T */
 export async function apiFetchData<T>(
   path: string,
-  options?: RequestInit
+  options?: ApiFetchOptions
 ): Promise<T> {
   const wrapped = await apiFetch<ApiResponse<T>>(path, options)
   return wrapped.data
@@ -79,7 +79,7 @@ export async function publicApiFetchData<T>(
 /** Unwraps PagedResponse<T> wrapper from backend */
 export async function apiFetchPaged<T>(
   path: string,
-  options?: RequestInit
+  options?: ApiFetchOptions
 ): Promise<PagedApiResponse<T>> {
   return apiFetch<PagedApiResponse<T>>(path, options)
 }

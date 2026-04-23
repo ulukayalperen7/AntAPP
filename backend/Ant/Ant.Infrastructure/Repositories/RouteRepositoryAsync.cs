@@ -55,6 +55,7 @@ namespace Ant.Infrastructure.Repositories
                 {
                     "public" => query.Where(r => r.IsPublic),
                     "draft" => query.Where(r => !r.IsPublic),
+                    "private" => query.Where(r => !r.IsPublic),
                     _ => query.Where(r => r.IsPublic)
                 };
             }

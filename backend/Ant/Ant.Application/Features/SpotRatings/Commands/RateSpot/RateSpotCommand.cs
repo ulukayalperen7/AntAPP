@@ -14,6 +14,7 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
     {
         public Guid SpotId { get; set; }
         public short Stars { get; set; }
+        public short? Score { get; set; }
     }
 
     public class RateSpotCommandHandler : IRequestHandler<RateSpotCommand, Guid>
@@ -40,7 +41,9 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
 
-            if (request.Stars < 1 || request.Stars > 5)
+            var stars = request.Stars > 0 ? request.Stars : request.Score.GetValueOrDefault();
+
+            if (stars < 1 || stars > 5)
                 throw new ApiException("Stars must be between 1 and 5.");
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
@@ -53,8 +56,8 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
 
             if (existing != null)
             {
-                spot.RatingSum = spot.RatingSum - existing.Stars + request.Stars;
-                existing.Stars = request.Stars;
+                spot.RatingSum = spot.RatingSum - existing.Stars + stars;
+                existing.Stars = stars;
                 await _ratingRepository.UpdateAsync(existing);
                 await _spotRepository.UpdateAsync(spot);
                 await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
@@ -65,11 +68,11 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
             {
                 UserId = userId,
                 SpotId = request.SpotId,
-                Stars = request.Stars,
+                Stars = stars,
                 CreatedAt = DateTime.UtcNow
             };
 
-            spot.RatingSum += request.Stars;
+            spot.RatingSum += stars;
             spot.RatingCount++;
 
             await _ratingRepository.AddAsync(rating);

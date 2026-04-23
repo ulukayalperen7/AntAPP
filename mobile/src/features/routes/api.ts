@@ -6,7 +6,7 @@ export type GetRoutesParams = {
   tagIds?: string[]
   sort?: 'rating' | 'newest' | string
   type?: 'official' | 'community' | 'sponsored'
-  visibility?: 'public' | 'private'
+  visibility?: 'public' | 'draft'
   authorId?: string
   page?: number
   pageSize?: number

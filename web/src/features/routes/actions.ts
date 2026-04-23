@@ -39,7 +39,7 @@ export async function getRoutes(params: GetRoutesParams = {}): Promise<PagedApiR
 }
 
 export async function getRouteById(id: string): Promise<RouteDetail> {
-  return publicApiFetchData<RouteDetail>(`/routes/${id}`, { revalidate: 120 })
+  return apiFetchData<RouteDetail>(`/routes/${id}`, { revalidate: 120 })
 }
 
 export async function getRouteStops(routeId: string): Promise<RouteStopItem[]> {

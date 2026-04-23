@@ -14,6 +14,7 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
     {
         public Guid RouteId { get; set; }
         public short Stars { get; set; }
+        public short? Score { get; set; }
     }
 
     public class RateRouteCommandHandler : IRequestHandler<RateRouteCommand, Guid>
@@ -40,7 +41,9 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
 
-            if (request.Stars < 1 || request.Stars > 5)
+            var stars = request.Stars > 0 ? request.Stars : request.Score.GetValueOrDefault();
+
+            if (stars < 1 || stars > 5)
                 throw new ApiException("Stars must be between 1 and 5.");
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
@@ -53,8 +56,8 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
 
             if (existing != null)
             {
-                route.RatingSum = route.RatingSum - existing.Stars + request.Stars;
-                existing.Stars = request.Stars;
+                route.RatingSum = route.RatingSum - existing.Stars + stars;
+                existing.Stars = stars;
                 await _ratingRepository.UpdateAsync(existing);
                 await _routeRepository.UpdateAsync(route);
                 await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
@@ -65,11 +68,11 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
             {
                 UserId = userId,
                 RouteId = request.RouteId,
-                Stars = request.Stars,
+                Stars = stars,
                 CreatedAt = DateTime.UtcNow
             };
 
-            route.RatingSum += request.Stars;
+            route.RatingSum += stars;
             route.RatingCount++;
 
             await _ratingRepository.AddAsync(rating);
