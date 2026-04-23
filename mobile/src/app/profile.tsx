@@ -9,6 +9,7 @@ import type { CurrentUser, RouteListItem } from '@/features/api/types'
 import { getCurrentUser } from '@/features/account/api'
 import { getRoutes, publishRoute, unpublishRoute } from '@/features/routes/api'
 import { routeToCardData } from '@/features/routes/presenters'
+import { ProfileScreenSkeleton } from '@/components/loading/page-skeletons'
 
 function RouteActionCard({
   route,
@@ -142,6 +143,10 @@ export default function ProfileScreen() {
       title: displayName,
       message: `Check out ${displayName}'s profile on AntAPP`,
     }).catch(() => {})
+  }
+
+  if (loading) {
+    return <ProfileScreenSkeleton topInset={insets.top} />
   }
 
   return (

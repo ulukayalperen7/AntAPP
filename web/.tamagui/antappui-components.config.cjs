@@ -21376,6 +21376,7 @@ __export(src_exports, {
   RatingDisplay: () => RatingDisplay,
   ResetPresence: () => ResetPresence,
   RouteCard: () => RouteCard,
+  RouteCardSkeleton: () => RouteCardSkeleton,
   ScrollView: () => ScrollView,
   SearchInput: () => SearchInput,
   Section: () => Section,
@@ -21393,6 +21394,8 @@ __export(src_exports, {
   SheetScrollView: () => SheetScrollView,
   SizableStack: () => SizableStack,
   SizableText: () => SizableText2,
+  Skeleton: () => Skeleton,
+  SkeletonText: () => SkeletonText,
   Slider: () => Slider,
   SliderActive: () => SliderActive,
   SliderActiveFrame: () => SliderActiveFrame,
@@ -21407,6 +21410,7 @@ __export(src_exports, {
   Spinner: () => Spinner,
   Square: () => Square,
   StatBox: () => StatBox,
+  StatBoxSkeleton: () => StatBoxSkeleton,
   Strong: () => Strong,
   StyleObjectIdentifier: () => StyleObjectIdentifier,
   StyleObjectProperty: () => StyleObjectProperty,
@@ -44759,6 +44763,115 @@ function RouteCard({ data, orientation = "vertical", onFavoritePress, ...rest })
   ] });
 }
 __name(RouteCard, "RouteCard");
+
+// ../packages/ui/src/components/skeleton.tsx
+var import_jsx_runtime101 = require("react/jsx-runtime");
+var SkeletonFrame = (0, import_core67.styled)(YStack, {
+  backgroundColor: "$muted",
+  borderRadius: "$3",
+  overflow: "hidden",
+  opacity: 0.85,
+  variants: {
+    tone: {
+      default: {},
+      subtle: {
+        opacity: 0.6
+      },
+      strong: {
+        backgroundColor: "$borderColor",
+        opacity: 1
+      }
+    },
+    circular: {
+      true: {
+        borderRadius: "$full"
+      }
+    }
+  },
+  defaultVariants: {
+    tone: "default"
+  }
+});
+function Skeleton(props) {
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SkeletonFrame, { ...props });
+}
+__name(Skeleton, "Skeleton");
+function SkeletonText({
+  lines = 3,
+  lineHeight: lineHeight2 = 12,
+  widths,
+  gap = "$2",
+  ...rest
+}) {
+  const resolvedWidths = widths ?? ["100%", "88%", "64%"];
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(YStack, { gap, ...rest, children: Array.from({ length: lines }).map((_, index3) => /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+    Skeleton,
+    {
+      width: resolvedWidths[index3] ?? resolvedWidths[resolvedWidths.length - 1] ?? "100%",
+      height: lineHeight2
+    },
+    index3
+  )) });
+}
+__name(SkeletonText, "SkeletonText");
+function RouteCardSkeleton({ orientation = "vertical", ...rest }) {
+  const isHorizontal = orientation === "horizontal";
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(
+    YStack,
+    {
+      backgroundColor: "$card",
+      borderRadius: "$4",
+      borderWidth: 1,
+      borderColor: "$borderColor",
+      overflow: "hidden",
+      flexDirection: isHorizontal ? "row" : "column",
+      ...rest,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(
+          Skeleton,
+          {
+            width: isHorizontal ? 120 : "100%",
+            height: isHorizontal ? 148 : 180,
+            borderRadius: "$0"
+          }
+        ),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(YStack, { flex: 1, padding: "$3", gap: "$2.5", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: "30%", height: 12 }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: "86%", height: 22 }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(SkeletonText, { lines: 2, lineHeight: 12, widths: ["92%", "70%"] }),
+          /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(XStack, { gap: "$2", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 64, height: 12 }),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 72, height: 12 }),
+            /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 52, height: 12 })
+          ] })
+        ] })
+      ]
+    }
+  );
+}
+__name(RouteCardSkeleton, "RouteCardSkeleton");
+function StatBoxSkeleton(props) {
+  return /* @__PURE__ */ (0, import_jsx_runtime101.jsxs)(
+    YStack,
+    {
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "$2",
+      paddingVertical: "$3",
+      paddingHorizontal: "$4",
+      backgroundColor: "$backgroundStrong",
+      borderRadius: "$3",
+      flex: 1,
+      ...props,
+      children: [
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 18, height: 18, circular: true }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 44, height: 24 }),
+        /* @__PURE__ */ (0, import_jsx_runtime101.jsx)(Skeleton, { width: 72, height: 10 })
+      ]
+    }
+  );
+}
+__name(StatBoxSkeleton, "StatBoxSkeleton");
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   ACTIONS,
@@ -44913,6 +45026,7 @@ __name(RouteCard, "RouteCard");
   RatingDisplay,
   ResetPresence,
   RouteCard,
+  RouteCardSkeleton,
   ScrollView,
   SearchInput,
   Section,
@@ -44930,6 +45044,8 @@ __name(RouteCard, "RouteCard");
   SheetScrollView,
   SizableStack,
   SizableText,
+  Skeleton,
+  SkeletonText,
   Slider,
   SliderActive,
   SliderActiveFrame,
@@ -44944,6 +45060,7 @@ __name(RouteCard, "RouteCard");
   Spinner,
   Square,
   StatBox,
+  StatBoxSkeleton,
   Strong,
   StyleObjectIdentifier,
   StyleObjectProperty,

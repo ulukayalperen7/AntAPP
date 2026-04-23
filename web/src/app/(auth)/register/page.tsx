@@ -5,6 +5,7 @@ import { startTransition, useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button, Text, VStack } from '@antapp/ui'
 import { register } from '@/features/auth/actions'
+import { AuthScreenSkeleton } from '@/components/loading/page-skeletons'
 
 const REGISTER_DRAFT_KEY = 'antapp-auth-register-draft'
 
@@ -12,7 +13,7 @@ const AuthRegisterScreen = dynamic(
   () => import('@antapp/app').then((mod) => mod.AuthRegisterScreen),
   {
     ssr: false,
-    loading: () => <div style={{ minHeight: '100vh', background: '#F8F9FA' }} />,
+    loading: () => <AuthScreenSkeleton />,
   }
 )
 
@@ -20,7 +21,7 @@ const AuthShell = dynamic(
   () => import('@antapp/app').then((mod) => mod.AuthShell),
   {
     ssr: false,
-    loading: () => <div style={{ minHeight: '100vh', background: '#F8F9FA' }} />,
+    loading: () => <AuthScreenSkeleton />,
   }
 )
 

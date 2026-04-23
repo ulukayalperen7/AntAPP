@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { getSpots, getSavedSpots, toggleSpotFavorite } from '@/features/spots/api'
 import type { SpotListItem } from '@/features/api/types'
+import { SpotsScreenSkeleton } from '@/components/loading/page-skeletons'
 
 const PAGE_SIZE = 20
 
@@ -320,31 +321,29 @@ export default function SpotsScreen() {
     </YStack>
   ) : null
 
+  if (loading && spots.length === 0) {
+    return <SpotsScreenSkeleton topInset={insets.top} />
+  }
+
   return (
     <YStack flex={1} backgroundColor="$background">
-      {loading && spots.length === 0 ? (
-        <YStack flex={1} alignItems="center" justifyContent="center">
-          <ActivityIndicator size="large" />
-        </YStack>
-      ) : (
-        <FlatList
-          data={spots}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          ListHeaderComponent={ListHeader}
-          ListEmptyComponent={ListEmpty}
-          ListFooterComponent={ListFooter}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 16,
-            paddingTop: insets.top + 12,
-            paddingBottom: 100,
-            gap: 12,
-          }}
-        />
-      )}
+      <FlatList
+        data={spots}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListHeaderComponent={ListHeader}
+        ListEmptyComponent={ListEmpty}
+        ListFooterComponent={ListFooter}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.3}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: insets.top + 12,
+          paddingBottom: 100,
+          gap: 12,
+        }}
+      />
 
       {error ? (
         <YStack

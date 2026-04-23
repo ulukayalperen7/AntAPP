@@ -7,6 +7,7 @@ import type { RouteCardData } from '@antapp/ui'
 import type { RouteListItem, Tag, RouteContentType, RouteDetail } from '@/types/api'
 import { getRoutes, getTags, getRouteById } from '@/features/routes/actions'
 import { Map } from 'lucide-react'
+import { loadMapLibre } from '@/lib/maplibre'
 
 const ROUTE_TYPES: { label: string; value: RouteContentType | '' }[] = [
   { label: 'All Types', value: '' },
@@ -105,32 +106,48 @@ export default function SearchPage() {
 
   const previewMapContainerRef = useRef<HTMLDivElement | null>(null)
   const previewMapRef = useRef<PreviewMap | null>(null)
+  const resultsRequestIdRef = useRef(0)
+  const hoverIntentTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     getTags(100).then(setTags).catch(() => {})
   }, [])
 
-  const fetchResults = useCallback(() => {
+  const fetchResults = useCallback((filters: {
+    search: string
+    activeTagId: string | null
+    routeType: RouteContentType | ''
+  }) => {
+    const requestId = ++resultsRequestIdRef.current
+
     startTransition(async () => {
       try {
         const res = await getRoutes({
-          search: search || undefined,
-          tagIds: activeTagId ? [activeTagId] : undefined,
-          type: routeType ? routeType.toLowerCase() as 'official' | 'community' | 'sponsored' : undefined,
+          search: filters.search || undefined,
+          tagIds: filters.activeTagId ? [filters.activeTagId] : undefined,
+          type: filters.routeType ? filters.routeType.toLowerCase() as 'official' | 'community' | 'sponsored' : undefined,
           pageSize: 20,
         })
+
+        if (requestId !== resultsRequestIdRef.current) return
+
         setResults(res.data)
         setTotalResults(res.totalRecords)
       } catch {
+        if (requestId !== resultsRequestIdRef.current) return
         setResults([])
         setTotalResults(0)
       }
     })
-  }, [search, activeTagId, routeType])
+  }, [])
 
   useEffect(() => {
-    fetchResults()
-  }, [fetchResults])
+    const timer = setTimeout(() => {
+      fetchResults({ search: search.trim(), activeTagId, routeType })
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [activeTagId, fetchResults, routeType, search])
 
   useEffect(() => {
     if (results.length === 0) {
@@ -171,15 +188,7 @@ export default function SearchPage() {
     if (!previewMapContainerRef.current || previewMapRef.current) return
 
     try {
-      if (!document.querySelector('link[data-maplibre-style="true"]')) {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
-        link.dataset.maplibreStyle = 'true'
-        document.head.appendChild(link)
-      }
-
-      const maplibre = await import('maplibre-gl')
+      const maplibre = await loadMapLibre()
       if (!previewMapContainerRef.current || previewMapRef.current) return
 
       const map = new maplibre.Map({
@@ -239,11 +248,15 @@ export default function SearchPage() {
   }, [])
 
   useEffect(() => {
+    if (!previewRouteId) return
     void tryInitPreviewMap()
-  }, [tryInitPreviewMap])
+  }, [previewRouteId, tryInitPreviewMap])
 
   useEffect(() => {
     return () => {
+      if (hoverIntentTimeoutRef.current) {
+        clearTimeout(hoverIntentTimeoutRef.current)
+      }
       if (previewMapRef.current) {
         previewMapRef.current.remove()
       }
@@ -474,8 +487,17 @@ export default function SearchPage() {
               <div
                 key={route.id}
                 onMouseEnter={() => {
-                  setPreviewRouteId(route.id)
-                  void ensurePreviewDetail(route.id)
+                  if (hoverIntentTimeoutRef.current) clearTimeout(hoverIntentTimeoutRef.current)
+                  hoverIntentTimeoutRef.current = setTimeout(() => {
+                    setPreviewRouteId(route.id)
+                    void ensurePreviewDetail(route.id)
+                  }, 120)
+                }}
+                onMouseLeave={() => {
+                  if (hoverIntentTimeoutRef.current) {
+                    clearTimeout(hoverIntentTimeoutRef.current)
+                    hoverIntentTimeoutRef.current = null
+                  }
                 }}
                 style={{
                   borderRadius: 14,

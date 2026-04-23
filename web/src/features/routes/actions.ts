@@ -1,6 +1,6 @@
 'use server'
 
-import { apiFetchPaged, apiFetchData } from '@/lib/api'
+import { apiFetchData, apiFetchPaged, publicApiFetchData, publicApiFetchPaged } from '@/lib/api'
 import type { RouteListItem, RouteDetail, RouteStopItem, Tag, PagedApiResponse } from '@/types/api'
 
 export type GetRoutesParams = {
@@ -8,13 +8,13 @@ export type GetRoutesParams = {
   tagIds?: string[]
   sort?: 'rating' | 'newest' | string
   type?: 'official' | 'community' | 'sponsored'
-  visibility?: 'public' | 'private'
+  visibility?: 'public' | 'draft'
   authorId?: string
   page?: number
   pageSize?: number
 }
 
-export async function getRoutes(params: GetRoutesParams = {}): Promise<PagedApiResponse<RouteListItem>> {
+function buildRoutesQuery(params: GetRoutesParams = {}) {
   const qs = new URLSearchParams()
   if (params.search) qs.set('search', params.search)
   if (params.tagIds?.length) qs.set('tagIds', params.tagIds.join(','))
@@ -24,13 +24,22 @@ export async function getRoutes(params: GetRoutesParams = {}): Promise<PagedApiR
   if (params.authorId) qs.set('authorId', params.authorId)
   if (params.page) qs.set('page', String(params.page))
   if (params.pageSize) qs.set('pageSize', String(params.pageSize))
+  return qs.toString()
+}
 
-  const query = qs.toString()
-  return apiFetchPaged<RouteListItem>(`/routes${query ? `?${query}` : ''}`)
+export async function getRoutes(params: GetRoutesParams = {}): Promise<PagedApiResponse<RouteListItem>> {
+  const query = buildRoutesQuery(params)
+  const path = `/routes${query ? `?${query}` : ''}`
+
+  if (params.visibility === 'draft') {
+    return apiFetchPaged<RouteListItem>(path)
+  }
+
+  return publicApiFetchPaged<RouteListItem>(path, { revalidate: 60 })
 }
 
 export async function getRouteById(id: string): Promise<RouteDetail> {
-  return apiFetchData<RouteDetail>(`/routes/${id}`)
+  return publicApiFetchData<RouteDetail>(`/routes/${id}`, { revalidate: 120 })
 }
 
 export async function getRouteStops(routeId: string): Promise<RouteStopItem[]> {
@@ -74,8 +83,24 @@ export async function reorderRouteStops(routeId: string, orderedStopIds: string[
 }
 
 export async function getTags(pageSize = 100): Promise<Tag[]> {
-  const res = await apiFetchPaged<Tag>(`/tags?pageSize=${pageSize}`)
+  const res = await publicApiFetchPaged<Tag>(`/tags?pageSize=${pageSize}`, { revalidate: 900 })
   return res.data
+}
+
+export async function getOwnRoutes(authorId: string, pageSize = 100): Promise<RouteListItem[]> {
+  const [publicRoutes, draftRoutes] = await Promise.allSettled([
+    getRoutes({ authorId, visibility: 'public', pageSize }),
+    getRoutes({ authorId, visibility: 'draft', pageSize }),
+  ])
+
+  const items = [
+    ...(publicRoutes.status === 'fulfilled' ? publicRoutes.value.data : []),
+    ...(draftRoutes.status === 'fulfilled' ? draftRoutes.value.data : []),
+  ]
+
+  return items
+    .filter((route, index, routes) => routes.findIndex((candidate) => candidate.id === route.id) === index)
+    .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
 }
 
 export async function createRoute(data: {

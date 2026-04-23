@@ -8,6 +8,7 @@ import { useAuth } from '@/features/auth/context'
 import { getRoutes, getTags } from '@/features/routes/api'
 import type { RouteListItem, Tag } from '@/features/api/types'
 import { routeToCardData } from '@/features/routes/presenters'
+import { HomeScreenSkeleton } from '@/components/loading/page-skeletons'
 
 const DISCOVERY_MAP_HTML = `<!DOCTYPE html>
 <html>
@@ -79,6 +80,10 @@ export default function HomeScreen() {
   const filterRoutes = (routes: RouteListItem[]) => {
     if (!activeTagId) return routes
     return routes
+  }
+
+  if (loading) {
+    return <HomeScreenSkeleton topInset={insets.top} />
   }
 
   return (

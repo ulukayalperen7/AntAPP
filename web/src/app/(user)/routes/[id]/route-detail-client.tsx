@@ -7,6 +7,7 @@ import type { RouteDetail } from '@/types/api'
 import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle } from 'lucide-react'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
+import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 // ─── Star Rating Widget ───────────────────────────────────────────────────────
 
@@ -141,6 +142,7 @@ export default function RouteDetailClient({
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<unknown>(null)
   const [mapError, setMapError] = useState<string | null>(null)
+  const [shouldLoadMap, setShouldLoadMap] = useState(false)
 
   const polylineCoordinates = useMemo(() => {
     if (!route.encodedPolyline) return []
@@ -173,22 +175,18 @@ export default function RouteDetailClient({
     [polylineCoordinates, stopCoordinates],
   )
 
+  useEffect(() => runWhenBrowserIdle(() => setShouldLoadMap(true)), [])
+
   useEffect(() => {
+    if (!shouldLoadMap) return
+
     let cancelled = false
 
     const initMap = async () => {
       if (!mapContainerRef.current || mapRef.current) return
 
       try {
-        if (!document.querySelector('link[data-maplibre-style="true"]')) {
-          const link = document.createElement('link')
-          link.rel = 'stylesheet'
-          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
-          link.dataset.maplibreStyle = 'true'
-          document.head.appendChild(link)
-        }
-
-        const maplibre = await import('maplibre-gl')
+        const maplibre = await loadMapLibre()
         if (cancelled || !mapContainerRef.current || mapRef.current) return
 
         const hasCenter = Number.isFinite(route.centerLatitude) && Number.isFinite(route.centerLongitude)
@@ -329,7 +327,7 @@ export default function RouteDetailClient({
       }
       mapRef.current = null
     }
-  }, [route.centerLatitude, route.centerLongitude, routeLineCoordinates, stopCoordinates, stopPoints])
+  }, [route.centerLatitude, route.centerLongitude, routeLineCoordinates, shouldLoadMap, stopCoordinates, stopPoints])
 
   // Save state
   const [isSaved, setIsSaved] = useState(false)

@@ -10,6 +10,7 @@ import {
   removeRouteFromCollection,
   updateCollection,
 } from '@/features/collections/api'
+import { FormPageSkeleton } from '@/components/loading/page-skeletons'
 
 type FeedbackState = {
   ok: boolean
@@ -103,11 +104,7 @@ export default function SavedCollectionDetailScreen() {
   }
 
   if (loading && !collection) {
-    return (
-      <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
-        <Text variant="body" muted>Loading collection...</Text>
-      </YStack>
-    )
+    return <FormPageSkeleton topInset={insets.top} />
   }
 
   return (

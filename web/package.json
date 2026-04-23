@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "tamagui generate-css",
     "dev": "next dev",
-    "build": "tamagui build --target web ./src -- next build",
+    "build": "tamagui build --target web ./src -- next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },

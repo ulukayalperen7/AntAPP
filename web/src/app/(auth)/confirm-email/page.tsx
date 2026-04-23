@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { confirmEmail } from '@/features/auth/actions'
 import ConfirmEmailClient from './confirm-email-client'
+import { AuthScreenSkeleton } from '@/components/loading/page-skeletons'
 
 async function ConfirmEmailServer({
   searchParams,
@@ -28,7 +29,7 @@ export default function ConfirmEmailPage({
   searchParams: Promise<{ userId?: string; code?: string }>
 }) {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F8F9FA' }} />}>
+    <Suspense fallback={<AuthScreenSkeleton />}>
       <ConfirmEmailServer searchParams={searchParams} />
     </Suspense>
   )

@@ -23511,9 +23511,38 @@ var FavoriteButton = (0, import_core9.styled)(XStack, {
   cursor: "pointer"
 });
 
+// ../packages/ui/src/components/skeleton.tsx
+var import_jsx_runtime19 = require("react/jsx-runtime");
+var SkeletonFrame = (0, import_core9.styled)(YStack, {
+  backgroundColor: "$muted",
+  borderRadius: "$3",
+  overflow: "hidden",
+  opacity: 0.85,
+  variants: {
+    tone: {
+      default: {},
+      subtle: {
+        opacity: 0.6
+      },
+      strong: {
+        backgroundColor: "$borderColor",
+        opacity: 1
+      }
+    },
+    circular: {
+      true: {
+        borderRadius: "$full"
+      }
+    }
+  },
+  defaultVariants: {
+    tone: "default"
+  }
+});
+
 // ../packages/app/src/screens/auth/auth-shell.tsx
 var import_react5 = __toESM(require("react"));
-var import_jsx_runtime19 = require("react/jsx-runtime");
+var import_jsx_runtime20 = require("react/jsx-runtime");
 var AUTH_PALETTE = {
   primary: "#005696",
   primaryDeep: "#0A3C63",
@@ -23546,7 +23575,7 @@ function AuthShell({
     if (!import_core9.isWeb) return;
     setShowDecorativeLayers(true);
   }, []);
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(import_core9.Theme, { name: "light_user", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(import_core9.Theme, { name: "light_user", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     YStack,
     {
       className: shellClassName,
@@ -23559,8 +23588,8 @@ function AuthShell({
       paddingVertical: "$6",
       minHeight: import_core9.isWeb ? "100vh" : void 0,
       children: [
-        showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(AuthBackdrop, {}) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+        showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthBackdrop, {}) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
           XStack,
           {
             className: frameClassName,
@@ -23572,7 +23601,7 @@ function AuthShell({
             gap: "$5",
             zIndex: 1,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
                 YStack,
                 {
                   className: formClassName,
@@ -23583,15 +23612,15 @@ function AuthShell({
                   justifyContent: "center",
                   gap: "$5",
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(VStack, { alignItems: "center", gap: "$2", paddingHorizontal: "$2", children: [
-                      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "heading2", align: "center", color: "$primary", children: "AntAPP" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(VStack, { alignItems: "center", gap: "$2", maxWidth: 440, children: [
-                        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "heading2", align: "center", children: title }),
-                        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "bodyLarge", align: "center", muted: true, children: subtitle })
+                    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { alignItems: "center", gap: "$2", paddingHorizontal: "$2", children: [
+                      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading2", align: "center", color: "$primary", children: "AntAPP" }),
+                      /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { alignItems: "center", gap: "$2", maxWidth: 440, children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading2", align: "center", children: title }),
+                        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "bodyLarge", align: "center", muted: true, children: subtitle })
                       ] })
                     ] }),
-                    /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "relative", width: "100%", children: [
-                      mascot ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+                    /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "relative", width: "100%", children: [
+                      mascot ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                         YStack,
                         {
                           position: "absolute",
@@ -23602,7 +23631,7 @@ function AuthShell({
                           children: mascot
                         }
                       ) : null,
-                      /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+                      /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                         Card,
                         {
                           variant: "elevated",
@@ -23611,11 +23640,11 @@ function AuthShell({
                           borderRadius: "$5",
                           backgroundColor: AUTH_PALETTE.neutralStrong,
                           ...mascot ? { paddingTop: "$5", marginTop: "$9" } : {},
-                          children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(VStack, { gap: "$4", children })
+                          children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(VStack, { gap: "$4", children })
                         }
                       )
                     ] }),
-                    footer ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+                    footer ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                       XStack,
                       {
                         className: footerClassName,
@@ -23628,7 +23657,7 @@ function AuthShell({
                   ]
                 }
               ),
-              showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              showDecorativeLayers ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 AuthVisualPanel,
                 {
                   className: panelClassName,
@@ -23645,10 +23674,10 @@ function AuthShell({
 }
 __name(AuthShell, "AuthShell");
 function AuthField({ label, error, children }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(VStack, { gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "label", children: label }),
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "label", children: label }),
     children,
-    error ? /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "caption", color: "$error500", children: error }) : null
+    error ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "caption", color: "$error500", children: error }) : null
   ] });
 }
 __name(AuthField, "AuthField");
@@ -23656,7 +23685,7 @@ function AuthNotice({ tone, children }) {
   const backgroundColor = tone === "success" ? "$success50" : "$error50";
   const borderColor = tone === "success" ? "$success200" : "$error200";
   const textColor = tone === "success" ? "$success500" : "$error500";
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
     YStack,
     {
       padding: "$3",
@@ -23664,7 +23693,7 @@ function AuthNotice({ tone, children }) {
       borderWidth: 1,
       backgroundColor,
       borderColor,
-      children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "body", color: textColor, children })
+      children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "body", color: textColor, children })
     }
   );
 }
@@ -23674,15 +23703,15 @@ function AuthFooterLink({
   actionLabel,
   onPress
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(HStack, { gap: "$1.5", flexWrap: "wrap", justifyContent: "center", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "body", muted: true, align: "center", children: prefix }),
-    /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Button, { variant: "link", size: "sm", onPress, children: actionLabel })
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(HStack, { gap: "$1.5", flexWrap: "wrap", justifyContent: "center", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "body", muted: true, align: "center", children: prefix }),
+    /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Button, { variant: "link", size: "sm", onPress, children: actionLabel })
   ] });
 }
 __name(AuthFooterLink, "AuthFooterLink");
 function AuthBackdrop() {
   const s = /* @__PURE__ */ __name((web, mob) => import_core9.isWeb ? web : mob, "s");
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     YStack,
     {
       pointerEvents: "none",
@@ -23693,12 +23722,12 @@ function AuthBackdrop() {
       left: 0,
       overflow: "hidden",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: AUTH_PALETTE.neutral }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-170, -92), left: s(-120, -76), width: s(440, 260), height: s(440, 260), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.5 }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-96, -60), right: s(36, -48), width: s(380, 240), height: s(380, 240), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.1 }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", top: s(32, 24), right: s(64, 20), opacity: 0.3, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(72, 48), height: s(72, 48), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-          [0, 45, 90, 135].map((deg) => /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: AUTH_PALETTE.neutral }),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-170, -92), left: s(-120, -76), width: s(440, 260), height: s(440, 260), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.5 }),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-96, -60), right: s(36, -48), width: s(380, 240), height: s(380, 240), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.1 }),
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: s(32, 24), right: s(64, 20), opacity: 0.3, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(72, 48), height: s(72, 48), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+          [0, 45, 90, 135].map((deg) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23714,18 +23743,18 @@ function AuthBackdrop() {
             deg
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { position: "absolute", top: s(60, 44), left: s(40, 10), opacity: 0.18, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(64, 40), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-12, -8), left: s(16, 10), width: s(36, 22), height: s(36, 22), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-8, -5), left: s(36, 22), width: s(28, 18), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { position: "absolute", top: s(60, 44), left: s(40, 10), opacity: 0.18, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(64, 40), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-12, -8), left: s(16, 10), width: s(36, 22), height: s(36, 22), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-8, -5), left: s(36, 22), width: s(28, 18), height: s(28, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { position: "absolute", top: s(110, 72), right: s(180, 80), opacity: 0.12, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(52, 34), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-10, -6), left: s(12, 8), width: s(30, 18), height: s(30, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-6, -4), left: s(28, 18), width: s(22, 14), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { position: "absolute", top: s(110, 72), right: s(180, 80), opacity: 0.12, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(52, 34), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-10, -6), left: s(12, 8), width: s(30, 18), height: s(30, 18), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-6, -4), left: s(28, 18), width: s(22, 14), height: s(22, 14), borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: s(120, 80), left: 0, right: 0, opacity: 0.08, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(120, 80), left: 0, right: 0, opacity: 0.08, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23741,7 +23770,7 @@ function AuthBackdrop() {
               borderBottomColor: AUTH_PALETTE.primaryDeep
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23757,7 +23786,7 @@ function AuthBackdrop() {
               borderBottomColor: AUTH_PALETTE.primary
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23774,9 +23803,9 @@ function AuthBackdrop() {
             }
           )
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: s(90, 56), left: s(48, 12), opacity: 0.14, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(8, 5), height: s(80, 52), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 4, alignSelf: "center" }),
-          [-50, -20, 15, 45].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(90, 56), left: s(48, 12), opacity: 0.14, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(8, 5), height: s(80, 52), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 4, alignSelf: "center" }),
+          [-50, -20, 15, 45].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23791,9 +23820,9 @@ function AuthBackdrop() {
             i
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: s(84, 50), right: s(60, 18), opacity: 0.1, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(6, 4), height: s(60, 40), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 3, alignSelf: "center" }),
-          [-45, -15, 20, 50].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(84, 50), right: s(60, 18), opacity: 0.1, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(6, 4), height: s(60, 40), backgroundColor: AUTH_PALETTE.secondary, borderRadius: 3, alignSelf: "center" }),
+          [-45, -15, 20, 50].map((deg, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23808,16 +23837,16 @@ function AuthBackdrop() {
             i
           ))
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(100, 64), opacity: 0.15, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", bottom: s(40, 26), left: s(-20, -10), right: s(-20, -10), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", bottom: s(24, 16), left: s(-30, -14), right: s(-30, -14), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.7 }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", bottom: s(8, 4), left: s(-10, -6), right: s(-10, -6), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.8 }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(32, 20), backgroundColor: AUTH_PALETTE.primary, opacity: 0.5 })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(100, 64), opacity: 0.15, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(40, 26), left: s(-20, -10), right: s(-20, -10), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(24, 16), left: s(-30, -14), right: s(-30, -14), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary, opacity: 0.7 }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: s(8, 4), left: s(-10, -6), right: s(-10, -6), height: s(48, 32), borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.8 }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", bottom: 0, left: 0, right: 0, height: s(32, 20), backgroundColor: AUTH_PALETTE.primary, opacity: 0.5 })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: s(68, 42), left: s(200, 100), opacity: 0.12, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(32, 20), height: s(10, 6), borderRadius: s(4, 2), backgroundColor: AUTH_PALETTE.secondary }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { position: "absolute", top: s(-16, -10), left: s(12, 8), width: s(3, 2), height: s(16, 10), backgroundColor: AUTH_PALETTE.neutralStrong }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: s(68, 42), left: s(200, 100), opacity: 0.12, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(32, 20), height: s(10, 6), borderRadius: s(4, 2), backgroundColor: AUTH_PALETTE.secondary }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { position: "absolute", top: s(-16, -10), left: s(12, 8), width: s(3, 2), height: s(16, 10), backgroundColor: AUTH_PALETTE.neutralStrong }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
             YStack,
             {
               position: "absolute",
@@ -23839,7 +23868,7 @@ function AuthBackdrop() {
           { top: s(80, 52), left: s(180, 90), size: s(16, 10) },
           { top: s(60, 40), left: s(220, 120), size: s(12, 8) },
           { top: s(95, 62), right: s(200, 100), size: s(14, 9) }
-        ].map((bird, i) => /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+        ].map((bird, i) => /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
           XStack,
           {
             position: "absolute",
@@ -23847,7 +23876,7 @@ function AuthBackdrop() {
             ...bird.left !== void 0 ? { left: bird.left } : { right: bird.right },
             opacity: 0.12,
             children: [
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 YStack,
                 {
                   width: bird.size,
@@ -23857,7 +23886,7 @@ function AuthBackdrop() {
                   transform: [{ rotate: "-25deg" }]
                 }
               ),
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
                 YStack,
                 {
                   width: bird.size,
@@ -23872,14 +23901,14 @@ function AuthBackdrop() {
           },
           i
         )),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", top: s(160, 130), right: s(132, 22), gap: "$2", opacity: 0.5, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(12, 8), height: s(12, 8), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(56, 36), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.6 })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: s(160, 130), right: s(132, 22), gap: "$2", opacity: 0.5, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(12, 8), height: s(12, 8), borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(56, 36), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.6 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: s(20, 12), children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(40, 24), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.5 }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: s(10, 6), height: s(10, 6), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary })
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: s(20, 12), children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(40, 24), height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.5 }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: s(10, 6), height: s(10, 6), borderRadius: "$full", backgroundColor: AUTH_PALETTE.primary })
           ] })
         ] })
       ]
@@ -23892,7 +23921,7 @@ function AuthVisualPanel({
   title,
   description
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
     YStack,
     {
       className,
@@ -23907,7 +23936,7 @@ function AuthVisualPanel({
       padding: "$8",
       position: "relative",
       children: [
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23919,7 +23948,7 @@ function AuthVisualPanel({
             opacity: 0.24
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23932,7 +23961,7 @@ function AuthVisualPanel({
             opacity: 0.24
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23945,7 +23974,7 @@ function AuthVisualPanel({
             opacity: 0.18
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23958,7 +23987,7 @@ function AuthVisualPanel({
             opacity: 0.16
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23971,7 +24000,7 @@ function AuthVisualPanel({
             opacity: 0.09
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23984,7 +24013,7 @@ function AuthVisualPanel({
             opacity: 0.1
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -23997,7 +24026,7 @@ function AuthVisualPanel({
             opacity: 0.12
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
           YStack,
           {
             position: "absolute",
@@ -24010,36 +24039,36 @@ function AuthVisualPanel({
             opacity: 0.2
           }
         ),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", top: 120, left: 96, gap: "$2.5", opacity: 0.84, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 92, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.74 })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", top: 120, left: 96, gap: "$2.5", opacity: 0.84, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 92, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.74 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 28, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 56, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.78 }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 })
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 28, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 56, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.78 }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 16, height: 16, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(YStack, { position: "absolute", bottom: 156, right: 86, gap: "$2", opacity: 0.56, children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 12, height: 12, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 68, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.84 })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(YStack, { position: "absolute", bottom: 156, right: 86, gap: "$2", opacity: 0.56, children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 12, height: 12, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 68, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.primarySoft, opacity: 0.84 })
           ] }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 22, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 34, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 8, height: 8, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.84 })
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$2", alignItems: "center", paddingLeft: 22, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 34, height: 5, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiary, opacity: 0.72 }),
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 8, height: 8, borderRadius: "$full", backgroundColor: AUTH_PALETTE.neutralStrong, opacity: 0.84 })
           ] })
         ] }),
-        /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(ZStack, { flex: 1, justifyContent: "space-between", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(VStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "label", color: AUTH_PALETTE.tertiarySoft, children: "AntAPP User Access" }) }),
-          /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(VStack, { gap: "$5", maxWidth: 460, children: [
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(XStack, { gap: "$3", alignItems: "center", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 48, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary, opacity: 0.92 }),
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(YStack, { width: 96, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.5 })
+        /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(ZStack, { flex: 1, justifyContent: "space-between", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(VStack, { gap: "$2", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "label", color: AUTH_PALETTE.tertiarySoft, children: "AntAPP User Access" }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$5", maxWidth: 460, children: [
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { gap: "$3", alignItems: "center", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 48, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.secondary, opacity: 0.92 }),
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(YStack, { width: 96, height: 6, borderRadius: "$full", backgroundColor: AUTH_PALETTE.tertiarySoft, opacity: 0.5 })
             ] }),
-            /* @__PURE__ */ (0, import_jsx_runtime19.jsxs)(VStack, { gap: "$3", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "heading1", color: AUTH_PALETTE.neutralStrong, children: title }),
-              /* @__PURE__ */ (0, import_jsx_runtime19.jsx)(Text4, { variant: "bodyLarge", color: AUTH_PALETTE.primarySoft, children: description })
+            /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(VStack, { gap: "$3", children: [
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "heading1", color: AUTH_PALETTE.neutralStrong, children: title }),
+              /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Text4, { variant: "bodyLarge", color: AUTH_PALETTE.primarySoft, children: description })
             ] })
           ] })
         ] })
@@ -24050,7 +24079,7 @@ function AuthVisualPanel({
 __name(AuthVisualPanel, "AuthVisualPanel");
 
 // ../packages/app/src/screens/auth/login-screen.tsx
-var import_jsx_runtime20 = require("react/jsx-runtime");
+var import_jsx_runtime21 = require("react/jsx-runtime");
 function AuthLoginScreen({
   email,
   password,
@@ -24074,7 +24103,7 @@ function AuthLoginScreen({
       });
     }
   }, "togglePasswordVisibility");
-  return /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
     AuthShell,
     {
       title: "Welcome Back",
@@ -24083,7 +24112,7 @@ function AuthLoginScreen({
       panelDescription: "Plan better routes, return to saved stops faster, and keep your Antalya trips organized.",
       panelPosition: "right",
       mascot,
-      footer: onNavigateToRegister ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+      footer: onNavigateToRegister ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
         AuthFooterLink,
         {
           prefix: "Don't have an account?",
@@ -24092,9 +24121,9 @@ function AuthLoginScreen({
         }
       ) : void 0,
       children: [
-        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
           Input2,
           {
             value: email,
@@ -24108,8 +24137,8 @@ function AuthLoginScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             Input2,
             {
               ref: passwordInputRef,
@@ -24130,7 +24159,7 @@ function AuthLoginScreen({
               onSubmitEditing: onSubmit
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
             Button,
             {
               variant: "link",
@@ -24147,8 +24176,8 @@ function AuthLoginScreen({
             }
           )
         ] }) }),
-        onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(XStack, { justifyContent: "flex-end", children: /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Button, { variant: "link", size: "sm", onPress: onNavigateToForgotPassword, disabled: pending, children: "Forgot password?" }) }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime20.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Sign In" })
+        onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(XStack, { justifyContent: "flex-end", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { variant: "link", size: "sm", onPress: onNavigateToForgotPassword, disabled: pending, children: "Forgot password?" }) }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Sign In" })
       ]
     }
   );
@@ -24157,15 +24186,15 @@ __name(AuthLoginScreen, "AuthLoginScreen");
 
 // ../packages/app/src/screens/auth/register-screen.tsx
 var import_react7 = require("react");
-var import_jsx_runtime21 = require("react/jsx-runtime");
+var import_jsx_runtime22 = require("react/jsx-runtime");
 function UserTypeSelector({
   value,
   onChange,
   disabled
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(YStack, { gap: "$2", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "label", color: "$mutedForeground", fontSize: "$3", children: "Account Type" }),
-    /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(YStack, { gap: "$2", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Text4, { variant: "label", color: "$mutedForeground", fontSize: "$3", children: "Account Type" }),
+    /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
       XStack,
       {
         borderRadius: "$4",
@@ -24174,7 +24203,7 @@ function UserTypeSelector({
         overflow: "hidden",
         children: ["personal", "business"].map((type) => {
           const isActive = value === type;
-          return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
             XStack,
             {
               flex: 1,
@@ -24188,7 +24217,7 @@ function UserTypeSelector({
               onPress: () => !disabled && onChange(type),
               pressStyle: disabled ? {} : { opacity: 0.8 },
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
                   YStack,
                   {
                     width: 8,
@@ -24198,7 +24227,7 @@ function UserTypeSelector({
                     opacity: isActive ? 1 : 0.4
                   }
                 ),
-                /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
                   Text4,
                   {
                     variant: "label",
@@ -24215,7 +24244,7 @@ function UserTypeSelector({
         })
       }
     ),
-    value === "business" && /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Text4, { variant: "caption", color: "$primary", fontSize: "$2", children: "Business accounts can list locations, create sponsored routes, and access analytics." })
+    value === "business" && /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Text4, { variant: "caption", color: "$primary", fontSize: "$2", children: "Business accounts can list locations, create sponsored routes, and access analytics." })
   ] });
 }
 __name(UserTypeSelector, "UserTypeSelector");
@@ -24256,7 +24285,7 @@ function AuthRegisterScreen({
       });
     }
   }, "toggleConfirmPasswordVisibility");
-  return /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
     AuthShell,
     {
       title: userType === "business" ? "Business Account" : "Create Account",
@@ -24265,7 +24294,7 @@ function AuthRegisterScreen({
       panelDescription: "Create your account, collect your favorite spots, and start building routes with a calmer rhythm.",
       panelPosition: "left",
       mascot,
-      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
         AuthFooterLink,
         {
           prefix: "Already have an account?",
@@ -24274,9 +24303,9 @@ function AuthRegisterScreen({
         }
       ) : void 0,
       children: [
-        error ? /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(UserTypeSelector, { value: userType, onChange: onUserTypeChange, disabled: pending }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Full Name", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        error ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(UserTypeSelector, { value: userType, onChange: onUserTypeChange, disabled: pending }),
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Full Name", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
           Input2,
           {
             value: fullName,
@@ -24288,7 +24317,7 @@ function AuthRegisterScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
           Input2,
           {
             value: email,
@@ -24302,8 +24331,8 @@ function AuthRegisterScreen({
             disabled: pending
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Password", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Input2,
             {
               ref: passwordInputRef,
@@ -24323,7 +24352,7 @@ function AuthRegisterScreen({
               disabled: pending
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Button,
             {
               variant: "link",
@@ -24340,8 +24369,8 @@ function AuthRegisterScreen({
             }
           )
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime21.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(XStack, { position: "relative", alignItems: "center", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Input2,
             {
               ref: confirmPasswordInputRef,
@@ -24362,7 +24391,7 @@ function AuthRegisterScreen({
               onSubmitEditing: onSubmit
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
             Button,
             {
               variant: "link",
@@ -24379,7 +24408,7 @@ function AuthRegisterScreen({
             }
           )
         ] }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime21.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: userType === "business" ? "Create Business Account" : "Sign Up" })
+        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: userType === "business" ? "Create Business Account" : "Sign Up" })
       ]
     }
   );
@@ -24387,7 +24416,7 @@ function AuthRegisterScreen({
 __name(AuthRegisterScreen, "AuthRegisterScreen");
 
 // ../packages/app/src/screens/auth/forgot-password-screen.tsx
-var import_jsx_runtime22 = require("react/jsx-runtime");
+var import_jsx_runtime23 = require("react/jsx-runtime");
 function AuthForgotPasswordScreen({
   email,
   onEmailChange,
@@ -24398,7 +24427,7 @@ function AuthForgotPasswordScreen({
   onNavigateToLogin,
   mascot
 }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime22.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
     AuthShell,
     {
       title: "Reset Password",
@@ -24407,7 +24436,7 @@ function AuthForgotPasswordScreen({
       panelDescription: "Recover access without losing your saved routes, collections, and upcoming plans.",
       panelPosition: "right",
       mascot,
-      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+      footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
         AuthFooterLink,
         {
           prefix: "Remembered your password?",
@@ -24416,9 +24445,9 @@ function AuthForgotPasswordScreen({
         }
       ) : void 0,
       children: [
-        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(
+        successMessage ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "success", children: successMessage }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Email", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
           Input2,
           {
             value: email,
@@ -24433,7 +24462,7 @@ function AuthForgotPasswordScreen({
             onSubmitEditing: onSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime22.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Send Reset Link" })
+        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { onPress: onSubmit, loading: pending, disabled: pending, size: "lg", borderRadius: "$4", children: "Send Reset Link" })
       ]
     }
   );
@@ -24442,7 +24471,7 @@ __name(AuthForgotPasswordScreen, "AuthForgotPasswordScreen");
 
 // ../packages/app/src/screens/auth/reset-password-screen.tsx
 var import_react8 = require("react");
-var import_jsx_runtime23 = require("react/jsx-runtime");
+var import_jsx_runtime24 = require("react/jsx-runtime");
 function AuthResetPasswordScreen({
   email = "",
   token = "",
@@ -24477,7 +24506,7 @@ function AuthResetPasswordScreen({
     });
   }, "handleSubmit");
   if (success) {
-    return /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+    return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
       AuthShell,
       {
         title: "Password Reset!",
@@ -24485,7 +24514,7 @@ function AuthResetPasswordScreen({
         panelTitle: "Back on track",
         panelDescription: "Your account is secured. Pick up where you left off.",
         mascot,
-        footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+        footer: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
           AuthFooterLink,
           {
             prefix: "Ready to continue?",
@@ -24493,11 +24522,11 @@ function AuthResetPasswordScreen({
             onPress: onNavigateToLogin
           }
         ) : void 0,
-        children: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(Button, { onPress: onNavigateToLogin, size: "lg", borderRadius: "$4", children: "Go to Sign In" }) : null
+        children: onNavigateToLogin ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onPress: onNavigateToLogin, size: "lg", borderRadius: "$4", children: "Go to Sign In" }) : null
       }
     );
   }
-  return /* @__PURE__ */ (0, import_jsx_runtime23.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(
     AuthShell,
     {
       title: "Reset Password",
@@ -24505,7 +24534,7 @@ function AuthResetPasswordScreen({
       panelTitle: "Secure your trail",
       panelDescription: "Choose a strong password to keep your routes, collections, and profile safe.",
       mascot,
-      footer: onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+      footer: onNavigateToForgotPassword ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
         AuthFooterLink,
         {
           prefix: "Link expired?",
@@ -24514,9 +24543,9 @@ function AuthResetPasswordScreen({
         }
       ) : void 0,
       children: [
-        invalidLink ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "error", children: "Invalid or expired reset link. Please request a new password reset." }) : null,
-        error ? /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthNotice, { tone: "error", children: error }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "New Password", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+        invalidLink ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: "Invalid or expired reset link. Please request a new password reset." }) : null,
+        error ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: error }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthField, { label: "New Password", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
           Input2,
           {
             value: password,
@@ -24529,7 +24558,7 @@ function AuthResetPasswordScreen({
             onSubmitEditing: handleSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthField, { label: "Confirm Password", children: /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
           Input2,
           {
             value: confirmPassword,
@@ -24542,7 +24571,7 @@ function AuthResetPasswordScreen({
             onSubmitEditing: handleSubmit
           }
         ) }),
-        /* @__PURE__ */ (0, import_jsx_runtime23.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
           Button,
           {
             onPress: handleSubmit,
@@ -24561,7 +24590,7 @@ __name(AuthResetPasswordScreen, "AuthResetPasswordScreen");
 
 // ../packages/app/src/screens/auth/confirm-email-screen.tsx
 var import_react9 = require("react");
-var import_jsx_runtime24 = require("react/jsx-runtime");
+var import_jsx_runtime25 = require("react/jsx-runtime");
 function AuthConfirmEmailScreen({
   userId,
   code,
@@ -24587,7 +24616,7 @@ function AuthConfirmEmailScreen({
   }, [userId, code]);
   const isSuccess = status === "success";
   const isError = status === "error";
-  return /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(
     AuthShell,
     {
       title: status === "loading" ? "Confirming your email\u2026" : isSuccess ? "Email Confirmed!" : "Confirmation Failed",
@@ -24595,9 +24624,9 @@ function AuthConfirmEmailScreen({
       panelTitle: isSuccess ? "You are all set!" : "Verify your account",
       panelDescription: isSuccess ? "Your email is confirmed. Explore routes and build your adventure." : "A confirmed email keeps your account secure and allows you to recover access.",
       mascot,
-      children: isSuccess ? /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onPress: onNavigateToApp, size: "lg", borderRadius: "$4", children: "Start Exploring" }) : isError ? /* @__PURE__ */ (0, import_jsx_runtime24.jsxs)(import_jsx_runtime24.Fragment, { children: [
-        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(AuthNotice, { tone: "error", children: message }),
-        /* @__PURE__ */ (0, import_jsx_runtime24.jsx)(Button, { onPress: onNavigateToApp, variant: "outline", size: "lg", borderRadius: "$4", children: "Go to App" })
+      children: isSuccess ? /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(Button, { onPress: onNavigateToApp, size: "lg", borderRadius: "$4", children: "Start Exploring" }) : isError ? /* @__PURE__ */ (0, import_jsx_runtime25.jsxs)(import_jsx_runtime25.Fragment, { children: [
+        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(AuthNotice, { tone: "error", children: message }),
+        /* @__PURE__ */ (0, import_jsx_runtime25.jsx)(Button, { onPress: onNavigateToApp, variant: "outline", size: "lg", borderRadius: "$4", children: "Go to App" })
       ] }) : null
     }
   );

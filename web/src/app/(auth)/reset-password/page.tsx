@@ -7,6 +7,7 @@ import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { resetPassword } from '@/features/auth/actions'
 import { Lock, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import { AuthScreenSkeleton } from '@/components/loading/page-skeletons'
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams()
@@ -137,7 +138,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F8F9FA' }} />}>
+    <Suspense fallback={<AuthScreenSkeleton />}>
       <ResetPasswordForm />
     </Suspense>
   )

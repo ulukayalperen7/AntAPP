@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons'
 import { getRoutes, getTags } from '@/features/routes/api'
 import type { RouteContentType, RouteListItem, Tag } from '@/features/api/types'
 import { routeToCardData } from '@/features/routes/presenters'
+import { ExploreScreenSkeleton } from '@/components/loading/page-skeletons'
 
 const ROUTE_TYPES: { label: string; value: RouteContentType | '' }[] = [
   { label: 'All', value: '' },
@@ -64,6 +65,10 @@ export default function ExploreScreen() {
   }, [fetchResults])
 
   const activeTags = useMemo(() => tags.filter((tag) => tag.isActive), [tags])
+
+  if (loading && results.length === 0) {
+    return <ExploreScreenSkeleton topInset={insets.top} />
+  }
 
   return (
     <YStack flex={1} backgroundColor="$background">

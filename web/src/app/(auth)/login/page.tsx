@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { login } from '@/features/auth/actions'
+import { AuthScreenSkeleton } from '@/components/loading/page-skeletons'
 
 const LOGIN_DRAFT_KEY = 'antapp-auth-login-draft'
 
@@ -11,7 +12,7 @@ const AuthLoginScreen = dynamic(
   () => import('@antapp/app').then((mod) => mod.AuthLoginScreen),
   {
     ssr: false,
-    loading: () => <div style={{ minHeight: '100vh', background: '#F8F9FA' }} />,
+    loading: () => <AuthScreenSkeleton />,
   }
 )
 

@@ -1,19 +1,13 @@
 import { getCurrentUser } from '@/features/account/actions'
-import { getRoutes } from '@/features/routes/actions'
+import { getOwnRoutes } from '@/features/routes/actions'
 import ProfileClient from './profile-client'
 
 export default async function ProfilePage() {
-  const [userResult, routesResult] = await Promise.allSettled([
-    getCurrentUser(),
-    getRoutes({ pageSize: 20 }),
-  ])
+  const userResult = await Promise.allSettled([getCurrentUser()])
+  const user = userResult[0].status === 'fulfilled' ? userResult[0].value : null
 
-  const user = userResult.status === 'fulfilled' ? userResult.value : null
-  const routes = routesResult.status === 'fulfilled' ? routesResult.value.data : []
-
-  // Filter routes by this user's id once we have the user
   const myRoutes = user
-    ? routes.filter((r) => r.authorUserId === user.id)
+    ? await getOwnRoutes(user.id)
     : []
 
   return <ProfileClient user={user} routes={myRoutes} />

@@ -1,6 +1,6 @@
 'use server'
 
-import { apiFetchData, apiFetchPaged } from '@/lib/api'
+import { apiFetchData, apiFetchPaged, publicApiFetchData, publicApiFetchPaged } from '@/lib/api'
 import type {
   BusinessSpotItem,
   PagedApiResponse,
@@ -21,15 +21,15 @@ export async function getSpots(params: {
   if (params.pageSize) qs.set('pageSize', String(params.pageSize))
 
   const query = qs.toString()
-  return apiFetchPaged<SpotListItem>(`/spots${query ? `?${query}` : ''}`)
+  return publicApiFetchPaged<SpotListItem>(`/spots${query ? `?${query}` : ''}`, { revalidate: 60 })
 }
 
 export async function getSpotById(id: string): Promise<SpotDetail> {
-  return apiFetchData<SpotDetail>(`/spots/${id}`)
+  return publicApiFetchData<SpotDetail>(`/spots/${id}`, { revalidate: 120 })
 }
 
 export async function getSpotRoutes(spotId: string, page = 1, pageSize = 12): Promise<PagedApiResponse<SpotRouteItem>> {
-  return apiFetchPaged<SpotRouteItem>(`/spots/${spotId}/routes?page=${page}&pageSize=${pageSize}`)
+  return publicApiFetchPaged<SpotRouteItem>(`/spots/${spotId}/routes?page=${page}&pageSize=${pageSize}`, { revalidate: 60 })
 }
 
 export async function rateSpot(spotId: string, score: number): Promise<void> {

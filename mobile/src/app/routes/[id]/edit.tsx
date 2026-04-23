@@ -19,6 +19,7 @@ import {
   deleteRouteStop,
   reorderRouteStops,
 } from '@/features/routes/api'
+import { FormPageSkeleton } from '@/components/loading/page-skeletons'
 
 type FeedbackState = { ok: boolean; message: string } | null
 
@@ -250,11 +251,7 @@ export default function RouteEditScreen() {
   }
 
   if (loading) {
-    return (
-      <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
-        <Text variant="body" muted>Loading...</Text>
-      </YStack>
-    )
+    return <FormPageSkeleton topInset={insets.top} />
   }
 
   if (!route) {

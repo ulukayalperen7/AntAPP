@@ -7,6 +7,7 @@ import type { RouteCardData } from '@antapp/ui'
 import type { SpotDetail, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
 import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
+import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 type SpotPreviewMap = {
   addControl: (control: unknown, position?: string) => void
@@ -104,6 +105,7 @@ export default function SpotDetailClient({
   const spotMapContainerRef = useRef<HTMLDivElement | null>(null)
   const spotMapRef = useRef<SpotPreviewMap | null>(null)
   const hasValidCoordinates = Number.isFinite(spot.latitude) && Number.isFinite(spot.longitude)
+  const [shouldLoadMap, setShouldLoadMap] = useState(false)
 
   useEffect(() => {
     getSavedSpots().then(spots => {
@@ -111,22 +113,16 @@ export default function SpotDetailClient({
     }).catch(() => { })
   }, [spot.id])
 
+  useEffect(() => runWhenBrowserIdle(() => setShouldLoadMap(true)), [])
+
   useEffect(() => {
-    if (!hasValidCoordinates || !spotMapContainerRef.current || spotMapRef.current) return
+    if (!shouldLoadMap || !hasValidCoordinates || !spotMapContainerRef.current || spotMapRef.current) return
 
     let cancelled = false
 
     const initSpotMap = async () => {
       try {
-        if (!document.querySelector('link[data-maplibre-style="true"]')) {
-          const link = document.createElement('link')
-          link.rel = 'stylesheet'
-          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
-          link.dataset.maplibreStyle = 'true'
-          document.head.appendChild(link)
-        }
-
-        const maplibre = await import('maplibre-gl')
+        const maplibre = await loadMapLibre()
         if (cancelled || !spotMapContainerRef.current || spotMapRef.current) return
 
         const map = new maplibre.Map({
@@ -170,7 +166,7 @@ export default function SpotDetailClient({
       }
       spotMapRef.current = null
     }
-  }, [hasValidCoordinates, spot.latitude, spot.longitude, spot.name])
+  }, [hasValidCoordinates, shouldLoadMap, spot.latitude, spot.longitude, spot.name])
 
   const handleToggleSave = () => {
     startSavingTransition(async () => {

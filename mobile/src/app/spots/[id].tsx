@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { getSpotById, getSpotRoutes, rateSpot, toggleSpotFavorite } from '@/features/spots/api'
 import type { SpotDetail, SpotRouteItem } from '@/features/api/types'
+import { SpotDetailSkeleton } from '@/components/loading/page-skeletons'
 
 function SpotRatingWidget({
   spotId,
@@ -129,11 +130,7 @@ export default function SpotDetailScreen() {
   }
 
   if (loading) {
-    return (
-      <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
-        <Text variant="body" muted>Loading spot...</Text>
-      </YStack>
-    )
+    return <SpotDetailSkeleton topInset={insets.top} />
   }
 
   if (!spot) {

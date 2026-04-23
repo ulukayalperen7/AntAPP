@@ -74,3 +74,11 @@ export type { StatBoxProps } from './components/stat-box'
 
 export { RouteCard } from './components/route-card'
 export type { RouteCardProps, RouteCardData } from './components/route-card'
+
+export { Skeleton, SkeletonText, RouteCardSkeleton, StatBoxSkeleton } from './components/skeleton'
+export type {
+  SkeletonProps,
+  SkeletonTextProps,
+  RouteCardSkeletonProps,
+  StatBoxSkeletonProps,
+} from './components/skeleton'

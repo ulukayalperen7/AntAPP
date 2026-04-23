@@ -6,6 +6,7 @@ import { YStack, XStack, Text, RouteCard, FilterChip } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { RouteListItem, Tag } from '@/types/api'
 import { Map } from 'lucide-react'
+import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 function routeToCardData(route: RouteListItem): RouteCardData {
   return {
@@ -33,23 +34,20 @@ export default function HomeClient({
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<unknown>(null)
   const [mapError, setMapError] = useState<string | null>(null)
+  const [shouldLoadMap, setShouldLoadMap] = useState(false)
+
+  useEffect(() => runWhenBrowserIdle(() => setShouldLoadMap(true)), [])
 
   useEffect(() => {
+    if (!shouldLoadMap) return
+
     let cancelled = false
 
     const initMap = async () => {
       if (!mapContainerRef.current || mapRef.current) return
 
       try {
-        if (!document.querySelector('link[data-maplibre-style="true"]')) {
-          const link = document.createElement('link')
-          link.rel = 'stylesheet'
-          link.href = 'https://unpkg.com/maplibre-gl/dist/maplibre-gl.css'
-          link.dataset.maplibreStyle = 'true'
-          document.head.appendChild(link)
-        }
-
-        const maplibre = await import('maplibre-gl')
+        const maplibre = await loadMapLibre()
 
         if (cancelled || !mapContainerRef.current || mapRef.current) return
 
@@ -78,7 +76,7 @@ export default function HomeClient({
       }
       mapRef.current = null
     }
-  }, [])
+  }, [shouldLoadMap])
 
   const allTag = { id: '__all__', name: 'All', isActive: true }
   const tagList = [allTag, ...tags.filter((t) => t.isActive)]

@@ -9,6 +9,7 @@ import { getRouteById, rateRoute, forkRoute } from '@/features/routes/api'
 import { useAuth } from '@/features/auth/context'
 import { SaveToCollectionModal } from '@/components/modals/save-to-collection-modal'
 import { RouteMap } from '@/components/map/route-map'
+import { RouteDetailSkeleton } from '@/components/loading/page-skeletons'
 
 function RouteRatingWidget({
   routeId,
@@ -132,11 +133,7 @@ export default function RouteDetailScreen() {
   }
 
   if (loading) {
-    return (
-      <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
-        <Text variant="body" muted>Loading route...</Text>
-      </YStack>
-    )
+    return <RouteDetailSkeleton topInset={insets.top} />
   }
 
   if (!route) {
