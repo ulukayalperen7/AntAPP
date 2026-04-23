@@ -104,7 +104,7 @@ export function AuthLoginScreen({
             right="$3"
             top="$2.5"
             zIndex={2}
-            onMouseDown={isWeb ? (event) => event.preventDefault() : undefined}
+            onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
             onPress={togglePasswordVisibility}
             disabled={pending}
             accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}

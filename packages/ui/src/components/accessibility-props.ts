@@ -1,4 +1,4 @@
-import { isWeb } from 'tamagui'
+import { isWeb } from '../style-system'
 
 type CrossPlatformAccessibilityProps = {
   role?: string
@@ -42,26 +42,27 @@ export function splitAccessibilityProps<T extends Record<string, unknown>>(
   } = props as T & CrossPlatformAccessibilityProps
 
   if (isWeb) {
-    const webRole = role ?? accessibilityRole ?? options?.defaultRole
-    const webAriaHidden =
-      ariaHidden ??
-      accessibilityElementsHidden ??
-      (importantForAccessibility === 'no-hide-descendants' ? true : undefined)
-    const webAriaLive =
-      ariaLive ?? (accessibilityLiveRegion === 'none' ? 'off' : accessibilityLiveRegion)
-
     return {
       rest,
       accessibilityProps: {
-        ...(webRole ? { role: webRole } : {}),
-        ...(ariaLabel ?? accessibilityLabel ? { 'aria-label': ariaLabel ?? accessibilityLabel } : {}),
+        ...(role ?? accessibilityRole ?? options?.defaultRole
+          ? { role: role ?? accessibilityRole ?? options?.defaultRole }
+          : {}),
+        ...(ariaLabel ?? accessibilityLabel
+          ? { 'aria-label': ariaLabel ?? accessibilityLabel }
+          : {}),
         ...(ariaLabelledBy ?? accessibilityLabelledBy
           ? { 'aria-labelledby': ariaLabelledBy ?? accessibilityLabelledBy }
           : {}),
-        ...(webAriaLive ? { 'aria-live': webAriaLive } : {}),
-        ...(webAriaHidden !== undefined ? { 'aria-hidden': webAriaHidden } : {}),
-        ...(nativeID ? { id: nativeID } : {}),
+        ...(ariaLive ?? accessibilityLiveRegion
+          ? { 'aria-live': ariaLive ?? (accessibilityLiveRegion === 'none' ? 'off' : accessibilityLiveRegion) }
+          : {}),
+        ...(ariaHidden ?? accessibilityElementsHidden !== undefined
+          ? { 'aria-hidden': ariaHidden ?? accessibilityElementsHidden }
+          : {}),
         ...(dataTestId ?? testID ? { 'data-testid': dataTestId ?? testID } : {}),
+        ...(nativeID ? { id: nativeID } : {}),
+        ...(accessibilityHint ? { title: accessibilityHint } : {}),
       } as Record<string, unknown>,
     }
   }
@@ -78,11 +79,9 @@ export function splitAccessibilityProps<T extends Record<string, unknown>>(
       ...(accessibilityLabelledBy ? { accessibilityLabelledBy } : {}),
       ...(accessibilityLiveRegion ? { accessibilityLiveRegion } : {}),
       ...(importantForAccessibility ? { importantForAccessibility } : {}),
-      ...(accessibilityElementsHidden !== undefined
-        ? { accessibilityElementsHidden }
-        : {}),
-      ...(nativeID ? { nativeID } : {}),
+      ...(accessibilityElementsHidden !== undefined ? { accessibilityElementsHidden } : {}),
       ...(testID ? { testID } : {}),
+      ...(nativeID ? { nativeID } : {}),
     } as Record<string, unknown>,
   }
 }

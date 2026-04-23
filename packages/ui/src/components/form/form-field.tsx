@@ -1,5 +1,5 @@
 import React from 'react'
-import { Label, Paragraph, YStack } from 'tamagui'
+import { Text, YStack } from '../../style-system'
 
 export type FormFieldProps = {
   label?: string
@@ -12,27 +12,15 @@ export type FormFieldProps = {
 export function FormField({ label, hint, error, required = false, children }: FormFieldProps) {
   return (
     <YStack gap="$1.5">
-      {label && (
-        <Label fontSize="$4" fontWeight="600" color="$color">
+      {label ? (
+        <Text variant="label">
           {label}
-          {required && (
-            <Label fontSize="$4" color="$destructive">
-              {' '}*
-            </Label>
-          )}
-        </Label>
-      )}
+          {required ? <Text variant="label" color="$destructive"> *</Text> : null}
+        </Text>
+      ) : null}
       {children}
-      {hint && !error && (
-        <Paragraph size="$3" color="$mutedForeground">
-          {hint}
-        </Paragraph>
-      )}
-      {error && (
-        <Paragraph size="$3" color="$destructive">
-          {error}
-        </Paragraph>
-      )}
+      {hint && !error ? <Text variant="caption" muted>{hint}</Text> : null}
+      {error ? <Text variant="caption" color="$destructive">{error}</Text> : null}
     </YStack>
   )
 }

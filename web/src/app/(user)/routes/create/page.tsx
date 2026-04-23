@@ -15,8 +15,11 @@ type StopEntry = {
   customDescription: string
 }
 
+let tempIdCounter = 0
+
 function generateTempId() {
-  return Math.random().toString(36).slice(2)
+  tempIdCounter += 1
+  return `web-stop-${tempIdCounter}`
 }
 
 export default function CreateRoutePage() {

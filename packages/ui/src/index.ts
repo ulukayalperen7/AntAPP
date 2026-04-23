@@ -1,20 +1,30 @@
-// Tamagui primitives — all exports from tamagui are available.
-// Custom components below explicitly override same-named exports.
-export * from 'tamagui'
-
-// Config
-export { tamaguiConfig } from './tamagui.config'
-export type { Conf } from './tamagui.config'
+export {
+  isWeb,
+  AntThemeProvider,
+  Theme,
+  useTheme,
+  useAntId,
+  extractStyleProps,
+  createResolvedStyle,
+  View,
+  YStack,
+  XStack,
+  ZStack,
+  Image,
+  ScrollView,
+  Anchor,
+  Spinner,
+} from './style-system'
 
 // Tokens, themes, fonts
 export { tokens } from './tokens'
 export type { AntTokens } from './tokens'
 export { themes } from './themes'
-export type { AntThemes, BaseTheme } from './themes'
+export type { AntThemes, BaseTheme, AntTheme, AntThemeName } from './themes'
 export { fonts, bodyFont, headingFont, monoFont } from './fonts'
 export type { AntFonts } from './fonts'
 
-// Components — these override tamagui's same-named exports where applicable
+// Components
 export { Button } from './components/button'
 export type { ButtonProps } from './components/button'
 

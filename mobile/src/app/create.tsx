@@ -17,8 +17,11 @@ type StopEntry = {
   customTitle: string
 }
 
+let tempIdCounter = 0
+
 function generateTempId() {
-  return Math.random().toString(36).slice(2)
+  tempIdCounter += 1
+  return `mobile-stop-${tempIdCounter}`
 }
 
 function emptyStop(): StopEntry {

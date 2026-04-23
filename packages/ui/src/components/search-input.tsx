@@ -1,48 +1,16 @@
 import React from 'react'
-import { styled, GetProps, XStack, YStack, Input as TamaguiInput } from 'tamagui'
-import { splitAccessibilityProps } from './accessibility-props'
-
-const SearchFrame = styled(XStack, {
-  alignItems: 'center',
-  borderRadius: '$full',
-  borderWidth: 1,
-  borderColor: '$borderColor',
-  backgroundColor: '$backgroundStrong',
-  paddingHorizontal: '$3',
-  gap: '$2',
-
-  focusWithinStyle: {
-    borderColor: '$primary',
-  },
-
-  variants: {
-    size: {
-      sm: { height: '$3' },
-      md: { height: '$4' },
-      lg: { height: '$5' },
-    },
-  } as const,
-
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-const SearchInputField = styled(TamaguiInput, {
-  flex: 1,
-  fontFamily: '$body',
-  fontSize: '$4',
-  backgroundColor: 'transparent',
-  borderWidth: 0,
-  color: '$color',
-  placeholderTextColor: '$placeholderColor',
-  outlineWidth: 0,
-  focusStyle: { outlineWidth: 0 },
-})
+import { XStack, YStack } from '../style-system'
+import { Input, type InputProps } from './input'
 
 type SearchInputSize = 'sm' | 'md' | 'lg'
 
-export type SearchInputProps = Omit<GetProps<typeof SearchInputField>, 'size'> & {
+const HEIGHTS = {
+  sm: '$3',
+  md: '$4',
+  lg: '$5',
+} as const
+
+export type SearchInputProps = Omit<InputProps, 'size'> & {
   size?: SearchInputSize
   icon?: React.ReactNode
   iconAfter?: React.ReactNode
@@ -72,14 +40,30 @@ function DefaultSearchIcon() {
   )
 }
 
-export function SearchInput({ size = 'md', icon, iconAfter, ...rest }: SearchInputProps) {
-  const { rest: inputRest, accessibilityProps } = splitAccessibilityProps(rest)
-
+export function SearchInput({ size = 'md', icon, iconAfter, ...props }: SearchInputProps) {
   return (
-    <SearchFrame size={size}>
+    <XStack
+      alignItems="center"
+      borderRadius="$full"
+      borderWidth={1}
+      borderColor="$borderColor"
+      backgroundColor="$backgroundStrong"
+      paddingHorizontal="$3"
+      gap="$2"
+      height={HEIGHTS[size]}
+      focusWithinStyle={{ borderColor: '$primary' }}
+    >
       {icon ?? <DefaultSearchIcon />}
-      <SearchInputField {...accessibilityProps} {...inputRest} />
+      <Input
+        flex={1}
+        size={size}
+        variant="outline"
+        borderWidth={0}
+        backgroundColor="transparent"
+        paddingHorizontal={0}
+        {...props}
+      />
       {iconAfter}
-    </SearchFrame>
+    </XStack>
   )
 }

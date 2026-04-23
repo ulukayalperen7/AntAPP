@@ -1,77 +1,5 @@
 import React from 'react'
-import { styled, GetProps, YStack, XStack, Text as TamaguiText, Image } from 'tamagui'
-import { splitAccessibilityProps } from './accessibility-props'
-
-const RouteCardFrame = styled(YStack, {
-  backgroundColor: '$card',
-  borderRadius: '$4',
-  overflow: 'hidden',
-  cursor: 'pointer',
-  pressStyle: { scale: 0.98, opacity: 0.95 },
-  hoverStyle: { opacity: 0.95 },
-
-  variants: {
-    orientation: {
-      vertical: {},
-      horizontal: { flexDirection: 'row' },
-    },
-  } as const,
-
-  defaultVariants: {
-    orientation: 'vertical',
-  },
-})
-
-const CardImage = styled(YStack, {
-  backgroundColor: '$muted',
-  overflow: 'hidden',
-  position: 'relative',
-
-  variants: {
-    orientation: {
-      vertical: { width: '100%', height: 180 },
-      horizontal: { width: 120, height: '100%' },
-    },
-  } as const,
-
-  defaultVariants: {
-    orientation: 'vertical',
-  },
-})
-
-const ContentTypeBadge = styled(XStack, {
-  position: 'absolute',
-  top: 10,
-  left: 10,
-  paddingHorizontal: '$2',
-  paddingVertical: '$1',
-  borderRadius: '$2',
-
-  variants: {
-    type: {
-      Official: { backgroundColor: '$primary' },
-      Sponsored: { backgroundColor: '$ant500' },
-      Community: { display: 'none' },
-    },
-  } as const,
-
-  defaultVariants: {
-    type: 'Community',
-  },
-})
-
-const FavoriteButton = styled(XStack, {
-  position: 'absolute',
-  top: 10,
-  right: 10,
-  width: 32,
-  height: 32,
-  borderRadius: '$full',
-  backgroundColor: 'rgba(255,255,255,0.9)',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-})
+import { Image, Text, XStack, YStack, isWeb } from '../style-system'
 
 function HeartIcon({ filled }: { filled: boolean }) {
   return (
@@ -121,52 +49,82 @@ export type RouteCardData = {
   rating?: number
   distance?: string
   duration?: string
-  /** @deprecated - backend has no difficulty field, use contentType */
   difficulty?: 'easy' | 'moderate' | 'hard'
   contentType?: 'Community' | 'Official' | 'Sponsored'
   tag?: string
   description?: string
   stopsCount?: number
   isFavorited?: boolean
-  /** @deprecated - use contentType === 'Official' */
   isOfficial?: boolean
 }
 
-export type RouteCardProps = Omit<GetProps<typeof RouteCardFrame>, 'orientation'> & {
+export type RouteCardProps = React.ComponentProps<typeof YStack> & {
   data: RouteCardData
   orientation?: 'vertical' | 'horizontal'
   onFavoritePress?: () => void
 }
 
-export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...rest }: RouteCardProps) {
-  const { rest: cardRest, accessibilityProps } = splitAccessibilityProps(rest)
+export function RouteCard({
+  data,
+  orientation = 'vertical',
+  onFavoritePress,
+  ...props
+}: RouteCardProps) {
+  const handleFavoritePress = (event?: { stopPropagation?: () => void }) => {
+    event?.stopPropagation?.()
+    onFavoritePress?.()
+  }
 
   return (
-    <RouteCardFrame orientation={orientation} {...accessibilityProps} {...cardRest}>
-      <CardImage orientation={orientation}>
-        {data.image && (
-          <Image
-            src={data.image}
-            width="100%"
-            height="100%"
-            objectFit="cover"
-          />
-        )}
-        {/* ContentType badge — Official/Sponsored only */}
-        {(data.contentType === 'Official' || data.isOfficial) && (
-          <ContentTypeBadge type="Official">
-            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF">OFFICIAL</TamaguiText>
-          </ContentTypeBadge>
-        )}
-        {data.contentType === 'Sponsored' && (
-          <ContentTypeBadge type="Sponsored">
-            <TamaguiText fontSize="$2" fontWeight="700" color="#FFFFFF">SPONSORED</TamaguiText>
-          </ContentTypeBadge>
-        )}
-        <FavoriteButton onPress={onFavoritePress}>
-          <HeartIcon filled={!!data.isFavorited} />
-        </FavoriteButton>
-        {data.rating != null && (
+    <YStack
+      as={isWeb ? 'article' : undefined}
+      backgroundColor="$card"
+      borderRadius="$4"
+      overflow="hidden"
+      cursor="pointer"
+      hoverStyle={{ opacity: 0.95 }}
+      pressStyle={{ scale: 0.98, opacity: 0.95 }}
+      flexDirection={orientation === 'horizontal' ? 'row' : 'column'}
+      {...props}
+    >
+      <YStack
+        backgroundColor="$muted"
+        overflow="hidden"
+        position="relative"
+        width={orientation === 'horizontal' ? 120 : '100%'}
+        height={orientation === 'horizontal' ? '100%' : 180}
+      >
+        {data.image ? <Image src={data.image} width="100%" height="100%" objectFit="cover" alt={data.title} /> : null}
+        {(data.contentType === 'Official' || data.isOfficial) ? (
+          <XStack position="absolute" top={10} left={10} paddingHorizontal="$2" paddingVertical="$1" borderRadius="$2" backgroundColor="$primary">
+            <Text variant="caption" fontSize="$2" weight="bold" color="#FFFFFF">OFFICIAL</Text>
+          </XStack>
+        ) : null}
+        {data.contentType === 'Sponsored' ? (
+          <XStack position="absolute" top={10} left={10} paddingHorizontal="$2" paddingVertical="$1" borderRadius="$2" backgroundColor="$ant500">
+            <Text variant="caption" fontSize="$2" weight="bold" color="#FFFFFF">SPONSORED</Text>
+          </XStack>
+        ) : null}
+        <XStack
+          as={isWeb ? 'button' : undefined}
+          type={isWeb ? 'button' : undefined}
+          position="absolute"
+          top={10}
+          right={10}
+          width={32}
+          height={32}
+          borderRadius="$full"
+          backgroundColor="rgba(255,255,255,0.9)"
+          alignItems="center"
+          justifyContent="center"
+          cursor="pointer"
+          accessibilityLabel="Toggle favorite"
+          onClick={handleFavoritePress}
+          onPress={handleFavoritePress}
+        >
+          <HeartIcon filled={Boolean(data.isFavorited)} />
+        </XStack>
+        {data.rating != null ? (
           <XStack
             position="absolute"
             top={10}
@@ -179,51 +137,39 @@ export function RouteCard({ data, orientation = 'vertical', onFavoritePress, ...
             gap="$1"
           >
             <YStack width={8} height={8} borderRadius={2} backgroundColor="$ant500" transform={[{ rotate: '45deg' }]} />
-            <TamaguiText fontSize="$3" fontWeight="600" color="$color">{data.rating.toFixed(1)}</TamaguiText>
+            <Text variant="caption" weight="semibold">{data.rating.toFixed(1)}</Text>
           </XStack>
-        )}
-      </CardImage>
+        ) : null}
+      </YStack>
 
       <YStack padding="$3" gap="$1.5" flex={1}>
-        {data.tag && (
-          <TamaguiText fontSize="$2" fontWeight="600" color="$primary" textTransform="uppercase">
-            {data.tag}
-          </TamaguiText>
-        )}
-        <TamaguiText fontFamily="$heading" fontSize="$5" fontWeight="600" color="$color" numberOfLines={2}>
+        {data.tag ? <Text variant="caption" fontSize="$2" weight="semibold" color="$primary" textTransform="uppercase">{data.tag}</Text> : null}
+        <Text variant="body" fontFamily="$heading" fontSize="$5" weight="semibold" numberOfLines={2}>
           {data.title}
-        </TamaguiText>
-        {data.description && (
-          <TamaguiText fontSize="$3" color="$mutedForeground" numberOfLines={2}>
-            {data.description}
-          </TamaguiText>
-        )}
-        {data.location && (
+        </Text>
+        {data.description ? <Text variant="caption" muted numberOfLines={2}>{data.description}</Text> : null}
+        {data.location ? (
           <XStack alignItems="center" gap="$1.5">
             <SmallDot color="$primary" />
-            <TamaguiText fontSize="$3" color="$mutedForeground">{data.location}</TamaguiText>
+            <Text variant="caption" muted>{data.location}</Text>
           </XStack>
-        )}
+        ) : null}
         <XStack alignItems="center" gap="$3" marginTop="$1">
-          {data.distance && (
+          {data.distance ? (
             <XStack alignItems="center" gap="$1.5">
               <SmallDot />
-              <TamaguiText fontSize="$3" color="$mutedForeground">{data.distance}</TamaguiText>
+              <Text variant="caption" muted>{data.distance}</Text>
             </XStack>
-          )}
-          {data.duration && (
+          ) : null}
+          {data.duration ? (
             <XStack alignItems="center" gap="$1.5">
               <SmallDot />
-              <TamaguiText fontSize="$3" color="$mutedForeground">{data.duration}</TamaguiText>
+              <Text variant="caption" muted>{data.duration}</Text>
             </XStack>
-          )}
-          {data.stopsCount != null && (
-            <TamaguiText fontSize="$3" color="$mutedForeground">
-              {data.stopsCount} Stops
-            </TamaguiText>
-          )}
+          ) : null}
+          {data.stopsCount != null ? <Text variant="caption" muted>{data.stopsCount} Stops</Text> : null}
         </XStack>
       </YStack>
-    </RouteCardFrame>
+    </YStack>
   )
 }
