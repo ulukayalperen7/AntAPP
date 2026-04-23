@@ -1,22 +1,20 @@
-import { getRoutes, getTags } from '@/features/routes/actions'
+import { getRoutes } from '@/features/routes/actions'
 import HomeClient from './home-client'
 
 export default async function ExplorePage() {
-  const [popularResult, recommendedResult, tags] = await Promise.allSettled([
-    getRoutes({ sort: 'rating', type: 'official', pageSize: 8 }),
-    getRoutes({ sort: 'newest', type: 'community', pageSize: 6 }),
-    getTags(),
+  const [timelineResult, spotlightResult] = await Promise.allSettled([
+    getRoutes({ sort: 'newest', pageSize: 12 }),
+    getRoutes({ sort: 'rating', type: 'official', pageSize: 4 }),
   ])
 
-  const popularRoutes = popularResult.status === 'fulfilled' ? popularResult.value.data : []
-  const recommendedRoutes = recommendedResult.status === 'fulfilled' ? recommendedResult.value.data : []
-  const tagList = tags.status === 'fulfilled' ? tags.value : []
+  const timelineRoutes = timelineResult.status === 'fulfilled' ? timelineResult.value.data : []
+  const spotlightRoutes = spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : []
 
   return (
     <HomeClient
-      popularRoutes={popularRoutes}
-      recommendedRoutes={recommendedRoutes}
-      tags={tagList}
+      mode="timeline"
+      timelineRoutes={timelineRoutes}
+      spotlightRoutes={spotlightRoutes}
     />
   )
 }

@@ -1,206 +1,527 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, RouteCard, FilterChip } from '@antapp/ui'
-import type { RouteCardData } from '@antapp/ui'
-import type { RouteListItem, Tag } from '@/types/api'
-import { Map } from 'lucide-react'
-import dynamic from 'next/dynamic'
+import { Avatar, Badge, Button, Card, Image, Text, XStack, YStack } from '@antapp/ui'
+import type { RouteListItem } from '@/types/api'
+import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp } from 'lucide-react'
 
-// Lazy load map component - no loading prop to avoid hydration mismatch
-const MapExplorer = dynamic(() => import('@/components/map-explorer'), {
-  ssr: false,
-})
+type FeedMode = 'timeline' | 'official' | 'community'
 
-// Client-only wrapper with loading state
-function MapExplorerWrapper() {
-  const [isClient, setIsClient] = useState(false)
+type HomeClientProps = {
+  mode: FeedMode
+  timelineRoutes: RouteListItem[]
+  spotlightRoutes: RouteListItem[]
+}
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+const PAGE_COPY: Record<FeedMode, {
+  title: string
+  subtitle: string
+  composer: string
+  railTitle: string
+  railSubtitle: string
+}> = {
+  timeline: {
+    title: 'Explore Feed',
+    subtitle: 'Public routes now behave like social posts. Fresh shares, official highlights, and community motion all meet here first.',
+    composer: 'Share a new route, drop a scenic update, or post today’s route draft...',
+    railTitle: 'Trending now',
+    railSubtitle: 'Routes getting the strongest pull in the public flow.',
+  },
+  official: {
+    title: 'Official Feed',
+    subtitle: 'A cleaner editorial stream for curated and promoted route drops.',
+    composer: 'Queue a featured route or spotlight an official collection...',
+    railTitle: 'Editorial watchlist',
+    railSubtitle: 'Fresh official cards the product can push harder.',
+  },
+  community: {
+    title: 'Community Feed',
+    subtitle: 'A faster social lane for user-created route posts, experiments, and daily shares.',
+    composer: 'What route did the community just post today?',
+    railTitle: 'Community momentum',
+    railSubtitle: 'Recent public posts climbing fastest in the feed.',
+  },
+}
 
-  if (!isClient) {
+function formatRelativeDate(value: string) {
+  const timestamp = new Date(value).getTime()
+  if (Number.isNaN(timestamp)) return 'Now'
+
+  const diffMinutes = Math.round((Date.now() - timestamp) / (1000 * 60))
+  if (diffMinutes <= 1) return 'Now'
+  if (diffMinutes < 60) return `${diffMinutes}m`
+
+  const diffHours = Math.round(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours}h`
+
+  const diffDays = Math.round(diffHours / 24)
+  if (diffDays < 7) return `${diffDays}d`
+
+  return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short' }).format(new Date(value))
+}
+
+function formatFullDate(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return 'Recently'
+
+  return new Intl.DateTimeFormat('tr-TR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
+}
+
+function getPostTone(route: RouteListItem) {
+  switch (route.contentType) {
+    case 'Official':
+      return { badge: 'Official', variant: 'info' as const, label: 'Editorial drop' }
+    case 'Sponsored':
+      return { badge: 'Sponsored', variant: 'warning' as const, label: 'Partner feature' }
+    default:
+      return { badge: 'Community', variant: 'default' as const, label: 'Community post' }
+  }
+}
+
+function getAuthor(route: RouteListItem) {
+  if (route.contentType === 'Official') {
+    return {
+      name: 'AntAPP Official',
+      role: 'Curated route desk',
+      initials: 'AO',
+    }
+  }
+
+  return {
+    name: 'Route Explorer',
+    role: 'Community creator',
+    initials: 'RE',
+  }
+}
+
+function StoryCard({
+  route,
+  action = false,
+}: {
+  route?: RouteListItem
+  action?: boolean
+}) {
+  if (action) {
     return (
-      <YStack
-        height={260}
-        backgroundColor="$muted"
-        borderRadius="$4"
-        alignItems="center"
-        justifyContent="center"
-        gap="$2"
-        borderWidth={2}
-        borderStyle="dashed"
-        borderColor="$borderColor"
+      <Card
+        variant="outline"
+        size="sm"
+        backgroundColor="$backgroundStrong"
+        overflow="hidden"
+        width={140}
+        minWidth={140}
+        gap="$0"
+        padding={0}
       >
-        <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
-        <Text variant="body" muted>Loading map...</Text>
-      </YStack>
+        <YStack height={120} backgroundColor="$muted" />
+        <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
+          <XStack
+            width={44}
+            height={44}
+            borderRadius="$full"
+            backgroundColor="$primary"
+            alignItems="center"
+            justifyContent="center"
+            marginTop={-26}
+            borderWidth={4}
+            borderColor="$backgroundStrong"
+          >
+            <Plus size={18} color="#FFFFFF" />
+          </XStack>
+          <Text variant="label" align="center">Create Story</Text>
+        </YStack>
+      </Card>
     )
   }
 
-  return <MapExplorer />
-}
+  if (!route) return null
 
-function routeToCardData(route: RouteListItem): RouteCardData {
-  return {
-    id: route.id,
-    title: route.title,
-    description: route.description ?? undefined,
-    image: route.thumbnailUrl ?? undefined,
-    rating: route.averageRating > 0 ? route.averageRating : undefined,
-    contentType: route.contentType,
-    isOfficial: route.contentType === 'Official',
-  }
-}
-
-export default function HomeClient({
-  popularRoutes,
-  recommendedRoutes,
-  tags,
-}: {
-  popularRoutes: RouteListItem[]
-  recommendedRoutes: RouteListItem[]
-  tags: Tag[]
-}) {
-  const router = useRouter()
-  const [activeTagId, setActiveTagId] = useState<string | null>(null)
-
-  const allTag = { id: '__all__', name: 'All', isActive: true }
-  const tagList = [allTag, ...tags.filter((t) => t.isActive)]
-
-  const filterRoutes = (routes: RouteListItem[]) => {
-    if (!activeTagId) return routes
-    return routes // tag filtering is server-side; this is just UI state for now
-  }
+  const tone = getPostTone(route)
 
   return (
-    <YStack gap="$4" flex={1} style={{ rowGap: 'clamp(14px, 1.8vw, 24px)' }}>
-      {/* Hero Banner */}
-      <YStack
-        backgroundColor="$ant900"
-        borderRadius="$4"
-        padding="$6"
-        minHeight={160}
-        justifyContent="center"
-        position="relative"
+    <Link href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
+      <Card
+        variant="outline"
+        size="sm"
+        backgroundColor="$backgroundStrong"
         overflow="hidden"
+        width={140}
+        minWidth={140}
+        gap="$0"
+        padding={0}
+        pressable
+      >
+        <YStack position="relative" height={190} backgroundColor="$muted">
+          {route.thumbnailUrl ? (
+            <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+          ) : null}
+          <YStack position="absolute" inset={0} backgroundColor="rgba(15,23,42,0.22)" />
+          <XStack position="absolute" top="$3" left="$3">
+            <Avatar size="md" initials={getAuthor(route).initials} />
+          </XStack>
+          <YStack position="absolute" bottom="$3" left="$3" right="$3" gap="$1.5">
+            <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+            <Text variant="label" color="#FFFFFF" numberOfLines={2}>
+              {route.title}
+            </Text>
+          </YStack>
+        </YStack>
+      </Card>
+    </Link>
+  )
+}
+
+function FeedPostCard({ route }: { route: RouteListItem }) {
+  const router = useRouter()
+  const tone = getPostTone(route)
+  const author = getAuthor(route)
+
+  return (
+    <Card
+      variant="outline"
+      size="sm"
+      backgroundColor="$backgroundStrong"
+      gap="$4"
+      pressable
+      onPress={() => router.push(`/routes/${route.id}`)}
+    >
+      <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
+        <XStack gap="$3" flex={1}>
+          <Avatar size="lg" initials={author.initials} />
+          <YStack gap="$1.5" flex={1}>
+            <XStack gap="$2" flexWrap="wrap" alignItems="center">
+              <Text variant="label">{author.name}</Text>
+              <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+            </XStack>
+            <Text variant="caption" muted>{author.role}</Text>
+            <XStack gap="$2" flexWrap="wrap" alignItems="center">
+              <Text variant="caption" muted>{formatRelativeDate(route.createdAt)}</Text>
+              <CircleDot size={10} color="var(--color-mutedForeground)" />
+              <Text variant="caption" muted>{tone.label}</Text>
+            </XStack>
+          </YStack>
+        </XStack>
+
+        <XStack gap="$2" alignItems="center">
+          <Ellipsis size={18} color="var(--color-mutedForeground)" />
+        </XStack>
+      </XStack>
+
+      <YStack gap="$2.5">
+        <Text variant="heading3">{route.title}</Text>
+        <Text variant="body" color="$color">
+          {route.description?.trim() || 'A newly shared route just dropped into the public feed. Open the card to inspect the route map, stops, and full detail.'}
+        </Text>
+      </YStack>
+
+      <YStack
+        borderRadius="$4"
+        overflow="hidden"
+        backgroundColor="$muted"
+        borderWidth={1}
+        borderColor="$borderColor"
       >
         <XStack
-          position="absolute"
-          top={-40}
-          right={-40}
-          width={200}
-          height={200}
-          borderRadius="$full"
-          backgroundColor="$ant800"
-          opacity={0.3}
-        />
-        <YStack gap="$2" maxWidth={480} zIndex={1}>
-          <XStack
-            backgroundColor="$primary"
-            paddingHorizontal="$2.5"
-            paddingVertical="$1"
-            borderRadius="$2"
-            alignSelf="flex-start"
+          flexDirection={route.thumbnailUrl ? 'row' : 'column'}
+          $md={{ flexDirection: 'column' }}
+        >
+          <YStack
+            flex={1.1}
+            minHeight={340}
+            backgroundColor="$muted"
+            $md={{ minHeight: 240 }}
           >
-            <Text variant="caption" weight="bold" color="#FFFFFF">EXPLORE</Text>
-          </XStack>
-          <Text variant="heading2" color="#FFFFFF">
-            Discover Your Next Big Adventure
-          </Text>
-          <Text variant="body" color="$ant200">
-            Join thousands of explorers sharing the best trails and hidden paths worldwide.
-          </Text>
-        </YStack>
-      </YStack>
+            {route.thumbnailUrl ? (
+              <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+            ) : null}
+          </YStack>
 
-      {/* Tag Filters */}
-      {tagList.length > 1 && (
-        <div style={{ overflowX: 'auto', paddingBottom: '2px' }}>
-          <XStack gap="$2" paddingVertical="$1" style={{ width: 'max-content' }}>
-            {tagList.map((tag) => (
-              <FilterChip
-                key={tag.id}
-                active={activeTagId === (tag.id === '__all__' ? null : tag.id)}
-                onPress={() => setActiveTagId(tag.id === '__all__' ? null : tag.id)}
-              >
-                {tag.name}
-              </FilterChip>
-            ))}
-          </XStack>
-        </div>
-      )}
+          <YStack
+            flex={0.9}
+            padding="$4"
+            gap="$3"
+            backgroundColor="$background"
+            borderLeftWidth={1}
+            borderLeftColor="$borderColor"
+            $md={{ borderLeftWidth: 0, borderTopWidth: 1, borderTopColor: '$borderColor' }}
+          >
+            <XStack gap="$2" flexWrap="wrap">
+              <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+              <Badge variant="success" size="sm">{route.isPublic ? 'Public' : 'Draft'}</Badge>
+            </XStack>
 
-      {/* Interactive Route Explorer */}
-      <YStack gap="$3">
-        <XStack justifyContent="space-between" alignItems="center">
-          <Text variant="heading3">Interactive Route Explorer</Text>
+            <YStack gap="$2">
+              <Text variant="label" color="$primary">Route Snapshot</Text>
+              <Text variant="body" muted>
+                Published {formatFullDate(route.createdAt)}. This card is rendered as a social post but still points into the same route detail experience.
+              </Text>
+            </YStack>
+
+            <YStack gap="$2">
+              <XStack justifyContent="space-between" alignItems="center">
+                <Text variant="caption" muted>Average rating</Text>
+                <XStack alignItems="center" gap="$1">
+                  <Star size={14} color="#F59E0B" fill="#F59E0B" />
+                  <Text variant="caption" weight="semibold">
+                    {route.averageRating > 0 ? route.averageRating.toFixed(1) : 'New'}
+                  </Text>
+                </XStack>
+              </XStack>
+
+              <XStack justifyContent="space-between" alignItems="center">
+                <Text variant="caption" muted>Lane</Text>
+                <Text variant="caption" weight="semibold">{route.contentType}</Text>
+              </XStack>
+
+              <XStack justifyContent="space-between" alignItems="center">
+                <Text variant="caption" muted>Post age</Text>
+                <Text variant="caption" weight="semibold">{formatRelativeDate(route.createdAt)}</Text>
+              </XStack>
+            </YStack>
+
+            <Button variant="outline" size="sm" icon={<Compass size={14} color="currentColor" />}>
+              Open route
+            </Button>
+          </YStack>
         </XStack>
-        <MapExplorerWrapper />
       </YStack>
 
-      {/* Popular Routes */}
-      {filterRoutes(popularRoutes).length > 0 && (
-        <YStack gap="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text variant="heading3">Popular Routes</Text>
-            <Text
-              variant="body"
-              color="$primary"
-              cursor="pointer"
-              onPress={() => router.push('/search?sort=rating&type=official')}
-            >
-              View All
-            </Text>
+      <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
+        <XStack gap="$3" alignItems="center">
+          <XStack alignItems="center" gap="$1.5">
+            <ThumbsUp size={14} color="var(--color-primary)" />
+            <Text variant="caption" muted>{12 + Math.round(route.averageRating * 3)} reacts</Text>
           </XStack>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-            {filterRoutes(popularRoutes).map((route) => (
-              <RouteCard
-                key={route.id}
-                data={routeToCardData(route)}
-                onPress={() => router.push(`/routes/${route.id}`)}
-              />
-            ))}
-          </div>
-        </YStack>
-      )}
-
-      {/* Recommended / Community */}
-      {filterRoutes(recommendedRoutes).length > 0 && (
-        <YStack gap="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text variant="heading3">Community Routes</Text>
-            <Text
-              variant="body"
-              color="$primary"
-              cursor="pointer"
-              onPress={() => router.push('/search?sort=newest&type=community')}
-            >
-              See More
-            </Text>
+          <XStack alignItems="center" gap="$1.5">
+            <MessageCircle size={14} color="var(--color-mutedForeground)" />
+            <Text variant="caption" muted>{4 + (route.title.length % 9)} comments</Text>
           </XStack>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-            {filterRoutes(recommendedRoutes).map((route) => (
-              <RouteCard
-                key={route.id}
-                data={routeToCardData(route)}
-                onPress={() => router.push(`/routes/${route.id}`)}
-              />
-            ))}
-          </div>
-        </YStack>
-      )}
+        </XStack>
+        <XStack alignItems="center" gap="$1.5">
+          <Send size={14} color="var(--color-mutedForeground)" />
+          <Text variant="caption" muted>{1 + (route.title.length % 4)} shares</Text>
+        </XStack>
+      </XStack>
 
-      {/* Empty state when no routes */}
-      {popularRoutes.length === 0 && recommendedRoutes.length === 0 && (
-        <YStack alignItems="center" justifyContent="center" padding="$10" gap="$3">
-          <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
-          <Text variant="heading3" muted align="center">No routes yet</Text>
-          <Text variant="body" muted align="center">Be the first to create a route and share your adventure!</Text>
+      <XStack
+        borderTopWidth={1}
+        borderTopColor="$borderColor"
+        paddingTop="$3"
+        justifyContent="space-between"
+        gap="$2"
+        flexWrap="wrap"
+      >
+        <Button variant="ghost" size="sm" icon={<ThumbsUp size={16} color="currentColor" />}>Like</Button>
+        <Button variant="ghost" size="sm" icon={<MessageCircle size={16} color="currentColor" />}>Comment</Button>
+        <Button variant="ghost" size="sm" icon={<Share2 size={16} color="currentColor" />}>Share</Button>
+      </XStack>
+    </Card>
+  )
+}
+
+function RightRailCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string
+  subtitle: string
+  children: React.ReactNode
+}) {
+  return (
+    <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$3">
+      <YStack gap="$1">
+        <Text variant="heading4">{title}</Text>
+        <Text variant="body" muted>{subtitle}</Text>
+      </YStack>
+      {children}
+    </Card>
+  )
+}
+
+export default function HomeClient({ mode, timelineRoutes, spotlightRoutes }: HomeClientProps) {
+  const copy = PAGE_COPY[mode]
+
+  return (
+    <XStack gap="$5" alignItems="flex-start" $md={{ flexDirection: 'column' }}>
+      <YStack flex={1} minWidth={0} maxWidth={860} width="100%" gap="$4">
+        <Card
+          variant="outline"
+          size="sm"
+          backgroundColor="$backgroundStrong"
+          gap="$4"
+          borderRadius="$5"
+        >
+          <XStack justifyContent="space-between" alignItems="flex-start" gap="$4" flexWrap="wrap">
+            <YStack gap="$1.5" maxWidth={560}>
+              <Text variant="heading2">{copy.title}</Text>
+              <Text variant="body" muted>{copy.subtitle}</Text>
+            </YStack>
+            <XStack gap="$2" flexWrap="wrap">
+              <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+                <Button variant={mode === 'timeline' ? 'solid' : 'outline'} size="sm">Timeline</Button>
+              </Link>
+              <Link href="/official" style={{ textDecoration: 'none' }}>
+                <Button variant={mode === 'official' ? 'solid' : 'outline'} size="sm">Official</Button>
+              </Link>
+              <Link href="/community" style={{ textDecoration: 'none' }}>
+                <Button variant={mode === 'community' ? 'solid' : 'outline'} size="sm">Community</Button>
+              </Link>
+            </XStack>
+          </XStack>
+        </Card>
+
+        <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
+          <XStack gap="$3" alignItems="center">
+            <Avatar size="lg" initials="AE" />
+            <XStack
+              flex={1}
+              minHeight={48}
+              alignItems="center"
+              paddingHorizontal="$4"
+              borderRadius="$full"
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
+              <Text variant="body" muted>{copy.composer}</Text>
+            </XStack>
+          </XStack>
+
+          <XStack
+            borderTopWidth={1}
+            borderTopColor="$borderColor"
+            paddingTop="$3"
+            gap="$2"
+            flexWrap="wrap"
+          >
+            <Button variant="ghost" size="sm" icon={<Camera size={16} color="#E11D48" />}>Live</Button>
+            <Button variant="ghost" size="sm" icon={<ImageIcon size={16} color="#16A34A" />}>Photo</Button>
+            <Button variant="ghost" size="sm" icon={<MapPinned size={16} color="#0EA5E9" />}>Check in</Button>
+          </XStack>
+        </Card>
+
+        <XStack
+          gap="$3"
+          overflow="scroll"
+          paddingBottom="$1"
+          style={{ overflowY: 'hidden', scrollbarWidth: 'none' }}
+        >
+          <StoryCard action />
+          {spotlightRoutes.slice(0, 5).map((route) => (
+            <StoryCard key={route.id} route={route} />
+          ))}
+        </XStack>
+
+        <YStack gap="$4">
+          {timelineRoutes.length > 0 ? (
+            timelineRoutes.map((route) => (
+              <FeedPostCard key={route.id} route={route} />
+            ))
+          ) : (
+            <Card variant="outline" size="lg" backgroundColor="$backgroundStrong" alignItems="center" gap="$3">
+              <Text variant="heading4">No posts in this lane yet</Text>
+              <Text variant="body" muted align="center" maxWidth={520}>
+                Once routes are shared publicly, they will land here as social-style posts.
+              </Text>
+            </Card>
+          )}
         </YStack>
-      )}
-    </YStack>
+      </YStack>
+
+      <YStack
+        width={320}
+        minWidth={320}
+        gap="$4"
+        $md={{ width: '100%', minWidth: 0 }}
+        style={{ position: 'sticky', top: '88px' }}
+      >
+        <RightRailCard title={copy.railTitle} subtitle={copy.railSubtitle}>
+          <YStack gap="$3">
+            {spotlightRoutes.slice(0, 4).map((route) => (
+              <Link key={route.id} href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
+                <XStack gap="$3" alignItems="center">
+                  <YStack width={88} height={88} borderRadius="$3" overflow="hidden" backgroundColor="$muted">
+                    {route.thumbnailUrl ? (
+                      <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+                    ) : null}
+                  </YStack>
+                  <YStack flex={1} gap="$1.5">
+                    <Badge variant={getPostTone(route).variant} size="sm">{route.contentType}</Badge>
+                    <Text variant="label" numberOfLines={2}>{route.title}</Text>
+                    <XStack gap="$2" alignItems="center">
+                      <Clock3 size={12} color="var(--color-mutedForeground)" />
+                      <Text variant="caption" muted>{formatRelativeDate(route.createdAt)}</Text>
+                    </XStack>
+                  </YStack>
+                </XStack>
+              </Link>
+            ))}
+          </YStack>
+        </RightRailCard>
+
+        <RightRailCard title="Sponsored" subtitle="Native placements inside the route feed">
+          <YStack gap="$3">
+            <YStack
+              borderRadius="$4"
+              overflow="hidden"
+              backgroundColor="$background"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
+              <YStack height={148} backgroundColor="$muted">
+                {spotlightRoutes[0]?.thumbnailUrl ? (
+                  <Image src={spotlightRoutes[0].thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+                ) : null}
+              </YStack>
+              <YStack padding="$3" gap="$1.5">
+                <Text variant="label">Featured stays near popular routes</Text>
+                <Text variant="caption" muted>Blend route discovery with local stays, tours, or partner placements.</Text>
+              </YStack>
+            </YStack>
+          </YStack>
+        </RightRailCard>
+
+        <RightRailCard title="Today in feed" subtitle="A compact status rail like a social network dashboard">
+          <YStack gap="$3">
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>New public posts</Text>
+              <Text variant="label">{timelineRoutes.length}</Text>
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>Official cards</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => route.contentType === 'Official').length}</Text>
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>Community cards</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => route.contentType === 'Community').length}</Text>
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>Alerts</Text>
+              <XStack gap="$1.5" alignItems="center">
+                <Bell size={14} color="var(--color-primary)" />
+                <Text variant="label">{Math.max(1, spotlightRoutes.length)}</Text>
+              </XStack>
+            </XStack>
+          </YStack>
+        </RightRailCard>
+
+        <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
+          <YStack gap="$2.5">
+            <Link href="/routes/create" style={{ textDecoration: 'none' }}>
+              <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create route post</Button>
+            </Link>
+            <Link href="/my-routes" style={{ textDecoration: 'none' }}>
+              <Button variant="outline" size="sm" icon={<Sparkles size={14} color="currentColor" />}>Manage my routes</Button>
+            </Link>
+          </YStack>
+        </RightRailCard>
+      </YStack>
+    </XStack>
   )
 }
