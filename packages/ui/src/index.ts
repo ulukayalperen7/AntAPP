@@ -1,6 +1,13 @@
-// Tamagui primitives — all exports from tamagui are available.
-// Custom components below explicitly override same-named exports.
-export * from 'tamagui'
+export {
+  Anchor,
+  Image,
+  ScrollView,
+  Theme,
+  XStack,
+  YStack,
+  ZStack,
+  isWeb,
+} from 'tamagui'
 
 // Config
 export { tamaguiConfig } from './tamagui.config'
