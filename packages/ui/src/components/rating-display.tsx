@@ -1,7 +1,8 @@
 import React from 'react'
-import { Text, XStack, YStack } from '../style-system'
+import { GetProps, XStack, YStack, Text as TamaguiText } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
-export type RatingDisplayProps = React.ComponentProps<typeof XStack> & {
+export type RatingDisplayProps = GetProps<typeof XStack> & {
   value: number
   maxStars?: number
   showValue?: boolean
@@ -20,21 +21,21 @@ function StarShape({ filled, size = 10 }: { filled: boolean; size?: number }) {
   )
 }
 
-export function RatingDisplay({
-  value,
-  maxStars = 5,
-  showValue = true,
-  starSize = 10,
-  ...props
-}: RatingDisplayProps) {
+export function RatingDisplay({ value, maxStars = 5, showValue = true, starSize = 10, ...rest }: RatingDisplayProps) {
+  const { rest: ratingRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <XStack alignItems="center" gap="$1.5" {...props}>
+    <XStack alignItems="center" gap="$1.5" {...accessibilityProps} {...ratingRest}>
       <XStack gap="$1" alignItems="center">
-        {Array.from({ length: maxStars }, (_, index) => (
-          <StarShape key={index} filled={index < Math.round(value)} size={starSize} />
+        {Array.from({ length: maxStars }, (_, i) => (
+          <StarShape key={i} filled={i < Math.round(value)} size={starSize} />
         ))}
       </XStack>
-      {showValue ? <Text variant="body" weight="semibold">{value.toFixed(1)}</Text> : null}
+      {showValue && (
+        <TamaguiText fontSize="$4" fontWeight="600" color="$color">
+          {value.toFixed(1)}
+        </TamaguiText>
+      )}
     </XStack>
   )
 }

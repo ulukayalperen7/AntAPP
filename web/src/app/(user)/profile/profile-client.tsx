@@ -31,7 +31,7 @@ function RouteActionCard({
   const [isPublic, setIsPublic] = useState(route.isPublic)
   const [isToggling, startToggle] = useTransition()
 
-  const handleTogglePublish = (e: { stopPropagation: () => void }) => {
+  const handleTogglePublish = (e: React.MouseEvent) => {
     e.stopPropagation()
     startToggle(async () => {
       try {
@@ -89,7 +89,7 @@ function RouteActionCard({
           borderRadius="$2"
           backgroundColor="rgba(255,255,255,0.1)"
           hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          onPress={(e: { stopPropagation: () => void }) => handleTogglePublish(e)}
+          onPress={(e: any) => handleTogglePublish(e)}
           opacity={isToggling ? 0.5 : 1}
         >
           <Text variant="caption" color="#FFFFFF" fontSize="$2">

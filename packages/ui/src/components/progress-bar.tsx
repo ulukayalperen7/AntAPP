@@ -1,33 +1,51 @@
 import React from 'react'
-import { XStack, YStack } from '../style-system'
+import { styled, GetProps, XStack, YStack } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
+
+const BarTrack = styled(XStack, {
+  width: '100%',
+  backgroundColor: '$muted',
+  borderRadius: '$full',
+  overflow: 'hidden',
+
+  variants: {
+    size: {
+      sm: { height: 4 },
+      md: { height: 8 },
+      lg: { height: 12 },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+const BarFill = styled(YStack, {
+  height: '100%',
+  backgroundColor: '$primary',
+  borderRadius: '$full',
+})
 
 type ProgressBarSize = 'sm' | 'md' | 'lg'
 
-const HEIGHTS = {
-  sm: 4,
-  md: 8,
-  lg: 12,
-} as const
-
-export type ProgressBarProps = React.ComponentProps<typeof XStack> & {
+export type ProgressBarProps = Omit<GetProps<typeof BarTrack>, 'size'> & {
   value: number
   max?: number
   size?: ProgressBarSize
   color?: string
 }
 
-export function ProgressBar({
-  value,
-  max = 100,
-  size = 'md',
-  color,
-  ...props
-}: ProgressBarProps) {
+export function ProgressBar({ value, max = 100, size = 'md', color, ...rest }: ProgressBarProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  const { rest: trackRest, accessibilityProps } = splitAccessibilityProps(rest)
 
   return (
-    <XStack width="100%" backgroundColor="$muted" borderRadius="$full" overflow="hidden" height={HEIGHTS[size]} {...props}>
-      <YStack width={`${percentage}%`} height="100%" borderRadius="$full" backgroundColor={color ?? '$primary'} />
-    </XStack>
+    <BarTrack size={size} {...accessibilityProps} {...trackRest}>
+      <BarFill
+        width={`${percentage}%`}
+        {...(color ? { backgroundColor: color } : {})}
+      />
+    </BarTrack>
   )
 }

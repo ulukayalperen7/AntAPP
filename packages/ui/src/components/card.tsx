@@ -1,70 +1,78 @@
 import React from 'react'
-import { XStack, YStack } from '../style-system'
+import { styled, GetProps, YStack, XStack } from 'tamagui'
 
-type CardVariant = 'elevated' | 'outline' | 'filled'
-type CardSize = 'sm' | 'md' | 'lg'
+const CardFrame = styled(YStack, {
+  backgroundColor: '$card',
+  borderRadius: '$4',
+  borderWidth: 1,
+  borderColor: '$borderColor',
+  overflow: 'hidden',
 
-const SIZE_STYLES = {
-  sm: { borderRadius: '$2', padding: '$3' },
-  md: { borderRadius: '$4', padding: '$4' },
-  lg: { borderRadius: '$5', padding: '$6' },
-} as const
+  variants: {
+    variant: {
+      elevated: {
+        shadowColor: '$shadowColor',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 8,
+        elevation: 4,
+        borderWidth: 0,
+      },
+      outline: {},
+      filled: {
+        backgroundColor: '$backgroundStrong',
+        borderColor: '$borderColor',
+      },
+    },
+    size: {
+      sm: { borderRadius: '$2', padding: '$3' },
+      md: { borderRadius: '$4', padding: '$4' },
+      lg: { borderRadius: '$5', padding: '$6' },
+    },
+    pressable: {
+      true: {
+        cursor: 'pointer',
+        pressStyle: { backgroundColor: '$backgroundPress', scale: 0.99 },
+        hoverStyle: { backgroundColor: '$backgroundHover' },
+      },
+    },
+  } as const,
 
-const VARIANT_STYLES = {
-  elevated: {
-    backgroundColor: '$backgroundStrong',
-    borderWidth: 0,
-    shadowColor: '$shadowColor',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 8,
+  defaultVariants: {
+    variant: 'outline',
+    size: 'md',
   },
-  outline: {
-    backgroundColor: '$card',
-    borderWidth: 1,
-    borderColor: '$borderColor',
-  },
-  filled: {
-    backgroundColor: '$backgroundStrong',
-    borderWidth: 1,
-    borderColor: '$borderColor',
-  },
-} as const
+})
 
-export type CardProps = React.ComponentProps<typeof YStack> & {
-  variant?: CardVariant
-  size?: CardSize
-  pressable?: boolean
+const CardHeaderFrame = styled(XStack, {
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: '$4',
+  paddingTop: '$4',
+  paddingBottom: '$2',
+})
+
+const CardContentFrame = styled(YStack, {
+  paddingHorizontal: '$4',
+  paddingVertical: '$3',
+  gap: '$2',
+})
+
+const CardFooterFrame = styled(XStack, {
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: '$2',
+  paddingHorizontal: '$4',
+  paddingBottom: '$4',
+  paddingTop: '$2',
+})
+
+export type CardProps = GetProps<typeof CardFrame>
+
+export function Card(props: CardProps) {
+  return <CardFrame {...props} />
 }
 
-export function Card({
-  variant = 'outline',
-  size = 'md',
-  pressable = false,
-  ...props
-}: CardProps) {
-  return (
-    <YStack
-      overflow="hidden"
-      cursor={pressable ? 'pointer' : undefined}
-      hoverStyle={pressable ? { backgroundColor: '$backgroundHover' } : undefined}
-      pressStyle={pressable ? { backgroundColor: '$backgroundPress', scale: 0.99 } : undefined}
-      {...VARIANT_STYLES[variant]}
-      {...SIZE_STYLES[size]}
-      {...props}
-    />
-  )
-}
-
-Card.Header = function CardHeader(props: React.ComponentProps<typeof XStack>) {
-  return <XStack alignItems="center" justifyContent="space-between" paddingBottom="$2" {...props} />
-}
-
-Card.Content = function CardContent(props: React.ComponentProps<typeof YStack>) {
-  return <YStack gap="$2" {...props} />
-}
-
-Card.Footer = function CardFooter(props: React.ComponentProps<typeof XStack>) {
-  return <XStack alignItems="center" justifyContent="flex-end" gap="$2" {...props} />
-}
+Card.Header = CardHeaderFrame
+Card.Content = CardContentFrame
+Card.Footer = CardFooterFrame

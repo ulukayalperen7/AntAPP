@@ -212,7 +212,7 @@ export default function SavedCollectionDetailScreen() {
                     borderWidth={1}
                     borderColor="$borderColor"
                   >
-                    <Feather name="folder" size={32} color="#6B7B8A" />
+                    <Feather name="folder" size={32} color="var(--color-mutedForeground, #999)" />
                     <Text variant="heading4" muted>No routes yet</Text>
                     <Text variant="body" muted align="center">
                       Saved routes added to this collection will appear here.

@@ -1,39 +1,50 @@
 import React from 'react'
-import { Image, Text, XStack } from '../style-system'
+import { styled, GetProps, XStack, Text as TamaguiText, Image } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
+
+const AvatarFrame = styled(XStack, {
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '$full',
+  backgroundColor: '$muted',
+  overflow: 'hidden',
+
+  variants: {
+    size: {
+      sm: { width: 32, height: 32 },
+      md: { width: 40, height: 40 },
+      lg: { width: 56, height: 56 },
+      xl: { width: 80, height: 80 },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+const initialsSize = { sm: '$2' as const, md: '$3' as const, lg: '$5' as const, xl: '$7' as const }
 
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
 
-const SIZE_STYLES = {
-  sm: { width: 32, height: 32, fontSize: '$2' },
-  md: { width: 40, height: 40, fontSize: '$3' },
-  lg: { width: 56, height: 56, fontSize: '$5' },
-  xl: { width: 80, height: 80, fontSize: '$7' },
-} as const
-
-export type AvatarProps = React.ComponentProps<typeof XStack> & {
+export type AvatarProps = Omit<GetProps<typeof AvatarFrame>, 'size'> & {
   size?: AvatarSize
   initials?: string
   src?: string
 }
 
-export function Avatar({ size = 'md', initials, src, ...props }: AvatarProps) {
+export function Avatar({ size = 'md', initials, src, ...rest }: AvatarProps) {
+  const { rest: avatarRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <XStack
-      alignItems="center"
-      justifyContent="center"
-      borderRadius="$full"
-      backgroundColor="$muted"
-      overflow="hidden"
-      {...SIZE_STYLES[size]}
-      {...props}
-    >
+    <AvatarFrame size={size} {...accessibilityProps} {...avatarRest}>
       {src ? (
-        <Image src={src} width="100%" height="100%" objectFit="cover" alt={initials ? `${initials} avatar` : 'avatar'} />
+        <Image source={{ uri: src }} width="100%" height="100%" objectFit="cover" />
       ) : initials ? (
-        <Text fontSize={SIZE_STYLES[size].fontSize} weight="semibold" color="$mutedForeground">
+        <TamaguiText fontSize={initialsSize[size]} fontWeight="600" color="$mutedForeground">
           {initials}
-        </Text>
+        </TamaguiText>
       ) : null}
-    </XStack>
+    </AvatarFrame>
   )
 }

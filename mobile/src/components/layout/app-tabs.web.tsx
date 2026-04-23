@@ -1,78 +1,104 @@
-import { usePathname, useRouter } from 'expo-router'
-import React from 'react'
-import { HStack, Text, YStack } from '@antapp/ui'
-import { Feather } from '@expo/vector-icons'
+import {
+  Tabs,
+  TabList,
+  TabTrigger,
+  TabSlot,
+  TabTriggerSlotProps,
+  TabListProps,
+} from 'expo-router/ui';
+import React from 'react';
+import { Pressable, useColorScheme, View, StyleSheet } from 'react-native';
 
-type TabItem = {
-  route: string
-  label: string
-  icon: React.ComponentProps<typeof Feather>['name']
-}
+import { ThemedText } from '../theme/themed-text';
+import { ThemedView } from '../theme/themed-view';
 
-const TABS: TabItem[] = [
-  { route: '/', label: 'Home', icon: 'home' },
-  { route: '/explore', label: 'Explore', icon: 'compass' },
-  { route: '/spots', label: 'Spots', icon: 'map-pin' },
-  { route: '/create', label: 'Create', icon: 'plus-circle' },
-  { route: '/profile', label: 'Profile', icon: 'user' },
-]
+import { Colors, MaxContentWidth, Spacing } from '@/constants/theme';
 
-const TAB_ROUTES = new Set(TABS.map((tab) => tab.route))
-
-export function BottomTabBar() {
-  const pathname = usePathname()
-  const router = useRouter()
-
-  const isTabRoute = pathname === '/' || TAB_ROUTES.has(pathname)
-  if (!isTabRoute) return null
-
+export default function AppTabs() {
   return (
-    <HStack
-      position="fixed"
-      bottom={20}
-      left={20}
-      right={20}
-      backgroundColor="rgba(255,255,255,0.92)"
-      borderWidth={1}
-      borderColor="$borderColor"
-      borderRadius="$full"
-      justifyContent="space-between"
-      alignItems="center"
-      paddingHorizontal="$2"
-      paddingVertical="$1.5"
-      style={{ backdropFilter: 'blur(12px)', boxShadow: '0 24px 40px -28px rgba(15, 23, 32, 0.28)' }}
-      zIndex={40}
-    >
-      {TABS.map((tab) => {
-        const active = pathname === tab.route
-        const color = active ? '#005696' : '#6B7B8A'
-
-        return (
-          <YStack
-            key={tab.route}
-            flex={1}
-            alignItems="center"
-            justifyContent="center"
-            gap="$1"
-            paddingVertical="$2"
-            borderRadius="$full"
-            backgroundColor={active ? '$accentSoft' : 'transparent'}
-            cursor="pointer"
-            onPress={() => {
-              if (!active) router.push(tab.route as Parameters<typeof router.push>[0])
-            }}
-            hoverStyle={{ backgroundColor: active ? '$accentSoft' : '$backgroundHover' }}
-            pressStyle={{ opacity: 0.72 }}
-          >
-            <Feather name={tab.icon} size={18} color={color} />
-            <Text variant="caption" color={color} weight={active ? 'semibold' : 'regular'}>
-              {tab.label}
-            </Text>
-          </YStack>
-        )
-      })}
-    </HStack>
-  )
+    <Tabs>
+      <TabSlot style={{ height: '100%' }} />
+      <TabList asChild>
+        <CustomTabList>
+          <TabTrigger name="home" href="/" asChild>
+            <TabButton>Home</TabButton>
+          </TabTrigger>
+          <TabTrigger name="explore" href="/explore" asChild>
+            <TabButton>Explore</TabButton>
+          </TabTrigger>
+          <TabTrigger name="spots" href="/spots" asChild>
+            <TabButton>Spots</TabButton>
+          </TabTrigger>
+          <TabTrigger name="create" href="/create" asChild>
+            <TabButton>Create</TabButton>
+          </TabTrigger>
+          <TabTrigger name="saved" href="/saved" asChild>
+            <TabButton>Saved</TabButton>
+          </TabTrigger>
+          <TabTrigger name="profile" href="/profile" asChild>
+            <TabButton>Profile</TabButton>
+          </TabTrigger>
+        </CustomTabList>
+      </TabList>
+    </Tabs>
+  );
 }
 
-export default BottomTabBar
+export function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
+  return (
+    <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
+      <ThemedView
+        type={isFocused ? 'backgroundSelected' : 'backgroundElement'}
+        style={styles.tabButtonView}>
+        <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
+          {children}
+        </ThemedText>
+      </ThemedView>
+    </Pressable>
+  );
+}
+
+export function CustomTabList(props: TabListProps) {
+  return (
+    <View {...props} style={styles.tabListContainer}>
+      <ThemedView type="backgroundElement" style={styles.innerContainer}>
+        <ThemedText type="smallBold" style={styles.brandText}>
+          AntAPP
+        </ThemedText>
+        {props.children}
+      </ThemedView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabListContainer: {
+    position: 'absolute',
+    width: '100%',
+    padding: Spacing.three,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  innerContainer: {
+    paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.five,
+    borderRadius: Spacing.five,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexGrow: 1,
+    gap: Spacing.two,
+    maxWidth: MaxContentWidth,
+  },
+  brandText: {
+    marginRight: 'auto',
+  },
+  pressed: {
+    opacity: 0.7,
+  },
+  tabButtonView: {
+    paddingVertical: Spacing.one,
+    paddingHorizontal: Spacing.three,
+    borderRadius: Spacing.three,
+  },
+});

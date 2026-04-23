@@ -8,9 +8,9 @@
 AntAPP is a multi-platform **route planning & social platform**.
 
 - **Backend**: .NET 8 Clean Architecture (CQRS, MediatR, EF Core, ASP.NET Identity, JWT)
-- **Web**: Next.js 16 (App Router, React 19, TypeScript, Ant UI)
-- **Mobile**: Expo SDK 55 (React Native 0.83, React 19, Expo Router, Ant UI)
-- **Shared UI**: `packages/ui` — custom Ant UI style system + component library
+- **Web**: Next.js 16 (App Router, React 19, TypeScript, Tamagui)
+- **Mobile**: Expo SDK 55 (React Native 0.83, React 19, Expo Router, Tamagui)
+- **Shared UI**: `packages/ui` — Tamagui component library
 - **Shared Logic**: `packages/app` — Platform-agnostic screens (Solito)
 
 ---
@@ -33,11 +33,11 @@ AntAPP/
 │       │   ├── (business)/business/ # Business panel → /business
 │       │   └── (auth)/login/        # Auth → /login
 │       ├── features/auth/           # Auth Server Actions, types
-│       ├── providers/               # AntUiProvider
+│       ├── providers/               # TamaguiProvider
 │       └── lib/api.ts               # Fetch wrapper
 ├── mobile/                          # Expo (@antapp/mobile-user)
 ├── packages/
-│   ├── ui/                          # @antapp/ui — Ant UI style system + components
+│   ├── ui/                          # @antapp/ui — Tamagui config + components
 │   └── app/                         # @antapp/app — Shared screens (Solito)
 └── docs/
     └── DEVLOG.md                    # Development log
@@ -72,7 +72,6 @@ cd mobile && npx expo start
 ### Build Check
 ```bash
 npm run build --workspace=web
-./node_modules/.bin/tsc --noEmit -p mobile/tsconfig.json
 cd backend && dotnet build Ant.sln
 ```
 
@@ -129,13 +128,10 @@ cp mobile/.env.example mobile/.env.local
 - Server Actions use `'use server'` directive (`features/*/actions.ts`)
 - Prefer Server Components — minimize client components
 - Feature-based folder structure: `features/<feature>/`
-- Cross-platform UI always goes through `@antapp/ui`
-- Keep `web/next.config.ts` focused on local build settings and preserve the `react-native -> react-native-web` alias
 
 ### Mobile (Expo)
 - Use Expo Router file-based routing
-- Import Ant UI primitives/components from `@antapp/ui`
-- Do not reintroduce raw `react-native` layout primitives into shared UI flows unless strictly platform-specific
+- Import Tamagui components from `@antapp/ui`
 
 ---
 
@@ -145,7 +141,7 @@ cp mobile/.env.example mobile/.env.local
 |---|---|---|
 | 3 web apps → 1 | Single Next.js app with route groups | Single deployment, shared state |
 | Auth token storage | httpOnly cookie | XSS protection |
-| UI system | Ant UI (`packages/ui`) | In-house cross-platform styling |
+| CSS framework | Tamagui 2 RC | React 19 support, web+mobile |
 | Navigation | Solito v5 | Shared screens (Next.js + Expo) |
 | DB (dev) | In-memory | No setup required |
 | Commit language | English | Standard |
@@ -154,11 +150,7 @@ cp mobile/.env.example mobile/.env.local
 
 ## Gotchas
 
-- `@antapp/ui` kendi style-system kullanır; UI katmanında yalnızca Ant UI primitive ve component yüzeyi kullanılır
-- `packages/ui/src/style-system.tsx` Ant UI'nin tek primitive/theme çözümleme kaynağıdır
-- Token string'leri (`$primary`, `$error500`, `$4`) sadece Ant UI primitive/component prop'larında çözülür
-- Dış icon kütüphanelerine `color="$primary"` verilmez; `useTheme()` ya da web CSS variable kullanılır
-- `web/next.config.ts` içinde `react-native: react-native-web` alias'ı korunmalı ve build ayarları Ant UI yapısıyla uyumlu kalmalı
+- `packages/ui/src/tamagui.config.ts` → use `defaultConfig` (not `config`)
 - `web/src/proxy.ts` → Next.js 16 middleware file is `proxy.ts`, exported function must be named `proxy`
 - CORS uses `WithOrigins("http://localhost:3000")` — `AllowAnyOrigin()` cannot be combined with `AllowCredentials()`
 - `appsettings.Development.json` is gitignored — new devs must create it from the `.example` file

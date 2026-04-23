@@ -1,13 +1,16 @@
 import React from 'react'
-import { Text, YStack } from '../style-system'
+import { GetProps, YStack, Text as TamaguiText } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
 
-export type StatBoxProps = React.ComponentProps<typeof YStack> & {
+export type StatBoxProps = GetProps<typeof YStack> & {
   value: string | number
   label: string
   icon?: React.ReactNode
 }
 
-export function StatBox({ value, label, icon, ...props }: StatBoxProps) {
+export function StatBox({ value, label, icon, ...rest }: StatBoxProps) {
+  const { rest: boxRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
     <YStack
       alignItems="center"
@@ -18,13 +21,16 @@ export function StatBox({ value, label, icon, ...props }: StatBoxProps) {
       backgroundColor="$backgroundStrong"
       borderRadius="$3"
       flex={1}
-      {...props}
+      {...accessibilityProps}
+      {...boxRest}
     >
       {icon}
-      <Text variant="heading4" weight="bold">{value}</Text>
-      <Text variant="caption" weight="medium" muted textTransform="uppercase">
+      <TamaguiText fontFamily="$heading" fontSize="$7" fontWeight="700" color="$color">
+        {value}
+      </TamaguiText>
+      <TamaguiText fontSize="$2" fontWeight="500" color="$mutedForeground" textTransform="uppercase">
         {label}
-      </Text>
+      </TamaguiText>
     </YStack>
   )
 }

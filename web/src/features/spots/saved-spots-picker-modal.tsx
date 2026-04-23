@@ -22,32 +22,13 @@ export function SavedSpotsPickerModal({
 
     useEffect(() => {
         if (!isOpen) return
-
-        let active = true
-
-        const load = async () => {
-            setLoading(true)
-            try {
-                const spots = await getSavedSpots()
-                if (!active) return
-                setSelected(new Set())
-                setSavedSpots(spots.filter((s) => !excludeIds.includes(s.id)))
-            } catch {
-                if (!active) return
-                setSelected(new Set())
-                setSavedSpots([])
-            } finally {
-                if (!active) return
-                setLoading(false)
-            }
-        }
-
-        void load()
-
-        return () => {
-            active = false
-        }
-    }, [excludeIds, isOpen])
+        setSelected(new Set())
+        setLoading(true)
+        getSavedSpots()
+            .then((spots) => setSavedSpots(spots.filter((s) => !excludeIds.includes(s.id))))
+            .catch(() => setSavedSpots([]))
+            .finally(() => setLoading(false))
+    }, [isOpen])
 
     if (!isOpen) return null
 
@@ -76,7 +57,7 @@ export function SavedSpotsPickerModal({
             }}
         >
             <div
-                onClick={(e: { stopPropagation: () => void }) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 style={{
                     background: '#fff', borderRadius: 16, padding: 24,
                     width: '100%', maxWidth: 480, maxHeight: '80vh',

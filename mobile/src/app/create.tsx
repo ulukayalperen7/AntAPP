@@ -17,11 +17,8 @@ type StopEntry = {
   customTitle: string
 }
 
-let tempIdCounter = 0
-
 function generateTempId() {
-  tempIdCounter += 1
-  return `mobile-stop-${tempIdCounter}`
+  return Math.random().toString(36).slice(2)
 }
 
 function emptyStop(): StopEntry {
@@ -82,13 +79,13 @@ function SpotSearchInput({
         alignItems="center"
         gap="$2"
       >
-        <Feather name="search" size={16} color="#6B7B8A" />
+        <Feather name="search" size={16} color="var(--color-mutedForeground, #999)" />
         <TextInput
           value={query}
           onChangeText={setQuery}
           placeholder="Search spots by name..."
-          placeholderTextColor="#6B7B8A"
-          style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: '#0F1720' }}
+          placeholderTextColor="var(--color-mutedForeground, #999)"
+          style={{ flex: 1, paddingVertical: 12, fontSize: 14, color: 'inherit' }}
         />
         {loading ? <ActivityIndicator size="small" /> : null}
       </XStack>
@@ -114,7 +111,7 @@ function SpotSearchInput({
               borderTopColor="$borderColor"
               pressStyle={{ backgroundColor: '$muted' }}
             >
-              <Feather name="map-pin" size={16} color="#005696" />
+              <Feather name="map-pin" size={16} color="var(--color-primary)" />
               <YStack flex={1}>
                 <Text variant="label">{spot.name}</Text>
                 {spot.description ? (
@@ -297,7 +294,7 @@ export default function CreateScreen() {
                         borderColor="$primary200"
                       >
                         <XStack gap="$2" alignItems="center" flex={1}>
-                          <Feather name="map-pin" size={14} color="#005696" />
+                          <Feather name="map-pin" size={14} color="var(--color-primary)" />
                           <Text variant="label" weight="semibold" numberOfLines={1} flex={1}>{stop.customTitle || stop.spotName}</Text>
                         </XStack>
                         <Button variant="ghost" size="sm" onPress={() => handleClearStop(idx)}>
@@ -322,7 +319,7 @@ export default function CreateScreen() {
                         cursor="pointer"
                         onPress={() => setAddingStopIndex(idx)}
                       >
-                        <Feather name="search" size={14} color="#6B7B8A" />
+                        <Feather name="search" size={14} color="var(--color-mutedForeground, #999)" />
                         <Text variant="caption" muted>Tap to search for a spot</Text>
                       </XStack>
                     )}
@@ -330,7 +327,7 @@ export default function CreateScreen() {
 
                   {stops.length > 2 ? (
                     <XStack paddingTop="$1" cursor="pointer" onPress={() => handleRemoveStop(stop.id)} padding="$2">
-                      <Feather name="trash-2" size={16} color="#DC2626" />
+                      <Feather name="trash-2" size={16} color="var(--color-error500, #DC2626)" />
                     </XStack>
                   ) : null}
                 </XStack>

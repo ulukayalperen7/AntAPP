@@ -116,6 +116,7 @@ function ResetPasswordForm() {
                 loading={isPending}
                 disabled={isPending || !email || !token}
                 icon={<Lock size={16} color="#fff" />}
+                // @ts-ignore — web-only HTML type attribute
                 htmlType="submit"
               >
                 Set New Password

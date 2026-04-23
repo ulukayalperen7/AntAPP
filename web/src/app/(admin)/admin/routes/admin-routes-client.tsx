@@ -92,7 +92,7 @@ export default function AdminRoutesClient({
 
                         {routes.map((route) => {
                             // Map numeric enum to string if backend returned standard JSON integers
-                            const rawType = route.contentType as string | number | string[];
+                            const rawType = route.contentType as any;
                             const contentTypeStr = Array.isArray(rawType)
                                 ? rawType[0]
                                 : (rawType === 1 || rawType === '1' ? 'Official' : (rawType === 2 || rawType === '2' ? 'Sponsored' : 'Community'));

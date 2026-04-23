@@ -407,7 +407,7 @@ export default function BusinessSpotsClient({
               <Text variant="label" color="$mutedForeground">Name *</Text>
               <Input
                 value={createForm.name}
-                onChangeText={(value: string) => setCreateForm((prev) => ({ ...prev, name: value }))}
+                onChangeText={(value) => setCreateForm((prev) => ({ ...prev, name: value }))}
                 variant="outline"
                 size="md"
                 placeholder="e.g. Cliffside Breakfast Terrace"
@@ -418,10 +418,11 @@ export default function BusinessSpotsClient({
               <Text variant="label" color="$mutedForeground">Description</Text>
               <Input
                 value={createForm.description}
-                onChangeText={(value: string) => setCreateForm((prev) => ({ ...prev, description: value }))}
+                onChangeText={(value) => setCreateForm((prev) => ({ ...prev, description: value }))}
                 variant="outline"
                 size="md"
                 placeholder="Tell visitors why this stop matters"
+                // @ts-ignore multiline web
                 multiline
                 numberOfLines={4}
               />
@@ -431,7 +432,7 @@ export default function BusinessSpotsClient({
               <Text variant="label" color="$mutedForeground">Photo URL</Text>
               <Input
                 value={createForm.photoUrl}
-                onChangeText={(value: string) => setCreateForm((prev) => ({ ...prev, photoUrl: value }))}
+                onChangeText={(value) => setCreateForm((prev) => ({ ...prev, photoUrl: value }))}
                 variant="outline"
                 size="md"
                 placeholder="https://..."
@@ -444,7 +445,7 @@ export default function BusinessSpotsClient({
                 <Text variant="label" color="$mutedForeground">Latitude *</Text>
                 <Input
                   value={createForm.latitude}
-                  onChangeText={(value: string) => setCreateForm((prev) => ({ ...prev, latitude: value }))}
+                  onChangeText={(value) => setCreateForm((prev) => ({ ...prev, latitude: value }))}
                   variant="outline"
                   size="md"
                   placeholder="36.8841"
@@ -454,7 +455,7 @@ export default function BusinessSpotsClient({
                 <Text variant="label" color="$mutedForeground">Longitude *</Text>
                 <Input
                   value={createForm.longitude}
-                  onChangeText={(value: string) => setCreateForm((prev) => ({ ...prev, longitude: value }))}
+                  onChangeText={(value) => setCreateForm((prev) => ({ ...prev, longitude: value }))}
                   variant="outline"
                   size="md"
                   placeholder="30.7056"
@@ -581,7 +582,7 @@ export default function BusinessSpotsClient({
                               <Text variant="label" color="$mutedForeground">Name *</Text>
                               <Input
                                 value={editForm.name}
-                                onChangeText={(value: string) => setEditForm((prev) => ({ ...prev, name: value }))}
+                                onChangeText={(value) => setEditForm((prev) => ({ ...prev, name: value }))}
                                 variant="outline"
                                 size="md"
                               />
@@ -591,9 +592,10 @@ export default function BusinessSpotsClient({
                               <Text variant="label" color="$mutedForeground">Description</Text>
                               <Input
                                 value={editForm.description}
-                                onChangeText={(value: string) => setEditForm((prev) => ({ ...prev, description: value }))}
+                                onChangeText={(value) => setEditForm((prev) => ({ ...prev, description: value }))}
                                 variant="outline"
                                 size="md"
+                                // @ts-ignore multiline web
                                 multiline
                                 numberOfLines={4}
                               />
@@ -603,7 +605,7 @@ export default function BusinessSpotsClient({
                               <Text variant="label" color="$mutedForeground">Photo URL</Text>
                               <Input
                                 value={editForm.photoUrl}
-                                onChangeText={(value: string) => setEditForm((prev) => ({ ...prev, photoUrl: value }))}
+                                onChangeText={(value) => setEditForm((prev) => ({ ...prev, photoUrl: value }))}
                                 variant="outline"
                                 size="md"
                                 autoCapitalize="none"
@@ -615,7 +617,7 @@ export default function BusinessSpotsClient({
                                 <Text variant="label" color="$mutedForeground">Latitude *</Text>
                                 <Input
                                   value={editForm.latitude}
-                                  onChangeText={(value: string) => setEditForm((prev) => ({ ...prev, latitude: value }))}
+                                  onChangeText={(value) => setEditForm((prev) => ({ ...prev, latitude: value }))}
                                   variant="outline"
                                   size="md"
                                 />
@@ -624,7 +626,7 @@ export default function BusinessSpotsClient({
                                 <Text variant="label" color="$mutedForeground">Longitude *</Text>
                                 <Input
                                   value={editForm.longitude}
-                                  onChangeText={(value: string) => setEditForm((prev) => ({ ...prev, longitude: value }))}
+                                  onChangeText={(value) => setEditForm((prev) => ({ ...prev, longitude: value }))}
                                   variant="outline"
                                   size="md"
                                 />

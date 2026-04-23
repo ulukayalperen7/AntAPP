@@ -1,47 +1,60 @@
-import React from 'react'
-import { HStack as BaseHStack, VStack as BaseVStack, YStack } from '../style-system'
+import { styled, GetProps, YStack, XStack } from 'tamagui'
 
-export const VStack = BaseVStack
-export type VStackProps = React.ComponentProps<typeof VStack>
+export const VStack = styled(YStack, {
+  name: 'VStack',
+})
 
-export const HStack = BaseHStack
-export type HStackProps = React.ComponentProps<typeof HStack>
+export type VStackProps = GetProps<typeof VStack>
 
-export function Center(props: React.ComponentProps<typeof YStack>) {
-  return <YStack flex={1} alignItems="center" justifyContent="center" {...props} />
-}
+export const HStack = styled(XStack, {
+  name: 'HStack',
+  alignItems: 'center',
+})
 
-export type CenterProps = React.ComponentProps<typeof Center>
+export type HStackProps = GetProps<typeof HStack>
 
-export function Container(props: React.ComponentProps<typeof YStack>) {
-  return (
-    <YStack
-      width="100%"
-      maxWidth={1120}
-      marginHorizontal="auto"
-      paddingHorizontal="$4"
-      alignSelf="center"
-      {...props}
-    />
-  )
-}
+export const Center = styled(YStack, {
+  name: 'Center',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+})
 
-export type ContainerProps = React.ComponentProps<typeof Container>
+export type CenterProps = GetProps<typeof Center>
 
-export function Divider({
-  orientation = 'horizontal',
-  ...props
-}: React.ComponentProps<typeof YStack> & {
-  orientation?: 'horizontal' | 'vertical'
-}) {
-  return (
-    <YStack
-      backgroundColor="$borderColor"
-      width={orientation === 'horizontal' ? '100%' : 1}
-      height={orientation === 'horizontal' ? 1 : '100%'}
-      {...props}
-    />
-  )
-}
+export const Container = styled(YStack, {
+  name: 'Container',
+  width: '100%',
+  maxWidth: 960,
+  marginHorizontal: 'auto',
+  paddingHorizontal: '$4',
+  alignSelf: 'center',
+})
 
-export type DividerProps = React.ComponentProps<typeof Divider>
+export type ContainerProps = GetProps<typeof Container>
+
+export const Divider = styled(YStack, {
+  name: 'Divider',
+  height: 1,
+  width: '100%',
+  backgroundColor: '$borderColor',
+
+  variants: {
+    orientation: {
+      horizontal: {
+        height: 1,
+        width: '100%',
+      },
+      vertical: {
+        height: '100%',
+        width: 1,
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    orientation: 'horizontal',
+  },
+})
+
+export type DividerProps = GetProps<typeof Divider>

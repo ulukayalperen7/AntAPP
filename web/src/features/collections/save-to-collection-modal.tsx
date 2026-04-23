@@ -88,7 +88,7 @@ export function SaveToCollectionModal({
             }}
         >
             <div
-                onClick={(e: { stopPropagation: () => void }) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 style={{
                     background: '#fff', borderRadius: 16, padding: 24,
                     width: '100%', maxWidth: 440, maxHeight: '80vh',

@@ -112,7 +112,7 @@ function CollectionCard({
           style={{ boxShadow: '0 4px 12px rgba(234, 88, 12, 0.36)' }}
           hoverStyle={{ backgroundColor: '#C2410C' }}
           pressStyle={{ scale: 0.96 }}
-          onPress={(e: { stopPropagation?: () => void }) => {
+          onPress={(e) => {
             stopEventPropagation(e)
             onDeleteRequest(collection)
           }}

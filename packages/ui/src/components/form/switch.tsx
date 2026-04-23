@@ -1,63 +1,46 @@
 import React from 'react'
-import { Switch as NativeSwitch } from 'react-native'
-import { Text, XStack, YStack, isWeb, useAntId, useTheme } from '../../style-system'
+import { Switch as TamaguiSwitch, GetProps, XStack, Label, YStack, Paragraph } from 'tamagui'
 
-export type SwitchProps = {
+export type SwitchProps = Omit<GetProps<typeof TamaguiSwitch>, 'id'> & {
   id?: string
   label?: string
   hint?: string
   error?: string
-  checked?: boolean
-  disabled?: boolean
-  onCheckedChange?: (checked: boolean) => void
 }
 
-export function Switch({
-  id,
-  label,
-  hint,
-  error,
-  checked = false,
-  disabled = false,
-  onCheckedChange,
-}: SwitchProps) {
-  const switchId = id ?? useAntId('switch')
-  const theme = useTheme()
-
-  if (isWeb) {
-    return (
-      <YStack gap="$1">
-        <label htmlFor={switchId} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: disabled ? 'not-allowed' : 'pointer' }}>
-          <input
-            id={switchId}
-            type="checkbox"
-            checked={checked}
-            disabled={disabled}
-            style={{ accentColor: theme.primary }}
-            onChange={(event) => onCheckedChange?.(event.target.checked)}
-          />
-          {label ? <Text>{label}</Text> : null}
-        </label>
-        {hint && !error ? <Text variant="caption" muted>{hint}</Text> : null}
-        {error ? <Text variant="caption" color="$destructive">{error}</Text> : null}
-      </YStack>
-    )
-  }
+export function Switch({ id, label, hint, error, ...rest }: SwitchProps) {
+  const switchId = id ?? `switch-${Math.random().toString(36).slice(2)}`
 
   return (
     <YStack gap="$1">
       <XStack alignItems="center" gap="$3">
-        <NativeSwitch
-          value={checked}
-          disabled={disabled}
-          onValueChange={(nextValue) => onCheckedChange?.(nextValue)}
-          trackColor={{ false: theme.borderColor, true: theme.primary }}
-          thumbColor={theme.backgroundStrong}
-        />
-        {label ? <Text>{label}</Text> : null}
+        <TamaguiSwitch
+          id={switchId}
+          size="$3"
+          backgroundColor="$muted"
+          borderColor="$borderColor"
+          {...rest}
+        >
+          <TamaguiSwitch.Thumb
+            backgroundColor="$backgroundStrong"
+          />
+        </TamaguiSwitch>
+        {label && (
+          <Label htmlFor={switchId} fontSize="$4" color="$color" cursor="pointer">
+            {label}
+          </Label>
+        )}
       </XStack>
-      {hint && !error ? <Text variant="caption" muted>{hint}</Text> : null}
-      {error ? <Text variant="caption" color="$destructive">{error}</Text> : null}
+      {hint && !error && (
+        <Paragraph size="$3" color="$mutedForeground">
+          {hint}
+        </Paragraph>
+      )}
+      {error && (
+        <Paragraph size="$3" color="$destructive">
+          {error}
+        </Paragraph>
+      )}
     </YStack>
   )
 }

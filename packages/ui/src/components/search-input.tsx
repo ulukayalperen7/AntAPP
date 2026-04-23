@@ -1,16 +1,48 @@
 import React from 'react'
-import { XStack, YStack } from '../style-system'
-import { Input, type InputProps } from './input'
+import { styled, GetProps, XStack, YStack, Input as TamaguiInput } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
+
+const SearchFrame = styled(XStack, {
+  alignItems: 'center',
+  borderRadius: '$full',
+  borderWidth: 1,
+  borderColor: '$borderColor',
+  backgroundColor: '$backgroundStrong',
+  paddingHorizontal: '$3',
+  gap: '$2',
+
+  focusWithinStyle: {
+    borderColor: '$primary',
+  },
+
+  variants: {
+    size: {
+      sm: { height: '$3' },
+      md: { height: '$4' },
+      lg: { height: '$5' },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+const SearchInputField = styled(TamaguiInput, {
+  flex: 1,
+  fontFamily: '$body',
+  fontSize: '$4',
+  backgroundColor: 'transparent',
+  borderWidth: 0,
+  color: '$color',
+  placeholderTextColor: '$placeholderColor',
+  outlineWidth: 0,
+  focusStyle: { outlineWidth: 0 },
+})
 
 type SearchInputSize = 'sm' | 'md' | 'lg'
 
-const HEIGHTS = {
-  sm: 44,
-  md: 52,
-  lg: 58,
-} as const
-
-export type SearchInputProps = Omit<InputProps, 'size'> & {
+export type SearchInputProps = Omit<GetProps<typeof SearchInputField>, 'size'> & {
   size?: SearchInputSize
   icon?: React.ReactNode
   iconAfter?: React.ReactNode
@@ -40,35 +72,14 @@ function DefaultSearchIcon() {
   )
 }
 
-export function SearchInput({ size = 'md', icon, iconAfter, ...props }: SearchInputProps) {
+export function SearchInput({ size = 'md', icon, iconAfter, ...rest }: SearchInputProps) {
+  const { rest: inputRest, accessibilityProps } = splitAccessibilityProps(rest)
+
   return (
-    <XStack
-      alignItems="center"
-      borderRadius="$4"
-      borderWidth={1}
-      borderColor="$borderColor"
-      backgroundColor="$backgroundStrong"
-      paddingHorizontal="$4"
-      gap="$2"
-      minHeight={HEIGHTS[size]}
-      boxShadow="0 2px 6px rgba(15, 23, 42, 0.04)"
-      focusWithinStyle={{
-        borderColor: '$primary',
-        boxShadow: '0 0 0 4px rgba(0, 86, 150, 0.10)',
-      }}
-    >
+    <SearchFrame size={size}>
       {icon ?? <DefaultSearchIcon />}
-      <Input
-        flex={1}
-        size={size}
-        variant="filled"
-        borderWidth={0}
-        backgroundColor="transparent"
-        paddingHorizontal={0}
-        minHeight={0}
-        {...props}
-      />
+      <SearchInputField {...accessibilityProps} {...inputRest} />
       {iconAfter}
-    </XStack>
+    </SearchFrame>
   )
 }

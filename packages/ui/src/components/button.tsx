@@ -1,72 +1,103 @@
 import React from 'react'
-import { Spinner, Text, XStack, isWeb, useTheme } from '../style-system'
+import { styled, GetProps, XStack, Text as TamaguiText, Spinner, useTheme } from 'tamagui'
+import { splitAccessibilityProps } from './accessibility-props'
+
+const ButtonFrame = styled(XStack, {
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '$2',
+  borderWidth: 1,
+  borderRadius: '$3',
+  cursor: 'pointer',
+
+  variants: {
+    size: {
+      sm: { height: '$3', paddingHorizontal: '$3' },
+      md: { height: '$4', paddingHorizontal: '$4' },
+      lg: { height: '$5', paddingHorizontal: '$5' },
+    },
+    variant: {
+      solid: {
+        backgroundColor: '$primary',
+        borderColor: '$primary',
+        pressStyle: { backgroundColor: '$primaryPress', borderColor: '$primaryPress' },
+        hoverStyle: { backgroundColor: '$primaryHover', borderColor: '$primaryHover' },
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        borderColor: '$borderColor',
+        pressStyle: { backgroundColor: '$backgroundPress' },
+        hoverStyle: { backgroundColor: '$backgroundHover', borderColor: '$borderColorHover' },
+      },
+      ghost: {
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        pressStyle: { backgroundColor: '$backgroundPress' },
+        hoverStyle: { backgroundColor: '$backgroundHover' },
+      },
+      link: {
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        paddingHorizontal: 0,
+        paddingVertical: 0,
+        height: 'auto',
+        pressStyle: { opacity: 0.7 },
+        hoverStyle: { opacity: 0.85 },
+      },
+    },
+    disabled: {
+      true: {
+        opacity: 0.5,
+        pointerEvents: 'none',
+        cursor: 'not-allowed',
+      },
+    },
+    loading: {
+      true: {
+        pointerEvents: 'none',
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'md',
+    variant: 'solid',
+  },
+})
+
+const ButtonLabel = styled(TamaguiText, {
+  fontFamily: '$body',
+  fontWeight: '600',
+  userSelect: 'none',
+
+  variants: {
+    variant: {
+      solid: { color: '$backgroundStrong' },
+      outline: { color: '$primary' },
+      ghost: { color: '$primary' },
+      link: { color: '$primary' },
+    },
+    size: {
+      sm: { fontSize: '$4' },
+      md: { fontSize: '$5' },
+      lg: { fontSize: '$6' },
+    },
+  } as const,
+
+  defaultVariants: {
+    variant: 'solid',
+    size: 'md',
+  },
+})
 
 type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'link'
 type ButtonSize = 'sm' | 'md' | 'lg'
 
-const SIZE_STYLES = {
-  sm: { minHeight: 42, paddingHorizontal: '$3.5', fontSize: '$4', borderRadius: '$3' },
-  md: { minHeight: 50, paddingHorizontal: '$4', fontSize: '$5', borderRadius: '$4' },
-  lg: { minHeight: 56, paddingHorizontal: '$5', fontSize: '$5', borderRadius: '$4' },
-} as const
-
-const VARIANT_STYLES = {
-  solid: {
-    backgroundColor: '$primary',
-    borderColor: '$primary',
-    boxShadow: '0 18px 34px -22px rgba(0, 86, 150, 0.72)',
-    hoverStyle: {
-      backgroundColor: '$primaryHover',
-      borderColor: '$primaryHover',
-      boxShadow: '0 22px 38px -24px rgba(0, 86, 150, 0.78)',
-    },
-    pressStyle: {
-      backgroundColor: '$primaryPress',
-      borderColor: '$primaryPress',
-      boxShadow: '0 12px 22px -18px rgba(0, 86, 150, 0.55)',
-      scale: 0.992,
-    },
-  },
-  outline: {
-    backgroundColor: '$backgroundStrong',
-    borderColor: '$borderColor',
-    boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
-    hoverStyle: {
-      backgroundColor: '$primary50',
-      borderColor: '$primary200',
-    },
-    pressStyle: {
-      backgroundColor: '$backgroundHover',
-      borderColor: '$borderColorHover',
-    },
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    borderColor: 'transparent',
-    hoverStyle: { backgroundColor: '$backgroundHover' },
-    pressStyle: { backgroundColor: '$backgroundPress', scale: 0.995 },
-  },
-  link: {
-    backgroundColor: 'transparent',
-    borderColor: 'transparent',
-    hoverStyle: { opacity: 0.82 },
-    pressStyle: { opacity: 0.68 },
-  },
-} as const
-
-const LABEL_COLORS = {
-  solid: '$backgroundStrong',
-  outline: '$primary',
-  ghost: '$primary',
-  link: '$primary',
-} as const
-
-export type ButtonProps = React.ComponentProps<typeof XStack> & {
+export type ButtonProps = Omit<GetProps<typeof ButtonFrame>, 'variant'> & {
   variant?: ButtonVariant
   size?: ButtonSize
   loading?: boolean
-  htmlType?: 'button' | 'submit' | 'reset'
-  color?: string
+  color?: any
   icon?: React.ReactNode
   iconAfter?: React.ReactNode
   children?: React.ReactNode
@@ -80,49 +111,51 @@ export function Button({
   disabled = false,
   variant = 'solid',
   size = 'md',
-  htmlType,
   color,
+  accessibilityLabel,
+  accessibilityRole,
+  role,
+  'aria-label': ariaLabel,
   ...rest
 }: ButtonProps) {
   const theme = useTheme()
+  const spinnerColor =
+    variant === 'solid'
+      ? (theme.backgroundStrong?.get() ?? '#FFFFFF')
+      : (theme.primary?.get() ?? '#EA580C')
+
   const isDisabled = disabled || loading
-  const labelColor = color ?? LABEL_COLORS[variant]
-  const spinnerColor = variant === 'solid' ? theme.backgroundStrong : theme.primary
+  const { rest: buttonRest, accessibilityProps } = splitAccessibilityProps(
+    {
+      ...rest,
+      role,
+      accessibilityRole,
+      accessibilityLabel,
+      'aria-label': ariaLabel,
+    },
+    { defaultRole: 'button' },
+  )
 
   return (
-    <XStack
-      as={isWeb ? 'button' : undefined}
-      type={isWeb ? (htmlType ?? 'button') : undefined}
-      alignItems="center"
-      justifyContent="center"
-      gap="$2"
-      borderWidth={variant === 'link' ? 0 : 1}
-      borderRadius={SIZE_STYLES[size].borderRadius}
-      cursor={isDisabled ? 'not-allowed' : 'pointer'}
-      opacity={isDisabled ? 0.56 : 1}
+    <ButtonFrame
+      variant={variant}
+      size={size}
       disabled={isDisabled}
-      pointerEvents={isDisabled ? 'none' : undefined}
-      minHeight={variant === 'link' ? undefined : SIZE_STYLES[size].minHeight}
-      paddingHorizontal={variant === 'link' ? 0 : SIZE_STYLES[size].paddingHorizontal}
-      paddingVertical={variant === 'link' ? 0 : size === 'lg' ? '$3' : '$2.5'}
-      userSelect="none"
-      whiteSpace="nowrap"
-      {...VARIANT_STYLES[variant]}
-      {...rest}
+      loading={loading}
+      {...accessibilityProps}
+      {...buttonRest}
     >
-      {loading ? <Spinner size="small" color={spinnerColor} /> : icon}
-      {children != null ? (
-        <Text
-          variant="label"
-          fontSize={SIZE_STYLES[size].fontSize}
-          weight="semibold"
-          color={labelColor}
-          userSelect="none"
-        >
+      {loading ? (
+        <Spinner size="small" color={spinnerColor} />
+      ) : (
+        icon
+      )}
+      {children != null && (
+        <ButtonLabel variant={variant} size={size} color={color}>
           {children}
-        </Text>
-      ) : null}
-      {!loading ? iconAfter : null}
-    </XStack>
+        </ButtonLabel>
+      )}
+      {!loading && iconAfter}
+    </ButtonFrame>
   )
 }

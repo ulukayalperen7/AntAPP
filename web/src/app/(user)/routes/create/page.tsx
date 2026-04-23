@@ -15,11 +15,8 @@ type StopEntry = {
   customDescription: string
 }
 
-let tempIdCounter = 0
-
 function generateTempId() {
-  tempIdCounter += 1
-  return `web-stop-${tempIdCounter}`
+  return Math.random().toString(36).slice(2)
 }
 
 export default function CreateRoutePage() {
@@ -143,6 +140,7 @@ export default function CreateRoutePage() {
             variant="outline"
             size="md"
             placeholder="Describe your route..."
+            // @ts-ignore — multiline works on web
             multiline
             numberOfLines={3}
           />
@@ -228,7 +226,7 @@ export default function CreateRoutePage() {
                     <Text variant="caption" color="$mutedForeground">Custom Title (optional)</Text>
                     <Input
                       value={stop.customTitle}
-                      onChangeText={(v: string) => updateStop(stop.id, 'customTitle', v)}
+                      onChangeText={(v) => updateStop(stop.id, 'customTitle', v)}
                       variant="outline"
                       size="md"
                       placeholder="Override spot name..."

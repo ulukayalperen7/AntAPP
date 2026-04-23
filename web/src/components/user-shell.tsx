@@ -27,6 +27,7 @@ export function UserShell({
       />
       <YStack
         flex={1}
+        // @ts-ignore web transition
         style={{ marginLeft: sidebarWidth, transition: 'margin-left 200ms ease' }}
         $md={{ marginLeft: 0 }}
       >
