@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
             <YStack gap="$1">
               <Text variant="heading3">Forgot Password</Text>
               <Text variant="body" muted>
-                Enter your email and we'll send you a reset link.
+                Enter your email and we&apos;ll send you a reset link.
               </Text>
             </YStack>
 
@@ -93,7 +93,6 @@ export default function ForgotPasswordPage() {
                 loading={isPending}
                 disabled={isPending}
                 icon={<Mail size={16} color="#fff" />}
-                // @ts-ignore — web-only HTML type attribute
                 htmlType="submit"
               >
                 Send Reset Link

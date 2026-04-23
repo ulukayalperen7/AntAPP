@@ -221,7 +221,7 @@ export default function ProfileScreen() {
                   onPress={() => router.push('/create')}
                   pressStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
                 >
-                  <Feather name="plus-circle" size={24} color="var(--color-primary)" />
+                  <Feather name="plus-circle" size={24} color="#005696" />
                   <Text variant="label" color="$primary">Create Route</Text>
                 </YStack>
               </YStack>
@@ -239,7 +239,7 @@ export default function ProfileScreen() {
                 onPress={() => router.push('/create')}
                 pressStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
               >
-                <Feather name="plus-circle" size={32} color="var(--color-primary)" />
+                <Feather name="plus-circle" size={32} color="#005696" />
                 <YStack alignItems="center" gap="$1">
                   <Text variant="label" color="$primary">Create Route</Text>
                   <Text variant="body" muted>Share your latest adventure</Text>

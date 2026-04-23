@@ -2,8 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { YStack, XStack, Text, Avatar, Divider } from '@antapp/ui'
-import { useTheme } from 'tamagui'
+import { YStack, XStack, Text, Avatar, Divider, useTheme } from '@antapp/ui'
 import { Globe, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -29,7 +28,7 @@ export function AppSidebar({
 }) {
   const pathname = usePathname()
   const theme = useTheme()
-  const activeNavIconColor = theme.primary?.get() ?? '#EA580C'
+  const activeNavIconColor = theme.primary ?? '#005696'
   const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH
 
   return (

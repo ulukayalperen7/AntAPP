@@ -224,7 +224,7 @@ export default function AdminSpotsClient({
                                 <Input
                                     placeholder="Enter spot name"
                                     value={formData.name || ''}
-                                    onChangeText={(text) => setFormData({ ...formData, name: text })}
+                                    onChangeText={(text: string) => setFormData({ ...formData, name: text })}
                                 />
                             </YStack>
 
@@ -233,7 +233,7 @@ export default function AdminSpotsClient({
                                 <Input
                                     placeholder="Enter description"
                                     value={formData.description || ''}
-                                    onChangeText={(text) => setFormData({ ...formData, description: text })}
+                                    onChangeText={(text: string) => setFormData({ ...formData, description: text })}
                                     numberOfLines={3}
                                     multiline
                                 />
@@ -244,7 +244,7 @@ export default function AdminSpotsClient({
                                 <Input
                                     placeholder="https://example.com/photo.jpg"
                                     value={formData.photoUrl || ''}
-                                    onChangeText={(text) => setFormData({ ...formData, photoUrl: text })}
+                                    onChangeText={(text: string) => setFormData({ ...formData, photoUrl: text })}
                                 />
                             </YStack>
 
@@ -255,7 +255,7 @@ export default function AdminSpotsClient({
                                         type="number"
                                         placeholder="36.8848"
                                         value={formData.latitude?.toString() || ''}
-                                        onChangeText={(text) => setFormData({ ...formData, latitude: parseFloat(text) || 0 })}
+                                        onChangeText={(text: string) => setFormData({ ...formData, latitude: parseFloat(text) || 0 })}
                                     />
                                 </YStack>
                                 <YStack gap="$1" flex={1}>
@@ -264,7 +264,7 @@ export default function AdminSpotsClient({
                                         type="number"
                                         placeholder="30.7040"
                                         value={formData.longitude?.toString() || ''}
-                                        onChangeText={(text) => setFormData({ ...formData, longitude: parseFloat(text) || 0 })}
+                                        onChangeText={(text: string) => setFormData({ ...formData, longitude: parseFloat(text) || 0 })}
                                     />
                                 </YStack>
                             </XStack>

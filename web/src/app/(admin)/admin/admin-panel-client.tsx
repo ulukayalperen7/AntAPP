@@ -574,7 +574,7 @@ export default function AdminPanelClient({
                     <Text variant="label" color="$mutedForeground">Name *</Text>
                     <Input
                       value={collectionForm.name}
-                      onChangeText={(value) => setCollectionForm((prev) => ({ ...prev, name: value }))}
+                      onChangeText={(value: string) => setCollectionForm((prev) => ({ ...prev, name: value }))}
                       variant="outline"
                       size="md"
                     />
@@ -584,10 +584,9 @@ export default function AdminPanelClient({
                     <Text variant="label" color="$mutedForeground">Description</Text>
                     <Input
                       value={collectionForm.description}
-                      onChangeText={(value) => setCollectionForm((prev) => ({ ...prev, description: value }))}
+                      onChangeText={(value: string) => setCollectionForm((prev) => ({ ...prev, description: value }))}
                       variant="outline"
                       size="md"
-                      // @ts-ignore multiline web
                       multiline
                       numberOfLines={4}
                     />
@@ -597,7 +596,7 @@ export default function AdminPanelClient({
                     <Text variant="label" color="$mutedForeground">Thumbnail URL</Text>
                     <Input
                       value={collectionForm.thumbnailUrl}
-                      onChangeText={(value) => setCollectionForm((prev) => ({ ...prev, thumbnailUrl: value }))}
+                      onChangeText={(value: string) => setCollectionForm((prev) => ({ ...prev, thumbnailUrl: value }))}
                       variant="outline"
                       size="md"
                       autoCapitalize="none"

@@ -73,7 +73,7 @@ export default function SettingsScreen() {
           {/* Profile Section */}
           <YStack backgroundColor="$backgroundStrong" borderRadius="$4" padding="$5" gap="$4" borderWidth={1} borderColor="$borderColor">
             <XStack alignItems="center" gap="$3">
-              <Feather name="user" size={20} color="var(--color-primary)" />
+              <Feather name="user" size={20} color="#005696" />
               <Text variant="heading4">Profile Information</Text>
             </XStack>
 
@@ -104,7 +104,7 @@ export default function SettingsScreen() {
                 <Feather
                   name={profileFeedback.ok ? 'check-circle' : 'alert-circle'}
                   size={16}
-                  color={profileFeedback.ok ? 'var(--color-success500, #22C55E)' : 'var(--color-error500, #DC2626)'}
+                  color={profileFeedback.ok ? '#16A34A' : '#DC2626'}
                 />
                 <Text variant="caption" color={profileFeedback.ok ? '$success500' : '$error500'}>
                   {profileFeedback.message}
@@ -127,7 +127,7 @@ export default function SettingsScreen() {
           {/* Password Section */}
           <YStack backgroundColor="$backgroundStrong" borderRadius="$4" padding="$5" gap="$4" borderWidth={1} borderColor="$borderColor">
             <XStack alignItems="center" gap="$3">
-              <Feather name="lock" size={20} color="var(--color-primary)" />
+              <Feather name="lock" size={20} color="#005696" />
               <Text variant="heading4">Change Password</Text>
             </XStack>
 
@@ -176,7 +176,7 @@ export default function SettingsScreen() {
                 <Feather
                   name={passwordFeedback.ok ? 'check-circle' : 'alert-circle'}
                   size={16}
-                  color={passwordFeedback.ok ? 'var(--color-success500, #22C55E)' : 'var(--color-error500, #DC2626)'}
+                  color={passwordFeedback.ok ? '#16A34A' : '#DC2626'}
                 />
                 <Text variant="caption" color={passwordFeedback.ok ? '$success500' : '$error500'}>
                   {passwordFeedback.message}

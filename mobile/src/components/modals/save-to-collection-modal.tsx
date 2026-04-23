@@ -131,7 +131,7 @@ export function SaveToCollectionModal({ visible, routeId, onClose }: Props) {
               {/* Create new collection */}
               <YStack gap="$3" padding="$4" backgroundColor="$backgroundStrong" borderRadius="$4" borderWidth={1} borderColor="$borderColor">
                 <XStack alignItems="center" gap="$2">
-                  <Feather name="plus-circle" size={16} color="var(--color-primary)" />
+                  <Feather name="plus-circle" size={16} color="#005696" />
                   <Text variant="heading4">New Collection</Text>
                 </XStack>
                 <XStack gap="$2" alignItems="center">
@@ -158,7 +158,7 @@ export function SaveToCollectionModal({ visible, routeId, onClose }: Props) {
               <YStack gap="$2">
                 {collections.length === 0 ? (
                   <YStack padding="$5" alignItems="center" gap="$2">
-                    <Feather name="folder" size={32} color="var(--color-mutedForeground, #999)" />
+                    <Feather name="folder" size={32} color="#6B7B8A" />
                     <Text variant="body" muted>No collections yet</Text>
                   </YStack>
                 ) : (
@@ -186,7 +186,7 @@ export function SaveToCollectionModal({ visible, routeId, onClose }: Props) {
                           <Feather
                             name={col.isDefault ? 'bookmark' : 'folder'}
                             size={16}
-                            color={saved ? 'var(--color-primary)' : 'var(--color-mutedForeground, #999)'}
+                            color={saved ? '#005696' : '#6B7B8A'}
                           />
                         </XStack>
                         <YStack flex={1} gap="$0.5">

@@ -8,19 +8,20 @@ import { getRouteDetail, RouteDetailViewModel } from '@/features/admin/routes-ac
 
 function decodePolyline(encoded: string): [number, number][] {
     if (!encoded) return [];
-    let poly: [number, number][] = [];
-    let index = 0, len = encoded.length;
+    const poly: [number, number][] = [];
+    let index = 0;
+    const len = encoded.length;
     let lat = 0, lng = 0;
 
     while (index < len) {
         let b, shift = 0, result = 0;
         do { result |= ((b = encoded.charCodeAt(index++) - 63) & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-        let dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+        const dlat = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
         lat += dlat;
 
         shift = 0; result = 0;
         do { result |= ((b = encoded.charCodeAt(index++) - 63) & 0x1f) << shift; shift += 5; } while (b >= 0x20);
-        let dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
+        const dlng = ((result & 1) !== 0 ? ~(result >> 1) : (result >> 1));
         lng += dlng;
 
         poly.push([lng / 1e5, lat / 1e5]);

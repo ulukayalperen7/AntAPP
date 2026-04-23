@@ -1,3 +1,4 @@
+import { Theme } from '@antapp/ui'
 import { requireAuth } from '@/features/auth/guard'
 
 export default async function AdminLayout({
@@ -6,5 +7,5 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   await requireAuth('/admin')
-  return <>{children}</>
+  return <Theme name="admin">{children}</Theme>
 }

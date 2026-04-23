@@ -456,7 +456,7 @@ export default function RouteEditClient({
                 <Text variant="label" color="$mutedForeground">Custom Title</Text>
                 <Input
                   value={newStop.customTitle}
-                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customTitle: value }))}
+                  onChangeText={(value: string) => setNewStop((prev) => ({ ...prev, customTitle: value }))}
                   variant="outline"
                   size="md"
                   placeholder="Optional name override"
@@ -467,7 +467,7 @@ export default function RouteEditClient({
                 <Text variant="label" color="$mutedForeground">Custom Description</Text>
                 <Input
                   value={newStop.customDescription}
-                  onChangeText={(value) => setNewStop((prev) => ({ ...prev, customDescription: value }))}
+                  onChangeText={(value: string) => setNewStop((prev) => ({ ...prev, customDescription: value }))}
                   variant="outline"
                   size="md"
                   placeholder="Optional description override"
@@ -590,7 +590,7 @@ export default function RouteEditClient({
                         <Text variant="label" color="$mutedForeground">Custom Title</Text>
                         <Input
                           value={stop.customTitle ?? ''}
-                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customTitle', value)}
+                          onChangeText={(value: string) => handleStopFieldChange(stop.id, 'customTitle', value)}
                           variant="outline"
                           size="md"
                           placeholder={stop.name}
@@ -601,7 +601,7 @@ export default function RouteEditClient({
                         <Text variant="label" color="$mutedForeground">Custom Description</Text>
                         <Input
                           value={stop.customDescription ?? ''}
-                          onChangeText={(value) => handleStopFieldChange(stop.id, 'customDescription', value)}
+                          onChangeText={(value: string) => handleStopFieldChange(stop.id, 'customDescription', value)}
                           variant="outline"
                           size="md"
                           placeholder={stop.description ?? 'Optional description override'}

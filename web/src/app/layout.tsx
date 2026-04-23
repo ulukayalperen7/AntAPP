@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import { TamaguiProvider } from '../providers/tamagui-provider'
+import { AntUiProvider } from '../providers/ant-ui-provider'
 import './globals.css'
-import './tamagui.generated.css'
 
 export const metadata: Metadata = {
   title: 'AntAPP',
-  description: 'AntAPP',
+  description: 'AntAPP — route planning and discovery platform',
 }
 
 export default function RootLayout({
@@ -16,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="tr" suppressHydrationWarning>
       <body>
-        <TamaguiProvider>{children}</TamaguiProvider>
+        <AntUiProvider>{children}</AntUiProvider>
       </body>
     </html>
   )

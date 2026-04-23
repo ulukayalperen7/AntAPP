@@ -17,7 +17,7 @@ function SpotCard({
   spot: SpotListItem
   onPress: () => void
   isSaved: boolean
-  onToggleSave: (e: any) => void
+  onToggleSave: (e: { stopPropagation?: () => void }) => void
 }) {
   return (
     <YStack
@@ -120,18 +120,21 @@ export default function SpotsClient({
     })
   }, [])
 
-  const fetchSavedSpotIds = useCallback(async () => {
-    try {
-      const saved = await getSavedSpots()
-      setSavedSpotIds(new Set(saved.map((s) => s.id)))
-    } catch {
-      // Ignored
+  useEffect(() => {
+    let active = true
+
+    getSavedSpots()
+      .then((saved) => {
+        if (!active) return
+        setSavedSpotIds(new Set(saved.map((s) => s.id)))
+      })
+      .catch(() => {
+      })
+
+    return () => {
+      active = false
     }
   }, [])
-
-  useEffect(() => {
-    fetchSavedSpotIds()
-  }, [fetchSavedSpotIds])
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -141,8 +144,8 @@ export default function SpotsClient({
     return () => window.clearTimeout(timeout)
   }, [fetchSpots, query, viewMode])
 
-  const handleToggleSave = async (e: any, spotId: string) => {
-    e.stopPropagation()
+  const handleToggleSave = async (e: { stopPropagation?: () => void }, spotId: string) => {
+    e.stopPropagation?.()
     try {
       const isNowSaved = await toggleSpotFavorite(spotId)
 

@@ -140,7 +140,7 @@ export default function ExploreScreen() {
               padding="$6"
               gap="$3"
             >
-              <Feather name="map" size={36} color="var(--color-mutedForeground, #999)" />
+              <Feather name="map" size={36} color="#6B7B8A" />
               <Text variant="heading4" muted>No routes found</Text>
               <Text variant="body" muted align="center">
                 Try adjusting the search term or filters.

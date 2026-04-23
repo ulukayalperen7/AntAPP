@@ -150,7 +150,7 @@ cp mobile/.env.example mobile/.env.local
 
 ## Gotchas
 
-- `packages/ui/src/tamagui.config.ts` → use `defaultConfig` (not `config`)
+- `@antapp/ui` kendi style-system kullanır, `tamagui` package'ı yüklenmez
 - `web/src/proxy.ts` → Next.js 16 middleware file is `proxy.ts`, exported function must be named `proxy`
 - CORS uses `WithOrigins("http://localhost:3000")` — `AllowAnyOrigin()` cannot be combined with `AllowCredentials()`
 - `appsettings.Development.json` is gitignored — new devs must create it from the `.example` file

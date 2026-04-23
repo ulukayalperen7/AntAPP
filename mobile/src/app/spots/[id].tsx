@@ -52,7 +52,7 @@ function SpotRatingWidget({
             <Feather
               name="star"
               size={24}
-              color={score <= active ? '#FF8C00' : 'var(--color-mutedForeground, #999)'}
+              color={score <= active ? '#FF8C00' : '#6B7B8A'}
             />
           </XStack>
         ))}
@@ -217,7 +217,7 @@ export default function SpotDetailScreen() {
               borderColor="$borderColor"
             >
               <XStack alignItems="center" gap="$2">
-                <Feather name="map-pin" size={16} color="var(--color-primary)" />
+                <Feather name="map-pin" size={16} color="#005696" />
                 <Text variant="heading4">Location</Text>
               </XStack>
               <YStack
@@ -229,7 +229,7 @@ export default function SpotDetailScreen() {
                 height={120}
                 gap="$2"
               >
-                <Feather name="map" size={28} color="var(--color-mutedForeground, #999)" />
+                <Feather name="map" size={28} color="#6B7B8A" />
                 <Text variant="caption" muted>Map — Coming Soon</Text>
                 <Text variant="caption" muted>
                   {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
@@ -274,7 +274,7 @@ export default function SpotDetailScreen() {
                 alignItems="center"
                 gap="$2"
               >
-                <Feather name="map" size={28} color="var(--color-mutedForeground, #999)" />
+                <Feather name="map" size={28} color="#6B7B8A" />
                 <Text variant="body" muted>No routes include this spot yet.</Text>
               </YStack>
             ) : (
@@ -302,7 +302,7 @@ export default function SpotDetailScreen() {
                       justifyContent="center"
                       flexShrink={0}
                     >
-                      <Feather name="navigation" size={16} color="var(--color-primary)" />
+                      <Feather name="navigation" size={16} color="#005696" />
                     </YStack>
                     <YStack flex={1} gap="$1">
                       <Text variant="heading4" numberOfLines={1}>{route.title}</Text>
@@ -316,7 +316,7 @@ export default function SpotDetailScreen() {
                         </XStack>
                       ) : null}
                     </YStack>
-                    <Feather name="chevron-right" size={16} color="var(--color-mutedForeground, #999)" />
+                    <Feather name="chevron-right" size={16} color="#6B7B8A" />
                   </XStack>
                 ))}
               </YStack>
@@ -356,7 +356,7 @@ export default function SpotDetailScreen() {
           loading={isTogglingFavorite}
           disabled={isTogglingFavorite}
           onPress={handleToggleFavorite}
-          icon={<Feather name="heart" size={18} color={isFavorite ? 'var(--color-primary)' : '#FFFFFF'} />}
+          icon={<Feather name="heart" size={18} color={isFavorite ? '#005696' : '#FFFFFF'} />}
         >
           {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
         </Button>

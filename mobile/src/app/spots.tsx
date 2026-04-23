@@ -46,7 +46,7 @@ function SpotCard({
         flexShrink={0}
         overflow="hidden"
       >
-        <Feather name="map-pin" size={22} color="var(--color-primary)" />
+        <Feather name="map-pin" size={22} color="#005696" />
       </YStack>
 
       <YStack flex={1} gap="$1.5">
@@ -69,7 +69,7 @@ function SpotCard({
       <XStack
         padding="$2"
         cursor="pointer"
-        onPress={(e) => {
+        onPress={(e: any) => {
           e.stopPropagation?.()
           if (!isToggling) onToggleFavorite()
         }}
@@ -79,7 +79,7 @@ function SpotCard({
         <Feather
           name="heart"
           size={20}
-          color={isFavorite ? '#EF4444' : 'var(--color-mutedForeground, #999)'}
+          color={isFavorite ? '#EF4444' : '#6B7B8A'}
         />
       </XStack>
     </XStack>
@@ -217,7 +217,7 @@ export default function SpotsScreen() {
         gap="$3"
       >
         <XStack alignItems="center" gap="$2">
-          <Feather name="compass" size={16} color="var(--color-primary)" />
+          <Feather name="compass" size={16} color="#005696" />
           <Text variant="caption" color="$primary">SPOTS DIRECTORY</Text>
         </XStack>
         <Text variant="heading2">Discover destinations</Text>
@@ -238,18 +238,18 @@ export default function SpotsScreen() {
             gap="$2"
             opacity={viewMode === 'saved' ? 0.5 : 1}
           >
-            <Feather name="search" size={14} color="var(--color-mutedForeground, #999)" />
+            <Feather name="search" size={14} color="#6B7B8A" />
             <TextInput
               value={search}
               onChangeText={handleSearchChange}
               placeholder="Search spots..."
-              placeholderTextColor="var(--color-mutedForeground, #999)"
-              style={{ flex: 1, paddingVertical: 10, fontSize: 14, color: 'inherit' }}
+              placeholderTextColor="#6B7B8A"
+              style={{ flex: 1, paddingVertical: 10, fontSize: 14, color: '#0F1720' }}
               editable={viewMode === 'all'}
             />
             {search && viewMode === 'all' ? (
               <XStack cursor="pointer" onPress={() => handleSearchChange('')} padding="$1">
-                <Feather name="x" size={12} color="var(--color-mutedForeground, #999)" />
+                <Feather name="x" size={12} color="#6B7B8A" />
               </XStack>
             ) : null}
           </XStack>
@@ -267,7 +267,7 @@ export default function SpotsScreen() {
               variant={viewMode === 'saved' ? 'solid' : 'ghost'}
               size="sm"
               onPress={() => handleViewModeChange('saved')}
-              icon={<Feather name="heart" size={12} color={viewMode === 'saved' ? '#FFFFFF' : 'var(--color-primary)'} />}
+              icon={<Feather name="heart" size={12} color={viewMode === 'saved' ? '#FFFFFF' : '#005696'} />}
             >
               Saved
             </Button>
@@ -298,7 +298,7 @@ export default function SpotsScreen() {
       alignItems="center"
       gap="$3"
     >
-      <Feather name="map-pin" size={36} color="var(--color-mutedForeground, #999)" />
+      <Feather name="map-pin" size={36} color="#6B7B8A" />
       <Text variant="heading4" muted>
         {viewMode === 'saved'
           ? 'No saved spots yet'

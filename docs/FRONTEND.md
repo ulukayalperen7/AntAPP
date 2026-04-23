@@ -1,4 +1,4 @@
-# AntAPP Frontend — Tamagui Design System Rehberi
+# AntAPP Frontend — UI Design System Rehberi
 
 > Bu doküman hem frontend geliştiriciler için pratik rehber, hem de AI agent'lar için bağlam kaynağıdır.
 > UI'ye dokunmadan önce bu dosyayı oku.
@@ -47,8 +47,6 @@ packages/ui/src/
 ├── themes.ts                  ← light/dark + sub-theme'ler
 ├── fonts.ts                   ← Web font stack (react-native import YOK)
 ├── fonts.native.ts            ← Native font stack (Metro otomatik seçer)
-├── tamagui.config.ts          ← Ana config (defaultConfig extend)
-├── tamagui-config.d.ts        ← TamaguiCustomConfig tip augmentation
 ├── index.ts                   ← Tüm export'lar buradan
 └── components/
     ├── button.tsx
@@ -190,12 +188,11 @@ Komponentlerde **hardcoded hex renk kullanılmaz**. Her zaman tema değişkenler
 ### Tema Değerini Okuma (runtime)
 
 ```tsx
-import { useTheme } from 'tamagui'
+import { useTheme } from '@antapp/ui'
 
 function MyComponent() {
   const theme = useTheme()
-  // .get() — web'de CSS var yerine gerçek değeri döner
-  const primaryColor = theme.primary?.get() ?? '#EA580C'
+  const primaryColor = theme.primary?.get() ?? '#005696'
 }
 ```
 
@@ -279,16 +276,6 @@ const MyView = styled(YStack, {
   $sm: { padding: '$2' },
   $xs: { padding: '$1' },
 })
-```
-
-Kullanım (hook ile):
-```tsx
-import { useMedia } from 'tamagui'
-
-function MyComponent() {
-  const media = useMedia()
-  return <Text>{media.sm ? 'Mobil' : 'Masaüstü'}</Text>
-}
 ```
 
 ---
@@ -434,13 +421,8 @@ Compound komponent — `Card.Header`, `Card.Content`, `Card.Footer` alt komponen
 </AntSelect>
 ```
 
-### Tamagui Primitive'leri (doğrudan kullanım)
-
-`@antapp/ui`'den `export * from 'tamagui'` yapıldığı için tüm Tamagui primitive'leri de erişilebilir:
-
-```tsx
-import { YStack, XStack, ZStack, Sheet, Dialog, ScrollView } from '@antapp/ui'
-// veya doğrudan tamagui'den de alınabilir — ikisi de kabul edilir
+// @antapp/ui style-system primitive'leri
+import { YStack, XStack, ZStack, ScrollView } from '@antapp/ui'
 ```
 
 ---
@@ -458,7 +440,7 @@ packages/ui/src/components/avatar.tsx
 **2. `styled()` ile yaz — hardcoded renk yok, her zaman semantic token:**
 
 ```tsx
-import { styled, GetProps, XStack, Text as TamaguiText } from 'tamagui'
+import { styled, GetProps, XStack, Text as TamaguiText } from '@antapp/ui'
 
 const AvatarFrame = styled(XStack, {
   alignItems: 'center',
@@ -573,7 +555,7 @@ type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
 ### Tema Key'i Değiştirmek
 
-Tema key'ini değiştirmek tüm komponentleri etkiler. `themes.ts`'teki `BaseTheme` tipini ve `light`/`dark` objelerini güncelle. Ardından `tamagui-config.d.ts` otomatik olarak yeni tipleri alır (import `tamaguiConfig`'den).
+Tema key'ini değiştirmek tüm komponentleri etkiler. `themes.ts`'teki `BaseTheme` tipini ve `light`/`dark` objelerini güncelle.
 
 ---
 
@@ -643,7 +625,7 @@ Web'de ilgili layout'a ekle:
 
 ```tsx
 // web/src/app/(support)/layout.tsx
-import { Theme } from 'tamagui'
+import { Theme } from '@antapp/ui'
 
 export default function SupportLayout({ children }) {
   return <Theme name="support">{children}</Theme>
@@ -660,7 +642,7 @@ Her web panelinin layout'u kendi tema sub-theme'ini uygular:
 
 ```tsx
 // web/src/app/(user)/layout.tsx
-import { Theme } from 'tamagui'
+import { Theme } from '@antapp/ui'
 
 export default function UserLayout({ children }) {
   return <Theme name="user">{children}</Theme>
@@ -669,6 +651,8 @@ export default function UserLayout({ children }) {
 
 ```tsx
 // web/src/app/(business)/layout.tsx
+import { Theme } from '@antapp/ui'
+
 export default function BusinessLayout({ children }) {
   return <Theme name="business">{children}</Theme>
 }
@@ -676,6 +660,8 @@ export default function BusinessLayout({ children }) {
 
 ```tsx
 // web/src/app/(admin)/layout.tsx
+import { Theme } from '@antapp/ui'
+
 export default function AdminLayout({ children }) {
   return <Theme name="admin">{children}</Theme>
 }
@@ -687,12 +673,12 @@ Root provider `defaultTheme="light"` kullanır. Dark mode toggle `NextThemeProvi
 
 ## 14. Mobile Kullanımı
 
-### TamaguiProvider
+### AntThemeProvider
 
 `mobile/src/app/_layout.tsx` — `defaultTheme` `useColorScheme`'den gelir:
 
 ```tsx
-<TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? 'light'}>
+<AntThemeProvider defaultTheme={colorScheme ?? 'light'}>
 ```
 
 ### Import Kuralı
@@ -704,7 +690,7 @@ import { YStack, XStack } from '@antapp/ui'
 
 // ❌ Yanlış
 import { View, Text, StyleSheet } from 'react-native'
-import { Button } from 'tamagui'  // tamagui'den direkt alınmaz, @antapp/ui'den alınır
+import { Button } from '@antapp/ui'  // @antapp/ui'den alınır
 ```
 
 ### `fonts.native.ts` Güncelleme
@@ -756,7 +742,7 @@ export { ProfileScreen } from './screens/profile/profile-screen'
 ```
 
 Shared screen'ler:
-- Yalnızca `@antapp/ui` ve `tamagui`'den import yapar
+- Yalnızca `@antapp/ui`'den import yapar
 - Platform-specific API (cookies, secure-store, server actions) kullanmaz
 - Navigasyon için `solito/link` veya prop callback kullanır
 
@@ -803,24 +789,6 @@ const color = theme.primary?.get() ?? '#EA580C'
 
 // react-native primitive'leri — asla (fonts.native.ts hariç)
 import { View, Text, StyleSheet, Pressable } from 'react-native'
-
-// Shared wrapper'larda accessibilityLabel/accessibilityRole'u
-// doğrudan XStack/YStack'e yayma — web'de DOM warning üretir
-;<XStack accessibilityLabel="Open menu" accessibilityRole="button" />
-
-// Platform import — sadece fonts.native.ts'te
-import { Platform } from 'react-native'  // ❌ başka dosyada
-// ✅ sadece packages/ui/src/fonts.native.ts'te
-
-// StyleSheet — asla
-const styles = StyleSheet.create({ ... })
-
-// Inline style object — asla Tamagui komponentlerinde
-<YStack style={{ backgroundColor: '#fff' }} />
-
-// tamagui'den direkt komponent (override edilmişleri için)
-import { Button, Text, Card } from 'tamagui'  // ❌
-import { Button, Text, Card } from '@antapp/ui'  // ✅
 ```
 
 ---
@@ -869,8 +837,6 @@ import { Button, Text, Card } from '@antapp/ui'  // ✅
 | Renk ekle/değiştir | `packages/ui/src/tokens.ts` |
 | Tema semantic key güncelle | `packages/ui/src/themes.ts` |
 | Yeni panel teması | `packages/ui/src/themes.ts` |
-| Medya query ekle | `packages/ui/src/tamagui.config.ts` |
-| Shorthand ekle | `packages/ui/src/tamagui.config.ts` |
 | Web font değiştir | `packages/ui/src/fonts.ts` |
 | Native font değiştir | `packages/ui/src/fonts.native.ts` |
 | Yeni komponent | `packages/ui/src/components/*.tsx` + `index.ts` |

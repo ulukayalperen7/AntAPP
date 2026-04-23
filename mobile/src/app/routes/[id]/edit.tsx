@@ -313,7 +313,7 @@ export default function RouteEditScreen() {
                 <Feather
                   name={feedback.ok ? 'check-circle' : 'alert-circle'}
                   size={16}
-                  color={feedback.ok ? 'var(--color-success500, #22C55E)' : 'var(--color-error500, #DC2626)'}
+                  color={feedback.ok ? '#16A34A' : '#DC2626'}
                 />
                 <Text variant="caption" color={feedback.ok ? '$success500' : '$error500'}>{feedback.message}</Text>
               </XStack>
@@ -347,7 +347,7 @@ export default function RouteEditScreen() {
             {/* Add Stop Form */}
             <YStack gap="$3" padding="$3" borderRadius="$4" backgroundColor="$muted" borderWidth={1} borderColor="$borderColor">
               <XStack alignItems="center" gap="$2">
-                <Feather name="plus" size={16} color="var(--color-primary)" />
+                <Feather name="plus" size={16} color="#005696" />
                 <Text variant="heading4">Add Stop</Text>
               </XStack>
 
@@ -384,7 +384,7 @@ export default function RouteEditScreen() {
                 <Feather
                   name={stopFeedback.ok ? 'check-circle' : 'alert-circle'}
                   size={16}
-                  color={stopFeedback.ok ? 'var(--color-success500, #22C55E)' : 'var(--color-error500, #DC2626)'}
+                  color={stopFeedback.ok ? '#16A34A' : '#DC2626'}
                 />
                 <Text variant="caption" color={stopFeedback.ok ? '$success500' : '$error500'}>{stopFeedback.message}</Text>
               </XStack>
@@ -392,7 +392,7 @@ export default function RouteEditScreen() {
 
             {stops.length === 0 ? (
               <YStack padding="$5" borderRadius="$4" borderWidth={1} borderStyle="dashed" borderColor="$borderColor" alignItems="center" gap="$2">
-                <Feather name="map-pin" size={28} color="var(--color-mutedForeground, #999)" />
+                <Feather name="map-pin" size={28} color="#6B7B8A" />
                 <Text variant="heading4">No stops yet</Text>
                 <Text variant="body" muted align="center">Add at least one spot above.</Text>
               </YStack>
@@ -451,7 +451,7 @@ export default function RouteEditScreen() {
                           <Text variant="label" color="$mutedForeground">Custom Title</Text>
                           <Input
                             value={stop.customTitle ?? ''}
-                            onChangeText={(v) => handleStopFieldChange(stop.id, 'customTitle', v)}
+                            onChangeText={(v: string) => handleStopFieldChange(stop.id, 'customTitle', v)}
                             variant="outline"
                             placeholder={stop.name}
                           />
@@ -461,7 +461,7 @@ export default function RouteEditScreen() {
                           <Text variant="label" color="$mutedForeground">Custom Description</Text>
                           <Input
                             value={stop.customDescription ?? ''}
-                            onChangeText={(v) => handleStopFieldChange(stop.id, 'customDescription', v)}
+                            onChangeText={(v: string) => handleStopFieldChange(stop.id, 'customDescription', v)}
                             variant="outline"
                             placeholder={stop.description ?? 'Optional override'}
                             multiline
@@ -510,7 +510,7 @@ export default function RouteEditScreen() {
               gap="$3"
               alignItems="center"
             >
-              <Feather name={isPublic ? 'globe' : 'lock'} size={20} color={isPublic ? 'var(--color-success500, #22C55E)' : 'var(--color-mutedForeground, #999)'} />
+              <Feather name={isPublic ? 'globe' : 'lock'} size={20} color={isPublic ? '#16A34A' : '#6B7B8A'} />
               <YStack flex={1} gap="$0.5">
                 <Text variant="label" weight="semibold">{isPublic ? 'Public' : 'Private'}</Text>
                 <Text variant="caption" muted>

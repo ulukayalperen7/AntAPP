@@ -57,7 +57,7 @@ function RouteRatingWidget({
             <Feather
               name="star"
               size={24}
-              color={score <= active ? '#FF8C00' : 'var(--color-mutedForeground, #999)'}
+              color={score <= active ? '#FF8C00' : '#6B7B8A'}
             />
           </XStack>
         ))}
@@ -297,7 +297,7 @@ export default function RouteDetailScreen() {
                 gap="$2"
               >
                 <XStack alignItems="center" gap="$2">
-                  <Feather name="git-branch" size={16} color="var(--color-primary)" />
+                  <Feather name="git-branch" size={16} color="#005696" />
                   <Text variant="heading4">Fork this route</Text>
                 </XStack>
                 <Text variant="caption" muted>Create your own copy and customize it freely.</Text>

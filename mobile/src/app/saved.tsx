@@ -190,7 +190,7 @@ export default function SavedScreen() {
                 alignItems="center"
                 justifyContent="center"
               >
-                <Feather name="bookmark" size={32} color="var(--color-primary, #005696)" />
+                <Feather name="bookmark" size={32} color="#005696" />
               </XStack>
               <Text variant="heading4" muted>No collections yet</Text>
               <Text variant="body" muted align="center" maxWidth={280}>
