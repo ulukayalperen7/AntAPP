@@ -58,10 +58,12 @@ export function AppSidebar({
           justifyContent={collapsed ? 'center' : 'space-between'}
           gap="$2"
         >
-          <XStack alignItems="center" gap="$2" overflow="hidden">
-            <Image src="/ant-logo.png" alt="" width={32} height={32} style={{ objectFit: 'contain', flexShrink: 0 }} />
-            {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
-          </XStack>
+          <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+            <XStack alignItems="center" gap="$2" overflow="hidden" cursor="pointer" hoverStyle={{ opacity: 0.8 }}>
+              <Image src="/ant-logo.png" alt="" width={32} height={32} style={{ objectFit: 'contain', flexShrink: 0 }} />
+              {!collapsed && <Text variant="heading4" color="$color">AntAPP</Text>}
+            </XStack>
+          </Link>
           {onToggle && !collapsed && (
             <XStack
               cursor="pointer"

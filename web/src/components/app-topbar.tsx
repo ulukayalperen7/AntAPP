@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { XStack, Text, IconButton, Button, Image } from '@antapp/ui'
+import { XStack, Text, IconButton, Button } from '@antapp/ui'
 import { Bell, Plus } from 'lucide-react'
 import { SearchBar } from './search-bar'
 
@@ -20,7 +20,6 @@ export function AppTopBar() {
       <XStack flex={1} alignItems="center" gap="$4">
         <Link href="/dashboard" style={{ textDecoration: 'none' }}>
           <XStack alignItems="center" gap="$2" cursor="pointer" hoverStyle={{ opacity: 0.8 }}>
-            <Image src="/ant-logo.png" alt="AntAPP" width={32} height={32} style={{ objectFit: 'contain' }} />
             <Text variant="heading4" color="$color" display="none" $md={{ display: 'flex' }}>AntAPP</Text>
           </XStack>
         </Link>
