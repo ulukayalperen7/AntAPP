@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, RouteCard, FilterChip } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
@@ -8,26 +8,40 @@ import type { RouteListItem, Tag } from '@/types/api'
 import { Map } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
-// Lazy load map component to reduce initial bundle
+// Lazy load map component - no loading prop to avoid hydration mismatch
 const MapExplorer = dynamic(() => import('@/components/map-explorer'), {
-  loading: () => (
-    <YStack
-      height={260}
-      backgroundColor="$muted"
-      borderRadius="$4"
-      alignItems="center"
-      justifyContent="center"
-      gap="$2"
-      borderWidth={2}
-      borderStyle="dashed"
-      borderColor="$borderColor"
-    >
-      <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
-      <Text variant="body" muted>Loading map...</Text>
-    </YStack>
-  ),
   ssr: false,
 })
+
+// Client-only wrapper with loading state
+function MapExplorerWrapper() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return (
+      <YStack
+        height={260}
+        backgroundColor="$muted"
+        borderRadius="$4"
+        alignItems="center"
+        justifyContent="center"
+        gap="$2"
+        borderWidth={2}
+        borderStyle="dashed"
+        borderColor="$borderColor"
+      >
+        <Map size={48} color="var(--color-mutedForeground)" strokeWidth={1.5} />
+        <Text variant="body" muted>Loading map...</Text>
+      </YStack>
+    )
+  }
+
+  return <MapExplorer />
+}
 
 function routeToCardData(route: RouteListItem): RouteCardData {
   return {
@@ -124,7 +138,7 @@ export default function HomeClient({
         <XStack justifyContent="space-between" alignItems="center">
           <Text variant="heading3">Interactive Route Explorer</Text>
         </XStack>
-        <MapExplorer />
+        <MapExplorerWrapper />
       </YStack>
 
       {/* Popular Routes */}
