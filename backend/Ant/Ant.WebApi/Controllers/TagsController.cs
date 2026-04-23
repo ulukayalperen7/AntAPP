@@ -1,7 +1,9 @@
 using Ant.Application.Features.Tags.Queries.GetAllTags;
 using Ant.Application.Wrappers;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System.Threading.Tasks;
 
 namespace Ant.WebApi.Controllers
@@ -11,6 +13,7 @@ namespace Ant.WebApi.Controllers
     public class TagsController : BaseApiController
     {
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachePolicies.TagsList)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<GetAllTagsViewModel>))]
         public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {

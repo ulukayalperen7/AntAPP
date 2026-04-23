@@ -1,8 +1,10 @@
 using Ant.Application.Features.Tags.Commands.CreateTag;
 using Ant.Application.Features.Tags.Commands.DeleteTagById;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Threading.Tasks;
 
@@ -22,16 +24,20 @@ namespace Ant.WebApi.Controllers.Admin
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Create(CreateTagCommand command)
+        public async Task<IActionResult> Create([FromServices] IOutputCacheStore outputCacheStore, CreateTagCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictTagsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid id, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new DeleteTagByIdCommand { Id = id }));
+            var response = await Mediator.Send(new DeleteTagByIdCommand { Id = id });
+            await OutputCacheTags.EvictTagsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
     }
 }

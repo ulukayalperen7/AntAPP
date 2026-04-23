@@ -1,3 +1,4 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -23,15 +24,18 @@ namespace Ant.Application.Features.RouteStops.Commands.UpdateRouteStop
         private readonly IRouteSpotRepositoryAsync _routeSpotRepository;
         private readonly IRouteRepositoryAsync _routeRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
         public UpdateRouteStopCommandHandler(
             IRouteSpotRepositoryAsync routeSpotRepository,
             IRouteRepositoryAsync routeRepository,
-            IAuthenticatedUserService authenticatedUser)
+            IAuthenticatedUserService authenticatedUser,
+            IAppCacheService cache)
         {
             _routeSpotRepository = routeSpotRepository;
             _routeRepository = routeRepository;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(UpdateRouteStopCommand request, CancellationToken cancellationToken)
@@ -56,6 +60,7 @@ namespace Ant.Application.Features.RouteStops.Commands.UpdateRouteStop
             if (request.CustomPhotoUrl != null) stop.CustomPhotoUrl = request.CustomPhotoUrl;
 
             await _routeSpotRepository.UpdateAsync(stop);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return new Response<Guid>(stop.Id, message: "Stop updated.");
         }
     }

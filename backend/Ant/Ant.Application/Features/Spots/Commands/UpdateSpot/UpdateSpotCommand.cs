@@ -1,4 +1,6 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using MediatR;
@@ -25,10 +27,12 @@ namespace Ant.Application.Features.Spots.Commands.UpdateSpot
     public class UpdateSpotCommandHandler : IRequestHandler<UpdateSpotCommand, Response<Guid>>
     {
         private readonly ISpotRepositoryAsync _spotRepository;
+        private readonly IAppCacheService _cache;
 
-        public UpdateSpotCommandHandler(ISpotRepositoryAsync spotRepository)
+        public UpdateSpotCommandHandler(ISpotRepositoryAsync spotRepository, IAppCacheService cache)
         {
             _spotRepository = spotRepository;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(UpdateSpotCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,8 @@ namespace Ant.Application.Features.Spots.Commands.UpdateSpot
             spot.UpdatedAt = DateTime.UtcNow;
 
             await _spotRepository.UpdateAsync(spot);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
 
             return new Response<Guid>(spot.Id, "Spot has been successfully updated.");
         }

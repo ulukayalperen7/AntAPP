@@ -16,7 +16,6 @@ namespace Ant.Infrastructure.Services
     public class OsrmMapRoutingService : IMapRoutingService
     {
         private readonly HttpClient _httpClient;
-        private const string OsrmBaseUrl = "http://router.project-osrm.org/route/v1/driving";
 
         public OsrmMapRoutingService(HttpClient httpClient)
         {
@@ -34,7 +33,7 @@ namespace Ant.Infrastructure.Services
             var coordinates = string.Join(";", waypoints.Select(w => 
                 $"{w.X.ToString(CultureInfo.InvariantCulture)},{w.Y.ToString(CultureInfo.InvariantCulture)}"));
 
-            var requestUrl = $"{OsrmBaseUrl}/{coordinates}?overview=full&geometries=polyline";
+            var requestUrl = $"route/v1/driving/{coordinates}?overview=full&geometries=polyline";
 
             try
             {

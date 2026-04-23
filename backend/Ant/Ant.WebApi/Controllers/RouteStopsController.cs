@@ -4,9 +4,11 @@ using Ant.Application.Features.RouteStops.Commands.ReorderRouteStops;
 using Ant.Application.Features.RouteStops.Commands.UpdateRouteStop;
 using Ant.Application.Features.RouteStops.Queries.GetRouteStops;
 using Ant.Application.Wrappers;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,44 +31,52 @@ namespace Ant.WebApi.Controllers
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Add(Guid routeId, AddRouteStopCommand command)
+        public async Task<IActionResult> Add(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore, AddRouteStopCommand command)
         {
             command.RouteId = routeId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // PATCH /api/routes/{routeId}/stops/{routeStopId}
         [HttpPatch("{routeStopId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Update(Guid routeId, Guid routeStopId, UpdateRouteStopCommand command)
+        public async Task<IActionResult> Update(Guid routeId, Guid routeStopId, [FromServices] IOutputCacheStore outputCacheStore, UpdateRouteStopCommand command)
         {
             command.RouteId = routeId;
             command.RouteStopId = routeStopId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // DELETE /api/routes/{routeId}/stops/{routeStopId}
         [HttpDelete("{routeStopId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Remove(Guid routeId, Guid routeStopId)
+        public async Task<IActionResult> Remove(Guid routeId, Guid routeStopId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new RemoveRouteStopCommand
+            var response = await Mediator.Send(new RemoveRouteStopCommand
             {
                 RouteId = routeId,
                 RouteStopId = routeStopId
-            }));
+            });
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // PUT /api/routes/{routeId}/stops/reorder
         [HttpPut("reorder")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<string>))]
-        public async Task<IActionResult> Reorder(Guid routeId, [FromBody] ReorderRouteStopsCommand command)
+        public async Task<IActionResult> Reorder(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] ReorderRouteStopsCommand command)
         {
             command.RouteId = routeId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
     }
 }

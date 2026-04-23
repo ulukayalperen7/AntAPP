@@ -4,9 +4,11 @@ using Ant.Application.Features.Spots.Commands.UpdateSpot;
 using Ant.Application.Features.Spots.Queries.GetBusinessSpots;
 using Ant.Application.Features.Spots.Queries.GetSpotById;
 using Ant.Application.Wrappers;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,9 +23,11 @@ namespace Ant.WebApi.Controllers.Business
         // POST /api/business/spots
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Create(CreateSpotCommand command)
+        public async Task<IActionResult> Create([FromServices] IOutputCacheStore outputCacheStore, CreateSpotCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // GET /api/business/spots
@@ -50,23 +54,27 @@ namespace Ant.WebApi.Controllers.Business
         // PATCH /api/business/spots/{spotId}
         [HttpPatch("{spotId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Update(Guid spotId, UpdateSpotCommand command)
+        public async Task<IActionResult> Update(Guid spotId, [FromServices] IOutputCacheStore outputCacheStore, UpdateSpotCommand command)
         {
             command.Id = spotId;
             command.EnforcedOwnerUserId = GetUserId();
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAndSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // DELETE /api/business/spots/{spotId}
         [HttpDelete("{spotId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Delete(Guid spotId)
+        public async Task<IActionResult> Delete(Guid spotId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new DeleteSpotCommand
+            var response = await Mediator.Send(new DeleteSpotCommand
             {
                 Id = spotId,
                 EnforcedOwnerUserId = GetUserId()
-            }));
+            });
+            await OutputCacheTags.EvictRoutesAndSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         private Guid GetUserId() => Guid.Parse(User.FindFirstValue("uid"));

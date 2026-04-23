@@ -1,4 +1,6 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using MediatR;
 using System;
@@ -19,10 +21,12 @@ namespace Ant.Application.Features.Tags.Commands.DeleteTagById
     public class DeleteTagByIdCommandHandler : IRequestHandler<DeleteTagByIdCommand, Guid>
     {
         private readonly ITagRepositoryAsync _tagRepository;
+        private readonly IAppCacheService _cache;
 
-        public DeleteTagByIdCommandHandler(ITagRepositoryAsync tagRepository)
+        public DeleteTagByIdCommandHandler(ITagRepositoryAsync tagRepository, IAppCacheService cache)
         {
             _tagRepository = tagRepository;
+            _cache = cache;
         }
 
         public async Task<Guid> Handle(DeleteTagByIdCommand command, CancellationToken cancellationToken)
@@ -30,6 +34,7 @@ namespace Ant.Application.Features.Tags.Commands.DeleteTagById
             var tag = await _tagRepository.GetByIdAsync(command.Id);
             if (tag == null) throw new ApiException($"Tag Not Found.");
             await _tagRepository.DeleteAsync(tag);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.TagsPrefix, cancellationToken);
             return tag.Id;
         }
     }

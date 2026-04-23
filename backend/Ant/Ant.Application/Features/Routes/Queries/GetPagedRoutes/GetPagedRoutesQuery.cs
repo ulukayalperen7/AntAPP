@@ -1,4 +1,6 @@
 using Ant.Core.Enums;
+using Ant.Application.Common.Caching;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using MediatR;
@@ -46,10 +48,12 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
     public class GetPagedRoutesQueryHandler : IRequestHandler<GetPagedRoutesQuery, PagedResponse<RouteListViewModel>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
+        private readonly IAppCacheService _cache;
 
-        public GetPagedRoutesQueryHandler(IRouteRepositoryAsync routeRepository)
+        public GetPagedRoutesQueryHandler(IRouteRepositoryAsync routeRepository, IAppCacheService cache)
         {
             _routeRepository = routeRepository;
+            _cache = cache;
         }
 
         public async Task<PagedResponse<RouteListViewModel>> Handle(GetPagedRoutesQuery request, CancellationToken cancellationToken)
@@ -64,38 +68,59 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
                 _ => null
             };
 
-            var routes = await _routeRepository.GetPagedRoutesAsync(
-                request.PageNumber, request.PageSize,
-                request.Search, request.TagId, request.TagIds, request.Sort,
-                request.NearLat, request.NearLng, request.RadiusKm,
-                request.AuthorId, request.Visibility, contentType);
+            var cacheKey = AppCacheKeys.RouteList(
+                validFilter.PageNumber,
+                validFilter.PageSize,
+                request.Search,
+                request.TagId,
+                request.TagIds,
+                request.Sort,
+                request.NearLat,
+                request.NearLng,
+                request.RadiusKm,
+                request.AuthorId,
+                request.Visibility,
+                request.Type);
 
-            var totalRecords = await _routeRepository.GetTotalRoutesCountAsync(
-                request.Search, request.TagId, request.TagIds,
-                request.NearLat, request.NearLng, request.RadiusKm,
-                request.AuthorId, request.Visibility, contentType);
+            return await _cache.GetOrCreateAsync(
+                cacheKey,
+                async _ =>
+                {
+                    var routes = await _routeRepository.GetPagedRoutesAsync(
+                        request.PageNumber, request.PageSize,
+                        request.Search, request.TagId, request.TagIds, request.Sort,
+                        request.NearLat, request.NearLng, request.RadiusKm,
+                        request.AuthorId, request.Visibility, contentType);
 
-            var viewModelList = routes.Select(r => new RouteListViewModel
-            {
-                Id = r.Id,
-                Title = r.Title,
-                Description = r.Description,
-                ThumbnailUrl = r.ThumbnailUrl,
-                AuthorUserId = r.AuthorUserId,
-                ContentType = r.ContentType.ToString(),
-                IsPublic = r.IsPublic,
-                CreatedAt = r.CreatedAt,
-                TotalDistanceMeters = r.TotalDistanceMeters,
-                EstimatedDurationSeconds = r.EstimatedDurationSeconds,
-                CenterLatitude = r.CenterLocation != null ? r.CenterLocation.Y : 0,
-                CenterLongitude = r.CenterLocation != null ? r.CenterLocation.X : 0,
-                AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
-            }).ToList();
+                    var totalRecords = await _routeRepository.GetTotalRoutesCountAsync(
+                        request.Search, request.TagId, request.TagIds,
+                        request.NearLat, request.NearLng, request.RadiusKm,
+                        request.AuthorId, request.Visibility, contentType);
 
-            return new PagedResponse<RouteListViewModel>(viewModelList, validFilter.PageNumber, validFilter.PageSize)
-            {
-                TotalRecords = totalRecords
-            };
+                    var viewModelList = routes.Select(r => new RouteListViewModel
+                    {
+                        Id = r.Id,
+                        Title = r.Title,
+                        Description = r.Description,
+                        ThumbnailUrl = r.ThumbnailUrl,
+                        AuthorUserId = r.AuthorUserId,
+                        ContentType = r.ContentType.ToString(),
+                        IsPublic = r.IsPublic,
+                        CreatedAt = r.CreatedAt,
+                        TotalDistanceMeters = r.TotalDistanceMeters,
+                        EstimatedDurationSeconds = r.EstimatedDurationSeconds,
+                        CenterLatitude = r.CenterLocation != null ? r.CenterLocation.Y : 0,
+                        CenterLongitude = r.CenterLocation != null ? r.CenterLocation.X : 0,
+                        AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
+                    }).ToList();
+
+                    return new PagedResponse<RouteListViewModel>(viewModelList, validFilter.PageNumber, validFilter.PageSize)
+                    {
+                        TotalRecords = totalRecords
+                    };
+                },
+                TimeSpan.FromMinutes(2),
+                cancellationToken);
         }
     }
 }

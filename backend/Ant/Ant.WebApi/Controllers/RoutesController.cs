@@ -9,9 +9,11 @@ using Ant.Application.Features.Routes.Queries.GetRouteById;
 using Ant.Application.Features.RouteRatings.Commands.RateRoute;
 using Ant.Application.Features.RouteRatings.Queries.GetRouteRatings;
 using Ant.Application.Wrappers;
+using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +29,7 @@ namespace Ant.WebApi.Controllers
         // GET /api/routes?nearLat=&nearLng=&radiusKm=
         // GET /api/routes?authorId=&visibility=public&type=official|community|sponsored
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachePolicies.RoutesList)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<RouteListViewModel>))]
         public async Task<IActionResult> GetAll(
             [FromQuery] string search = null,
@@ -65,6 +68,7 @@ namespace Ant.WebApi.Controllers
 
         // GET /api/routes/{routeId}
         [HttpGet("{routeId}")]
+        [OutputCache(PolicyName = OutputCachePolicies.RouteDetail)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<GetRouteByIdViewModel>))]
         public async Task<IActionResult> GetById(Guid routeId)
         {
@@ -75,65 +79,79 @@ namespace Ant.WebApi.Controllers
         [HttpPost]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Create([FromBody] CreateRouteCommand command)
+        public async Task<IActionResult> Create([FromServices] IOutputCacheStore outputCacheStore, [FromBody] CreateRouteCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAndSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // PATCH /api/routes/{routeId}
         [HttpPatch("{routeId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Update(Guid routeId, [FromBody] UpdateRouteCommand command)
+        public async Task<IActionResult> Update(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] UpdateRouteCommand command)
         {
             command.Id = routeId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // DELETE /api/routes/{routeId}
         [HttpDelete("{routeId}")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Delete(Guid routeId)
+        public async Task<IActionResult> Delete(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new DeleteRouteCommand { Id = routeId }));
+            var response = await Mediator.Send(new DeleteRouteCommand { Id = routeId });
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // POST /api/routes/{routeId}/fork
         [HttpPost("{routeId}/fork")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Fork(Guid routeId)
+        public async Task<IActionResult> Fork(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new ForkRouteCommand { OriginalRouteId = routeId }));
+            var response = await Mediator.Send(new ForkRouteCommand { OriginalRouteId = routeId });
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // POST /api/routes/{routeId}/publish
         [HttpPost("{routeId}/publish")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Publish(Guid routeId)
+        public async Task<IActionResult> Publish(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new PublishRouteCommand { Id = routeId }));
+            var response = await Mediator.Send(new PublishRouteCommand { Id = routeId });
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // POST /api/routes/{routeId}/unpublish
         [HttpPost("{routeId}/unpublish")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
-        public async Task<IActionResult> Unpublish(Guid routeId)
+        public async Task<IActionResult> Unpublish(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new UnpublishRouteCommand { Id = routeId }));
+            var response = await Mediator.Send(new UnpublishRouteCommand { Id = routeId });
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // PUT /api/routes/{routeId}/rating
         [HttpPut("{routeId}/rating")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Rate(Guid routeId, [FromBody] RateRouteCommand command)
+        public async Task<IActionResult> Rate(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] RateRouteCommand command)
         {
             command.RouteId = routeId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // GET /api/routes/{routeId}/ratings

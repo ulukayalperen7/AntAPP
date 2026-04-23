@@ -1,4 +1,6 @@
 using Ant.Core.Entities;
+using Ant.Application.Common.Caching;
+using Ant.Application.Interfaces;
 using Ant.Application.Wrappers;
 using MediatR;
 using System;
@@ -47,39 +49,45 @@ namespace Ant.Application.Features.Routes.Queries.GetNearbyRoutes
     public class GetNearbyRoutesQueryHandler : IRequestHandler<GetNearbyRoutesQuery, Response<IEnumerable<RouteListNearbyViewModel>>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
+        private readonly IAppCacheService _cache;
 
-        public GetNearbyRoutesQueryHandler(IRouteRepositoryAsync routeRepository)
+        public GetNearbyRoutesQueryHandler(IRouteRepositoryAsync routeRepository, IAppCacheService cache)
         {
             _routeRepository = routeRepository;
+            _cache = cache;
         }
 
         public async Task<Response<IEnumerable<RouteListNearbyViewModel>>> Handle(GetNearbyRoutesQuery request, CancellationToken cancellationToken)
         {
             var validFilter = new Ant.Application.Filters.RequestParameter(request.PageNumber, request.PageSize);
-            
-            var routes = await _routeRepository.GetNearbyRoutesAsync(
-                request.Latitude, 
-                request.Longitude, 
-                request.RadiusInMeters, 
-                validFilter.PageNumber, 
-                validFilter.PageSize);
+            var cacheKey = AppCacheKeys.NearbyRoutes(request.Latitude, request.Longitude, request.RadiusInMeters, validFilter.PageNumber, validFilter.PageSize);
 
-            // Manual mapping
-            var viewModelList = routes.Select(r => new RouteListNearbyViewModel
-            {
-                Id = r.Id,
-                Title = r.Title,
-                Description = r.Description,
-                ThumbnailUrl = r.ThumbnailUrl,
-                AuthorUserId = r.AuthorUserId,
-                CreatedAt = r.CreatedAt,
-                
-                // Dynamically compute the average based on cached aggregates to prevent database overhead.
-                // Math.Round ensures a clean representation like 4.5 for UI stars.
-                AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
-            }).ToList();
+            return await _cache.GetOrCreateAsync(
+                cacheKey,
+                async _ =>
+                {
+                    var routes = await _routeRepository.GetNearbyRoutesAsync(
+                        request.Latitude,
+                        request.Longitude,
+                        request.RadiusInMeters,
+                        validFilter.PageNumber,
+                        validFilter.PageSize);
 
-            return new Response<IEnumerable<RouteListNearbyViewModel>>(viewModelList, message: $"Found {viewModelList.Count} nearby route(s).");
+                    var viewModelList = routes.Select(r => new RouteListNearbyViewModel
+                    {
+                        Id = r.Id,
+                        Title = r.Title,
+                        Description = r.Description,
+                        ThumbnailUrl = r.ThumbnailUrl,
+                        AuthorUserId = r.AuthorUserId,
+                        CreatedAt = r.CreatedAt,
+                        AverageRating = r.RatingCount == 0 ? 0 : Math.Round(r.RatingSum / (double)r.RatingCount, 1)
+                    }).ToList();
+
+                    return new Response<IEnumerable<RouteListNearbyViewModel>>(viewModelList, message: $"Found {viewModelList.Count} nearby route(s).");
+                },
+                TimeSpan.FromMinutes(1),
+                cancellationToken);
         }
     }
 }

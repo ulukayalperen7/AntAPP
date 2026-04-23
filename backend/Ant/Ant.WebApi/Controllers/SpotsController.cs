@@ -7,12 +7,14 @@ using Ant.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Ant.Application.Features.Spots.Commands.ToggleSpotFavorite;
 using Ant.Application.Features.Spots.Queries.GetSavedSpots;
+using Ant.WebApi.Caching;
 
 namespace Ant.WebApi.Controllers
 {
@@ -22,6 +24,7 @@ namespace Ant.WebApi.Controllers
     {
         // GET /api/spots
         [HttpGet]
+        [OutputCache(PolicyName = OutputCachePolicies.SpotsList)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<SpotListViewModel>))]
         public async Task<IActionResult> GetAll(
             [FromQuery] string search = null,
@@ -38,6 +41,7 @@ namespace Ant.WebApi.Controllers
 
         // GET /api/spots/{spotId}
         [HttpGet("{spotId}")]
+        [OutputCache(PolicyName = OutputCachePolicies.SpotDetail)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<SpotDetailViewModel>))]
         public async Task<IActionResult> GetById(Guid spotId)
         {
@@ -46,6 +50,7 @@ namespace Ant.WebApi.Controllers
 
         // GET /api/spots/{spotId}/routes
         [HttpGet("{spotId}/routes")]
+        [OutputCache(PolicyName = OutputCachePolicies.SpotRoutes)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<SpotRouteViewModel>))]
         public async Task<IActionResult> GetRoutes(Guid spotId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
@@ -61,10 +66,12 @@ namespace Ant.WebApi.Controllers
         [HttpPut("{spotId}/rating")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
-        public async Task<IActionResult> Rate(Guid spotId, [FromBody] RateSpotCommand command)
+        public async Task<IActionResult> Rate(Guid spotId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] RateSpotCommand command)
         {
             command.SpotId = spotId;
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         // GET /api/spots/{spotId}/ratings

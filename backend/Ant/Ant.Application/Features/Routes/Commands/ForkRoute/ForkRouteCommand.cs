@@ -1,5 +1,6 @@
 using Ant.Core.Entities;
 using Ant.Core.Enums;
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -22,11 +23,13 @@ namespace Ant.Application.Features.Routes.Commands.ForkRoute
     {
         private readonly IRouteRepositoryAsync _routeRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
-        public ForkRouteCommandHandler(IRouteRepositoryAsync routeRepository, IAuthenticatedUserService authenticatedUser)
+        public ForkRouteCommandHandler(IRouteRepositoryAsync routeRepository, IAuthenticatedUserService authenticatedUser, IAppCacheService cache)
         {
             _routeRepository = routeRepository;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(ForkRouteCommand request, CancellationToken cancellationToken)
@@ -62,6 +65,7 @@ namespace Ant.Application.Features.Routes.Commands.ForkRoute
             };
 
             await _routeRepository.AddAsync(forked);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return new Response<Guid>(forked.Id, message: "Route forked as draft.");
         }
     }

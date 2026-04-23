@@ -1,4 +1,5 @@
 using Ant.Core.Entities;
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -20,15 +21,18 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
         private readonly ISpotRatingRepositoryAsync _ratingRepository;
         private readonly IGenericRepositoryAsync<Spot> _spotRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
         public RateSpotCommandHandler(
             ISpotRatingRepositoryAsync ratingRepository,
             IGenericRepositoryAsync<Spot> spotRepository,
-            IAuthenticatedUserService authenticatedUser)
+            IAuthenticatedUserService authenticatedUser,
+            IAppCacheService cache)
         {
             _ratingRepository = ratingRepository;
             _spotRepository = spotRepository;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Guid> Handle(RateSpotCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,7 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
                 existing.Stars = request.Stars;
                 await _ratingRepository.UpdateAsync(existing);
                 await _spotRepository.UpdateAsync(spot);
+                await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
                 return existing.Id;
             }
 
@@ -69,6 +74,7 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
 
             await _ratingRepository.AddAsync(rating);
             await _spotRepository.UpdateAsync(spot);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
             return rating.Id;
         }
     }

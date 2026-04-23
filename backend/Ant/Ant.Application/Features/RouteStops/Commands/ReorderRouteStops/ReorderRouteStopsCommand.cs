@@ -1,3 +1,4 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -23,17 +24,20 @@ namespace Ant.Application.Features.RouteStops.Commands.ReorderRouteStops
         private readonly IRouteRepositoryAsync _routeRepository;
         private readonly IMapRoutingService _mapRoutingService;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
         public ReorderRouteStopsCommandHandler(
             IRouteSpotRepositoryAsync routeSpotRepository,
             IRouteRepositoryAsync routeRepository,
             IMapRoutingService mapRoutingService,
-            IAuthenticatedUserService authenticatedUser)
+            IAuthenticatedUserService authenticatedUser,
+            IAppCacheService cache)
         {
             _routeSpotRepository = routeSpotRepository;
             _routeRepository = routeRepository;
             _mapRoutingService = mapRoutingService;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Response<string>> Handle(ReorderRouteStopsCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,7 @@ namespace Ant.Application.Features.RouteStops.Commands.ReorderRouteStops
 
             await _routeSpotRepository.ReorderStopsAsync(request.RouteId, request.OrderedStopIds);
             await RecomputeRouteGeometryAsync(request.RouteId, cancellationToken);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return new Response<string>("ok", message: "Stops reordered.");
         }
 

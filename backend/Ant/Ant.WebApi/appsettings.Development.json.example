@@ -43,6 +43,10 @@
     "ApiKey": "YOUR_GOOGLE_MAPS_API_KEY_HERE" 
   },
 
+  "Routing": {
+    "OsrmBaseUrl": "http://router.project-osrm.org/"
+  },
+
   "RouteSettings": {
     "MaxRouteDistanceKm": 50.0 // Ardışık noktalar arası izin verilen maksimum mesafe (km). Bunu aşarsa hata fırlatılır.
   }

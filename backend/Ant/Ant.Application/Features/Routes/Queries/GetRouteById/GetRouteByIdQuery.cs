@@ -1,4 +1,6 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using MediatR;
@@ -66,59 +68,58 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
     public class GetRouteByIdQueryHandler : IRequestHandler<GetRouteByIdQuery, Response<GetRouteByIdViewModel>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
+        private readonly IAppCacheService _cache;
 
-        public GetRouteByIdQueryHandler(IRouteRepositoryAsync routeRepository)
+        public GetRouteByIdQueryHandler(IRouteRepositoryAsync routeRepository, IAppCacheService cache)
         {
             _routeRepository = routeRepository;
+            _cache = cache;
         }
 
         public async Task<Response<GetRouteByIdViewModel>> Handle(GetRouteByIdQuery request, CancellationToken cancellationToken)
         {
-            var route = await _routeRepository.GetRouteWithSpotsAsync(request.Id);
-            
-            if (route == null) throw new ApiException($"Route NOT FOUND.");
-
-            var viewModel = new GetRouteByIdViewModel
-            {
-                Id = route.Id,
-                Title = route.Title,
-                Description = route.Description,
-                ThumbnailUrl = route.ThumbnailUrl,
-                AuthorUserId = route.AuthorUserId,
-                ContentType = route.ContentType,
-                IsPublic = route.IsPublic,
-                
-                EncodedPolyline = route.EncodedPolyline,
-                TotalDistanceMeters = route.TotalDistanceMeters,
-                EstimatedDurationSeconds = route.EstimatedDurationSeconds,
-                CenterLatitude = route.CenterLocation?.Y ?? 0,
-                CenterLongitude = route.CenterLocation?.X ?? 0,
-                
-                // Dynamically compute the average based on cached aggregates to prevent database overhead.
-                // Math.Round ensures a clean representation like 4.5 for UI stars.
-                AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
-                
-                // Map the RouteSpots into the DTO and sort them by the strict SpotOrder!
-                Stops = route.RouteSpots.OrderBy(rs => rs.SpotOrder).Select(rs => new RouteSpotDto
+            return await _cache.GetOrCreateAsync(
+                AppCacheKeys.RouteDetail(request.Id),
+                async _ =>
                 {
-                    SpotId = rs.Spot.Id,
-                    Order = rs.SpotOrder,
-                    
-                    // Business Logic: If the user provided a Custom Title for this route, use it. Otherwise, use the original Spot name.
-                    Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
-                    SpotName = rs.Spot.Name,
-                    CustomTitle = rs.CustomTitle,
-                    Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
-                    PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
-                    
-                    // PostGIS Coordinates mapped to standard doubles for frontend consumption
-                    Latitude = rs.Spot.Location.Y, 
-                    Longitude = rs.Spot.Location.X,
-                    GooglePlaceId = rs.Spot.GooglePlaceId
-                }).ToList()
-            };
+                    var route = await _routeRepository.GetRouteWithSpotsAsync(request.Id);
 
-            return new Response<GetRouteByIdViewModel>(viewModel);
+                    if (route == null) throw new ApiException($"Route NOT FOUND.");
+
+                    var viewModel = new GetRouteByIdViewModel
+                    {
+                        Id = route.Id,
+                        Title = route.Title,
+                        Description = route.Description,
+                        ThumbnailUrl = route.ThumbnailUrl,
+                        AuthorUserId = route.AuthorUserId,
+                        ContentType = route.ContentType,
+                        IsPublic = route.IsPublic,
+                        EncodedPolyline = route.EncodedPolyline,
+                        TotalDistanceMeters = route.TotalDistanceMeters,
+                        EstimatedDurationSeconds = route.EstimatedDurationSeconds,
+                        CenterLatitude = route.CenterLocation?.Y ?? 0,
+                        CenterLongitude = route.CenterLocation?.X ?? 0,
+                        AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
+                        Stops = route.RouteSpots.OrderBy(rs => rs.SpotOrder).Select(rs => new RouteSpotDto
+                        {
+                            SpotId = rs.Spot.Id,
+                            Order = rs.SpotOrder,
+                            Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
+                            SpotName = rs.Spot.Name,
+                            CustomTitle = rs.CustomTitle,
+                            Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
+                            PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
+                            Latitude = rs.Spot.Location.Y,
+                            Longitude = rs.Spot.Location.X,
+                            GooglePlaceId = rs.Spot.GooglePlaceId
+                        }).ToList()
+                    };
+
+                    return new Response<GetRouteByIdViewModel>(viewModel);
+                },
+                TimeSpan.FromMinutes(5),
+                cancellationToken);
         }
     }
 }

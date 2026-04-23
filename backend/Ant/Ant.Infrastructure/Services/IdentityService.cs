@@ -44,28 +44,26 @@ namespace Ant.Infrastructure.Services
         public async Task<IEnumerable<UserIdentityDto>> GetAllUsersAsync()
         {
             var users = await _dbContext.Users.AsNoTracking().ToListAsync();
-            var userRoles = await _dbContext.UserRoles.AsNoTracking().ToListAsync();
-            var roles = await _dbContext.Roles.AsNoTracking().ToListAsync();
+            var roleNamesById = await _dbContext.Roles.AsNoTracking()
+                .ToDictionaryAsync(role => role.Id, role => role.Name);
+            var roleNamesByUserId = await _dbContext.UserRoles.AsNoTracking()
+                .GroupBy(userRole => userRole.UserId)
+                .ToDictionaryAsync(
+                    group => group.Key,
+                    group => group
+                        .Select(userRole => roleNamesById.GetValueOrDefault(userRole.RoleId))
+                        .Where(roleName => !string.IsNullOrWhiteSpace(roleName))
+                        .ToList());
 
-            var userList = new List<UserIdentityDto>(users.Count);
-
-            foreach (var user in users)
+            return users.Select(user => new UserIdentityDto
             {
-                var userRoleIds = userRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId);
-                var userRoleNames = roles.Where(r => userRoleIds.Contains(r.Id)).Select(r => r.Name).ToList();
-
-                userList.Add(new UserIdentityDto
-                {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    IsVerified = user.EmailConfirmed,
-                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
-                    Roles = userRoleNames
-                });
-            }
-
-            return userList;
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                IsVerified = user.EmailConfirmed,
+                IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
+                Roles = roleNamesByUserId.GetValueOrDefault(user.Id) ?? new List<string>()
+            }).ToList();
         }
 
         public async Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)

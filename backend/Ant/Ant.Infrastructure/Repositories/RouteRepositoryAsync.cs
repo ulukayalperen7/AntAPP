@@ -24,6 +24,8 @@ namespace Ant.Infrastructure.Repositories
         public async Task<Route> GetRouteWithSpotsAsync(Guid routeId)
         {
             return await _dbContext.Routes
+                .AsNoTracking()
+                .AsSplitQuery()
                 .Include(r => r.RouteSpots)
                     .ThenInclude(rs => rs.Spot)
                 .Include(r => r.RouteTags)
@@ -73,11 +75,11 @@ namespace Ant.Infrastructure.Repositories
             if (tagIds != null && tagIds.Count > 0)
                 query = query.Where(r => r.RouteTags.Any(rt => tagIds.Contains(rt.TagId)));
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var term = searchTerm.ToLower();
-                query = query.Where(r => r.Title.ToLower().Contains(term)
-                                      || r.Description.ToLower().Contains(term));
+                var pattern = $"%{searchTerm.Trim()}%";
+                query = query.Where(r => EF.Functions.ILike(r.Title, pattern)
+                                      || EF.Functions.ILike(r.Description, pattern));
             }
 
             if (nearLat.HasValue && nearLng.HasValue && radiusKm.HasValue)

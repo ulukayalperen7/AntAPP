@@ -1,4 +1,6 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using MediatR;
@@ -26,10 +28,12 @@ namespace Ant.Application.Features.Spots.Commands.DeleteSpot
     public class DeleteSpotCommandHandler : IRequestHandler<DeleteSpotCommand, Response<Guid>>
     {
         private readonly ISpotRepositoryAsync _spotRepository;
+        private readonly IAppCacheService _cache;
 
-        public DeleteSpotCommandHandler(ISpotRepositoryAsync spotRepository)
+        public DeleteSpotCommandHandler(ISpotRepositoryAsync spotRepository, IAppCacheService cache)
         {
             _spotRepository = spotRepository;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(DeleteSpotCommand request, CancellationToken cancellationToken)
@@ -44,6 +48,8 @@ namespace Ant.Application.Features.Spots.Commands.DeleteSpot
             }
 
             await _spotRepository.DeleteAsync(spot);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
 
             return new Response<Guid>(spot.Id, "Spot has been successfully deleted.");
         }

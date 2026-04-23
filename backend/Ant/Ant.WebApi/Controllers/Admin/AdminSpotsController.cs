@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Ant.Application.Features.Spots.Queries.GetAdminSpots;
 using Ant.Application.Features.Spots.Commands.CreateSpot;
 using Ant.Application.Features.Spots.Commands.UpdateSpot;
 using Ant.Application.Features.Spots.Commands.DeleteSpot;
+using Ant.WebApi.Caching;
 
 namespace Ant.WebApi.Controllers.Admin
 {
@@ -20,25 +22,32 @@ namespace Ant.WebApi.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(CreateSpotCommand command)
+        public async Task<IActionResult> Post([FromServices] IOutputCacheStore outputCacheStore, CreateSpotCommand command)
         {
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(System.Guid id, UpdateSpotCommand command)
+        public async Task<IActionResult> Put(System.Guid id, [FromServices] IOutputCacheStore outputCacheStore, UpdateSpotCommand command)
         {
             if (id != command.Id)
             {
                 return BadRequest();
             }
-            return Ok(await Mediator.Send(command));
+
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAndSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(System.Guid id)
+        public async Task<IActionResult> Delete(System.Guid id, [FromServices] IOutputCacheStore outputCacheStore)
         {
-            return Ok(await Mediator.Send(new DeleteSpotCommand(id)));
+            var response = await Mediator.Send(new DeleteSpotCommand(id));
+            await OutputCacheTags.EvictRoutesAndSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
     }
 }

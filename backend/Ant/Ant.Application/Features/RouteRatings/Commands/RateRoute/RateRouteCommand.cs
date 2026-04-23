@@ -1,4 +1,5 @@
 using Ant.Core.Entities;
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -20,15 +21,18 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
         private readonly IRouteRatingRepositoryAsync _ratingRepository;
         private readonly IGenericRepositoryAsync<Route> _routeRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
         public RateRouteCommandHandler(
             IRouteRatingRepositoryAsync ratingRepository,
             IGenericRepositoryAsync<Route> routeRepository,
-            IAuthenticatedUserService authenticatedUser)
+            IAuthenticatedUserService authenticatedUser,
+            IAppCacheService cache)
         {
             _ratingRepository = ratingRepository;
             _routeRepository = routeRepository;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Guid> Handle(RateRouteCommand request, CancellationToken cancellationToken)
@@ -53,6 +57,7 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
                 existing.Stars = request.Stars;
                 await _ratingRepository.UpdateAsync(existing);
                 await _routeRepository.UpdateAsync(route);
+                await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
                 return existing.Id;
             }
 
@@ -69,6 +74,7 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
 
             await _ratingRepository.AddAsync(rating);
             await _routeRepository.UpdateAsync(route);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return rating.Id;
         }
     }

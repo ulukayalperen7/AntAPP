@@ -2,6 +2,7 @@ using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using Ant.Application.Settings;
+using Ant.Infrastructure.Caching;
 using Ant.Infrastructure.Contexts;
 using Ant.Infrastructure.Models;
 using Ant.Infrastructure.Repositories;
@@ -16,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
+using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 
@@ -43,13 +46,29 @@ namespace Ant.Infrastructure
 
 
 
+            services.AddMemoryCache();
+            services.AddSingleton<IAppCacheService, AppMemoryCacheService>();
+
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             #region Services
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IIdentityService, IdentityService>();
             
             // Use OSRM for map routing
-            services.AddHttpClient<IMapRoutingService, OsrmMapRoutingService>();
+            services.AddHttpClient<IMapRoutingService, OsrmMapRoutingService>(client =>
+            {
+                var osrmBaseUrl = configuration["Routing:OsrmBaseUrl"] ?? "http://router.project-osrm.org/";
+                client.BaseAddress = new Uri(osrmBaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(10);
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+                PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
+                MaxConnectionsPerServer = 20,
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli
+            })
+            .SetHandlerLifetime(TimeSpan.FromMinutes(10));
             #endregion
             services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
             services.AddAuthentication(options =>

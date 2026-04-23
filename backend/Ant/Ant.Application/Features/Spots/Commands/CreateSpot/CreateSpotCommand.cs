@@ -1,3 +1,5 @@
+using Ant.Application.Common.Caching;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using Ant.Application.Wrappers;
 using Ant.Core.Entities;
@@ -23,10 +25,12 @@ namespace Ant.Application.Features.Spots.Commands.CreateSpot
     public class CreateSpotCommandHandler : IRequestHandler<CreateSpotCommand, Response<Guid>>
     {
         private readonly ISpotRepositoryAsync _spotRepository;
+        private readonly IAppCacheService _cache;
 
-        public CreateSpotCommandHandler(ISpotRepositoryAsync spotRepository)
+        public CreateSpotCommandHandler(ISpotRepositoryAsync spotRepository, IAppCacheService cache)
         {
             _spotRepository = spotRepository;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(CreateSpotCommand request, CancellationToken cancellationToken)
@@ -44,7 +48,8 @@ namespace Ant.Application.Features.Spots.Commands.CreateSpot
             };
 
             await _spotRepository.AddAsync(spot);
-            
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
+
             return new Response<Guid>(spot.Id, "Spot has been successfully created.");
         }
     }

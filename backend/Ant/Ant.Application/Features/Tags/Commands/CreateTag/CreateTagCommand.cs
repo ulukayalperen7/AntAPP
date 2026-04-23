@@ -1,4 +1,6 @@
 using Ant.Core.Entities;
+using Ant.Application.Common.Caching;
+using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
 using MediatR;
 using System;
@@ -20,10 +22,12 @@ namespace Ant.Application.Features.Tags.Commands.CreateTag
     public class CreateTagCommandHandler : IRequestHandler<CreateTagCommand, Guid>
     {
         private readonly ITagRepositoryAsync _tagRepository;
+        private readonly IAppCacheService _cache;
 
-        public CreateTagCommandHandler(ITagRepositoryAsync tagRepository)
+        public CreateTagCommandHandler(ITagRepositoryAsync tagRepository, IAppCacheService cache)
         {
             _tagRepository = tagRepository;
+            _cache = cache;
         }
 
         public async Task<Guid> Handle(CreateTagCommand request, CancellationToken cancellationToken)
@@ -36,6 +40,7 @@ namespace Ant.Application.Features.Tags.Commands.CreateTag
             };
 
             await _tagRepository.AddAsync(newTag);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.TagsPrefix, cancellationToken);
             return newTag.Id;
         }
     }

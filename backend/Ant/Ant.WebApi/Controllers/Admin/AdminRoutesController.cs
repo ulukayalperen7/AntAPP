@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Ant.Application.Features.Routes.Queries.GetAdminRoutes;
 using Ant.Application.Features.Routes.Commands.PromoteRoute;
+using Ant.WebApi.Caching;
 using System.Threading.Tasks;
 using System;
 
@@ -25,12 +27,14 @@ namespace Ant.WebApi.Controllers.Admin
         /// Promote a route (Official/Sponsored)
         /// </summary>
         [HttpPut("{id}/promote")]
-        public async Task<IActionResult> Promote(Guid id, [FromBody] PromoteRouteCommand command)
+        public async Task<IActionResult> Promote(Guid id, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] PromoteRouteCommand command)
         {
             if (id != command.Id)
                 return BadRequest();
 
-            return Ok(await Mediator.Send(command));
+            var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
         }
     }
 }

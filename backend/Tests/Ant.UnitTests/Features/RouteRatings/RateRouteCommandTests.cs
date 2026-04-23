@@ -15,6 +15,7 @@ public class RateRouteCommandTests
     private readonly Mock<IRouteRatingRepositoryAsync> _ratingRepoMock;
     private readonly Mock<IGenericRepositoryAsync<Route>> _routeRepoMock;
     private readonly Mock<IAuthenticatedUserService> _authMock;
+    private readonly Mock<IAppCacheService> _cacheMock;
     private readonly RateRouteCommandHandler _handler;
 
     public RateRouteCommandTests()
@@ -22,7 +23,8 @@ public class RateRouteCommandTests
         _ratingRepoMock = new Mock<IRouteRatingRepositoryAsync>();
         _routeRepoMock = new Mock<IGenericRepositoryAsync<Route>>();
         _authMock = new Mock<IAuthenticatedUserService>();
-        _handler = new RateRouteCommandHandler(_ratingRepoMock.Object, _routeRepoMock.Object, _authMock.Object);
+        _cacheMock = new Mock<IAppCacheService>();
+        _handler = new RateRouteCommandHandler(_ratingRepoMock.Object, _routeRepoMock.Object, _authMock.Object, _cacheMock.Object);
     }
 
     [Fact]

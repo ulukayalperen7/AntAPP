@@ -4,6 +4,7 @@ using Ant.Core.Enums;
 using Ant.Application.Interfaces;
 using Ant.Infrastructure;
 using Ant.Infrastructure.Contexts;
+using Ant.WebApi.Caching;
 using Ant.WebApi.Extensions;
 using Ant.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,36 @@ builder.Services.AddControllers()
     });
 builder.Services.AddApiVersioningExtension();
 builder.Services.AddHealthChecks();
+builder.Services.AddOutputCache(options =>
+{
+    options.AddBasePolicy(policy => policy.NoCache());
+    options.AddPolicy(OutputCachePolicies.RoutesList, policy => policy
+        .Expire(TimeSpan.FromMinutes(1))
+        .SetVaryByQuery("search", "tagId", "tagIds", "sort", "nearLat", "nearLng", "radiusKm", "authorId", "visibility", "type", "page", "pageSize")
+        .Tag(OutputCacheTags.Routes));
+    options.AddPolicy(OutputCachePolicies.RouteDetail, policy => policy
+        .Expire(TimeSpan.FromMinutes(2))
+        .SetVaryByRouteValue("routeId")
+        .Tag(OutputCacheTags.Routes));
+    options.AddPolicy(OutputCachePolicies.SpotsList, policy => policy
+        .Expire(TimeSpan.FromMinutes(1))
+        .SetVaryByQuery("search", "page", "pageSize")
+        .Tag(OutputCacheTags.Spots));
+    options.AddPolicy(OutputCachePolicies.SpotDetail, policy => policy
+        .Expire(TimeSpan.FromMinutes(2))
+        .SetVaryByRouteValue("spotId")
+        .Tag(OutputCacheTags.Spots));
+    options.AddPolicy(OutputCachePolicies.SpotRoutes, policy => policy
+        .Expire(TimeSpan.FromMinutes(1))
+        .SetVaryByRouteValue("spotId")
+        .SetVaryByQuery("page", "pageSize")
+        .Tag(OutputCacheTags.Spots)
+        .Tag(OutputCacheTags.Routes));
+    options.AddPolicy(OutputCachePolicies.TagsList, policy => policy
+        .Expire(TimeSpan.FromMinutes(10))
+        .SetVaryByQuery("pageNumber", "pageSize")
+        .Tag(OutputCacheTags.Tags));
+});
 builder.Services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 builder.Services.AddHttpContextAccessor();
 
@@ -69,6 +100,7 @@ app.UseCors(options => options
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());
+app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwaggerExtension();

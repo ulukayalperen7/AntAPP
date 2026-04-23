@@ -15,6 +15,7 @@ public class RateSpotCommandTests
     private readonly Mock<ISpotRatingRepositoryAsync> _ratingRepoMock;
     private readonly Mock<IGenericRepositoryAsync<Spot>> _spotRepoMock;
     private readonly Mock<IAuthenticatedUserService> _authMock;
+    private readonly Mock<IAppCacheService> _cacheMock;
     private readonly RateSpotCommandHandler _handler;
 
     public RateSpotCommandTests()
@@ -22,7 +23,8 @@ public class RateSpotCommandTests
         _ratingRepoMock = new Mock<ISpotRatingRepositoryAsync>();
         _spotRepoMock = new Mock<IGenericRepositoryAsync<Spot>>();
         _authMock = new Mock<IAuthenticatedUserService>();
-        _handler = new RateSpotCommandHandler(_ratingRepoMock.Object, _spotRepoMock.Object, _authMock.Object);
+        _cacheMock = new Mock<IAppCacheService>();
+        _handler = new RateSpotCommandHandler(_ratingRepoMock.Object, _spotRepoMock.Object, _authMock.Object, _cacheMock.Object);
     }
 
     [Fact]

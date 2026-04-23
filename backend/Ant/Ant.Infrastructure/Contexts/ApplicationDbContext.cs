@@ -85,12 +85,16 @@ namespace Ant.Infrastructure.Contexts
                 entity.HasIndex(u => u.UserName).IsUnique();
             });
 
-            // Enable PostGIS for geospatial functionality (Spot.Location)
             builder.HasPostgresExtension("postgis");
+            builder.HasPostgresExtension("pg_trgm");
 
             builder.Entity<Route>(entity =>
             {
                 entity.HasIndex(r => r.CenterLocation).HasMethod("GIST");
+                entity.HasIndex(r => new { r.IsDeleted, r.IsPublic, r.CreatedAt });
+                entity.HasIndex(r => new { r.AuthorUserId, r.CreatedAt });
+                entity.HasIndex(r => r.Title).HasMethod("GIN").HasOperators("gin_trgm_ops");
+                entity.HasIndex(r => r.Description).HasMethod("GIN").HasOperators("gin_trgm_ops");
             });
 
             // Many-to-many: Route <-> Tag (via RouteTag bridge table)
@@ -109,6 +113,11 @@ namespace Ant.Infrastructure.Contexts
                     .WithMany(u => u.OwnedSpots)
                     .HasForeignKey(s => s.OwnerUserId)
                     .OnDelete(DeleteBehavior.SetNull);
+                entity.HasIndex(s => s.Location).HasMethod("GIST");
+                entity.HasIndex(s => new { s.IsActive, s.CreatedAt });
+                entity.HasIndex(s => new { s.OwnerUserId, s.CreatedAt });
+                entity.HasIndex(s => s.Name).HasMethod("GIN").HasOperators("gin_trgm_ops");
+                entity.HasIndex(s => s.Description).HasMethod("GIN").HasOperators("gin_trgm_ops");
             });
 
             builder.Entity<CollectionRoute>()

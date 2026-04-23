@@ -1,3 +1,4 @@
+using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
@@ -18,11 +19,13 @@ namespace Ant.Application.Features.Routes.Commands.UnpublishRoute
     {
         private readonly IRouteRepositoryAsync _routeRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IAppCacheService _cache;
 
-        public UnpublishRouteCommandHandler(IRouteRepositoryAsync routeRepository, IAuthenticatedUserService authenticatedUser)
+        public UnpublishRouteCommandHandler(IRouteRepositoryAsync routeRepository, IAuthenticatedUserService authenticatedUser, IAppCacheService cache)
         {
             _routeRepository = routeRepository;
             _authenticatedUser = authenticatedUser;
+            _cache = cache;
         }
 
         public async Task<Response<Guid>> Handle(UnpublishRouteCommand request, CancellationToken cancellationToken)
@@ -40,6 +43,7 @@ namespace Ant.Application.Features.Routes.Commands.UnpublishRoute
 
             route.IsPublic = false;
             await _routeRepository.UpdateAsync(route);
+            await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return new Response<Guid>(route.Id, message: "Route unpublished (draft).");
         }
     }

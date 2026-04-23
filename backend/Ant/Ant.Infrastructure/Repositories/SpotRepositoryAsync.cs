@@ -28,12 +28,12 @@ namespace Ant.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Spot>> GetPagedSpotsAsync(int pageNumber, int pageSize, string searchTerm = null)
         {
-            var query = _dbContext.Spots.AsNoTracking().Include(s => s.RouteSpots).Where(s => s.IsActive);
+            var query = _dbContext.Spots.AsNoTracking().Where(s => s.IsActive);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var term = searchTerm.ToLower();
-                query = query.Where(s => s.Name.ToLower().Contains(term) || s.Description.ToLower().Contains(term));
+                var pattern = $"%{searchTerm.Trim()}%";
+                query = query.Where(s => EF.Functions.ILike(s.Name, pattern) || EF.Functions.ILike(s.Description, pattern));
             }
 
             return await query
@@ -47,10 +47,10 @@ namespace Ant.Infrastructure.Repositories
         {
             var query = _dbContext.Spots.AsNoTracking().Where(s => s.IsActive);
 
-            if (!string.IsNullOrEmpty(searchTerm))
+            if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                var term = searchTerm.ToLower();
-                query = query.Where(s => s.Name.ToLower().Contains(term) || s.Description.ToLower().Contains(term));
+                var pattern = $"%{searchTerm.Trim()}%";
+                query = query.Where(s => EF.Functions.ILike(s.Name, pattern) || EF.Functions.ILike(s.Description, pattern));
             }
 
             return await query.CountAsync();
