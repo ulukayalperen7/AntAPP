@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Ant.Application.Features.Routes.Commands.AdminDeleteRoute;
 using Ant.Application.Features.Routes.Queries.GetAdminRoutes;
 using Ant.Application.Features.Routes.Commands.PromoteRoute;
 using Ant.WebApi.Caching;
@@ -33,6 +34,17 @@ namespace Ant.WebApi.Controllers.Admin
                 return BadRequest();
 
             var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Delete a route (Admin only, soft delete)
+        /// </summary>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id, [FromServices] IOutputCacheStore outputCacheStore)
+        {
+            var response = await Mediator.Send(new AdminDeleteRouteCommand { Id = id });
             await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
             return Ok(response);
         }

@@ -3,9 +3,9 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
-import { LogOut, ArrowLeft, Star, Map } from 'lucide-react'
+import { LogOut, ArrowLeft, Star, Map, Trash2 } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
-import { promoteRoute } from '@/features/admin/routes-actions'
+import { deleteAdminRoute, promoteRoute } from '@/features/admin/routes-actions'
 import type { RouteListItem } from '@/types/api'
 import { RouteMapModal } from './route-map-modal'
 
@@ -29,6 +29,19 @@ export default function AdminRoutesClient({
             const success = await promoteRoute(id, newType)
             if (success) {
                 setRoutes(prev => prev.map(r => r.id === id ? { ...r, contentType: newType } : r))
+            }
+        })
+    }
+
+    const handleDelete = (id: string) => {
+        if (!window.confirm('Delete this route from the system?')) return
+
+        startTransition(async () => {
+            const success = await deleteAdminRoute(id)
+            if (success) {
+                setRoutes(prev => prev.filter(r => r.id !== id))
+            } else {
+                alert('Failed to delete route.')
             }
         })
     }
@@ -144,6 +157,9 @@ export default function AdminRoutesClient({
                                         {contentTypeStr !== 'Community' && (
                                             <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Community')} disabled={isPending}>Revert</Button>
                                         )}
+                                        <Button size="sm" variant="ghost" onPress={() => handleDelete(route.id)} disabled={isPending} icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}>
+                                            <Text variant="label" color="$error500">Delete</Text>
+                                        </Button>
                                     </XStack>
                                 </XStack>
                             );
