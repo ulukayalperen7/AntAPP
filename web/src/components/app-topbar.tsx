@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { XStack, Text, SearchInput, IconButton, Button } from '@antapp/ui'
+import { XStack, Text, SearchInput, IconButton, Button, Image } from '@antapp/ui'
 import { Bell, Plus, Search } from 'lucide-react'
 
 export function AppTopBar() {
@@ -16,13 +16,21 @@ export function AppTopBar() {
       borderBottomColor="$borderColor"
       gap="$4"
     >
-      <XStack flex={1} maxWidth={640} minWidth={400}>
-        <SearchInput
-          placeholder="Search routes, cities..."
-          size="md"
-          flex={1}
-          icon={<Search size={18} color="var(--color-mutedForeground)" />}
-        />
+      <XStack flex={1} alignItems="center" gap="$4">
+        <Link href="/dashboard" style={{ textDecoration: 'none' }}>
+          <XStack alignItems="center" gap="$2" cursor="pointer">
+            <Image src="/ant-logo.png" alt="AntAPP" width={32} height={32} style={{ objectFit: 'contain' }} />
+            <Text variant="heading4" color="$color">AntAPP</Text>
+          </XStack>
+        </Link>
+        <XStack flex={1} maxWidth={560} minWidth={300}>
+          <SearchInput
+            placeholder="Search routes, cities..."
+            size="md"
+            flex={1}
+            icon={<Search size={18} color="var(--color-mutedForeground)" />}
+          />
+        </XStack>
       </XStack>
 
       <XStack alignItems="center" gap="$3">
