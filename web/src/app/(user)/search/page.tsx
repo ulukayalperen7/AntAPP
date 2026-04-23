@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import { useState, useTransition, useCallback, useEffect, useMemo, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { YStack, XStack, Text, RouteCard, SearchInput, Divider } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { RouteListItem, Tag, RouteContentType, RouteDetail } from '@/types/api'
@@ -90,9 +90,11 @@ function decodePolyline(encoded: string): Array<[number, number]> {
 
 export default function SearchPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
 
-  const [search, setSearch] = useState('')
+  // Initialize search from URL query parameter
+  const [search, setSearch] = useState(() => searchParams.get('q') || '')
   const [activeTagId, setActiveTagId] = useState<string | null>(null)
   const [routeType, setRouteType] = useState<RouteContentType | ''>('')
   const [tags, setTags] = useState<Tag[]>([])
