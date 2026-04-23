@@ -5,9 +5,9 @@ import { Input, type InputProps } from './input'
 type SearchInputSize = 'sm' | 'md' | 'lg'
 
 const HEIGHTS = {
-  sm: '$3',
-  md: '$4',
-  lg: '$5',
+  sm: 44,
+  md: 52,
+  lg: 58,
 } as const
 
 export type SearchInputProps = Omit<InputProps, 'size'> & {
@@ -44,23 +44,28 @@ export function SearchInput({ size = 'md', icon, iconAfter, ...props }: SearchIn
   return (
     <XStack
       alignItems="center"
-      borderRadius="$full"
+      borderRadius="$4"
       borderWidth={1}
       borderColor="$borderColor"
       backgroundColor="$backgroundStrong"
-      paddingHorizontal="$3"
+      paddingHorizontal="$4"
       gap="$2"
-      height={HEIGHTS[size]}
-      focusWithinStyle={{ borderColor: '$primary' }}
+      minHeight={HEIGHTS[size]}
+      boxShadow="0 2px 6px rgba(15, 23, 42, 0.04)"
+      focusWithinStyle={{
+        borderColor: '$primary',
+        boxShadow: '0 0 0 4px rgba(0, 86, 150, 0.10)',
+      }}
     >
       {icon ?? <DefaultSearchIcon />}
       <Input
         flex={1}
         size={size}
-        variant="outline"
+        variant="filled"
         borderWidth={0}
         backgroundColor="transparent"
         paddingHorizontal={0}
+        minHeight={0}
         {...props}
       />
       {iconAfter}

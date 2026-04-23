@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Button, Input, XStack, isWeb } from '@antapp/ui'
+import { Button, Input, XStack, YStack, isWeb } from '@antapp/ui'
 import { AuthField, AuthFooterLink, AuthNotice, AuthShell } from './auth-shell'
 
 export type AuthLoginScreenProps = {
@@ -78,7 +78,7 @@ export function AuthLoginScreen({
       </AuthField>
 
       <AuthField label="Password">
-        <XStack position="relative" alignItems="center">
+        <XStack position="relative" alignItems="center" width="100%">
           <Input
             ref={passwordInputRef}
             flex={1}
@@ -93,24 +93,22 @@ export function AuthLoginScreen({
             placeholder="Enter your password"
             variant="filled"
             size="lg"
-            paddingRight="$14"
+            paddingRight="$16"
             disabled={pending}
             onSubmitEditing={onSubmit}
           />
-          <Button
-            variant="link"
-            size="sm"
-            position="absolute"
-            right="$3"
-            top="$2.5"
-            zIndex={2}
-            onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
-            onPress={togglePasswordVisibility}
-            disabled={pending}
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </Button>
+          <YStack position="absolute" top={0} bottom={0} right="$4" justifyContent="center" zIndex={2}>
+            <Button
+              variant="link"
+              size="sm"
+              onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
+              onPress={togglePasswordVisibility}
+              disabled={pending}
+              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </Button>
+          </YStack>
         </XStack>
       </AuthField>
 

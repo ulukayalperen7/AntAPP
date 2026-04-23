@@ -80,7 +80,7 @@ export function AuthShell({
         overflow="hidden"
         backgroundColor={AUTH_PALETTE.neutral}
         justifyContent="center"
-        paddingHorizontal="$4"
+        paddingHorizontal="$5"
         paddingVertical="$6"
         minHeight={isWeb ? '100vh' : undefined}
       >
@@ -106,40 +106,47 @@ export function AuthShell({
             gap="$5"
           >
             <VStack alignItems="center" gap="$2" paddingHorizontal="$2">
-              <Text variant="heading2" align="center" color="$primary">
+              {mascot ? (
+                <YStack
+                  width={92}
+                  height={92}
+                  alignItems="center"
+                  justifyContent="center"
+                  borderRadius="$full"
+                  backgroundColor="rgba(255,255,255,0.72)"
+                  borderWidth={1}
+                  borderColor="rgba(15,23,42,0.06)"
+                  style={{ boxShadow: '0 24px 48px -34px rgba(15, 23, 42, 0.28)' }}
+                >
+                  {mascot}
+                </YStack>
+              ) : null}
+
+              <Text variant="heading3" align="center" color="$primary" weight="bold">
                 AntAPP
               </Text>
-              <VStack alignItems="center" gap="$2" maxWidth={440}>
-                <Text variant="heading2" align="center">
+              <VStack alignItems="center" gap="$2" maxWidth={460}>
+                <Text variant="heading1" align="center" style={{ lineHeight: 1.02 }}>
                   {title}
                 </Text>
-                <Text variant="bodyLarge" align="center" muted>
+                <Text variant="bodyLarge" align="center" muted style={{ maxWidth: 420, lineHeight: 1.55 }}>
                   {subtitle}
                 </Text>
               </VStack>
             </VStack>
 
-            <YStack position="relative" width="100%">
-              {mascot ? (
-                <YStack
-                  position="absolute"
-                  top={-80}
-                  left={20}
-                  zIndex={10}
-                  alignItems="center"
-                >
-                  {mascot}
-                </YStack>
-              ) : null}
+            <YStack width="100%">
               <Card
                 variant="elevated"
-                size="md"
+                size="lg"
                 width="100%"
-                borderRadius="$5"
+                borderRadius={28}
+                borderWidth={1}
+                borderColor="rgba(15,23,42,0.06)"
                 backgroundColor={AUTH_PALETTE.neutralStrong}
-                {...(mascot ? { paddingTop: '$5', marginTop: '$9' } : {})}
+                style={{ boxShadow: '0 34px 70px -40px rgba(15, 23, 42, 0.22)' }}
               >
-                <VStack gap="$4">{children}</VStack>
+                <VStack gap="$4.5">{children}</VStack>
               </Card>
             </YStack>
 
@@ -171,7 +178,9 @@ export function AuthShell({
 export function AuthField({ label, error, children }: AuthFieldProps) {
   return (
     <VStack gap="$2">
-      <Text variant="label">{label}</Text>
+      <Text variant="label" color="$mutedForeground" fontSize="$3">
+        {label}
+      </Text>
       {children}
       {error ? (
         <Text variant="caption" color="$error500">
@@ -189,8 +198,8 @@ export function AuthNotice({ tone, children }: AuthNoticeProps) {
 
   return (
     <YStack
-      padding="$3"
-      borderRadius="$3"
+      padding="$3.5"
+      borderRadius="$4"
       borderWidth={1}
       backgroundColor={backgroundColor}
       borderColor={borderColor}
@@ -216,7 +225,7 @@ export function AuthFooterLink({
       <Text variant="body" muted align="center">
         {prefix}
       </Text>
-      <Button variant="link" size="sm" onPress={onPress}>
+      <Button variant="link" size="md" onPress={onPress}>
         {actionLabel}
       </Button>
     </HStack>

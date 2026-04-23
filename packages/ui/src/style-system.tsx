@@ -254,22 +254,69 @@ function mergeStyles(...styles: Array<AntStyleObject | undefined>) {
   return merged
 }
 
-function useViewportWidth() {
-  const [width, setWidth] = React.useState(() => {
-    if (!isWeb || typeof window === 'undefined') return 1280
-    return window.innerWidth
-  })
+let viewportWidthSnapshot = 1280
+let viewportListenerAttached = false
+const viewportWidthSubscribers = new Set<() => void>()
+const STATIC_VIEWPORT_WIDTH = 1280
 
-  React.useEffect(() => {
-    if (!isWeb || typeof window === 'undefined') return undefined
+function getViewportSnapshot() {
+  if (!isWeb || typeof window === 'undefined') {
+    return STATIC_VIEWPORT_WIDTH
+  }
 
-    const handleResize = () => setWidth(window.innerWidth)
+  viewportWidthSnapshot = window.innerWidth
+  return viewportWidthSnapshot
+}
+
+function subscribeViewportWidth(callback: () => void) {
+  if (!isWeb || typeof window === 'undefined') {
+    return () => {}
+  }
+
+  viewportWidthSubscribers.add(callback)
+
+  if (!viewportListenerAttached) {
+    viewportWidthSnapshot = window.innerWidth
+    const handleResize = () => {
+      viewportWidthSnapshot = window.innerWidth
+      for (const subscriber of viewportWidthSubscribers) {
+        subscriber()
+      }
+    }
+
     window.addEventListener('resize', handleResize)
+    viewportListenerAttached = true
+  }
 
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  return () => {
+    viewportWidthSubscribers.delete(callback)
+  }
+}
 
-  return width
+function subscribeStaticViewportWidth() {
+  return () => {}
+}
+
+function getStaticViewportSnapshot() {
+  return STATIC_VIEWPORT_WIDTH
+}
+
+function hasResponsiveProps(rawProps: AntStyleObject) {
+  for (const [key, value] of Object.entries(rawProps)) {
+    if (key.startsWith('$') && typeof value === 'object' && value != null) {
+      return true
+    }
+  }
+
+  return false
+}
+
+function useViewportWidth(enabled = true) {
+  return React.useSyncExternalStore(
+    enabled ? subscribeViewportWidth : subscribeStaticViewportWidth,
+    enabled ? getViewportSnapshot : getStaticViewportSnapshot,
+    getStaticViewportSnapshot,
+  )
 }
 
 function resolveThemeName(name?: string, parentThemeName: AntThemeName = 'light'): AntThemeName {
@@ -781,17 +828,16 @@ type PrimitiveProps = AntStyleObject & {
   children?: React.ReactNode
 }
 
-function BasePrimitive({
-  as = 'div',
-  children,
-  defaultDirection,
-  ...rawProps
-}: PrimitiveProps & {
+type PrimitiveComponentProps = PrimitiveProps & {
   defaultDirection?: 'row' | 'column'
-}) {
-  const theme = useTheme()
-  const viewportWidth = useViewportWidth()
-  const { styleProps, restProps, interactionStyles } = extractStyleProps(
+}
+
+function buildPrimitiveProps(
+  rawProps: AntStyleObject,
+  defaultDirection: 'row' | 'column' | undefined,
+  viewportWidth: number,
+) {
+  return extractStyleProps(
     defaultDirection
       ? {
           display: 'flex',
@@ -801,6 +847,67 @@ function BasePrimitive({
       : rawProps,
     viewportWidth,
   )
+}
+
+function PassivePrimitive({
+  as = 'div',
+  children,
+  defaultDirection,
+  ...rawProps
+}: PrimitiveComponentProps) {
+  const theme = useTheme()
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
+  const { styleProps, restProps } = buildPrimitiveProps(rawProps, defaultDirection, viewportWidth)
+  const baseStyle = createResolvedStyle(styleProps, theme)
+  const disabled = Boolean(restProps.disabled)
+
+  if (isWeb) {
+    const {
+      webRestProps,
+      accessibilityProps,
+    } = splitWebAccessibilityProps(restProps)
+    const className = webRestProps.className
+
+    const webProps: AntStyleObject = {
+      ...webRestProps,
+      className,
+      ...accessibilityProps,
+      style: baseStyle,
+      'aria-disabled': disabled || undefined,
+    }
+
+    if (as === 'button' && webProps.type == null) {
+      webProps.type = 'button'
+    }
+
+    return React.createElement(as, webProps, children)
+  }
+
+  const pointerEvents = baseStyle.pointerEvents
+  const nativeStyle = { ...baseStyle }
+  delete nativeStyle.pointerEvents
+
+  const nativeProps = sanitizeNativeProps(restProps)
+  if (pointerEvents) {
+    nativeProps.pointerEvents = pointerEvents
+  }
+
+  return (
+    <ReactNativeView {...nativeProps} style={nativeStyle}>
+      {children}
+    </ReactNativeView>
+  )
+}
+
+function InteractivePrimitive({
+  as = 'div',
+  children,
+  defaultDirection,
+  ...rawProps
+}: PrimitiveComponentProps) {
+  const theme = useTheme()
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
+  const { styleProps, restProps, interactionStyles } = buildPrimitiveProps(rawProps, defaultDirection, viewportWidth)
 
   const [hovered, setHovered] = React.useState(false)
   const [pressed, setPressed] = React.useState(false)
@@ -867,34 +974,43 @@ function BasePrimitive({
     nativeProps.pointerEvents = pointerEvents
   }
 
-  if (nativeProps.onPress || nativeProps.onClick || interactionStyles.pressStyle) {
-    const onPress = disabled ? undefined : nativeProps.onPress ?? nativeProps.onClick
-    delete nativeProps.onClick
-
-    return (
-      <Pressable
-        {...nativeProps}
-        disabled={disabled}
-        onPress={onPress}
-        style={({ pressed: nativePressed }) =>
-          mergeStyles(
-            nativeStyle,
-            nativePressed && interactionStyles.pressStyle
-              ? createResolvedStyle(interactionStyles.pressStyle, theme)
-              : undefined,
-          )
-        }
-      >
-        {children}
-      </Pressable>
-    )
-  }
+  const onPress = disabled ? undefined : nativeProps.onPress ?? nativeProps.onClick
+  delete nativeProps.onClick
 
   return (
-    <ReactNativeView {...nativeProps} style={nativeStyle}>
+    <Pressable
+      {...nativeProps}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed: nativePressed }) =>
+        mergeStyles(
+          nativeStyle,
+          nativePressed && interactionStyles.pressStyle
+            ? createResolvedStyle(interactionStyles.pressStyle, theme)
+            : undefined,
+        )
+      }
+    >
       {children}
-    </ReactNativeView>
+    </Pressable>
   )
+}
+
+function BasePrimitive(props: PrimitiveComponentProps) {
+  const interactive = Boolean(
+    props.onPress ||
+    props.onClick ||
+    props.hoverStyle ||
+    props.pressStyle ||
+    props.focusStyle ||
+    props.focusWithinStyle,
+  )
+
+  if (interactive) {
+    return <InteractivePrimitive {...props} />
+  }
+
+  return <PassivePrimitive {...props} />
 }
 
 export function YStack(props: PrimitiveProps) {
@@ -949,7 +1065,7 @@ export type AntTextProps = AntStyleObject & {
 export const Text = React.forwardRef<any, AntTextProps>(function Text(
   {
     variant = 'body',
-    weight = 'regular',
+    weight,
     align = 'left',
     muted = false,
     truncate = false,
@@ -960,9 +1076,11 @@ export const Text = React.forwardRef<any, AntTextProps>(function Text(
   ref,
 ) {
   const theme = useTheme()
-  const viewportWidth = useViewportWidth()
-  const resolvedWeight = (weight ?? 'regular') as keyof typeof TEXT_WEIGHTS
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
   const resolvedVariant = (variant ?? 'body') as keyof typeof TEXT_VARIANTS
+  const fontWeightOverride =
+    rawProps.fontWeight ??
+    (weight ? TEXT_WEIGHTS[weight as keyof typeof TEXT_WEIGHTS] : undefined)
   const { styleProps, restProps } = extractStyleProps(
     {
       color: muted ? '$mutedForeground' : '$color',
@@ -970,7 +1088,7 @@ export const Text = React.forwardRef<any, AntTextProps>(function Text(
       userSelect: 'text',
       ...(TEXT_VARIANTS[resolvedVariant] as Record<string, any>),
       ...rawProps,
-      fontWeight: rawProps.fontWeight ?? TEXT_WEIGHTS[resolvedWeight],
+      ...(fontWeightOverride ? { fontWeight: fontWeightOverride } : null),
     },
     viewportWidth,
   )
@@ -1038,7 +1156,7 @@ export function ScrollView({
   children?: React.ReactNode
 }) {
   const theme = useTheme()
-  const viewportWidth = useViewportWidth()
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
   const { styleProps, restProps } = extractStyleProps(rawProps, viewportWidth)
   const style = createResolvedStyle(styleProps, theme)
 
@@ -1079,7 +1197,7 @@ export const Image = React.forwardRef<any, AntStyleObject>(function Image(
   ref,
 ) {
   const theme = useTheme()
-  const viewportWidth = useViewportWidth()
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
   const { styleProps, restProps } = extractStyleProps(
     { objectFit, ...rawProps },
     viewportWidth,
@@ -1104,7 +1222,7 @@ export function Anchor({
   children?: React.ReactNode
 }) {
   const theme = useTheme()
-  const viewportWidth = useViewportWidth()
+  const viewportWidth = useViewportWidth(hasResponsiveProps(rawProps))
   const { styleProps, restProps } = extractStyleProps(rawProps, viewportWidth)
   const style = createResolvedStyle(styleProps, theme)
 

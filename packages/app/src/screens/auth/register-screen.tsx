@@ -39,6 +39,7 @@ function UserTypeSelector({
         borderWidth={1}
         borderColor="$borderColor"
         overflow="hidden"
+        backgroundColor="$backgroundStrong"
       >
         {(['personal', 'business'] as const).map((type) => {
           const isActive = value === type
@@ -46,7 +47,7 @@ function UserTypeSelector({
             <XStack
               key={type}
               flex={1}
-              paddingVertical="$2.5"
+              paddingVertical="$3"
               alignItems="center"
               justifyContent="center"
               gap="$1.5"
@@ -175,7 +176,7 @@ export function AuthRegisterScreen({
       </AuthField>
 
       <AuthField label="Password">
-        <XStack position="relative" alignItems="center">
+        <XStack position="relative" alignItems="center" width="100%">
           <Input
             ref={passwordInputRef}
             flex={1}
@@ -190,28 +191,26 @@ export function AuthRegisterScreen({
             placeholder="Create a password"
             variant="filled"
             size="lg"
-            paddingRight="$14"
+            paddingRight="$16"
             disabled={pending}
           />
-          <Button
-            variant="link"
-            size="sm"
-            position="absolute"
-            right="$3"
-            top="$2.5"
-            zIndex={2}
-            onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
-            onPress={togglePasswordVisibility}
-            disabled={pending}
-            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </Button>
+          <YStack position="absolute" top={0} bottom={0} right="$4" justifyContent="center" zIndex={2}>
+            <Button
+              variant="link"
+              size="sm"
+              onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
+              onPress={togglePasswordVisibility}
+              disabled={pending}
+              accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </Button>
+          </YStack>
         </XStack>
       </AuthField>
 
       <AuthField label="Confirm Password">
-        <XStack position="relative" alignItems="center">
+        <XStack position="relative" alignItems="center" width="100%">
           <Input
             ref={confirmPasswordInputRef}
             flex={1}
@@ -226,24 +225,22 @@ export function AuthRegisterScreen({
             placeholder="Re-enter your password"
             variant="filled"
             size="lg"
-            paddingRight="$14"
+            paddingRight="$16"
             disabled={pending}
             onSubmitEditing={onSubmit}
           />
-          <Button
-            variant="link"
-            size="sm"
-            position="absolute"
-            right="$3"
-            top="$2.5"
-            zIndex={2}
-            onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
-            onPress={toggleConfirmPasswordVisibility}
-            disabled={pending}
-            accessibilityLabel={showConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}
-          >
-            {showConfirmPassword ? 'Hide' : 'Show'}
-          </Button>
+          <YStack position="absolute" top={0} bottom={0} right="$4" justifyContent="center" zIndex={2}>
+            <Button
+              variant="link"
+              size="sm"
+              onMouseDown={isWeb ? (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault() : undefined}
+              onPress={toggleConfirmPasswordVisibility}
+              disabled={pending}
+              accessibilityLabel={showConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}
+            >
+              {showConfirmPassword ? 'Hide' : 'Show'}
+            </Button>
+          </YStack>
         </XStack>
       </AuthField>
 
