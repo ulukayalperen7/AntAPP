@@ -60,6 +60,12 @@ function reorderArray<T>(items: T[], fromIndex: number, toIndex: number) {
   return next
 }
 
+function scrollToStop(stopId: string) {
+  if (typeof document === 'undefined') return
+  const element = document.getElementById(`route-stop-${stopId}`)
+  element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
 export default function RouteEditClient({
   route,
   initialStops,
@@ -270,6 +276,7 @@ export default function RouteEditClient({
       return
     }
 
+    const movedStopId = stops[fromIndex]?.id
     const previousStops = stops
     const nextStops = reorderArray(previousStops, fromIndex, toIndex)
     setStops(nextStops)
@@ -280,6 +287,9 @@ export default function RouteEditClient({
       try {
         await reorderRouteStops(route.id, nextStops.map((stop) => stop.id))
         await refreshStops('Stop order updated.')
+        if (movedStopId) {
+          setTimeout(() => scrollToStop(movedStopId), 0)
+        }
       } catch (e) {
         setStops(previousStops)
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to reorder stops.' })
@@ -552,7 +562,7 @@ export default function RouteEditClient({
               const dirty = isStopDirty(stop)
 
               return (
-                <XStack key={stop.id} gap="$3" alignItems="flex-start">
+                <XStack key={stop.id} id={`route-stop-${stop.id}`} gap="$3" alignItems="flex-start">
                   <YStack alignItems="center" gap="$1" paddingTop="$2">
                     <XStack
                       width={34}

@@ -224,6 +224,7 @@ function FeedPostCard({
   const media = route.postImageUrls?.length ? route.postImageUrls : (route.thumbnailUrl ? [route.thumbnailUrl] : [])
   const coverImage = media[0] ?? null
   const postId = route.postId ?? null
+  const isInteractivePost = Boolean(postId)
 
   const [reactionCount, setReactionCount] = useState(route.postReactionCount ?? 0)
   const [commentCount, setCommentCount] = useState(route.postCommentCount ?? 0)
@@ -489,7 +490,7 @@ function FeedPostCard({
         <Button
           variant={isReacted ? 'solid' : 'ghost'}
           size="sm"
-          disabled={!postId || isLiking}
+          disabled={!isInteractivePost || isLiking}
           loading={isLiking}
           icon={<ThumbsUp size={16} color="currentColor" />}
           onPress={handleToggleReaction}
@@ -499,7 +500,7 @@ function FeedPostCard({
         <Button
           variant={isCommentsOpen ? 'outline' : 'ghost'}
           size="sm"
-          disabled={!postId}
+          disabled={!isInteractivePost}
           icon={<MessageCircle size={16} color="currentColor" />}
           onPress={handleToggleComments}
         >
@@ -508,7 +509,7 @@ function FeedPostCard({
         <Button
           variant={isShared ? 'solid' : 'ghost'}
           size="sm"
-          disabled={!postId || isSharing}
+          disabled={!isInteractivePost || isSharing}
           loading={isSharing}
           icon={<Share2 size={16} color="currentColor" />}
           onPress={handleShare}
@@ -516,6 +517,12 @@ function FeedPostCard({
           Share
         </Button>
       </XStack>
+
+      {!isInteractivePost ? (
+        <Text variant="caption" muted>
+          This card comes from route listing. Create a post to enable like, comment, and share.
+        </Text>
+      ) : null}
 
       {isCommentsOpen ? (
         <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
