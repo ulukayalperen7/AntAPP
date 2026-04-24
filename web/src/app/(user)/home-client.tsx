@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Avatar, Badge, Button, Card, Image, Text, XStack, YStack } from '@antapp/ui'
-import type { RouteListItem } from '@/types/api'
+import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from '@antapp/ui'
+import { addPostComment, getPostComments, sharePost, togglePostReaction } from '@/features/posts/actions'
+import type { PostCommentItem, RouteListItem } from '@/types/api'
 import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp } from 'lucide-react'
 
 type FeedMode = 'timeline' | 'official' | 'community'
@@ -221,6 +223,110 @@ function FeedPostCard({
   const author = getAuthor(route)
   const media = route.postImageUrls?.length ? route.postImageUrls : (route.thumbnailUrl ? [route.thumbnailUrl] : [])
   const coverImage = media[0] ?? null
+  const postId = route.postId ?? null
+
+  const [reactionCount, setReactionCount] = useState(route.postReactionCount ?? 0)
+  const [commentCount, setCommentCount] = useState(route.postCommentCount ?? 0)
+  const [shareCount, setShareCount] = useState(route.postShareCount ?? 0)
+  const [isReacted, setIsReacted] = useState(route.isReactedByCurrentUser ?? false)
+  const [isShared, setIsShared] = useState(route.isSharedByCurrentUser ?? false)
+
+  const [comments, setComments] = useState<PostCommentItem[]>([])
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false)
+  const [commentsLoaded, setCommentsLoaded] = useState(false)
+  const [commentDraft, setCommentDraft] = useState('')
+  const [socialError, setSocialError] = useState<string | null>(null)
+
+  const [isLiking, startLiking] = useTransition()
+  const [isCommentLoading, startCommentLoading] = useTransition()
+  const [isCommentPosting, startCommentPosting] = useTransition()
+  const [isSharing, startSharing] = useTransition()
+
+  const loadComments = () => {
+    if (!postId) return
+
+    startCommentLoading(async () => {
+      try {
+        const response = await getPostComments(postId, 1, 20)
+        setComments(response.data)
+        setCommentsLoaded(true)
+        setCommentCount((current) => Math.max(current, response.totalRecords))
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to load comments.')
+      }
+    })
+  }
+
+  const handleToggleReaction = () => {
+    if (!postId || isLiking) return
+
+    startLiking(async () => {
+      try {
+        const result = await togglePostReaction(postId)
+        setIsReacted(result.isReactedByCurrentUser)
+        setReactionCount(result.reactionCount)
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to update reaction.')
+      }
+    })
+  }
+
+  const handleToggleComments = () => {
+    const nextOpen = !isCommentsOpen
+    setIsCommentsOpen(nextOpen)
+    if (nextOpen && !commentsLoaded) {
+      loadComments()
+    }
+  }
+
+  const handleAddComment = () => {
+    if (!postId || isCommentPosting) return
+
+    const content = commentDraft.trim()
+    if (!content) {
+      setSocialError('Comment cannot be empty.')
+      return
+    }
+
+    startCommentPosting(async () => {
+      try {
+        const result = await addPostComment(postId, content)
+        setCommentCount(result.commentCount)
+        setCommentDraft('')
+        setCommentsLoaded(false)
+        if (isCommentsOpen) {
+          loadComments()
+        }
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to post comment.')
+      }
+    })
+  }
+
+  const handleShare = () => {
+    if (!postId || isSharing) return
+
+    startSharing(async () => {
+      try {
+        const result = await sharePost(postId)
+        setIsShared(result.isSharedByCurrentUser)
+        setShareCount(result.shareCount)
+        const routeLink = `${window.location.origin}/routes/${route.id}`
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+          try {
+            await navigator.clipboard.writeText(routeLink)
+          } catch {
+          }
+        }
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to share post.')
+      }
+    })
+  }
 
   return (
     <Card
@@ -228,8 +334,6 @@ function FeedPostCard({
       size="sm"
       backgroundColor="$backgroundStrong"
       gap="$4"
-      pressable
-      onPress={() => router.push(`/routes/${route.id}`)}
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
         <XStack gap="$3" flex={1}>
@@ -345,7 +449,12 @@ function FeedPostCard({
               </XStack>
             </YStack>
 
-            <Button variant="outline" size="sm" icon={<Compass size={14} color="currentColor" />}>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={<Compass size={14} color="currentColor" />}
+              onPress={() => router.push(`/routes/${route.id}`)}
+            >
               Open route
             </Button>
           </YStack>
@@ -356,16 +465,16 @@ function FeedPostCard({
         <XStack gap="$3" alignItems="center">
           <XStack alignItems="center" gap="$1.5">
             <ThumbsUp size={14} color="var(--color-primary)" />
-            <Text variant="caption" muted>0 reacts</Text>
+            <Text variant="caption" muted>{reactionCount} reacts</Text>
           </XStack>
           <XStack alignItems="center" gap="$1.5">
             <MessageCircle size={14} color="var(--color-mutedForeground)" />
-            <Text variant="caption" muted>0 comments</Text>
+            <Text variant="caption" muted>{commentCount} comments</Text>
           </XStack>
         </XStack>
         <XStack alignItems="center" gap="$1.5">
           <Send size={14} color="var(--color-mutedForeground)" />
-          <Text variant="caption" muted>0 shares</Text>
+          <Text variant="caption" muted>{shareCount} shares</Text>
         </XStack>
       </XStack>
 
@@ -377,10 +486,85 @@ function FeedPostCard({
         gap="$2"
         flexWrap="wrap"
       >
-        <Button variant="ghost" size="sm" disabled icon={<ThumbsUp size={16} color="currentColor" />}>Like</Button>
-        <Button variant="ghost" size="sm" disabled icon={<MessageCircle size={16} color="currentColor" />}>Comment</Button>
-        <Button variant="ghost" size="sm" disabled icon={<Share2 size={16} color="currentColor" />}>Share</Button>
+        <Button
+          variant={isReacted ? 'solid' : 'ghost'}
+          size="sm"
+          disabled={!postId || isLiking}
+          loading={isLiking}
+          icon={<ThumbsUp size={16} color="currentColor" />}
+          onPress={handleToggleReaction}
+        >
+          Like
+        </Button>
+        <Button
+          variant={isCommentsOpen ? 'outline' : 'ghost'}
+          size="sm"
+          disabled={!postId}
+          icon={<MessageCircle size={16} color="currentColor" />}
+          onPress={handleToggleComments}
+        >
+          Comment
+        </Button>
+        <Button
+          variant={isShared ? 'solid' : 'ghost'}
+          size="sm"
+          disabled={!postId || isSharing}
+          loading={isSharing}
+          icon={<Share2 size={16} color="currentColor" />}
+          onPress={handleShare}
+        >
+          Share
+        </Button>
       </XStack>
+
+      {isCommentsOpen ? (
+        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
+          <XStack gap="$2">
+            <Input
+              value={commentDraft}
+              onChangeText={setCommentDraft}
+              variant="outline"
+              size="md"
+              placeholder="Write a comment..."
+              flex={1}
+            />
+            <Button
+              variant="solid"
+              size="sm"
+              disabled={!postId || isCommentPosting}
+              loading={isCommentPosting}
+              onPress={handleAddComment}
+            >
+              Post
+            </Button>
+          </XStack>
+
+          {isCommentLoading ? (
+            <Text variant="caption" muted>Loading comments...</Text>
+          ) : comments.length === 0 ? (
+            <Text variant="caption" muted>No comments yet.</Text>
+          ) : (
+            <YStack gap="$2">
+              {comments.map((comment) => (
+                <XStack key={comment.commentId} gap="$2.5" alignItems="flex-start">
+                  <Avatar size="sm" initials={getInitials(comment.userName)} />
+                  <YStack gap="$1" flex={1}>
+                    <XStack gap="$2" alignItems="center" flexWrap="wrap">
+                      <Text variant="label">{comment.userName?.trim() || 'Route Explorer'}</Text>
+                      <Text variant="caption" muted>{formatRelativeDate(comment.createdAt, referenceNowMs)}</Text>
+                    </XStack>
+                    <Text variant="body">{comment.content}</Text>
+                  </YStack>
+                </XStack>
+              ))}
+            </YStack>
+          )}
+        </YStack>
+      ) : null}
+
+      {socialError ? (
+        <Text variant="caption" color="$error500">{socialError}</Text>
+      ) : null}
     </Card>
   )
 }

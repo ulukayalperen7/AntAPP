@@ -1,5 +1,6 @@
 using Ant.Core.Entities;
 using Ant.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -9,5 +10,6 @@ namespace Ant.Application.Interfaces.Repositories
     {
         Task<IReadOnlyList<Post>> GetFeedPostsAsync(RouteContentTypeEnum? contentType, int pageNumber, int pageSize);
         Task<int> GetFeedPostsCountAsync(RouteContentTypeEnum? contentType);
+        Task<Post> GetPublicPostByIdAsync(Guid postId);
     }
 }

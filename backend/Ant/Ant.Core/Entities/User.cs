@@ -16,5 +16,8 @@ namespace Ant.Core.Entities
         public virtual ICollection<Spot> OwnedSpots { get; set; }
         public virtual ICollection<SpotFavorite> FavoriteSpots { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
+        public virtual ICollection<PostReaction> PostReactions { get; set; }
+        public virtual ICollection<PostComment> PostComments { get; set; }
+        public virtual ICollection<PostShare> PostShares { get; set; }
     }
 }

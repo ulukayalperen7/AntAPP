@@ -67,6 +67,11 @@ export type RouteListItem = {
   postId?: string
   postContent?: string | null
   postImageUrls?: string[]
+  postReactionCount?: number
+  postCommentCount?: number
+  postShareCount?: number
+  isReactedByCurrentUser?: boolean
+  isSharedByCurrentUser?: boolean
   contentType: RouteContentType
   isPublic: boolean
   createdAt: string
@@ -88,6 +93,38 @@ export type FeedPostItem = {
   routeIsPublic: boolean
   routeAverageRating: number
   imageUrls: string[]
+  reactionCount: number
+  commentCount: number
+  shareCount: number
+  isReactedByCurrentUser: boolean
+  isSharedByCurrentUser: boolean
+}
+
+export type PostCommentItem = {
+  commentId: string
+  postId: string
+  userId: string
+  userName: string | null
+  content: string
+  createdAt: string
+}
+
+export type PostReactionSummary = {
+  postId: string
+  isReactedByCurrentUser: boolean
+  reactionCount: number
+}
+
+export type PostShareSummary = {
+  postId: string
+  isSharedByCurrentUser: boolean
+  shareCount: number
+}
+
+export type PostCommentCreateResult = {
+  commentId: string
+  postId: string
+  commentCount: number
 }
 
 export type RouteStop = {

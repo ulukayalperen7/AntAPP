@@ -19,5 +19,8 @@ namespace Ant.Core.Entities
         public DateTime UpdatedAt { get; set; }
 
         public virtual ICollection<PostImage> Images { get; set; }
+        public virtual ICollection<PostReaction> Reactions { get; set; }
+        public virtual ICollection<PostComment> Comments { get; set; }
+        public virtual ICollection<PostShare> Shares { get; set; }
     }
 }

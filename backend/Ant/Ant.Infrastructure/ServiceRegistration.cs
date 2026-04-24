@@ -139,6 +139,9 @@ namespace Ant.Infrastructure
             services.AddTransient<IRouteSpotRepositoryAsync, RouteSpotRepositoryAsync>();
             services.AddTransient<ISpotFavoriteRepositoryAsync, SpotFavoriteRepositoryAsync>();
             services.AddTransient<IPostRepositoryAsync, PostRepositoryAsync>();
+            services.AddTransient<IPostReactionRepositoryAsync, PostReactionRepositoryAsync>();
+            services.AddTransient<IPostCommentRepositoryAsync, PostCommentRepositoryAsync>();
+            services.AddTransient<IPostShareRepositoryAsync, PostShareRepositoryAsync>();
             #endregion
         }
     }
