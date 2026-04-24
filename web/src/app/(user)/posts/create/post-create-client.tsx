@@ -44,12 +44,19 @@ export default function CreatePostClient({ routes }: Props) {
       return
     }
 
+    const normalizedContent = content.trim()
+    const normalizedImages = imageUrls.map((url) => url.trim()).filter(Boolean)
+    if (!normalizedContent && normalizedImages.length === 0) {
+      setError('Add post text or at least one image.')
+      return
+    }
+
     startTransition(async () => {
       try {
         await createPost({
           routeId,
-          content: content.trim() || undefined,
-          imageUrls: imageUrls.map((url) => url.trim()).filter(Boolean),
+          content: normalizedContent || undefined,
+          imageUrls: normalizedImages,
         })
         router.push('/dashboard')
       } catch (e) {

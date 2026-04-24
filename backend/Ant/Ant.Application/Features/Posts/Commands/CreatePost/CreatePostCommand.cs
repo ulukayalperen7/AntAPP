@@ -60,11 +60,15 @@ namespace Ant.Application.Features.Posts.Commands.CreatePost
                 .Take(8)
                 .ToList();
 
+            var normalizedContent = request.Content?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedContent) && normalizedImageUrls.Count == 0)
+                throw new ApiException("Post text or at least one image is required.");
+
             var post = new Post
             {
                 AuthorUserId = authorUserId,
                 RouteId = request.RouteId,
-                Content = request.Content?.Trim(),
+                Content = normalizedContent,
                 IsPublic = request.IsPublic,
                 IsDeleted = false,
                 Images = normalizedImageUrls

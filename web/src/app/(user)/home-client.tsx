@@ -9,6 +9,7 @@ import type { PostCommentItem, RouteListItem } from '@/types/api'
 import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp } from 'lucide-react'
 
 type FeedMode = 'timeline' | 'official' | 'community'
+const COMMENTS_PAGE_SIZE = 20
 
 type HomeClientProps = {
   mode: FeedMode
@@ -142,34 +143,37 @@ function StoryCard({
 }) {
   if (action) {
     return (
-      <Card
-        variant="outline"
-        size="sm"
-        backgroundColor="$backgroundStrong"
-        overflow="hidden"
-        width={140}
-        minWidth={140}
-        gap="$0"
-        padding={0}
-      >
-        <YStack height={120} backgroundColor="$muted" />
-        <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
-          <XStack
-            width={44}
-            height={44}
-            borderRadius="$full"
-            backgroundColor="$primary"
-            alignItems="center"
-            justifyContent="center"
-            marginTop={-26}
-            borderWidth={4}
-            borderColor="$backgroundStrong"
-          >
-            <Plus size={18} color="#FFFFFF" />
-          </XStack>
-          <Text variant="label" align="center">Create Story</Text>
-        </YStack>
-      </Card>
+      <Link href="/posts/create" style={{ textDecoration: 'none' }}>
+        <Card
+          variant="outline"
+          size="sm"
+          backgroundColor="$backgroundStrong"
+          overflow="hidden"
+          width={140}
+          minWidth={140}
+          gap="$0"
+          padding={0}
+          pressable
+        >
+          <YStack height={120} backgroundColor="$muted" />
+          <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
+            <XStack
+              width={44}
+              height={44}
+              borderRadius="$full"
+              backgroundColor="$primary"
+              alignItems="center"
+              justifyContent="center"
+              marginTop={-26}
+              borderWidth={4}
+              borderColor="$backgroundStrong"
+            >
+              <Plus size={18} color="#FFFFFF" />
+            </XStack>
+            <Text variant="label" align="center">Create Story</Text>
+          </YStack>
+        </Card>
+      </Link>
     )
   }
 
@@ -235,6 +239,8 @@ function FeedPostCard({
   const [comments, setComments] = useState<PostCommentItem[]>([])
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
   const [commentsLoaded, setCommentsLoaded] = useState(false)
+  const [commentsPage, setCommentsPage] = useState(1)
+  const [hasMoreComments, setHasMoreComments] = useState(false)
   const [commentDraft, setCommentDraft] = useState('')
   const [socialError, setSocialError] = useState<string | null>(null)
 
@@ -243,14 +249,27 @@ function FeedPostCard({
   const [isCommentPosting, startCommentPosting] = useTransition()
   const [isSharing, startSharing] = useTransition()
 
-  const loadComments = () => {
+  const loadComments = (page = 1, append = false) => {
     if (!postId) return
 
     startCommentLoading(async () => {
       try {
-        const response = await getPostComments(postId, 1, 20)
-        setComments(response.data)
+        const response = await getPostComments(postId, page, COMMENTS_PAGE_SIZE)
+        setComments((current) => {
+          if (!append) return response.data
+
+          const merged = [...current]
+          const existing = new Set(current.map((comment) => comment.commentId))
+          for (const item of response.data) {
+            if (!existing.has(item.commentId)) {
+              merged.push(item)
+            }
+          }
+          return merged
+        })
         setCommentsLoaded(true)
+        setCommentsPage(page)
+        setHasMoreComments(page * COMMENTS_PAGE_SIZE < response.totalRecords)
         setCommentCount((current) => Math.max(current, response.totalRecords))
         setSocialError(null)
       } catch (e) {
@@ -278,7 +297,7 @@ function FeedPostCard({
     const nextOpen = !isCommentsOpen
     setIsCommentsOpen(nextOpen)
     if (nextOpen && !commentsLoaded) {
-      loadComments()
+      loadComments(1, false)
     }
   }
 
@@ -297,8 +316,10 @@ function FeedPostCard({
         setCommentCount(result.commentCount)
         setCommentDraft('')
         setCommentsLoaded(false)
+        setCommentsPage(1)
+        setHasMoreComments(false)
         if (isCommentsOpen) {
-          loadComments()
+          loadComments(1, false)
         }
         setSocialError(null)
       } catch (e) {
@@ -327,6 +348,11 @@ function FeedPostCard({
         setSocialError((e as Error).message ?? 'Failed to share post.')
       }
     })
+  }
+
+  const handleLoadMoreComments = () => {
+    if (!postId || isCommentLoading || !hasMoreComments) return
+    loadComments(commentsPage + 1, true)
   }
 
   return (
@@ -564,6 +590,18 @@ function FeedPostCard({
                   </YStack>
                 </XStack>
               ))}
+
+              {hasMoreComments ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={isCommentLoading}
+                  disabled={isCommentLoading}
+                  onPress={handleLoadMoreComments}
+                >
+                  Load more comments
+                </Button>
+              ) : null}
             </YStack>
           )}
         </YStack>
@@ -603,6 +641,7 @@ export default function HomeClient({
   currentUserName,
   referenceNowIso,
 }: HomeClientProps) {
+  const router = useRouter()
   const copy = PAGE_COPY[mode]
   const composerInitials = getInitials(currentUserName)
   const referenceNowMs = parseApiDate(referenceNowIso)?.getTime() ?? 0
@@ -661,7 +700,14 @@ export default function HomeClient({
             flexWrap="wrap"
           >
             <Button variant="ghost" size="sm" icon={<Camera size={16} color="#E11D48" />}>Live</Button>
-            <Button variant="ghost" size="sm" icon={<ImageIcon size={16} color="#16A34A" />}>Photo</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<ImageIcon size={16} color="#16A34A" />}
+              onPress={() => router.push('/posts/create')}
+            >
+              Photo
+            </Button>
             <Button variant="ghost" size="sm" icon={<MapPinned size={16} color="#0EA5E9" />}>Check in</Button>
           </XStack>
         </Card>
