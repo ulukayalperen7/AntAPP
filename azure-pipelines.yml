@@ -15,7 +15,7 @@ stages:
       - job: BuildAndPush
         displayName: Build and Push
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         steps:
           - task: Docker@2
             displayName: Login to Docker Hub
@@ -66,57 +66,25 @@ stages:
                 $(IMAGE_TAG)
                 latest
 
-          - task: CopyFiles@2
-            displayName: Copy docker-compose to staging
-            inputs:
-              contents: docker-compose.yml
-              targetFolder: $(Build.ArtifactStagingDirectory)
-
-          - task: PublishBuildArtifacts@1
-            displayName: Publish artifact
-            inputs:
-              pathToPublish: $(Build.ArtifactStagingDirectory)
-              artifactName: deploy
-
   - stage: Deploy
     displayName: Deploy to Server
     dependsOn: Build
     jobs:
       - deployment: DeployToServer
-        displayName: SSH Deploy
+        displayName: Deploy
         environment: production
         pool:
-          vmImage: ubuntu-latest
+          name: Default
         strategy:
           runOnce:
             deploy:
               steps:
-                - task: DownloadBuildArtifacts@1
-                  inputs:
-                    buildType: current
-                    artifactName: deploy
-                    downloadPath: $(System.ArtifactsDirectory)
-
-                - task: InstallSSHKey@0
-                  displayName: Install SSH key
-                  inputs:
-                    knownHostsEntry: $(SSH_KNOWN_HOSTS)
-                    sshPublicKey: $(SSH_PUBLIC_KEY)
-                    sshKeySecureFile: deploy_key
+                - script: |
+                    cp $(Pipeline.Workspace)/../../s/docker-compose.yml /opt/antapp/docker-compose.yml
+                  displayName: Update docker-compose.yml
 
                 - script: |
-                    scp $(System.ArtifactsDirectory)/deploy/docker-compose.yml \
-                      $(SSH_USER)@$(SSH_HOST):/opt/antapp/docker-compose.yml
-                  displayName: Copy docker-compose.yml to server
-
-                - script: |
-                    ssh $(SSH_USER)@$(SSH_HOST) "
-                      cd /opt/antapp &&
-                      DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) \
-                      IMAGE_TAG=$(IMAGE_TAG) \
-                      docker compose pull &&
-                      DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) \
-                      IMAGE_TAG=$(IMAGE_TAG) \
-                      docker compose up -d --remove-orphans
-                    "
+                    cd /opt/antapp
+                    DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) IMAGE_TAG=$(IMAGE_TAG) docker compose pull
+                    DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) IMAGE_TAG=$(IMAGE_TAG) docker compose up -d --remove-orphans
                   displayName: Pull and restart containers
