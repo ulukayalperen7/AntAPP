@@ -3,11 +3,12 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY patches/ ./patches/
 COPY web/package.json ./web/
 COPY mobile/package.json ./mobile/
 COPY packages/app/package.json ./packages/app/
 COPY packages/ui/package.json ./packages/ui/
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 FROM base AS builder
 WORKDIR /app
