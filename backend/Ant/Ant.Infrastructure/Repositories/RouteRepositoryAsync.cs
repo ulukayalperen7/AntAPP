@@ -30,6 +30,8 @@ namespace Ant.Infrastructure.Repositories
                     .ThenInclude(rs => rs.Spot)
                 .Include(r => r.RouteTags)
                     .ThenInclude(rt => rt.Tag)
+                .Include(r => r.OriginalRoute)
+                    .ThenInclude(or => or.AuthorUser)
                 .FirstOrDefaultAsync(r => r.Id == routeId);
         }
 
@@ -55,6 +57,7 @@ namespace Ant.Infrastructure.Repositories
                 {
                     "public" => query.Where(r => r.IsPublic),
                     "draft" => query.Where(r => !r.IsPublic),
+                    "private" => query.Where(r => !r.IsPublic),
                     _ => query.Where(r => r.IsPublic)
                 };
             }
@@ -109,6 +112,9 @@ namespace Ant.Infrastructure.Repositories
             };
 
             return await query
+                .Include(r => r.AuthorUser)
+                .Include(r => r.OriginalRoute)
+                    .ThenInclude(or => or.AuthorUser)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

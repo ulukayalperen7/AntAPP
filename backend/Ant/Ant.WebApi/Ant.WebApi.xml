@@ -24,5 +24,10 @@
             Promote a route (Official/Sponsored)
             </summary>
         </member>
+        <member name="M:Ant.WebApi.Controllers.Admin.AdminRoutesController.Delete(System.Guid,Microsoft.AspNetCore.OutputCaching.IOutputCacheStore)">
+            <summary>
+            Delete a route (Admin only, soft delete)
+            </summary>
+        </member>
     </members>
 </doc>

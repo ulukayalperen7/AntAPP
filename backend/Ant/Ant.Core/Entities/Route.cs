@@ -22,6 +22,7 @@ namespace Ant.Core.Entities
         /// Used for maintaining attribution history.
         /// </summary>
         public Guid? OriginalRouteId { get; set; }
+        public virtual Route OriginalRoute { get; set; }
 
         public string Title { get; set; }
         public string Description { get; set; }
@@ -58,5 +59,6 @@ namespace Ant.Core.Entities
         
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
         public virtual ICollection<RouteRating> RouteRatings { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
     }
 }

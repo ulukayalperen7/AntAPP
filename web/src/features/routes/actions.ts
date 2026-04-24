@@ -39,7 +39,7 @@ export async function getRoutes(params: GetRoutesParams = {}): Promise<PagedApiR
 }
 
 export async function getRouteById(id: string): Promise<RouteDetail> {
-  return publicApiFetchData<RouteDetail>(`/routes/${id}`, { revalidate: 120 })
+  return apiFetchData<RouteDetail>(`/routes/${id}`)
 }
 
 export async function getRouteStops(routeId: string): Promise<RouteStopItem[]> {
@@ -107,6 +107,7 @@ export async function createRoute(data: {
   title: string
   description?: string
   thumbnailUrl?: string
+  isPublic?: boolean
   tagIds?: string[]
   spots: Array<{ spotId: string; customTitle?: string; customDescription?: string }>
 }): Promise<string> {
@@ -120,6 +121,7 @@ export async function updateRoute(id: string, data: {
   title?: string
   description?: string
   thumbnailUrl?: string
+  isPublic?: boolean
 }): Promise<string> {
   return apiFetchData<string>(`/routes/${id}`, {
     method: 'PATCH',
@@ -146,7 +148,7 @@ export async function forkRoute(id: string): Promise<string> {
 export async function rateRoute(routeId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/routes/${routeId}/rating`, {
     method: 'PUT',
-    body: JSON.stringify({ score }),
+    body: JSON.stringify({ stars: score }),
   })
 }
 

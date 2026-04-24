@@ -63,10 +63,69 @@ export type RouteListItem = {
   description: string | null
   thumbnailUrl: string | null
   authorUserId: string
+  authorUserName?: string | null
+  originalAuthorName?: string | null
+  postId?: string
+  postContent?: string | null
+  postImageUrls?: string[]
+  postReactionCount?: number
+  postCommentCount?: number
+  postShareCount?: number
+  isReactedByCurrentUser?: boolean
+  isSharedByCurrentUser?: boolean
   contentType: RouteContentType
   isPublic: boolean
   createdAt: string
   averageRating: number
+}
+
+export type FeedPostItem = {
+  postId: string
+  content: string | null
+  createdAt: string
+  isPublic: boolean
+  authorUserId: string
+  authorUserName: string | null
+  routeId: string
+  routeTitle: string
+  routeDescription: string | null
+  routeThumbnailUrl: string | null
+  routeContentType: RouteContentType
+  routeIsPublic: boolean
+  routeAverageRating: number
+  imageUrls: string[]
+  reactionCount: number
+  commentCount: number
+  shareCount: number
+  isReactedByCurrentUser: boolean
+  isSharedByCurrentUser: boolean
+}
+
+export type PostCommentItem = {
+  commentId: string
+  postId: string
+  userId: string
+  userName: string | null
+  content: string
+  createdAt: string
+}
+
+export type PostReactionSummary = {
+  postId: string
+  isReactedByCurrentUser: boolean
+  reactionCount: number
+}
+
+export type PostShareSummary = {
+  postId: string
+  isSharedByCurrentUser: boolean
+  shareCount: number
+}
+
+export type PostCommentCreateResult = {
+  commentId: string
+  postId: string
+  commentCount: number
 }
 
 export type RouteStop = {
@@ -87,6 +146,7 @@ export type RouteDetail = {
   description: string | null
   thumbnailUrl: string | null
   authorUserId: string
+  originalAuthorName?: string | null
   isPublic: boolean
   contentType: RouteContentType
   averageRating: number

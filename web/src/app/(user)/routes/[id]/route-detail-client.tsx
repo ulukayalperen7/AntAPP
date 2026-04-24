@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay } from '@antapp/ui'
 import type { RouteDetail } from '@/types/api'
-import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle } from 'lucide-react'
+import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle, Sparkles, Ellipsis } from 'lucide-react'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
 import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
@@ -338,6 +338,7 @@ export default function RouteDetailClient({
   // Fork state
   const [isForking, startFork] = useTransition()
   const [forkError, setForkError] = useState<string | null>(null)
+  const [hasForked, setHasForked] = useState(false)
 
   // Promote state
   const [isPromoting, startPromote] = useTransition()
@@ -358,12 +359,15 @@ export default function RouteDetailClient({
   }
 
   const handleFork = () => {
+    if (isForking || hasForked) return
     setForkError(null)
+    setHasForked(true)
     startFork(async () => {
       try {
         const forkedId = await forkRoute(route.id)
         router.push(`/routes/${forkedId}`)
       } catch (e) {
+        setHasForked(false)
         setForkError((e as Error).message ?? 'Failed to fork route')
       }
     })
@@ -419,27 +423,33 @@ export default function RouteDetailClient({
           style={{ background: 'linear-gradient(180deg, rgba(15,23,42,0.16) 0%, rgba(15,23,42,0.44) 100%)' }}
         />
 
-        {/* Owner badge */}
+        {/* Privacy Badge */}
         {isOwner && (
           <XStack
             position="absolute"
             top="$4"
             right="$4"
-            backgroundColor="rgba(255,255,255,0.15)"
+            backgroundColor="rgba(15,23,42,0.6)"
             paddingHorizontal="$3"
             paddingVertical="$1.5"
             borderRadius="$2"
             gap="$1.5"
             alignItems="center"
           >
-            <Pencil size={12} color="#fff" />
-            <Text variant="caption" color="#FFFFFF">Your Route</Text>
+            {route.isPublic ? <Sparkles size={12} color="#4ADE80" /> : <Ellipsis size={12} color="#FBBF24" />}
+            <Text variant="caption" color="#FFFFFF">{route.isPublic ? 'Public' : 'Draft'}</Text>
           </XStack>
         )}
 
         <YStack zIndex={1} gap="$3">
           <YStack gap="$1">
             <Text variant="heading1" color="#FFFFFF">{route.title}</Text>
+            {route.originalAuthorName && (
+              <XStack alignItems="center" gap="$2" marginTop="$1">
+                <GitFork size={14} color="#FFFFFF" opacity={0.8} />
+                <Text variant="caption" color="#FFFFFF" opacity={0.8}>Forked from {route.originalAuthorName}</Text>
+              </XStack>
+            )}
             {displayRating > 0 && (
               <XStack alignItems="center" gap="$3" flexWrap="wrap">
                 <RatingDisplay value={displayRating} />
@@ -703,35 +713,37 @@ export default function RouteDetailClient({
           )}
 
           {/* Fork Route */}
-          <YStack
-            backgroundColor="$backgroundStrong"
-            borderRadius="$4"
-            padding="$4"
-            gap="$3"
-            borderWidth={1}
-            borderColor="$borderColor"
-          >
-            <XStack alignItems="center" gap="$2">
-              <GitFork size={18} color="var(--color-primary)" />
-              <Text variant="heading4">Customize This Route</Text>
-            </XStack>
-            <Text variant="body" muted>
-              Want to make changes? Fork this route to create your own editable copy in your profile.
-            </Text>
-            {forkError && (
-              <Text variant="caption" color="$error500">{forkError}</Text>
-            )}
-            <Button
-              variant="outline"
-              size="md"
-              loading={isForking}
-              disabled={isForking}
-              onPress={handleFork}
-              icon={<GitFork size={16} color="currentColor" />}
+          {!isOwner && (
+            <YStack
+              backgroundColor="$backgroundStrong"
+              borderRadius="$4"
+              padding="$4"
+              gap="$3"
+              borderWidth={1}
+              borderColor="$borderColor"
             >
-              Fork Route
-            </Button>
-          </YStack>
+              <XStack alignItems="center" gap="$2">
+                <GitFork size={18} color="var(--color-primary)" />
+                <Text variant="heading4">Customize This Route</Text>
+              </XStack>
+              <Text variant="body" muted>
+                Want to make changes? Fork this route to create your own editable copy in your profile.
+              </Text>
+              {forkError && (
+                <Text variant="caption" color="$error500">{forkError}</Text>
+              )}
+              <Button
+                variant="outline"
+                size="md"
+                loading={isForking}
+                disabled={isForking || hasForked}
+                onPress={handleFork}
+                icon={hasForked ? <CheckCircle size={16} color="currentColor" /> : <GitFork size={16} color="currentColor" />}
+              >
+                {hasForked ? 'Forked!' : 'Fork Route'}
+              </Button>
+            </YStack>
+          )}
         </YStack>
       </div>
 

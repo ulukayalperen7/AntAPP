@@ -38,6 +38,11 @@ namespace Ant.Infrastructure.Contexts
         public DbSet<RouteRating> RouteRatings { get; set; }
         public DbSet<SpotRating> SpotRatings { get; set; }
         public DbSet<SpotFavorite> SpotFavorites { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<PostImage> PostImages { get; set; }
+        public DbSet<PostReaction> PostReactions { get; set; }
+        public DbSet<PostComment> PostComments { get; set; }
+        public DbSet<PostShare> PostShares { get; set; }
         public DbSet<User> DomainUsers { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -45,6 +50,7 @@ namespace Ant.Infrastructure.Contexts
             SetTimestamps(ChangeTracker.Entries<Route>());
             SetTimestamps(ChangeTracker.Entries<Collection>());
             SetTimestamps(ChangeTracker.Entries<Spot>());
+            SetTimestamps(ChangeTracker.Entries<Post>());
 
             return base.SaveChangesAsync(cancellationToken);
         }
@@ -161,6 +167,82 @@ namespace Ant.Infrastructure.Contexts
                 .WithMany(s => s.FavoritedBy)
                 .HasForeignKey(sf => sf.SpotId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Post>(entity =>
+            {
+                entity.HasIndex(p => new { p.IsDeleted, p.IsPublic, p.CreatedAt });
+                entity.HasIndex(p => new { p.RouteId, p.CreatedAt });
+
+                entity.HasOne(p => p.AuthorUser)
+                    .WithMany(u => u.Posts)
+                    .HasForeignKey(p => p.AuthorUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.Route)
+                    .WithMany(r => r.Posts)
+                    .HasForeignKey(p => p.RouteId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<PostImage>(entity =>
+            {
+                entity.HasIndex(pi => new { pi.PostId, pi.SortOrder });
+                entity.Property(pi => pi.ImageUrl).IsRequired();
+
+                entity.HasOne(pi => pi.Post)
+                    .WithMany(p => p.Images)
+                    .HasForeignKey(pi => pi.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<PostReaction>(entity =>
+            {
+                entity.HasIndex(pr => new { pr.PostId, pr.UserId }).IsUnique();
+                entity.HasIndex(pr => new { pr.PostId, pr.CreatedAt });
+
+                entity.HasOne(pr => pr.Post)
+                    .WithMany(p => p.Reactions)
+                    .HasForeignKey(pr => pr.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(pr => pr.User)
+                    .WithMany(u => u.PostReactions)
+                    .HasForeignKey(pr => pr.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<PostComment>(entity =>
+            {
+                entity.HasIndex(pc => new { pc.PostId, pc.CreatedAt });
+                entity.HasIndex(pc => new { pc.UserId, pc.CreatedAt });
+                entity.Property(pc => pc.Content).IsRequired();
+
+                entity.HasOne(pc => pc.Post)
+                    .WithMany(p => p.Comments)
+                    .HasForeignKey(pc => pc.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(pc => pc.User)
+                    .WithMany(u => u.PostComments)
+                    .HasForeignKey(pc => pc.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<PostShare>(entity =>
+            {
+                entity.HasIndex(ps => new { ps.PostId, ps.UserId }).IsUnique();
+                entity.HasIndex(ps => new { ps.PostId, ps.CreatedAt });
+
+                entity.HasOne(ps => ps.Post)
+                    .WithMany(p => p.Shares)
+                    .HasForeignKey(ps => ps.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(ps => ps.User)
+                    .WithMany(u => u.PostShares)
+                    .HasForeignKey(ps => ps.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
             builder.Entity<IdentityRole<Guid>>(entity =>
             {

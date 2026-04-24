@@ -9,6 +9,7 @@ using Ant.Application.Features.Routes.Queries.GetRouteById;
 using Ant.Application.Features.RouteRatings.Commands.RateRoute;
 using Ant.Application.Features.RouteRatings.Queries.GetRouteRatings;
 using Ant.Application.Wrappers;
+using Ant.Core.Enums;
 using Ant.WebApi.Caching;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,6 +51,24 @@ namespace Ant.WebApi.Controllers
                 ? null
                 : tagIds.Split(',').Select(t => Guid.TryParse(t.Trim(), out var g) ? g : (Guid?)null).Where(g => g.HasValue).Select(g => g.Value).ToList();
 
+            if (string.Equals(visibility, "draft", StringComparison.OrdinalIgnoreCase))
+            {
+                var rawUserId = User.FindFirstValue("uid");
+                if (string.IsNullOrEmpty(rawUserId) || !Guid.TryParse(rawUserId, out var currentUserId))
+                {
+                    return Unauthorized();
+                }
+
+                if (!authorId.HasValue)
+                {
+                    authorId = currentUserId;
+                }
+                else if (authorId.Value != currentUserId && !User.IsInRole(RoleNames.Admin))
+                {
+                    return Forbid();
+                }
+            }
+
             return Ok(await Mediator.Send(new GetPagedRoutesQuery
             {
                 Search = search,
@@ -72,7 +92,24 @@ namespace Ant.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<GetRouteByIdViewModel>))]
         public async Task<IActionResult> GetById(Guid routeId)
         {
-            return Ok(await Mediator.Send(new GetRouteByIdQuery { Id = routeId }));
+            var response = await Mediator.Send(new GetRouteByIdQuery { Id = routeId });
+            if (response?.Data is not null && !response.Data.IsPublic)
+            {
+                var rawUserId = User.FindFirstValue("uid");
+                if (string.IsNullOrEmpty(rawUserId) || !Guid.TryParse(rawUserId, out var currentUserId))
+                {
+                    return Unauthorized();
+                }
+
+                var isOwner = response.Data.AuthorUserId == currentUserId;
+                var isAdmin = User.IsInRole(RoleNames.Admin);
+                if (!isOwner && !isAdmin)
+                {
+                    return Forbid();
+                }
+            }
+
+            return Ok(response);
         }
 
         // POST /api/routes

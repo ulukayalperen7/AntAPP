@@ -35,6 +35,8 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
         public Guid AuthorUserId { get; set; }
+        public string AuthorUserName { get; set; }
+        public string OriginalAuthorName { get; set; }
         public string ContentType { get; set; }
         public bool IsPublic { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -104,6 +106,8 @@ namespace Ant.Application.Features.Routes.Queries.GetPagedRoutes
                         Description = r.Description,
                         ThumbnailUrl = r.ThumbnailUrl,
                         AuthorUserId = r.AuthorUserId,
+                        AuthorUserName = r.AuthorUser?.UserName,
+                        OriginalAuthorName = r.OriginalRoute?.AuthorUser?.UserName,
                         ContentType = r.ContentType.ToString(),
                         IsPublic = r.IsPublic,
                         CreatedAt = r.CreatedAt,

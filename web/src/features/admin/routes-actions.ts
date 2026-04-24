@@ -52,6 +52,17 @@ export async function promoteRoute(id: string, contentType: 'Official' | 'Sponso
     }
 }
 
+export async function deleteAdminRoute(id: string): Promise<boolean> {
+    try {
+        await apiFetch(`/admin/routes/${id}`, {
+            method: 'DELETE',
+        })
+        return true
+    } catch {
+        return false
+    }
+}
+
 export async function getRouteDetail(id: string): Promise<RouteDetailViewModel | null> {
     try {
         const res = await apiFetch<{ data: RouteDetailViewModel }>(`/routes/${id}`)

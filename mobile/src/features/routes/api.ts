@@ -6,7 +6,7 @@ export type GetRoutesParams = {
   tagIds?: string[]
   sort?: 'rating' | 'newest' | string
   type?: 'official' | 'community' | 'sponsored'
-  visibility?: 'public' | 'private'
+  visibility?: 'public' | 'draft'
   authorId?: string
   page?: number
   pageSize?: number
@@ -40,7 +40,7 @@ export async function getTags(pageSize = 100): Promise<Tag[]> {
 export async function rateRoute(routeId: string, score: number): Promise<void> {
   await apiFetchData<string>(`/routes/${routeId}/rating`, {
     method: 'PUT',
-    body: JSON.stringify({ score }),
+    body: JSON.stringify({ stars: score }),
   })
 }
 

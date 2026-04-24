@@ -46,7 +46,7 @@ namespace Ant.Application.Features.Routes.Commands.ForkRoute
             var forked = new Route
             {
                 AuthorUserId = userId,
-                OriginalRouteId = original.Id,
+                OriginalRouteId = original.AuthorUserId == userId ? null : original.Id,
                 Title = original.Title,
                 Description = original.Description,
                 ThumbnailUrl = original.ThumbnailUrl,
