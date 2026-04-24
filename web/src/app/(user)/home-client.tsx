@@ -143,7 +143,7 @@ function StoryCard({
 }) {
   if (action) {
     return (
-      <Link href="/posts/create" style={{ textDecoration: 'none' }}>
+      <Link href="/posts/create?intent=story" style={{ textDecoration: 'none' }}>
         <Card
           variant="outline"
           size="sm"
@@ -249,6 +249,14 @@ function FeedPostCard({
   const [isCommentPosting, startCommentPosting] = useTransition()
   const [isSharing, startSharing] = useTransition()
 
+  const openCreatePost = (intent: 'post' | 'live' | 'photo' | 'checkin' | 'react' | 'comment' | 'share') => {
+    const params = new URLSearchParams({
+      intent,
+      routeId: route.id,
+    })
+    router.push(`/posts/create?${params.toString()}`)
+  }
+
   const loadComments = (page = 1, append = false) => {
     if (!postId) return
 
@@ -279,7 +287,11 @@ function FeedPostCard({
   }
 
   const handleToggleReaction = () => {
-    if (!postId || isLiking) return
+    if (!postId) {
+      openCreatePost('react')
+      return
+    }
+    if (isLiking) return
 
     startLiking(async () => {
       try {
@@ -294,6 +306,11 @@ function FeedPostCard({
   }
 
   const handleToggleComments = () => {
+    if (!postId) {
+      openCreatePost('comment')
+      return
+    }
+
     const nextOpen = !isCommentsOpen
     setIsCommentsOpen(nextOpen)
     if (nextOpen && !commentsLoaded) {
@@ -329,7 +346,11 @@ function FeedPostCard({
   }
 
   const handleShare = () => {
-    if (!postId || isSharing) return
+    if (!postId) {
+      openCreatePost('share')
+      return
+    }
+    if (isSharing) return
 
     startSharing(async () => {
       try {
@@ -516,7 +537,7 @@ function FeedPostCard({
         <Button
           variant={isReacted ? 'solid' : 'ghost'}
           size="sm"
-          disabled={!isInteractivePost || isLiking}
+          disabled={isLiking}
           loading={isLiking}
           icon={<ThumbsUp size={16} color="currentColor" />}
           onPress={handleToggleReaction}
@@ -526,7 +547,6 @@ function FeedPostCard({
         <Button
           variant={isCommentsOpen ? 'outline' : 'ghost'}
           size="sm"
-          disabled={!isInteractivePost}
           icon={<MessageCircle size={16} color="currentColor" />}
           onPress={handleToggleComments}
         >
@@ -535,7 +555,7 @@ function FeedPostCard({
         <Button
           variant={isShared ? 'solid' : 'ghost'}
           size="sm"
-          disabled={!isInteractivePost || isSharing}
+          disabled={isSharing}
           loading={isSharing}
           icon={<Share2 size={16} color="currentColor" />}
           onPress={handleShare}
@@ -545,9 +565,14 @@ function FeedPostCard({
       </XStack>
 
       {!isInteractivePost ? (
-        <Text variant="caption" muted>
-          This card comes from route listing. Create a post to enable like, comment, and share.
-        </Text>
+        <YStack gap="$2">
+          <Text variant="caption" muted>
+            This card comes from route listing. Publish a post for this route to activate social interactions.
+          </Text>
+          <Button variant="outline" size="sm" onPress={() => openCreatePost('post')}>
+            Create post from this route
+          </Button>
+        </YStack>
       ) : null}
 
       {isCommentsOpen ? (
@@ -687,6 +712,9 @@ export default function HomeClient({
               backgroundColor="$background"
               borderWidth={1}
               borderColor="$borderColor"
+              cursor="pointer"
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+              onPress={() => router.push('/posts/create?intent=post')}
             >
               <Text variant="body" muted>{copy.composer}</Text>
             </XStack>
@@ -699,16 +727,30 @@ export default function HomeClient({
             gap="$2"
             flexWrap="wrap"
           >
-            <Button variant="ghost" size="sm" icon={<Camera size={16} color="#E11D48" />}>Live</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<Camera size={16} color="#E11D48" />}
+              onPress={() => router.push('/posts/create?intent=live')}
+            >
+              Live
+            </Button>
             <Button
               variant="ghost"
               size="sm"
               icon={<ImageIcon size={16} color="#16A34A" />}
-              onPress={() => router.push('/posts/create')}
+              onPress={() => router.push('/posts/create?intent=photo')}
             >
               Photo
             </Button>
-            <Button variant="ghost" size="sm" icon={<MapPinned size={16} color="#0EA5E9" />}>Check in</Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<MapPinned size={16} color="#0EA5E9" />}
+              onPress={() => router.push('/posts/create?intent=checkin')}
+            >
+              Check in
+            </Button>
           </XStack>
         </Card>
 
@@ -819,7 +861,7 @@ export default function HomeClient({
 
         <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
           <YStack gap="$2.5">
-            <Link href="/posts/create" style={{ textDecoration: 'none' }}>
+            <Link href="/posts/create?intent=post" style={{ textDecoration: 'none' }}>
               <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create post</Button>
             </Link>
             <Link href="/my-routes" style={{ textDecoration: 'none' }}>
