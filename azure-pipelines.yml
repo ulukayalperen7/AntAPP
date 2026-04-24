@@ -1,0 +1,122 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  - group: antapp-prod
+  - name: IMAGE_TAG
+    value: $(Build.BuildId)
+
+stages:
+  - stage: Build
+    displayName: Build & Push Docker Images
+    jobs:
+      - job: BuildAndPush
+        displayName: Build and Push
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Docker@2
+            displayName: Login to Docker Hub
+            inputs:
+              command: login
+              containerRegistry: DockerHubConnection
+
+          - task: Docker@2
+            displayName: Build backend image
+            inputs:
+              command: build
+              dockerfile: backend/Dockerfile
+              buildContext: backend
+              repository: $(DOCKER_HUB_USERNAME)/antapp-backend
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          - task: Docker@2
+            displayName: Push backend image
+            inputs:
+              command: push
+              repository: $(DOCKER_HUB_USERNAME)/antapp-backend
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          - task: Docker@2
+            displayName: Build web image
+            inputs:
+              command: build
+              dockerfile: web/Dockerfile
+              buildContext: .
+              repository: $(DOCKER_HUB_USERNAME)/antapp-web
+              arguments: >
+                --build-arg NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL)
+                --build-arg NEXT_PUBLIC_APP_URL=$(NEXT_PUBLIC_APP_URL)
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          - task: Docker@2
+            displayName: Push web image
+            inputs:
+              command: push
+              repository: $(DOCKER_HUB_USERNAME)/antapp-web
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          - task: CopyFiles@2
+            displayName: Copy docker-compose to staging
+            inputs:
+              contents: docker-compose.yml
+              targetFolder: $(Build.ArtifactStagingDirectory)
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish artifact
+            inputs:
+              pathToPublish: $(Build.ArtifactStagingDirectory)
+              artifactName: deploy
+
+  - stage: Deploy
+    displayName: Deploy to Server
+    dependsOn: Build
+    jobs:
+      - deployment: DeployToServer
+        displayName: SSH Deploy
+        environment: production
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: DownloadBuildArtifacts@1
+                  inputs:
+                    buildType: current
+                    artifactName: deploy
+                    downloadPath: $(System.ArtifactsDirectory)
+
+                - task: InstallSSHKey@0
+                  displayName: Install SSH key
+                  inputs:
+                    knownHostsEntry: $(SSH_KNOWN_HOSTS)
+                    sshPublicKey: $(SSH_PUBLIC_KEY)
+                    sshKeySecureFile: deploy_key
+
+                - script: |
+                    scp $(System.ArtifactsDirectory)/deploy/docker-compose.yml \
+                      $(SSH_USER)@$(SSH_HOST):/opt/antapp/docker-compose.yml
+                  displayName: Copy docker-compose.yml to server
+
+                - script: |
+                    ssh $(SSH_USER)@$(SSH_HOST) "
+                      cd /opt/antapp &&
+                      DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) \
+                      IMAGE_TAG=$(IMAGE_TAG) \
+                      docker compose pull &&
+                      DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) \
+                      IMAGE_TAG=$(IMAGE_TAG) \
+                      docker compose up -d --remove-orphans
+                    "
+                  displayName: Pull and restart containers

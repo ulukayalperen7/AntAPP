@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: antapp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-antapp}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-antapp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - antapp
+
+  backend:
+    image: ${DOCKER_HUB_USERNAME}/antapp-backend:${IMAGE_TAG:-latest}
+    container_name: antapp-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-antapp};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Trust Server Certificate=true;CommandTimeout=300;"
+      JWTSettings__Key: ${JWT_SECRET}
+      JWTSettings__Issuer: AntAppBackend
+      JWTSettings__Audience: AntAppUser
+      JWTSettings__DurationInMinutes: ${JWT_DURATION_MINUTES:-60}
+      MailSettings__EmailFrom: ${MAIL_FROM}
+      MailSettings__SmtpHost: ${SMTP_HOST}
+      MailSettings__SmtpPort: ${SMTP_PORT:-587}
+      MailSettings__SmtpUser: ${SMTP_USER}
+      MailSettings__SmtpPass: ${SMTP_PASS}
+      MailSettings__DisplayName: ${MAIL_DISPLAY_NAME:-AntApp}
+      AllowedOrigins__0: ${WEB_URL}
+    ports:
+      - "8080:8080"
+    networks:
+      - antapp
+
+  web:
+    image: ${DOCKER_HUB_USERNAME}/antapp-web:${IMAGE_TAG:-latest}
+    container_name: antapp-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOSTNAME: "0.0.0.0"
+    ports:
+      - "3000:3000"
+    networks:
+      - antapp
+
+volumes:
+  postgres_data:
+
+networks:
+  antapp:
+    driver: bridge

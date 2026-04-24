@@ -93,7 +93,6 @@ builder.Services.AddHttpContextAccessor();
 //Build the application
 var app = builder.Build();
 
-/* 
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -107,7 +106,6 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole<Guid>(role));
     }
 }
-*/
 
 if (app.Environment.IsDevelopment())
 {
@@ -122,8 +120,10 @@ else
 
 app.UseRouting();
 app.UseResponseCompression();
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:3000", "https://localhost:3000"];
 app.UseCors(options => options
-    .WithOrigins("http://localhost:3000", "https://localhost:3000", "http://localhost:8081", "http://172.20.10.2:8081", "http://172.20.10.2:3000")
+    .WithOrigins(allowedOrigins)
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials());

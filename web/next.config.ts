@@ -1,6 +1,11 @@
+import path from 'path'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  experimental: {
+    outputFileTracingRoot: path.join(__dirname, '../'),
+  },
   transpilePackages: ['@antapp/app', '@antapp/ui'],
   images: {
     remotePatterns: [
