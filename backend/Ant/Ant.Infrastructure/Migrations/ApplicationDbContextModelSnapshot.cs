@@ -83,6 +83,152 @@ namespace Ant.Infrastructure.Migrations
                     b.ToTable("CollectionRoutes");
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AuthorUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorUserId");
+
+                    b.HasIndex("RouteId", "CreatedAt");
+
+                    b.HasIndex("IsDeleted", "IsPublic", "CreatedAt");
+
+                    b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId", "CreatedAt");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("PostComments");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId", "SortOrder");
+
+                    b.ToTable("PostImages");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostReaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PostId", "CreatedAt");
+
+                    b.HasIndex("PostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("PostReactions");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostShare", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PostId", "CreatedAt");
+
+                    b.HasIndex("PostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("PostShares");
+                });
+
             modelBuilder.Entity("Ant.Core.Entities.Route", b =>
                 {
                     b.Property<Guid>("Id")
@@ -616,6 +762,93 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("Route");
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.Post", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.User", "AuthorUser")
+                        .WithMany("Posts")
+                        .HasForeignKey("AuthorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.Route", "Route")
+                        .WithMany("Posts")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuthorUser");
+
+                    b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostComment", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.User", "User")
+                        .WithMany("PostComments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostImage", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.Post", "Post")
+                        .WithMany("Images")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostReaction", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.Post", "Post")
+                        .WithMany("Reactions")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.User", "User")
+                        .WithMany("PostReactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostShare", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.Post", "Post")
+                        .WithMany("Shares")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.User", "User")
+                        .WithMany("PostShares")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Ant.Core.Entities.Route", b =>
                 {
                     b.HasOne("Ant.Core.Entities.User", "AuthorUser")
@@ -842,9 +1075,22 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("CollectionRoutes");
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.Post", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("Reactions");
+
+                    b.Navigation("Shares");
+                });
+
             modelBuilder.Entity("Ant.Core.Entities.Route", b =>
                 {
                     b.Navigation("CollectionRoutes");
+
+                    b.Navigation("Posts");
 
                     b.Navigation("RouteRatings");
 
@@ -876,6 +1122,14 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("FavoriteSpots");
 
                     b.Navigation("OwnedSpots");
+
+                    b.Navigation("PostComments");
+
+                    b.Navigation("PostReactions");
+
+                    b.Navigation("PostShares");
+
+                    b.Navigation("Posts");
 
                     b.Navigation("RouteRatings");
 

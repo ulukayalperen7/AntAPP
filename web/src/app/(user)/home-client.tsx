@@ -28,7 +28,7 @@ const PAGE_COPY: Record<FeedMode, {
   timeline: {
     title: 'Explore Feed',
     subtitle: 'Public routes now behave like social posts. Fresh shares, official highlights, and community motion all meet here first.',
-    composer: 'Share a new route, drop a scenic update, or post today’s route draft...',
+    composer: "Share a new route, drop a scenic update, or post today's route draft...",
     railTitle: 'Trending now',
     railSubtitle: 'Routes getting the strongest pull in the public flow.',
   },
