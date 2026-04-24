@@ -2,6 +2,7 @@ using Ant.Application.Features.Posts.Commands.CreatePost;
 using Ant.Application.Features.Posts.Commands.TogglePostReaction;
 using Ant.Application.Features.Posts.Commands.AddPostComment;
 using Ant.Application.Features.Posts.Commands.SharePost;
+using Ant.Application.Features.Posts.Commands.DeletePostComment;
 using Ant.Application.Features.Posts.Queries.GetFeedPosts;
 using Ant.Application.Features.Posts.Queries.GetPostComments;
 using Ant.Application.Wrappers;
@@ -80,6 +81,17 @@ namespace Ant.WebApi.Controllers
             return Ok(await Mediator.Send(new SharePostCommand
             {
                 PostId = postId
+            }));
+        }
+
+        [HttpDelete("{postId}/comments/{commentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
+        public async Task<IActionResult> DeleteComment(Guid postId, Guid commentId)
+        {
+            return Ok(await Mediator.Send(new DeletePostCommentCommand
+            {
+                PostId = postId,
+                CommentId = commentId
             }));
         }
     }

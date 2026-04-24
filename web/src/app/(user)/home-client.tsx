@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from '@antapp/ui'
-import { addPostComment, getPostComments, sharePost, togglePostReaction } from '@/features/posts/actions'
+import { addPostComment, deletePostComment, getPostComments, sharePost, togglePostReaction } from '@/features/posts/actions'
 import type { PostCommentItem, RouteListItem } from '@/types/api'
-import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp } from 'lucide-react'
+import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
 
 type FeedMode = 'timeline' | 'official' | 'community'
 const COMMENTS_PAGE_SIZE = 20
@@ -218,9 +218,11 @@ function StoryCard({
 function FeedPostCard({
   route,
   referenceNowMs,
+  currentUserName,
 }: {
   route: RouteListItem
   referenceNowMs: number
+  currentUserName?: string | null
 }) {
   const router = useRouter()
   const tone = getPostTone(route)
@@ -341,6 +343,22 @@ function FeedPostCard({
         setSocialError(null)
       } catch (e) {
         setSocialError((e as Error).message ?? 'Failed to post comment.')
+      }
+    })
+  }
+
+  const handleDeleteComment = (commentId: string) => {
+    if (!postId || isCommentPosting) return
+    if (!window.confirm('Delete this comment?')) return
+
+    startCommentPosting(async () => {
+      try {
+        await deletePostComment(postId, commentId)
+        setComments(current => current.filter(c => c.commentId !== commentId))
+        setCommentCount(c => Math.max(0, c - 1))
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to delete comment.')
       }
     })
   }
@@ -611,6 +629,18 @@ function FeedPostCard({
                       <Text variant="label">{comment.userName?.trim() || 'Route Explorer'}</Text>
                       <Text variant="caption" muted>{formatRelativeDate(comment.createdAt, referenceNowMs)}</Text>
                     </XStack>
+                    {currentUserName && comment.userName === currentUserName && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        padding="$1"
+                        height="auto"
+                        onPress={() => handleDeleteComment(comment.commentId)}
+                        disabled={isCommentPosting}
+                      >
+                        <Trash2 size={14} color="var(--color-mutedForeground)" />
+                      </Button>
+                    )}
                     <Text variant="body">{comment.content}</Text>
                   </YStack>
                 </XStack>
@@ -769,7 +799,7 @@ export default function HomeClient({
         <YStack gap="$4">
           {timelineRoutes.length > 0 ? (
             timelineRoutes.map((route) => (
-              <FeedPostCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} referenceNowMs={referenceNowMs} />
+              <FeedPostCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} referenceNowMs={referenceNowMs} currentUserName={currentUserName} />
             ))
           ) : (
             <Card variant="outline" size="lg" backgroundColor="$backgroundStrong" alignItems="center" gap="$3">
@@ -794,7 +824,7 @@ export default function HomeClient({
             {spotlightRoutes.slice(0, 4).map((route) => (
               <Link key={route.id} href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
                 <XStack gap="$3" alignItems="center">
-                    <YStack width={88} height={88} borderRadius="$3" overflow="hidden" backgroundColor="$muted">
+                  <YStack width={88} height={88} borderRadius="$3" overflow="hidden" backgroundColor="$muted">
                     {(route.postImageUrls?.[0] || route.thumbnailUrl) ? (
                       <Image src={route.postImageUrls?.[0] || route.thumbnailUrl || ''} width="100%" height="100%" objectFit="cover" />
                     ) : null}
