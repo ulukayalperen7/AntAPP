@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Switch } from '@antapp/ui'
 import { createRoute } from '@/features/routes/actions'
 import { ArrowLeft, Plus, Trash2, MapPin, Heart } from 'lucide-react'
 import SpotSelect from '@/components/spot-select'
@@ -25,6 +25,7 @@ export default function CreateRoutePage() {
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [isPublic, setIsPublic] = useState(true)
   const [stops, setStops] = useState<StopEntry[]>([
     { id: generateTempId(), spotId: '', customTitle: '', customDescription: '' },
     { id: generateTempId(), spotId: '', customTitle: '', customDescription: '' },
@@ -85,6 +86,7 @@ export default function CreateRoutePage() {
         const routeId = await createRoute({
           title: title.trim(),
           description: description.trim() || undefined,
+          isPublic,
           spots: validStops.map((s) => ({
             spotId: s.spotId.trim(),
             customTitle: s.customTitle.trim() || undefined,
@@ -144,6 +146,16 @@ export default function CreateRoutePage() {
             multiline
             numberOfLines={3}
           />
+        </YStack>
+
+        <YStack gap="$1.5" marginTop="$2">
+          <XStack alignItems="center" justifyContent="space-between">
+            <YStack>
+              <Text variant="label" color="$mutedForeground">Public visibility</Text>
+              <Text variant="caption" muted>If enabled, this route can be discovered by others.</Text>
+            </YStack>
+            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
+          </XStack>
         </YStack>
       </YStack>
 

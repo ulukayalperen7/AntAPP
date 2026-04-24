@@ -527,60 +527,64 @@ function FeedPostCard({
         </XStack>
       </YStack>
 
-      <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
-        <XStack gap="$3" alignItems="center">
-          <XStack alignItems="center" gap="$1.5">
-            <ThumbsUp size={14} color="var(--color-primary)" />
-            <Text variant="caption" muted>{reactionCount} reacts</Text>
+      {isInteractivePost && (
+        <>
+          <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
+            <XStack gap="$3" alignItems="center">
+              <XStack alignItems="center" gap="$1.5">
+                <ThumbsUp size={14} color="var(--color-primary)" />
+                <Text variant="caption" muted>{reactionCount} reacts</Text>
+              </XStack>
+              <XStack alignItems="center" gap="$1.5">
+                <MessageCircle size={14} color="var(--color-mutedForeground)" />
+                <Text variant="caption" muted>{commentCount} comments</Text>
+              </XStack>
+            </XStack>
+            <XStack alignItems="center" gap="$1.5">
+              <Send size={14} color="var(--color-mutedForeground)" />
+              <Text variant="caption" muted>{shareCount} shares</Text>
+            </XStack>
           </XStack>
-          <XStack alignItems="center" gap="$1.5">
-            <MessageCircle size={14} color="var(--color-mutedForeground)" />
-            <Text variant="caption" muted>{commentCount} comments</Text>
-          </XStack>
-        </XStack>
-        <XStack alignItems="center" gap="$1.5">
-          <Send size={14} color="var(--color-mutedForeground)" />
-          <Text variant="caption" muted>{shareCount} shares</Text>
-        </XStack>
-      </XStack>
 
-      <XStack
-        borderTopWidth={1}
-        borderTopColor="$borderColor"
-        paddingTop="$3"
-        justifyContent="space-between"
-        gap="$2"
-        flexWrap="wrap"
-      >
-        <Button
-          variant={isReacted ? 'solid' : 'ghost'}
-          size="sm"
-          disabled={isLiking}
-          loading={isLiking}
-          icon={<ThumbsUp size={16} color="currentColor" />}
-          onPress={handleToggleReaction}
-        >
-          Like
-        </Button>
-        <Button
-          variant={isCommentsOpen ? 'outline' : 'ghost'}
-          size="sm"
-          icon={<MessageCircle size={16} color="currentColor" />}
-          onPress={handleToggleComments}
-        >
-          Comment
-        </Button>
-        <Button
-          variant={isShared ? 'solid' : 'ghost'}
-          size="sm"
-          disabled={isSharing}
-          loading={isSharing}
-          icon={<Share2 size={16} color="currentColor" />}
-          onPress={handleShare}
-        >
-          Share
-        </Button>
-      </XStack>
+          <XStack
+            borderTopWidth={1}
+            borderTopColor="$borderColor"
+            paddingTop="$3"
+            justifyContent="space-between"
+            gap="$2"
+            flexWrap="wrap"
+          >
+            <Button
+              variant={isReacted ? 'solid' : 'ghost'}
+              size="sm"
+              disabled={isLiking}
+              loading={isLiking}
+              icon={<ThumbsUp size={16} color="currentColor" />}
+              onPress={handleToggleReaction}
+            >
+              Like
+            </Button>
+            <Button
+              variant={isCommentsOpen ? 'outline' : 'ghost'}
+              size="sm"
+              icon={<MessageCircle size={16} color="currentColor" />}
+              onPress={handleToggleComments}
+            >
+              Comment
+            </Button>
+            <Button
+              variant={isShared ? 'solid' : 'ghost'}
+              size="sm"
+              disabled={isSharing}
+              loading={isSharing}
+              icon={<Share2 size={16} color="currentColor" />}
+              onPress={handleShare}
+            >
+              Share
+            </Button>
+          </XStack>
+        </>
+      )}
 
       {!isInteractivePost ? (
         <YStack gap="$2">

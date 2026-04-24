@@ -64,6 +64,7 @@ export type RouteListItem = {
   thumbnailUrl: string | null
   authorUserId: string
   authorUserName?: string | null
+  originalAuthorName?: string | null
   postId?: string
   postContent?: string | null
   postImageUrls?: string[]
@@ -145,6 +146,7 @@ export type RouteDetail = {
   description: string | null
   thumbnailUrl: string | null
   authorUserId: string
+  originalAuthorName?: string | null
   isPublic: boolean
   contentType: RouteContentType
   averageRating: number

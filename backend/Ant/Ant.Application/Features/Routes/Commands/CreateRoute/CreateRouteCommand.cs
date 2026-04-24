@@ -40,6 +40,7 @@ namespace Ant.Application.Features.Routes.Commands.CreateRoute
         public string Title { get; set; }
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
+        public bool IsPublic { get; set; } = true;
         public List<Guid> TagIds { get; set; }
         
         /// <summary>
@@ -91,7 +92,7 @@ namespace Ant.Application.Features.Routes.Commands.CreateRoute
                 Description = request.Description,
                 ThumbnailUrl = request.ThumbnailUrl,
                 RouteType = RouteTypeEnum.Walking,
-                IsPublic = true,
+                IsPublic = request.IsPublic,
                 RouteTags = new List<RouteTag>(),
                 RouteSpots = new List<RouteSpot>()
             };

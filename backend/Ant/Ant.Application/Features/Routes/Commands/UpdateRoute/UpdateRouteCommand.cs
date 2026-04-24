@@ -18,6 +18,7 @@ namespace Ant.Application.Features.Routes.Commands.UpdateRoute
         public string Title { get; set; }
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
+        public bool? IsPublic { get; set; }
         public List<Guid> TagIds { get; set; }
     }
 
@@ -50,6 +51,7 @@ namespace Ant.Application.Features.Routes.Commands.UpdateRoute
             if (request.Title != null) route.Title = request.Title;
             if (request.Description != null) route.Description = request.Description;
             if (request.ThumbnailUrl != null) route.ThumbnailUrl = request.ThumbnailUrl;
+            if (request.IsPublic.HasValue) route.IsPublic = request.IsPublic.Value;
 
             // Update Tags
             if (request.TagIds != null)

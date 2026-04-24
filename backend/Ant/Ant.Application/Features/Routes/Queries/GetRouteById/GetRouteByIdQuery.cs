@@ -27,6 +27,7 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
         public Guid AuthorUserId { get; set; }
+        public string OriginalAuthorName { get; set; }
         public Ant.Core.Enums.RouteContentTypeEnum ContentType { get; set; }
         public bool IsPublic { get; set; }
 
@@ -93,6 +94,7 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
                         Description = route.Description,
                         ThumbnailUrl = route.ThumbnailUrl,
                         AuthorUserId = route.AuthorUserId,
+                        OriginalAuthorName = route.OriginalRoute?.AuthorUser?.UserName,
                         ContentType = route.ContentType,
                         IsPublic = route.IsPublic,
                         EncodedPolyline = route.EncodedPolyline,

@@ -107,6 +107,7 @@ export async function createRoute(data: {
   title: string
   description?: string
   thumbnailUrl?: string
+  isPublic?: boolean
   tagIds?: string[]
   spots: Array<{ spotId: string; customTitle?: string; customDescription?: string }>
 }): Promise<string> {
@@ -120,6 +121,7 @@ export async function updateRoute(id: string, data: {
   title?: string
   description?: string
   thumbnailUrl?: string
+  isPublic?: boolean
 }): Promise<string> {
   return apiFetchData<string>(`/routes/${id}`, {
     method: 'PATCH',

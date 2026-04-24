@@ -16,7 +16,7 @@ export default async function DashboardPage() {
     ? mapFeedPostsToRouteCards(feedResult.value.data)
     : []
   const fallbackRoutes = fallbackResult.status === 'fulfilled' ? fallbackResult.value.data : []
-  const timelineRoutes = feedResult.status === 'fulfilled' ? feedRoutes : fallbackRoutes
+  const timelineRoutes = feedRoutes.length > 0 ? feedRoutes : fallbackRoutes
   const spotlightRoutes = spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : []
   const currentUserName = userResult.status === 'fulfilled' ? userResult.value.userName : null
 
