@@ -13,6 +13,7 @@ type HomeClientProps = {
   timelineRoutes: RouteListItem[]
   spotlightRoutes: RouteListItem[]
   currentUserName?: string | null
+  referenceNowIso: string
 }
 
 const PAGE_COPY: Record<FeedMode, {
@@ -45,11 +46,19 @@ const PAGE_COPY: Record<FeedMode, {
   },
 }
 
-function formatRelativeDate(value: string) {
-  const timestamp = new Date(value).getTime()
-  if (Number.isNaN(timestamp)) return 'Now'
+function parseApiDate(value: string) {
+  const hasTimezone = /(?:[zZ]|[+-]\d{2}:\d{2})$/.test(value)
+  const normalized = hasTimezone ? value : `${value}Z`
+  const date = new Date(normalized)
+  return Number.isNaN(date.getTime()) ? null : date
+}
 
-  const diffMinutes = Math.round((Date.now() - timestamp) / (1000 * 60))
+function formatRelativeDate(value: string, referenceNowMs: number) {
+  const parsed = parseApiDate(value)
+  if (!parsed) return 'Now'
+  const timestamp = parsed.getTime()
+
+  const diffMinutes = Math.round((referenceNowMs - timestamp) / (1000 * 60))
   if (diffMinutes <= 1) return 'Now'
   if (diffMinutes < 60) return `${diffMinutes}m`
 
@@ -59,17 +68,18 @@ function formatRelativeDate(value: string) {
   const diffDays = Math.round(diffHours / 24)
   if (diffDays < 7) return `${diffDays}d`
 
-  return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short' }).format(new Date(value))
+  return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short', timeZone: 'UTC' }).format(parseApiDate(value) ?? new Date(0))
 }
 
 function formatFullDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return 'Recently'
+  const date = parseApiDate(value)
+  if (!date) return 'Recently'
 
   return new Intl.DateTimeFormat('tr-TR', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
+    timeZone: 'UTC',
   }).format(date)
 }
 
@@ -199,7 +209,13 @@ function StoryCard({
   )
 }
 
-function FeedPostCard({ route }: { route: RouteListItem }) {
+function FeedPostCard({
+  route,
+  referenceNowMs,
+}: {
+  route: RouteListItem
+  referenceNowMs: number
+}) {
   const router = useRouter()
   const tone = getPostTone(route)
   const author = getAuthor(route)
@@ -225,7 +241,7 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
             </XStack>
             <Text variant="caption" muted>{author.role}</Text>
             <XStack gap="$2" flexWrap="wrap" alignItems="center">
-              <Text variant="caption" muted>{formatRelativeDate(route.createdAt)}</Text>
+              <Text variant="caption" muted>{formatRelativeDate(route.createdAt, referenceNowMs)}</Text>
               <CircleDot size={10} color="var(--color-mutedForeground)" />
               <Text variant="caption" muted>{tone.label}</Text>
             </XStack>
@@ -325,7 +341,7 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
 
               <XStack justifyContent="space-between" alignItems="center">
                 <Text variant="caption" muted>Post age</Text>
-                <Text variant="caption" weight="semibold">{formatRelativeDate(route.createdAt)}</Text>
+                <Text variant="caption" weight="semibold">{formatRelativeDate(route.createdAt, referenceNowMs)}</Text>
               </XStack>
             </YStack>
 
@@ -389,9 +405,16 @@ function RightRailCard({
   )
 }
 
-export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, currentUserName }: HomeClientProps) {
+export default function HomeClient({
+  mode,
+  timelineRoutes,
+  spotlightRoutes,
+  currentUserName,
+  referenceNowIso,
+}: HomeClientProps) {
   const copy = PAGE_COPY[mode]
   const composerInitials = getInitials(currentUserName)
+  const referenceNowMs = parseApiDate(referenceNowIso)?.getTime() ?? 0
 
   return (
     <XStack gap="$5" alignItems="flex-start" $md={{ flexDirection: 'column' }}>
@@ -467,7 +490,7 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, curr
         <YStack gap="$4">
           {timelineRoutes.length > 0 ? (
             timelineRoutes.map((route) => (
-              <FeedPostCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} />
+              <FeedPostCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} referenceNowMs={referenceNowMs} />
             ))
           ) : (
             <Card variant="outline" size="lg" backgroundColor="$backgroundStrong" alignItems="center" gap="$3">
@@ -502,7 +525,7 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, curr
                     <Text variant="label" numberOfLines={2}>{route.title}</Text>
                     <XStack gap="$2" alignItems="center">
                       <Clock3 size={12} color="var(--color-mutedForeground)" />
-                      <Text variant="caption" muted>{formatRelativeDate(route.createdAt)}</Text>
+                      <Text variant="caption" muted>{formatRelativeDate(route.createdAt, referenceNowMs)}</Text>
                     </XStack>
                   </YStack>
                 </XStack>

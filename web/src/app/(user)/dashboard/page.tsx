@@ -26,6 +26,7 @@ export default async function DashboardPage() {
       timelineRoutes={timelineRoutes}
       spotlightRoutes={spotlightRoutes}
       currentUserName={currentUserName}
+      referenceNowIso={new Date().toISOString()}
     />
   )
 }

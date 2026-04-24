@@ -26,6 +26,7 @@ export default async function CommunityPage() {
       timelineRoutes={timelineRoutes}
       spotlightRoutes={spotlightRoutes}
       currentUserName={currentUserName}
+      referenceNowIso={new Date().toISOString()}
     />
   )
 }
