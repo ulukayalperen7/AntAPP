@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 FROM base AS deps
 WORKDIR /app
@@ -8,7 +8,7 @@ COPY web/package.json ./web/
 COPY mobile/package.json ./mobile/
 COPY packages/app/package.json ./packages/app/
 COPY packages/ui/package.json ./packages/ui/
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts --no-audit --no-fund
 
 FROM base AS builder
 WORKDIR /app
