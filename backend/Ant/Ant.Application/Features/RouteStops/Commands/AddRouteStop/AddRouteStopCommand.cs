@@ -25,6 +25,7 @@ namespace Ant.Application.Features.RouteStops.Commands.AddRouteStop
     {
         private readonly IRouteSpotRepositoryAsync _routeSpotRepository;
         private readonly IRouteRepositoryAsync _routeRepository;
+        private readonly IGenericRepositoryAsync<Spot> _spotRepository;
         private readonly IMapRoutingService _mapRoutingService;
         private readonly IAuthenticatedUserService _authenticatedUser;
         private readonly IAppCacheService _cache;
@@ -32,12 +33,14 @@ namespace Ant.Application.Features.RouteStops.Commands.AddRouteStop
         public AddRouteStopCommandHandler(
             IRouteSpotRepositoryAsync routeSpotRepository,
             IRouteRepositoryAsync routeRepository,
+            IGenericRepositoryAsync<Spot> spotRepository,
             IMapRoutingService mapRoutingService,
             IAuthenticatedUserService authenticatedUser,
             IAppCacheService cache)
         {
             _routeSpotRepository = routeSpotRepository;
             _routeRepository = routeRepository;
+            _spotRepository = spotRepository;
             _mapRoutingService = mapRoutingService;
             _authenticatedUser = authenticatedUser;
             _cache = cache;
@@ -56,7 +59,15 @@ namespace Ant.Application.Features.RouteStops.Commands.AddRouteStop
             if (route.AuthorUserId != userId)
                 throw new ApiException("You can only add stops to your own routes.");
 
-            var order = request.Order ?? (await _routeSpotRepository.GetMaxOrderForRouteAsync(request.RouteId) + 1);
+            var spot = await _spotRepository.GetByIdAsync(request.SpotId);
+            if (spot == null)
+                throw new ApiException("Spot not found.");
+
+            var existingStops = await _routeSpotRepository.GetStopsForRouteAsync(request.RouteId);
+            if (existingStops.Any(rs => rs.SpotId == request.SpotId))
+                throw new ApiException("This spot is already in the route.");
+
+            var order = request.Order ?? (existingStops.Count == 0 ? 1 : existingStops.Max(rs => rs.SpotOrder) + 1);
 
             var routeSpot = new RouteSpot
             {

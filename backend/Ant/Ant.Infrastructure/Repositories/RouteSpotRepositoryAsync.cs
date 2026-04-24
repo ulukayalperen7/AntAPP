@@ -52,11 +52,24 @@ namespace Ant.Infrastructure.Repositories
                 .Where(rs => rs.RouteId == routeId)
                 .ToListAsync();
 
+            var stopById = stops.ToDictionary(s => s.Id);
+
             for (int i = 0; i < orderedStopIds.Count; i++)
             {
-                var stop = stops.FirstOrDefault(s => s.Id == orderedStopIds[i]);
-                if (stop != null)
+                if (stopById.TryGetValue(orderedStopIds[i], out var stop))
+                {
+                    stop.SpotOrder = -(i + 1);
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            for (int i = 0; i < orderedStopIds.Count; i++)
+            {
+                if (stopById.TryGetValue(orderedStopIds[i], out var stop))
+                {
                     stop.SpotOrder = i + 1;
+                }
             }
 
             await _dbContext.SaveChangesAsync();

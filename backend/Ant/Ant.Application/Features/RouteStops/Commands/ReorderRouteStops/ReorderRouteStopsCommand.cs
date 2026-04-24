@@ -56,7 +56,20 @@ namespace Ant.Application.Features.RouteStops.Commands.ReorderRouteStops
             if (request.OrderedStopIds == null || request.OrderedStopIds.Count == 0)
                 throw new ApiException("Ordered stop IDs are required.");
 
-            await _routeSpotRepository.ReorderStopsAsync(request.RouteId, request.OrderedStopIds);
+            var normalizedStopIds = request.OrderedStopIds.Distinct().ToList();
+            if (normalizedStopIds.Count != request.OrderedStopIds.Count)
+                throw new ApiException("Ordered stop IDs must be unique.");
+
+            var existingStops = await _routeSpotRepository.GetStopsForRouteAsync(request.RouteId);
+            var existingStopIds = existingStops.Select(s => s.Id).ToList();
+
+            if (normalizedStopIds.Count != existingStopIds.Count)
+                throw new ApiException("All route stops must be included in reorder request.");
+
+            if (normalizedStopIds.Except(existingStopIds).Any() || existingStopIds.Except(normalizedStopIds).Any())
+                throw new ApiException("Reorder payload does not match the current route stops.");
+
+            await _routeSpotRepository.ReorderStopsAsync(request.RouteId, normalizedStopIds);
             await RecomputeRouteGeometryAsync(request.RouteId, cancellationToken);
             await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
             return new Response<string>("ok", message: "Stops reordered.");

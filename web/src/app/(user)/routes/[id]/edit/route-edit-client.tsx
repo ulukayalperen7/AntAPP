@@ -86,6 +86,8 @@ export default function RouteEditClient({
   const [showSavedSpotPicker, setShowSavedSpotPicker] = useState(false)
   const [stopFeedback, setStopFeedback] = useState<FeedbackState>(null)
   const [isManagingStops, startManageStops] = useTransition()
+  const [isMutatingStops, setIsMutatingStops] = useState(false)
+  const isStopActionPending = isManagingStops || isMutatingStops
 
   const refreshStops = async (successMessage?: string) => {
     const nextStops = await getRouteStops(route.id)
@@ -173,7 +175,9 @@ export default function RouteEditClient({
   }
 
   const handleSaveStop = (stop: RouteStopItem) => {
+    if (isStopActionPending) return
     setStopFeedback(null)
+    setIsMutatingStops(true)
     startManageStops(async () => {
       try {
         await updateRouteStop(route.id, stop.id, {
@@ -183,11 +187,14 @@ export default function RouteEditClient({
         await refreshStops('Stop updated successfully.')
       } catch (e) {
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to update stop.' })
+      } finally {
+        setIsMutatingStops(false)
       }
     })
   }
 
   const handleAddStop = () => {
+    if (isStopActionPending) return
     setStopFeedback(null)
 
     if (!newStop.spotId.trim()) {
@@ -195,6 +202,7 @@ export default function RouteEditClient({
       return
     }
 
+    setIsMutatingStops(true)
     startManageStops(async () => {
       try {
         await addRouteStop(route.id, {
@@ -206,14 +214,18 @@ export default function RouteEditClient({
         await refreshStops('Stop added successfully.')
       } catch (e) {
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add stop.' })
+      } finally {
+        setIsMutatingStops(false)
       }
     })
   }
 
   const handleAddFromSaved = (pickedSpots: SpotListItem[]) => {
     if (pickedSpots.length === 0) return
+    if (isStopActionPending) return
 
     setStopFeedback(null)
+    setIsMutatingStops(true)
     startManageStops(async () => {
       try {
         for (const spot of pickedSpots) {
@@ -225,43 +237,54 @@ export default function RouteEditClient({
         await refreshStops(`${pickedSpots.length} stop${pickedSpots.length > 1 ? 's' : ''} added from saved spots.`)
       } catch (e) {
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to add saved spots.' })
+      } finally {
+        setIsMutatingStops(false)
       }
     })
   }
 
   const handleDeleteStop = (stopId: string) => {
+    if (isStopActionPending) return
     if (!window.confirm('Remove this stop from the route?')) {
       return
     }
 
     setStopFeedback(null)
+    setIsMutatingStops(true)
     startManageStops(async () => {
       try {
         await deleteRouteStop(route.id, stopId)
         await refreshStops('Stop removed from route.')
       } catch (e) {
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to remove stop.' })
+      } finally {
+        setIsMutatingStops(false)
       }
     })
   }
 
   const handleMoveStop = (fromIndex: number, direction: 'up' | 'down') => {
+    if (isStopActionPending) return
     const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
     if (toIndex < 0 || toIndex >= stops.length) {
       return
     }
 
-    const nextStops = reorderArray(stops, fromIndex, toIndex)
+    const previousStops = stops
+    const nextStops = reorderArray(previousStops, fromIndex, toIndex)
     setStops(nextStops)
     setStopFeedback(null)
+    setIsMutatingStops(true)
 
     startManageStops(async () => {
       try {
         await reorderRouteStops(route.id, nextStops.map((stop) => stop.id))
         await refreshStops('Stop order updated.')
       } catch (e) {
-        setStops(savedStops)
+        setStops(previousStops)
         setStopFeedback({ ok: false, message: (e as Error).message ?? 'Failed to reorder stops.' })
+      } finally {
+        setIsMutatingStops(false)
       }
     })
   }
@@ -405,7 +428,7 @@ export default function RouteEditClient({
                   size="sm"
                   icon={<Heart size={14} color="#EA580C" fill="#EA580C" />}
                   onPress={() => setShowSavedSpotPicker(true)}
-                  disabled={isManagingStops}
+                  disabled={isStopActionPending}
                 >
                   Add from Saved
                 </Button>
@@ -431,7 +454,7 @@ export default function RouteEditClient({
                     variant="ghost"
                     size="sm"
                     onPress={() => setNewStop(createEmptyStopForm())}
-                    disabled={isManagingStops}
+                    disabled={isStopActionPending}
                   >
                     Change
                   </Button>
@@ -482,8 +505,8 @@ export default function RouteEditClient({
               <Button
                 variant="solid"
                 size="sm"
-                loading={isManagingStops}
-                disabled={isManagingStops}
+                loading={isStopActionPending}
+                disabled={isStopActionPending}
                 onPress={handleAddStop}
                 icon={<Plus size={14} color="#FFFFFF" />}
               >
@@ -567,7 +590,7 @@ export default function RouteEditClient({
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={index === 0 || isManagingStops}
+                          disabled={index === 0 || isStopActionPending}
                           onPress={() => handleMoveStop(index, 'up')}
                           icon={<ChevronUp size={14} color="currentColor" />}
                         >
@@ -576,7 +599,7 @@ export default function RouteEditClient({
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={index === stops.length - 1 || isManagingStops}
+                          disabled={index === stops.length - 1 || isStopActionPending}
                           onPress={() => handleMoveStop(index, 'down')}
                           icon={<ChevronDown size={14} color="currentColor" />}
                         >
@@ -647,7 +670,7 @@ export default function RouteEditClient({
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={!dirty || isManagingStops}
+                          disabled={!dirty || isStopActionPending}
                           onPress={() => handleResetStop(stop.id)}
                           icon={<RotateCcw size={14} color="currentColor" />}
                         >
@@ -656,8 +679,8 @@ export default function RouteEditClient({
                         <Button
                           variant="solid"
                           size="sm"
-                          loading={isManagingStops}
-                          disabled={!dirty || isManagingStops}
+                          loading={isStopActionPending}
+                          disabled={!dirty || isStopActionPending}
                           onPress={() => handleSaveStop(stop)}
                           icon={<Save size={14} color="#FFFFFF" />}
                         >
@@ -666,7 +689,7 @@ export default function RouteEditClient({
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={isManagingStops}
+                          disabled={isStopActionPending}
                           onPress={() => handleDeleteStop(stop.id)}
                           icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
                         >
