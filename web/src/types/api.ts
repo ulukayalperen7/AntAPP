@@ -64,10 +64,30 @@ export type RouteListItem = {
   thumbnailUrl: string | null
   authorUserId: string
   authorUserName?: string | null
+  postId?: string
+  postContent?: string | null
+  postImageUrls?: string[]
   contentType: RouteContentType
   isPublic: boolean
   createdAt: string
   averageRating: number
+}
+
+export type FeedPostItem = {
+  postId: string
+  content: string | null
+  createdAt: string
+  isPublic: boolean
+  authorUserId: string
+  authorUserName: string | null
+  routeId: string
+  routeTitle: string
+  routeDescription: string | null
+  routeThumbnailUrl: string | null
+  routeContentType: RouteContentType
+  routeIsPublic: boolean
+  routeAverageRating: number
+  imageUrls: string[]
 }
 
 export type RouteStop = {

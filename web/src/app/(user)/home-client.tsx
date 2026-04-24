@@ -164,6 +164,7 @@ function StoryCard({
   if (!route) return null
 
   const tone = getPostTone(route)
+  const storyImage = route.postImageUrls?.[0] || route.thumbnailUrl
 
   return (
     <Link href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
@@ -179,8 +180,8 @@ function StoryCard({
         pressable
       >
         <YStack position="relative" height={190} backgroundColor="$muted">
-          {route.thumbnailUrl ? (
-            <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+          {storyImage ? (
+            <Image src={storyImage} width="100%" height="100%" objectFit="cover" />
           ) : null}
           <YStack position="absolute" inset={0} backgroundColor="rgba(15,23,42,0.22)" />
           <XStack position="absolute" top="$3" left="$3">
@@ -202,6 +203,8 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
   const router = useRouter()
   const tone = getPostTone(route)
   const author = getAuthor(route)
+  const media = route.postImageUrls?.length ? route.postImageUrls : (route.thumbnailUrl ? [route.thumbnailUrl] : [])
+  const coverImage = media[0] ?? null
 
   return (
     <Card
@@ -237,7 +240,7 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
       <YStack gap="$2.5">
         <Text variant="heading3">{route.title}</Text>
         <Text variant="body" color="$color">
-          {route.description?.trim() || 'A newly shared route just dropped into the public feed. Open the card to inspect the route map, stops, and full detail.'}
+          {route.postContent?.trim() || route.description?.trim() || 'A newly shared route just dropped into the public feed. Open the card to inspect the route map, stops, and full detail.'}
         </Text>
       </YStack>
 
@@ -249,7 +252,7 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
         borderColor="$borderColor"
       >
         <XStack
-          flexDirection={route.thumbnailUrl ? 'row' : 'column'}
+          flexDirection={coverImage ? 'row' : 'column'}
           $md={{ flexDirection: 'column' }}
         >
           <YStack
@@ -258,8 +261,8 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
             backgroundColor="$muted"
             $md={{ minHeight: 240 }}
           >
-            {route.thumbnailUrl ? (
-              <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+            {coverImage ? (
+              <Image src={coverImage} width="100%" height="100%" objectFit="cover" />
             ) : null}
           </YStack>
 
@@ -283,6 +286,26 @@ function FeedPostCard({ route }: { route: RouteListItem }) {
                 Published {formatFullDate(route.createdAt)}. This card is rendered as a social post but still points into the same route detail experience.
               </Text>
             </YStack>
+
+            {media.length > 1 ? (
+              <YStack gap="$2">
+                <Text variant="caption" muted>Post images ({media.length})</Text>
+                <XStack gap="$2">
+                  {media.slice(1, 4).map((url, index) => (
+                    <YStack
+                      key={`${route.postId ?? route.id}-${index}`}
+                      width={60}
+                      height={44}
+                      borderRadius="$2"
+                      overflow="hidden"
+                      backgroundColor="$muted"
+                    >
+                      <Image src={url} width="100%" height="100%" objectFit="cover" />
+                    </YStack>
+                  ))}
+                </XStack>
+              </YStack>
+            ) : null}
 
             <YStack gap="$2">
               <XStack justifyContent="space-between" alignItems="center">
@@ -437,14 +460,14 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, curr
         >
           <StoryCard action />
           {spotlightRoutes.slice(0, 5).map((route) => (
-            <StoryCard key={route.id} route={route} />
+            <StoryCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} />
           ))}
         </XStack>
 
         <YStack gap="$4">
           {timelineRoutes.length > 0 ? (
             timelineRoutes.map((route) => (
-              <FeedPostCard key={route.id} route={route} />
+              <FeedPostCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} />
             ))
           ) : (
             <Card variant="outline" size="lg" backgroundColor="$backgroundStrong" alignItems="center" gap="$3">
@@ -469,9 +492,9 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, curr
             {spotlightRoutes.slice(0, 4).map((route) => (
               <Link key={route.id} href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
                 <XStack gap="$3" alignItems="center">
-                  <YStack width={88} height={88} borderRadius="$3" overflow="hidden" backgroundColor="$muted">
-                    {route.thumbnailUrl ? (
-                      <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+                    <YStack width={88} height={88} borderRadius="$3" overflow="hidden" backgroundColor="$muted">
+                    {(route.postImageUrls?.[0] || route.thumbnailUrl) ? (
+                      <Image src={route.postImageUrls?.[0] || route.thumbnailUrl || ''} width="100%" height="100%" objectFit="cover" />
                     ) : null}
                   </YStack>
                   <YStack flex={1} gap="$1.5">
@@ -536,8 +559,8 @@ export default function HomeClient({ mode, timelineRoutes, spotlightRoutes, curr
 
         <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
           <YStack gap="$2.5">
-            <Link href="/routes/create" style={{ textDecoration: 'none' }}>
-              <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create route</Button>
+            <Link href="/posts/create" style={{ textDecoration: 'none' }}>
+              <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create post</Button>
             </Link>
             <Link href="/my-routes" style={{ textDecoration: 'none' }}>
               <Button variant="outline" size="sm" icon={<Sparkles size={14} color="currentColor" />}>Manage my routes</Button>

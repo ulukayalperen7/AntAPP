@@ -58,5 +58,6 @@ namespace Ant.Core.Entities
         
         public virtual ICollection<CollectionRoute> CollectionRoutes { get; set; }
         public virtual ICollection<RouteRating> RouteRatings { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
     }
 }

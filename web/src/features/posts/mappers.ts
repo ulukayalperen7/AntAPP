@@ -1,0 +1,19 @@
+import type { FeedPostItem, RouteListItem } from '@/types/api'
+
+export function mapFeedPostsToRouteCards(posts: FeedPostItem[]): RouteListItem[] {
+  return posts.map((post) => ({
+    id: post.routeId,
+    title: post.routeTitle,
+    description: post.routeDescription,
+    thumbnailUrl: post.routeThumbnailUrl,
+    authorUserId: post.authorUserId,
+    authorUserName: post.authorUserName,
+    postId: post.postId,
+    postContent: post.content,
+    postImageUrls: post.imageUrls,
+    contentType: post.routeContentType,
+    isPublic: post.routeIsPublic,
+    createdAt: post.createdAt,
+    averageRating: post.routeAverageRating,
+  }))
+}
