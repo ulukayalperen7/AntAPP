@@ -16,7 +16,7 @@ export default async function CommunityPage() {
     ? mapFeedPostsToRouteCards(feedResult.value.data)
     : []
   const fallbackRoutes = fallbackResult.status === 'fulfilled' ? fallbackResult.value.data : []
-  const timelineRoutes = feedRoutes.length > 0 ? feedRoutes : fallbackRoutes
+  const timelineRoutes = feedResult.status === 'fulfilled' ? feedRoutes : fallbackRoutes
   const spotlightRoutes = spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : []
   const currentUserName = userResult.status === 'fulfilled' ? userResult.value.userName : null
 
