@@ -18,27 +18,37 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
     const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
-        const timer = setTimeout(async () => {
-            if (query.length < 2) {
-                setSpots([])
-                setIsOpen(false)
-                return
-            }
+        let active = true
 
-            setLoading(true)
+        if (query.length < 2) {
+            setSpots([])
+            setIsOpen(false)
+            setLoading(false)
+            return
+        }
+
+        setLoading(true)
+        const timer = setTimeout(async () => {
             try {
                 const response = await getSpots({ search: query, pageSize: 5 })
-                setSpots(response.data.filter(s => !excludeIds.includes(s.id)))
-                setIsOpen(true)
+                if (active) {
+                    setSpots(response.data)
+                    setIsOpen(true)
+                }
             } catch (error) {
-                console.error('Failed to fetch spots:', error)
+                if (active) console.error('Failed to fetch spots:', error)
             } finally {
-                setLoading(false)
+                if (active) setLoading(false)
             }
         }, 300)
 
-        return () => clearTimeout(timer)
-    }, [query, excludeIds])
+        return () => {
+            active = false
+            clearTimeout(timer)
+        }
+    }, [query])
+
+    const filteredSpots = spots.filter(s => !excludeIds.includes(s.id))
 
     return (
         <YStack gap="$2" width="100%" position="relative">
@@ -55,7 +65,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                 {loading && <Loader2 size={16} className="animate-spin" color="var(--color-primary)" />}
             </XStack>
 
-            {isOpen && spots.length > 0 && (
+            {isOpen && filteredSpots.length > 0 && (
                 <YStack
                     position="absolute"
                     top="100%"
@@ -71,7 +81,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                     maxHeight={300}
                     overflow="scroll"
                 >
-                    {spots.map((spot) => (
+                    {filteredSpots.map((spot) => (
                         <XStack
                             key={spot.id}
                             padding="$3"
@@ -108,7 +118,7 @@ export default function SpotSelect({ onSelect, excludeIds = [] }: SpotSelectProp
                 </YStack>
             )}
 
-            {isOpen && query.length >= 2 && !loading && spots.length === 0 && (
+            {isOpen && query.length >= 2 && !loading && filteredSpots.length === 0 && (
                 <YStack
                     position="absolute"
                     top="100%"

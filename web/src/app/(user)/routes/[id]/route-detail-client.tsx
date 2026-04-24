@@ -338,6 +338,7 @@ export default function RouteDetailClient({
   // Fork state
   const [isForking, startFork] = useTransition()
   const [forkError, setForkError] = useState<string | null>(null)
+  const [hasForked, setHasForked] = useState(false)
 
   // Promote state
   const [isPromoting, startPromote] = useTransition()
@@ -358,12 +359,15 @@ export default function RouteDetailClient({
   }
 
   const handleFork = () => {
+    if (isForking || hasForked) return
     setForkError(null)
+    setHasForked(true)
     startFork(async () => {
       try {
         const forkedId = await forkRoute(route.id)
         router.push(`/routes/${forkedId}`)
       } catch (e) {
+        setHasForked(false)
         setForkError((e as Error).message ?? 'Failed to fork route')
       }
     })
@@ -725,11 +729,11 @@ export default function RouteDetailClient({
               variant="outline"
               size="md"
               loading={isForking}
-              disabled={isForking}
+              disabled={isForking || hasForked}
               onPress={handleFork}
-              icon={<GitFork size={16} color="currentColor" />}
+              icon={hasForked ? <CheckCircle size={16} color="currentColor" /> : <GitFork size={16} color="currentColor" />}
             >
-              Fork Route
+              {hasForked ? 'Forked!' : 'Fork Route'}
             </Button>
           </YStack>
         </YStack>
