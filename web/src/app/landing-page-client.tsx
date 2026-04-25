@@ -189,17 +189,16 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
 
             <XStack alignItems="center" gap="$2">
               <Button
-                {...({ size: '$3', chromeless: true } as any)}
+                variant="ghost"
+                size="sm"
                 icon={<LogIn size={16} />}
                 onPress={() => router.push('/login')}
               >
                 Sign In
               </Button>
               <Button
-                {...({ size: '$3' } as any)}
-                backgroundColor="$primary"
-                color="white"
-                hoverStyle={{ backgroundColor: '$primaryHover' }}
+                variant="solid"
+                size="sm"
                 borderRadius="$10"
                 onPress={() => router.push('/register')}
               >
