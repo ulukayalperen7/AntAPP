@@ -91,4 +91,6 @@ stages:
                     cd /opt/antapp
                     DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) IMAGE_TAG=$(IMAGE_TAG) docker compose pull
                     DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME) IMAGE_TAG=$(IMAGE_TAG) docker compose up -d --force-recreate --remove-orphans
+                    docker image prune -af --filter "until=24h"
+                    docker builder prune -f --keep-storage=2gb
                   displayName: Pull and restart containers
