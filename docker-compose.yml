@@ -45,6 +45,14 @@ services:
       - "5000:5000"
     networks:
       - antapp
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.antapp-backend.rule=Host(`api.antapp.fun`)"
+      - "traefik.http.routers.antapp-backend.entrypoints=https"
+      - "traefik.http.routers.antapp-backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.antapp-backend.loadbalancer.server.port=5000"
+      - "traefik.docker.network=coolify"
 
   web:
     image: ${DOCKER_HUB_USERNAME}/antapp-web:${IMAGE_TAG:-latest}
@@ -57,6 +65,14 @@ services:
       - "3001:3000"
     networks:
       - antapp
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.antapp-web.rule=Host(`antapp.fun`) || Host(`www.antapp.fun`)"
+      - "traefik.http.routers.antapp-web.entrypoints=https"
+      - "traefik.http.routers.antapp-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.antapp-web.loadbalancer.server.port=3000"
+      - "traefik.docker.network=coolify"
 
 volumes:
   postgres_data:
@@ -64,3 +80,5 @@ volumes:
 networks:
   antapp:
     driver: bridge
+  coolify:
+    external: true
