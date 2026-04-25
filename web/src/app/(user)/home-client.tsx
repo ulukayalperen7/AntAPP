@@ -28,24 +28,24 @@ const PAGE_COPY: Record<FeedMode, {
 }> = {
   timeline: {
     title: 'Explore Feed',
-    subtitle: 'Public routes now behave like social posts. Fresh shares, official highlights, and community motion all meet here first.',
-    composer: "Share a new route, drop a scenic update, or post today's route draft...",
+    subtitle: 'Public route posts and route previews meet here. Real posts support likes, comments, and shares.',
+    composer: 'Share one of your routes with an optional caption or photo...',
     railTitle: 'Trending now',
-    railSubtitle: 'Routes getting the strongest pull in the public flow.',
+    railSubtitle: 'Public routes and posts getting the strongest pull.',
   },
   official: {
     title: 'Official Feed',
-    subtitle: 'A cleaner editorial stream for curated and promoted route drops.',
-    composer: 'Queue a featured route or spotlight an official collection...',
+    subtitle: 'Curated and promoted route posts from the AntAPP team.',
+    composer: 'Share a curated route update...',
     railTitle: 'Editorial watchlist',
-    railSubtitle: 'Fresh official cards the product can push harder.',
+    railSubtitle: 'Fresh official routes and posts to watch.',
   },
   community: {
     title: 'Community Feed',
-    subtitle: 'A faster social lane for user-created route posts, experiments, and daily shares.',
-    composer: 'What route did the community just post today?',
+    subtitle: 'User-created public routes and route posts from the community.',
+    composer: 'Share a community route update...',
     railTitle: 'Community momentum',
-    railSubtitle: 'Recent public posts climbing fastest in the feed.',
+    railSubtitle: 'Recent community routes and posts climbing fastest.',
   },
 }
 
@@ -93,7 +93,7 @@ function getPostTone(route: RouteListItem) {
     case 'Sponsored':
       return { badge: 'Sponsored', variant: 'warning' as const, label: 'Partner feature' }
     default:
-      return { badge: 'Community', variant: 'default' as const, label: 'Community post' }
+      return { badge: 'Community', variant: 'default' as const, label: 'Community share' }
   }
 }
 
@@ -117,7 +117,7 @@ function getAuthor(route: RouteListItem) {
 
   return {
     name: displayName,
-    role: 'Community creator',
+    role: 'Route creator',
     initials,
   }
 }
@@ -150,6 +150,7 @@ function FeedPostCard({
   const coverImage = media[0] ?? null
   const postId = route.postId ?? null
   const isInteractivePost = Boolean(postId)
+  const feedLabel = isInteractivePost ? tone.label : 'Route preview'
 
   const [reactionCount, setReactionCount] = useState(route.postReactionCount ?? 0)
   const [commentCount, setCommentCount] = useState(route.postCommentCount ?? 0)
@@ -331,7 +332,7 @@ function FeedPostCard({
             <XStack gap="$2" flexWrap="wrap" alignItems="center">
               <Text variant="caption" muted>{formatRelativeDate(route.createdAt, referenceNowMs)}</Text>
               <CircleDot size={10} color="var(--color-mutedForeground)" />
-              <Text variant="caption" muted>{tone.label}</Text>
+              <Text variant="caption" muted>{feedLabel}</Text>
             </XStack>
           </YStack>
         </XStack>
@@ -385,9 +386,11 @@ function FeedPostCard({
             </XStack>
 
             <YStack gap="$2">
-              <Text variant="label" color="$primary">Route Snapshot</Text>
+              <Text variant="label" color="$primary">{isInteractivePost ? 'Post details' : 'Route preview'}</Text>
               <Text variant="body" muted>
-                Published {formatFullDate(route.createdAt)}. This card is rendered as a social post but still points into the same route detail experience.
+                {isInteractivePost
+                  ? `Posted ${formatFullDate(route.createdAt)}. Likes, comments, and shares are stored on this post.`
+                  : `Published ${formatFullDate(route.createdAt)}. This is a public route preview, not a social post yet.`}
               </Text>
             </YStack>
 
@@ -507,10 +510,10 @@ function FeedPostCard({
       {!isInteractivePost ? (
         <YStack gap="$2">
           <Text variant="caption" muted>
-            This card comes from route listing. Publish a post for this route to activate social interactions.
+            Share this route as a post to enable likes, comments, and shares.
           </Text>
           <Button variant="outline" size="sm" onPress={openCreatePost}>
-            Create post from this route
+            Share this route as a post
           </Button>
         </YStack>
       ) : null}
@@ -750,11 +753,15 @@ export default function HomeClient({
           </YStack>
         </RightRailCard>
 
-        <RightRailCard title="Today in feed" subtitle="A compact status rail like a social network dashboard">
+        <RightRailCard title="Today in feed" subtitle="What is actually visible in this feed right now">
           <YStack gap="$3">
             <XStack justifyContent="space-between" alignItems="center">
-              <Text variant="caption" muted>New public posts</Text>
-              <Text variant="label">{timelineRoutes.length}</Text>
+              <Text variant="caption" muted>Real posts</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => route.postId).length}</Text>
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>Route previews</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => !route.postId).length}</Text>
             </XStack>
             <XStack justifyContent="space-between" alignItems="center">
               <Text variant="caption" muted>Official cards</Text>
