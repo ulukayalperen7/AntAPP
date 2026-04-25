@@ -43,7 +43,7 @@ public class SaveRouteCommandTests
     */
 
     [Fact]
-    public async Task Handle_RouteAlreadySaved_ThrowsApiException()
+    public async Task Handle_RouteAlreadySaved_ReturnsCollectionWithoutAddingDuplicate()
     {
         var userId = Guid.NewGuid();
         var routeId = Guid.NewGuid();
@@ -55,8 +55,10 @@ public class SaveRouteCommandTests
         _repoMock.Setup(r => r.GetOrCreateDefaultCollectionAsync(userId)).ReturnsAsync(defaultCollection);
         _repoMock.Setup(r => r.GetCollectionRouteAsync(defaultCollectionId, routeId)).ReturnsAsync(existing);
 
-        await Assert.ThrowsAsync<ApiException>(() =>
-            _handler.Handle(new SaveRouteCommand { RouteId = routeId }, CancellationToken.None));
+        var result = await _handler.Handle(new SaveRouteCommand { RouteId = routeId }, CancellationToken.None);
+
+        Assert.Equal(defaultCollectionId, result.Data);
+        _repoMock.Verify(r => r.AddCollectionRouteAsync(It.IsAny<CollectionRoute>()), Times.Never);
     }
 
     [Fact]
