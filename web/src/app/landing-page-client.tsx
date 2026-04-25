@@ -191,15 +191,14 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
 
             <XStack alignItems="center" gap="$2">
               <Button
-                size="sm"
-                variant="ghost"
+                {...({ size: '$3', chromeless: true } as any)}
                 icon={<LogIn size={16} />}
                 onPress={() => router.push('/login')}
               >
                 Sign In
               </Button>
               <Button
-                size="sm"
+                {...({ size: '$3' } as any)}
                 backgroundColor="$primary"
                 color="white"
                 hoverStyle={{ backgroundColor: '$primaryHover' }}
@@ -278,7 +277,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
 
               <XStack gap="$3" flexWrap="wrap">
                 <Button
-                  size="lg"
+                  {...({ size: '$5' } as any)}
                   backgroundColor="$primary"
                   color="white"
                   hoverStyle={{ backgroundColor: '$primaryHover' }}
@@ -288,7 +287,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
                   Start Exploring Free
                 </Button>
                 <Button
-                  size="lg"
+                  {...({ size: '$5' } as any)}
                   backgroundColor="$card"
                   color="$primary"
                   borderColor="$primary"
@@ -483,7 +482,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
             </Text>
             <XStack gap="$3" flexWrap="wrap" justifyContent="center">
               <Button
-                size="lg"
+                {...({ size: '$5' } as any)}
                 backgroundColor="white"
                 color="$primary"
                 hoverStyle={{ backgroundColor: '$ant50' }}
@@ -493,7 +492,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
                 Sign Up Free
               </Button>
               <Button
-                size="lg"
+                {...({ size: '$5' } as any)}
                 backgroundColor="transparent"
                 color="white"
                 borderColor="rgba(255,255,255,0.7)"
