@@ -168,6 +168,7 @@ function FeedPostCard({
   const [commentsPage, setCommentsPage] = useState(1)
   const [hasMoreComments, setHasMoreComments] = useState(false)
   const [commentDraft, setCommentDraft] = useState('')
+  const [shareNotice, setShareNotice] = useState<string | null>(null)
   const [socialError, setSocialError] = useState<string | null>(null)
 
   const [isLiking, startLiking] = useTransition()
@@ -223,6 +224,7 @@ function FeedPostCard({
         const result = await togglePostReaction(postId)
         setIsReacted(result.isReactedByCurrentUser)
         setReactionCount(result.reactionCount)
+        setShareNotice(null)
         setSocialError(null)
       } catch (e) {
         setSocialError((e as Error).message ?? 'Failed to update reaction.')
@@ -260,6 +262,7 @@ function FeedPostCard({
         setCommentsLoaded(false)
         setCommentsPage(1)
         setHasMoreComments(false)
+        setShareNotice(null)
         if (isCommentsOpen) {
           loadComments(1, false)
         }
@@ -279,6 +282,7 @@ function FeedPostCard({
         await deletePostComment(postId, commentId)
         setComments(current => current.filter(c => c.commentId !== commentId))
         setCommentCount(c => Math.max(0, c - 1))
+        setShareNotice(null)
         setSocialError(null)
       } catch (e) {
         setSocialError((e as Error).message ?? 'Failed to delete comment.')
@@ -298,15 +302,19 @@ function FeedPostCard({
         const result = await sharePost(postId)
         setIsShared(result.isSharedByCurrentUser)
         setShareCount(result.shareCount)
+        let copied = false
         const routeLink = `${window.location.origin}/routes/${route.id}`
         if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
           try {
             await navigator.clipboard.writeText(routeLink)
+            copied = true
           } catch {
           }
         }
+        setShareNotice(copied ? 'Route link copied.' : 'Share saved.')
         setSocialError(null)
       } catch (e) {
+        setShareNotice(null)
         setSocialError((e as Error).message ?? 'Failed to share post.')
       }
     })
@@ -512,6 +520,12 @@ function FeedPostCard({
               Share
             </Button>
           </XStack>
+
+          {shareNotice ? (
+            <YStack backgroundColor="$success50" borderRadius="$3" padding="$3" borderWidth={1} borderColor="$success200">
+              <Text variant="caption" color="$success500">{shareNotice}</Text>
+            </YStack>
+          ) : null}
         </>
       )}
 
