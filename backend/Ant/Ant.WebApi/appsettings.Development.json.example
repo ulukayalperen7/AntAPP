@@ -16,7 +16,12 @@
   "UseInMemoryDatabase": true, // false yapıp DefaultConnection'ı doldurursanız SQL Server kullanılır
 
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=SERVER_ADI\\SQLEXPRESS;Initial Catalog=AntAppDb;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=true"
+    "DefaultConnection": "Data Source=SERVER_ADI\\SQLEXPRESS;Initial Catalog=AntAppDb;Integrated Security=True;MultipleActiveResultSets=True;TrustServerCertificate=true",
+    "Valkey": "localhost:6379"
+  },
+
+  "Cache": {
+    "Provider": "Memory" // Valkey kullanmak için "Valkey" yapın
   },
 
   "MailSettings": {

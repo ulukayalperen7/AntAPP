@@ -105,3 +105,9 @@ Thumbs.db
 node_modules
 .claude/
 .agents/
+
+# ide and ai tool files
+.codex
+.cursor
+.vscode
+.claude
