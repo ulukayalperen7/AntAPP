@@ -297,6 +297,8 @@ namespace Ant.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Description"), "GIN");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Description"), new[] { "gin_trgm_ops" });
 
+                    b.HasIndex("OriginalRouteId");
+
                     b.HasIndex("Title");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "GIN");
@@ -857,7 +859,13 @@ namespace Ant.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Ant.Core.Entities.Route", "OriginalRoute")
+                        .WithMany()
+                        .HasForeignKey("OriginalRouteId");
+
                     b.Navigation("AuthorUser");
+
+                    b.Navigation("OriginalRoute");
                 });
 
             modelBuilder.Entity("Ant.Core.Entities.RouteRating", b =>
