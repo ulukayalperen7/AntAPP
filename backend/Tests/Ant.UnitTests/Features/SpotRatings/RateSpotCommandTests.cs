@@ -39,10 +39,14 @@ public class RateSpotCommandTests
         _ratingRepoMock.Setup(r => r.GetByUserAndSpotAsync(userId, spotId)).ReturnsAsync((SpotRating?)null);
         _ratingRepoMock.Setup(r => r.AddAsync(It.IsAny<SpotRating>())).ReturnsAsync((SpotRating r) => r);
 
-        await _handler.Handle(new RateSpotCommand { SpotId = spotId, Stars = 3 }, CancellationToken.None);
+        var result = await _handler.Handle(new RateSpotCommand { SpotId = spotId, Stars = 3 }, CancellationToken.None);
 
         Assert.Equal(8, spot.RatingSum);
         Assert.Equal(3, spot.RatingCount);
+        Assert.Equal(spotId, result.Data.SpotId);
+        Assert.Equal(3, result.Data.CurrentUserRating);
+        Assert.Equal(2.7, result.Data.AverageRating);
+        Assert.Equal(3, result.Data.RatingCount);
         _ratingRepoMock.Verify(r => r.AddAsync(It.Is<SpotRating>(sr => sr.Stars == 3)), Times.Once);
         _spotRepoMock.Verify(r => r.UpdateAsync(spot), Times.Once);
     }
@@ -62,10 +66,12 @@ public class RateSpotCommandTests
 
         var result = await _handler.Handle(new RateSpotCommand { SpotId = spotId, Stars = 4 }, CancellationToken.None);
 
-        Assert.Equal(existingId, result);
+        Assert.Equal(existingId, result.Data.RatingId);
         Assert.Equal(4, existing.Stars);
         Assert.Equal(12, spot.RatingSum);
         Assert.Equal(3, spot.RatingCount);
+        Assert.Equal(4.0, result.Data.AverageRating);
+        Assert.Equal(3, result.Data.RatingCount);
         _ratingRepoMock.Verify(r => r.UpdateAsync(existing), Times.Once);
         _ratingRepoMock.Verify(r => r.AddAsync(It.IsAny<SpotRating>()), Times.Never);
     }

@@ -6,6 +6,7 @@ import type {
   PagedApiResponse,
   SpotDetail,
   SpotListItem,
+  SpotRatingResult,
   SpotRouteItem,
 } from '@/types/api'
 
@@ -32,8 +33,8 @@ export async function getSpotRoutes(spotId: string, page = 1, pageSize = 12): Pr
   return publicApiFetchPaged<SpotRouteItem>(`/spots/${spotId}/routes?page=${page}&pageSize=${pageSize}`, { revalidate: 60 })
 }
 
-export async function rateSpot(spotId: string, score: number): Promise<void> {
-  await apiFetchData<string>(`/spots/${spotId}/rating`, {
+export async function rateSpot(spotId: string, score: number): Promise<SpotRatingResult> {
+  return apiFetchData<SpotRatingResult>(`/spots/${spotId}/rating`, {
     method: 'PUT',
     body: JSON.stringify({ stars: score }),
   })

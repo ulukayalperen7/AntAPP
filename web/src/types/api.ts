@@ -276,3 +276,19 @@ export type RouteRating = {
   score: number
   createdAt: string
 }
+
+export type RouteRatingResult = {
+  ratingId: string
+  routeId: string
+  currentUserRating: number
+  averageRating: number
+  ratingCount: number
+}
+
+export type SpotRatingResult = {
+  ratingId: string
+  spotId: string
+  currentUserRating: number
+  averageRating: number
+  ratingCount: number
+}

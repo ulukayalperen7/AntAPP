@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay } from '@antapp/ui'
-import type { RouteDetail } from '@/types/api'
+import type { RouteDetail, RouteRatingResult } from '@/types/api'
 import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle, Sparkles, Ellipsis } from 'lucide-react'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
@@ -16,7 +16,7 @@ function StarRatingWidget({
   onRated,
 }: {
   routeId: string
-  onRated: (score: number) => void
+  onRated: (result: RouteRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
   const [selected, setSelected] = useState(0)
@@ -28,9 +28,9 @@ function StarRatingWidget({
     setSelected(score)
     startSubmit(async () => {
       try {
-        await rateRoute(routeId, score)
+        const result = await rateRoute(routeId, score)
         setSubmitted(true)
-        onRated(score)
+        onRated(result)
       } catch {
         setSelected(0)
       }
@@ -65,9 +65,9 @@ function StarRatingWidget({
           >
             <Star
               size={28}
-              fill={star <= active ? '#FF8C00' : 'transparent'}
-              color={star <= active ? '#FF8C00' : 'var(--color-mutedForeground)'}
-              strokeWidth={1.5}
+              fill={star <= active ? '#FF8C00' : 'rgba(148,163,184,0.18)'}
+              color={star <= active ? '#FF8C00' : '#64748B'}
+              strokeWidth={1.8}
             />
           </XStack>
         ))}
@@ -679,12 +679,7 @@ export default function RouteDetailClient({
               <Text variant="heading4">Rate This Route</Text>
               <StarRatingWidget
                 routeId={route.id}
-                onRated={(score) => {
-                  // Optimistically blend the new score into averageRating
-                  setDisplayRating((prev) =>
-                    parseFloat(((prev + score) / 2).toFixed(1))
-                  )
-                }}
+                onRated={(result) => setDisplayRating(result.averageRating)}
               />
             </YStack>
           )}

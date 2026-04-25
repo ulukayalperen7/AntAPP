@@ -1,7 +1,7 @@
 'use server'
 
 import { apiFetchData, apiFetchPaged, publicApiFetchData, publicApiFetchPaged } from '@/lib/api'
-import type { RouteListItem, RouteDetail, RouteStopItem, Tag, PagedApiResponse } from '@/types/api'
+import type { RouteListItem, RouteDetail, RouteStopItem, Tag, PagedApiResponse, RouteRatingResult } from '@/types/api'
 
 export type GetRoutesParams = {
   search?: string
@@ -145,8 +145,8 @@ export async function forkRoute(id: string): Promise<string> {
   return apiFetchData<string>(`/routes/${id}/fork`, { method: 'POST' })
 }
 
-export async function rateRoute(routeId: string, score: number): Promise<void> {
-  await apiFetchData<string>(`/routes/${routeId}/rating`, {
+export async function rateRoute(routeId: string, score: number): Promise<RouteRatingResult> {
+  return apiFetchData<RouteRatingResult>(`/routes/${routeId}/rating`, {
     method: 'PUT',
     body: JSON.stringify({ stars: score }),
   })

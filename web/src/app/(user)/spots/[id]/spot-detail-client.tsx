@@ -4,7 +4,7 @@ import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Badge, RouteCard, RatingDisplay } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
-import type { SpotDetail, SpotRouteItem } from '@/types/api'
+import type { SpotDetail, SpotRatingResult, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
 import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
 import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
@@ -29,7 +29,7 @@ function SpotRatingWidget({
   onRated,
 }: {
   spotId: string
-  onRated: (score: number) => void
+  onRated: (result: SpotRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
   const [selected, setSelected] = useState(0)
@@ -44,9 +44,9 @@ function SpotRatingWidget({
     setSelected(score)
     startTransition(async () => {
       try {
-        await rateSpot(spotId, score)
+        const result = await rateSpot(spotId, score)
         setSubmitted(true)
-        onRated(score)
+        onRated(result)
       } catch {
         setSelected(0)
       }
@@ -70,9 +70,9 @@ function SpotRatingWidget({
           >
             <Star
               size={26}
-              fill={score <= active ? '#FF8C00' : 'transparent'}
-              color={score <= active ? '#FF8C00' : 'var(--color-mutedForeground)'}
-              strokeWidth={1.5}
+              fill={score <= active ? '#FF8C00' : 'rgba(148,163,184,0.18)'}
+              color={score <= active ? '#FF8C00' : '#64748B'}
+              strokeWidth={1.8}
             />
           </XStack>
         ))}
@@ -377,17 +377,9 @@ export default function SpotDetailClient({
             <Text variant="heading4">Community feedback</Text>
             <SpotRatingWidget
               spotId={spot.id}
-              onRated={(score) => {
-                if (displayRatingCount === 0) {
-                  setDisplayRating(score)
-                  setDisplayRatingCount(1)
-                  return
-                }
-
-                const nextCount = displayRatingCount + 1
-                const nextAverage = ((displayRating * displayRatingCount) + score) / nextCount
-                setDisplayRating(parseFloat(nextAverage.toFixed(1)))
-                setDisplayRatingCount(nextCount)
+              onRated={(result) => {
+                setDisplayRating(result.averageRating)
+                setDisplayRatingCount(result.ratingCount)
               }}
             />
           </YStack>

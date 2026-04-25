@@ -65,7 +65,7 @@ namespace Ant.WebApi.Controllers
         // PUT /api/spots/{spotId}/rating
         [HttpPut("{spotId}/rating")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<SpotRatingResultViewModel>))]
         public async Task<IActionResult> Rate(Guid spotId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] RateSpotCommand command)
         {
             command.SpotId = spotId;

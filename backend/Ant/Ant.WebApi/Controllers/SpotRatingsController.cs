@@ -1,5 +1,6 @@
 using Ant.Application.Features.SpotRatings.Commands.RateSpot;
 using Ant.Application.Features.SpotRatings.Queries.GetSpotAverageRating;
+using Ant.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace Ant.WebApi.Controllers
     {
         [HttpPut]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<SpotRatingResultViewModel>))]
         public async Task<IActionResult> Rate([FromBody] RateSpotCommand command)
         {
             return Ok(await Mediator.Send(command));

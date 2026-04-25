@@ -3,6 +3,7 @@ using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
+using Ant.Application.Wrappers;
 using MediatR;
 using System;
 using System.Threading;
@@ -10,14 +11,23 @@ using System.Threading.Tasks;
 
 namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
 {
-    public class RateSpotCommand : IRequest<Guid>
+    public class RateSpotCommand : IRequest<Response<SpotRatingResultViewModel>>
     {
         public Guid SpotId { get; set; }
         public short Stars { get; set; }
         public short? Score { get; set; }
     }
 
-    public class RateSpotCommandHandler : IRequestHandler<RateSpotCommand, Guid>
+    public class SpotRatingResultViewModel
+    {
+        public Guid RatingId { get; set; }
+        public Guid SpotId { get; set; }
+        public short CurrentUserRating { get; set; }
+        public double AverageRating { get; set; }
+        public long RatingCount { get; set; }
+    }
+
+    public class RateSpotCommandHandler : IRequestHandler<RateSpotCommand, Response<SpotRatingResultViewModel>>
     {
         private readonly ISpotRatingRepositoryAsync _ratingRepository;
         private readonly IGenericRepositoryAsync<Spot> _spotRepository;
@@ -36,7 +46,7 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
             _cache = cache;
         }
 
-        public async Task<Guid> Handle(RateSpotCommand request, CancellationToken cancellationToken)
+        public async Task<Response<SpotRatingResultViewModel>> Handle(RateSpotCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
@@ -61,7 +71,7 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
                 await _ratingRepository.UpdateAsync(existing);
                 await _spotRepository.UpdateAsync(spot);
                 await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
-                return existing.Id;
+                return new Response<SpotRatingResultViewModel>(ToResult(existing.Id, spot, stars));
             }
 
             var rating = new SpotRating
@@ -78,7 +88,19 @@ namespace Ant.Application.Features.SpotRatings.Commands.RateSpot
             await _ratingRepository.AddAsync(rating);
             await _spotRepository.UpdateAsync(spot);
             await _cache.RemoveByPrefixAsync(AppCacheKeys.SpotsPrefix, cancellationToken);
-            return rating.Id;
+            return new Response<SpotRatingResultViewModel>(ToResult(rating.Id, spot, stars));
+        }
+
+        private static SpotRatingResultViewModel ToResult(Guid ratingId, Spot spot, short currentUserRating)
+        {
+            return new SpotRatingResultViewModel
+            {
+                RatingId = ratingId,
+                SpotId = spot.Id,
+                CurrentUserRating = currentUserRating,
+                AverageRating = spot.RatingCount == 0 ? 0 : Math.Round(spot.RatingSum / (double)spot.RatingCount, 1),
+                RatingCount = spot.RatingCount
+            };
         }
     }
 }
