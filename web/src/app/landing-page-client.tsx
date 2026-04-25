@@ -53,7 +53,6 @@ function FeatureCard({ icon, title, body }: { icon: React.ReactNode; title: stri
       borderColor="$ant100"
       borderWidth={1}
       borderRadius="$4"
-      {...({ animation: 'quick' } as any)}
     >
       <YStack
         width={48}
@@ -90,7 +89,6 @@ function RouteCard({ route, onPress }: { route: FeaturedRoute; onPress?: () => v
       shadowOffset={{ width: 0, height: 6 }}
       shadowRadius={16}
       cursor="pointer"
-      {...({ animation: 'quick' } as any)}
       onPress={onPress}
     >
       <YStack height={180} backgroundColor="$ant50" position="relative" overflow="hidden">
@@ -170,7 +168,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
           height={scrolled ? 60 : 72}
           alignItems="center"
           justifyContent="center"
-          {...({ animation: 'quick', style: { backdropFilter: 'blur(12px)' } } as any)}
+          {...({ style: { backdropFilter: 'blur(12px)' } } as any)}
         >
           <XStack width="100%" maxWidth={1200} alignItems="center" justifyContent="space-between">
             <XStack alignItems="center" gap="$2.5" cursor="pointer" onPress={() => router.push('/')}>
