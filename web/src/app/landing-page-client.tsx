@@ -53,7 +53,7 @@ function FeatureCard({ icon, title, body }: { icon: React.ReactNode; title: stri
       borderColor="$ant100"
       borderWidth={1}
       borderRadius="$4"
-      animation="quick"
+      {...({ animation: 'quick' } as any)}
     >
       <YStack
         width={48}
@@ -90,7 +90,7 @@ function RouteCard({ route, onPress }: { route: FeaturedRoute; onPress?: () => v
       shadowOffset={{ width: 0, height: 6 }}
       shadowRadius={16}
       cursor="pointer"
-      animation="quick"
+      {...({ animation: 'quick' } as any)}
       onPress={onPress}
     >
       <YStack height={180} backgroundColor="$ant50" position="relative" overflow="hidden">
@@ -170,8 +170,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
           height={scrolled ? 60 : 72}
           alignItems="center"
           justifyContent="center"
-          animation="quick"
-          {...({ style: { backdropFilter: 'blur(12px)' } } as any)}
+          {...({ animation: 'quick', style: { backdropFilter: 'blur(12px)' } } as any)}
         >
           <XStack width="100%" maxWidth={1200} alignItems="center" justifyContent="space-between">
             <XStack alignItems="center" gap="$2.5" cursor="pointer" onPress={() => router.push('/')}>
@@ -192,15 +191,15 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
 
             <XStack alignItems="center" gap="$2">
               <Button
-                size="$3"
-                chromeless
+                size="sm"
+                variant="ghost"
                 icon={<LogIn size={16} />}
                 onPress={() => router.push('/login')}
               >
                 Sign In
               </Button>
               <Button
-                size="$3"
+                size="sm"
                 backgroundColor="$primary"
                 color="white"
                 hoverStyle={{ backgroundColor: '$primaryHover' }}
@@ -279,7 +278,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
 
               <XStack gap="$3" flexWrap="wrap">
                 <Button
-                  size="$5"
+                  size="lg"
                   backgroundColor="$primary"
                   color="white"
                   hoverStyle={{ backgroundColor: '$primaryHover' }}
@@ -289,7 +288,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
                   Start Exploring Free
                 </Button>
                 <Button
-                  size="$5"
+                  size="lg"
                   backgroundColor="$card"
                   color="$primary"
                   borderColor="$primary"
@@ -484,7 +483,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
             </Text>
             <XStack gap="$3" flexWrap="wrap" justifyContent="center">
               <Button
-                size="$5"
+                size="lg"
                 backgroundColor="white"
                 color="$primary"
                 hoverStyle={{ backgroundColor: '$ant50' }}
@@ -494,7 +493,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
                 Sign Up Free
               </Button>
               <Button
-                size="$5"
+                size="lg"
                 backgroundColor="transparent"
                 color="white"
                 borderColor="rgba(255,255,255,0.7)"
