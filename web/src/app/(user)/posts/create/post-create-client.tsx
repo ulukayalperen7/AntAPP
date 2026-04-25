@@ -7,77 +7,21 @@ import type { RouteListItem } from '@/types/api'
 import { createPost } from '@/features/posts/actions'
 import { ArrowLeft, ImagePlus, Plus, Trash2 } from 'lucide-react'
 
-type PostIntent = 'post' | 'story' | 'photo' | 'live' | 'checkin' | 'react' | 'comment' | 'share'
-
-const INTENT_COPY: Record<PostIntent, { title: string; subtitle: string; placeholder: string; initialDraft: string }> = {
-  post: {
-    title: 'Create Post',
-    subtitle: 'Share a route with optional post images',
-    placeholder: 'Write a short caption for this post...',
-    initialDraft: '',
-  },
-  story: {
-    title: 'Create Story Post',
-    subtitle: 'Publish a story-style route update to the feed',
-    placeholder: 'Drop a short story caption...',
-    initialDraft: '',
-  },
-  photo: {
-    title: 'Create Photo Post',
-    subtitle: 'Attach one or more images to a route update',
-    placeholder: 'Write context for your photos...',
-    initialDraft: '',
-  },
-  live: {
-    title: 'Create Live Update',
-    subtitle: 'Post a quick live moment linked to a route',
-    placeholder: 'What is happening right now on this route?',
-    initialDraft: 'Live update: ',
-  },
-  checkin: {
-    title: 'Create Check-in',
-    subtitle: 'Share a route check-in with your followers',
-    placeholder: 'Checked in at...',
-    initialDraft: 'Checked in at ',
-  },
-  react: {
-    title: 'Create Post',
-    subtitle: 'Publish this route first, then reactions become active',
-    placeholder: 'Why did this route catch your attention?',
-    initialDraft: '',
-  },
-  comment: {
-    title: 'Create Post',
-    subtitle: 'Publish this route first, then comments become active',
-    placeholder: 'Start the conversation about this route...',
-    initialDraft: '',
-  },
-  share: {
-    title: 'Create Post',
-    subtitle: 'Publish this route first, then sharing becomes active',
-    placeholder: 'Tell people why this route is worth sharing...',
-    initialDraft: '',
-  },
+const POST_COPY = {
+  title: 'Create Post',
+  subtitle: 'Share a route with optional post images',
+  placeholder: 'Write a short caption for this post...',
 }
 
 type Props = {
   routes: RouteListItem[]
   initialRouteId?: string | null
-  intent?: string | null
 }
 
-function normalizeIntent(intent?: string | null): PostIntent {
-  const key = intent?.trim().toLowerCase()
-  if (!key) return 'post'
-  if (key in INTENT_COPY) return key as PostIntent
-  return 'post'
-}
-
-export default function CreatePostClient({ routes, initialRouteId, intent }: Props) {
+export default function CreatePostClient({ routes, initialRouteId }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const normalizedIntent = normalizeIntent(intent)
-  const copy = INTENT_COPY[normalizedIntent]
+  const copy = POST_COPY
 
   const routeOptions = useMemo(
     () => routes.map((route) => ({ id: route.id, title: route.title })),
@@ -90,7 +34,7 @@ export default function CreatePostClient({ routes, initialRouteId, intent }: Pro
     : (routeOptions[0]?.id ?? '')
 
   const [routeId, setRouteId] = useState(() => defaultRouteId)
-  const [content, setContent] = useState(copy.initialDraft)
+  const [content, setContent] = useState('')
   const [imageUrls, setImageUrls] = useState<string[]>([''])
   const [error, setError] = useState<string | null>(null)
 

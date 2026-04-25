@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from '@antapp/ui'
 import { addPostComment, deletePostComment, getPostComments, sharePost, togglePostReaction } from '@/features/posts/actions'
 import type { PostCommentItem, RouteListItem } from '@/types/api'
-import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
+import { Bell, CircleDot, Clock3, Compass, Ellipsis, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
 
 type FeedMode = 'timeline' | 'official' | 'community'
 const COMMENTS_PAGE_SIZE = 20
@@ -134,87 +134,6 @@ function getInitials(name?: string | null) {
     .join('')
 }
 
-function StoryCard({
-  route,
-  action = false,
-}: {
-  route?: RouteListItem
-  action?: boolean
-}) {
-  if (action) {
-    return (
-      <Link href="/posts/create?intent=story" style={{ textDecoration: 'none' }}>
-        <Card
-          variant="outline"
-          size="sm"
-          backgroundColor="$backgroundStrong"
-          overflow="hidden"
-          width={140}
-          minWidth={140}
-          gap="$0"
-          padding={0}
-          pressable
-        >
-          <YStack height={120} backgroundColor="$muted" />
-          <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
-            <XStack
-              width={44}
-              height={44}
-              borderRadius="$full"
-              backgroundColor="$primary"
-              alignItems="center"
-              justifyContent="center"
-              marginTop={-26}
-              borderWidth={4}
-              borderColor="$backgroundStrong"
-            >
-              <Plus size={18} color="#FFFFFF" />
-            </XStack>
-            <Text variant="label" align="center">Create Story</Text>
-          </YStack>
-        </Card>
-      </Link>
-    )
-  }
-
-  if (!route) return null
-
-  const tone = getPostTone(route)
-  const storyImage = route.postImageUrls?.[0] || route.thumbnailUrl
-
-  return (
-    <Link href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
-      <Card
-        variant="outline"
-        size="sm"
-        backgroundColor="$backgroundStrong"
-        overflow="hidden"
-        width={140}
-        minWidth={140}
-        gap="$0"
-        padding={0}
-        pressable
-      >
-        <YStack position="relative" height={190} backgroundColor="$muted">
-          {storyImage ? (
-            <Image src={storyImage} width="100%" height="100%" objectFit="cover" />
-          ) : null}
-          <YStack position="absolute" inset={0} backgroundColor="rgba(15,23,42,0.22)" />
-          <XStack position="absolute" top="$3" left="$3">
-            <Avatar size="md" initials={getAuthor(route).initials} />
-          </XStack>
-          <YStack position="absolute" bottom="$3" left="$3" right="$3" gap="$1.5">
-            <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
-            <Text variant="label" color="#FFFFFF" numberOfLines={2}>
-              {route.title}
-            </Text>
-          </YStack>
-        </YStack>
-      </Card>
-    </Link>
-  )
-}
-
 function FeedPostCard({
   route,
   referenceNowMs,
@@ -251,9 +170,8 @@ function FeedPostCard({
   const [isCommentPosting, startCommentPosting] = useTransition()
   const [isSharing, startSharing] = useTransition()
 
-  const openCreatePost = (intent: 'post' | 'live' | 'photo' | 'checkin' | 'react' | 'comment' | 'share') => {
+  const openCreatePost = () => {
     const params = new URLSearchParams({
-      intent,
       routeId: route.id,
     })
     router.push(`/posts/create?${params.toString()}`)
@@ -290,7 +208,7 @@ function FeedPostCard({
 
   const handleToggleReaction = () => {
     if (!postId) {
-      openCreatePost('react')
+      openCreatePost()
       return
     }
     if (isLiking) return
@@ -309,7 +227,7 @@ function FeedPostCard({
 
   const handleToggleComments = () => {
     if (!postId) {
-      openCreatePost('comment')
+      openCreatePost()
       return
     }
 
@@ -365,7 +283,7 @@ function FeedPostCard({
 
   const handleShare = () => {
     if (!postId) {
-      openCreatePost('share')
+      openCreatePost()
       return
     }
     if (isSharing) return
@@ -591,7 +509,7 @@ function FeedPostCard({
           <Text variant="caption" muted>
             This card comes from route listing. Publish a post for this route to activate social interactions.
           </Text>
-          <Button variant="outline" size="sm" onPress={() => openCreatePost('post')}>
+          <Button variant="outline" size="sm" onPress={openCreatePost}>
             Create post from this route
           </Button>
         </YStack>
@@ -735,7 +653,7 @@ export default function HomeClient({
         </Card>
 
         <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
-          <XStack gap="$3" alignItems="center">
+          <XStack gap="$3" alignItems="center" flexWrap="wrap">
             <Avatar size="lg" initials={composerInitials} />
             <XStack
               flex={1}
@@ -748,57 +666,20 @@ export default function HomeClient({
               borderColor="$borderColor"
               cursor="pointer"
               hoverStyle={{ backgroundColor: '$backgroundHover' }}
-              onPress={() => router.push('/posts/create?intent=post')}
+              onPress={() => router.push('/posts/create')}
             >
               <Text variant="body" muted>{copy.composer}</Text>
             </XStack>
-          </XStack>
-
-          <XStack
-            borderTopWidth={1}
-            borderTopColor="$borderColor"
-            paddingTop="$3"
-            gap="$2"
-            flexWrap="wrap"
-          >
             <Button
-              variant="ghost"
+              variant="solid"
               size="sm"
-              icon={<Camera size={16} color="#E11D48" />}
-              onPress={() => router.push('/posts/create?intent=live')}
+              icon={<Plus size={14} color="#FFFFFF" />}
+              onPress={() => router.push('/posts/create')}
             >
-              Live
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ImageIcon size={16} color="#16A34A" />}
-              onPress={() => router.push('/posts/create?intent=photo')}
-            >
-              Photo
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<MapPinned size={16} color="#0EA5E9" />}
-              onPress={() => router.push('/posts/create?intent=checkin')}
-            >
-              Check in
+              Create post
             </Button>
           </XStack>
         </Card>
-
-        <XStack
-          gap="$3"
-          overflow="scroll"
-          paddingBottom="$1"
-          style={{ overflowY: 'hidden', scrollbarWidth: 'none' }}
-        >
-          <StoryCard action />
-          {spotlightRoutes.slice(0, 5).map((route) => (
-            <StoryCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} />
-          ))}
-        </XStack>
 
         <YStack gap="$4">
           {timelineRoutes.length > 0 ? (
@@ -895,7 +776,7 @@ export default function HomeClient({
 
         <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
           <YStack gap="$2.5">
-            <Link href="/posts/create?intent=post" style={{ textDecoration: 'none' }}>
+            <Link href="/posts/create" style={{ textDecoration: 'none' }}>
               <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create post</Button>
             </Link>
             <Link href="/my-routes" style={{ textDecoration: 'none' }}>

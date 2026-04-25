@@ -5,7 +5,7 @@ import CreatePostClient from './post-create-client'
 export default async function CreatePostPage({
   searchParams,
 }: {
-  searchParams: Promise<{ routeId?: string; intent?: string }>
+  searchParams: Promise<{ routeId?: string }>
 }) {
   const params = await searchParams
 
@@ -35,7 +35,6 @@ export default async function CreatePostPage({
     <CreatePostClient
       routes={sortedRoutes}
       initialRouteId={params.routeId ?? null}
-      intent={params.intent ?? null}
     />
   )
 }
