@@ -29,21 +29,21 @@ const PAGE_COPY: Record<FeedMode, {
   timeline: {
     title: 'Explore Feed',
     subtitle: 'Public route posts and route previews meet here. Real posts support likes, comments, and shares.',
-    composer: 'Share one of your routes with an optional caption or photo...',
+    composer: 'Choose a public route, add a caption, and attach optional photos.',
     railTitle: 'Trending now',
     railSubtitle: 'Public routes and posts getting the strongest pull.',
   },
   official: {
     title: 'Official Feed',
     subtitle: 'Curated and promoted route posts from the AntAPP team.',
-    composer: 'Share a curated route update...',
+    composer: 'Choose a curated route and publish an official update.',
     railTitle: 'Editorial watchlist',
     railSubtitle: 'Fresh official routes and posts to watch.',
   },
   community: {
     title: 'Community Feed',
     subtitle: 'User-created public routes and route posts from the community.',
-    composer: 'Share a community route update...',
+    composer: 'Choose a community route and publish a post.',
     railTitle: 'Community momentum',
     railSubtitle: 'Recent community routes and posts climbing fastest.',
   },
@@ -132,6 +132,10 @@ function getInitials(name?: string | null) {
     .slice(0, 2)
     .map((chunk) => chunk[0]?.toUpperCase())
     .join('')
+}
+
+function formatSocialCount(count: number, singular: string, plural: string) {
+  return `${count} ${count === 1 ? singular : plural}`
 }
 
 function FeedPostCard({
@@ -389,8 +393,8 @@ function FeedPostCard({
               <Text variant="label" color="$primary">{isInteractivePost ? 'Post details' : 'Route preview'}</Text>
               <Text variant="body" muted>
                 {isInteractivePost
-                  ? `Posted ${formatFullDate(route.createdAt)}. Likes, comments, and shares are stored on this post.`
-                  : `Published ${formatFullDate(route.createdAt)}. This is a public route preview, not a social post yet.`}
+                  ? `Shared on ${formatFullDate(route.createdAt)}. People can like, comment, and share this post.`
+                  : `Published ${formatFullDate(route.createdAt)}. Share this route as a post to turn on likes, comments, and shares.`}
               </Text>
             </YStack>
 
@@ -454,16 +458,20 @@ function FeedPostCard({
             <XStack gap="$3" alignItems="center">
               <XStack alignItems="center" gap="$1.5">
                 <ThumbsUp size={14} color="var(--color-primary)" />
-                <Text variant="caption" muted>{reactionCount} reacts</Text>
+                <Text variant="caption" muted>{formatSocialCount(reactionCount, 'like', 'likes')}</Text>
               </XStack>
-              <XStack alignItems="center" gap="$1.5">
-                <MessageCircle size={14} color="var(--color-mutedForeground)" />
-                <Text variant="caption" muted>{commentCount} comments</Text>
-              </XStack>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={<MessageCircle size={14} color="currentColor" />}
+                onPress={handleToggleComments}
+              >
+                {formatSocialCount(commentCount, 'comment', 'comments')}
+              </Button>
             </XStack>
             <XStack alignItems="center" gap="$1.5">
               <Send size={14} color="var(--color-mutedForeground)" />
-              <Text variant="caption" muted>{shareCount} shares</Text>
+              <Text variant="caption" muted>{formatSocialCount(shareCount, 'share', 'shares')}</Text>
             </XStack>
           </XStack>
 
@@ -658,21 +666,14 @@ export default function HomeClient({
         <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
           <XStack gap="$3" alignItems="center" flexWrap="wrap">
             <Avatar size="lg" initials={composerInitials} />
-            <XStack
+            <YStack
               flex={1}
-              minHeight={48}
-              alignItems="center"
-              paddingHorizontal="$4"
-              borderRadius="$full"
-              backgroundColor="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-              cursor="pointer"
-              hoverStyle={{ backgroundColor: '$backgroundHover' }}
-              onPress={() => router.push('/posts/create')}
+              minWidth={220}
+              gap="$1"
             >
-              <Text variant="body" muted>{copy.composer}</Text>
-            </XStack>
+              <Text variant="label">Create a route post</Text>
+              <Text variant="caption" muted>{copy.composer}</Text>
+            </YStack>
             <Button
               variant="solid"
               size="sm"
