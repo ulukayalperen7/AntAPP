@@ -523,32 +523,7 @@ function FeedPostCard({
 
       {isInteractivePost && (
         <>
-          <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
-            <XStack gap="$3" alignItems="center">
-              <XStack alignItems="center" gap="$1.5">
-                <ThumbsUp size={14} color="var(--color-primary)" />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onPress={handleToggleReactions}
-                >
-                  {formatSocialCount(reactionCount, 'like', 'likes')}
-                </Button>
-              </XStack>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={<MessageCircle size={14} color="currentColor" />}
-                onPress={handleToggleComments}
-              >
-                {formatSocialCount(commentCount, 'comment', 'comments')}
-              </Button>
-            </XStack>
-            <XStack alignItems="center" gap="$1.5">
-              <Copy size={14} color="var(--color-mutedForeground)" />
-              <Text variant="caption" muted>{formatSocialCount(shareCount, 'copy', 'copies')}</Text>
-            </XStack>
-          </XStack>
+          
 
           <XStack
             borderTopWidth={1}
@@ -558,32 +533,13 @@ function FeedPostCard({
             gap="$2"
             flexWrap="wrap"
           >
-            <Button
-              variant={isReacted ? 'solid' : 'ghost'}
-              size="sm"
-              disabled={isLiking}
-              loading={isLiking}
-              icon={<ThumbsUp size={16} color="currentColor" />}
-              onPress={handleToggleReaction}
-            >
-              Like
+            <Button variant={isReacted ? 'solid' : 'ghost'} size="sm" disabled={isLiking} loading={isLiking} icon={<ThumbsUp size={16} color="currentColor" />} onPress={handleToggleReaction}>
+              Like {reactionCount > 0 ? `(${reactionCount})` : ''}
             </Button>
-            <Button
-              variant={isCommentsOpen ? 'outline' : 'ghost'}
-              size="sm"
-              icon={<MessageCircle size={16} color="currentColor" />}
-              onPress={handleToggleComments}
-            >
-              Comment
+            <Button variant={isCommentsOpen ? 'outline' : 'ghost'} size="sm" icon={<MessageCircle size={16} color="currentColor" />} onPress={handleToggleComments}>
+              Comment {commentCount > 0 ? `(${commentCount})` : ''}
             </Button>
-            <Button
-              variant={isShared ? 'solid' : 'ghost'}
-              size="sm"
-              disabled={isSharing}
-              loading={isSharing}
-              icon={<Copy size={16} color="currentColor" />}
-              onPress={handleShare}
-            >
+            <Button variant={isShared ? 'solid' : 'ghost'} size="sm" disabled={isSharing} loading={isSharing} icon={<Copy size={16} color="currentColor" />} onPress={handleShare}>
               Copy link
             </Button>
           </XStack>
