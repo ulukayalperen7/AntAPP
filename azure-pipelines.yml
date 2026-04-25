@@ -79,8 +79,10 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+
                 - script: |
-                    cp $(Pipeline.Workspace)/../../s/docker-compose.yml /opt/antapp/docker-compose.yml
+                    cp $(Build.SourcesDirectory)/docker-compose.yml /opt/antapp/docker-compose.yml
                   displayName: Update docker-compose.yml
 
                 - script: |
