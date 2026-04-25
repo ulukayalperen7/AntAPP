@@ -179,8 +179,8 @@ namespace Ant.Infrastructure.Services
                     foreach (var roleName in roleNames.Distinct())
                         await _userManager.AddToRoleAsync(user, roleName);
 
-                    var verificationUri = await SendVerificationEmail(user, origin);
-                    return $"Account created successfully. Please confirm your email: {verificationUri}";
+                    await SendVerificationEmail(user, origin);
+                    return "Account created successfully. Please check your email to confirm your account.";
                 }
                 else
                 {
@@ -212,10 +212,14 @@ namespace Ant.Infrastructure.Services
             var account = await _userManager.FindByEmailAsync(model.Email);
             if (account == null) return;
 
+            var baseUrl = string.IsNullOrWhiteSpace(origin) || origin.Contains("localhost")
+                ? "https://antapp.fun"
+                : origin;
+
             var code = await _userManager.GeneratePasswordResetTokenAsync(account);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var encodedEmail = Uri.EscapeDataString(model.Email);
-            var resetLink = $"{origin}/reset-password?token={encodedToken}&email={encodedEmail}";
+            var resetLink = $"{baseUrl}/reset-password?token={encodedToken}&email={encodedEmail}";
             var emailRequest = new EmailRequest()
             {
                 Body = $"Click the link below to reset your password:<br/><br/><a href=\"{resetLink}\">{resetLink}</a><br/><br/>If you did not request this, you can ignore this email.",
@@ -280,18 +284,24 @@ namespace Ant.Infrastructure.Services
             return BitConverter.ToString(randomBytes).Replace("-", "");
         }
 
-        private async Task<string> SendVerificationEmail(ApplicationUser user, string origin)
+        private async Task SendVerificationEmail(ApplicationUser user, string origin)
         {
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            var route = "api/auth/confirm-email/";
-            var endpointUri = new Uri(string.Concat($"{origin}/", route));
+            var baseUrl = string.IsNullOrWhiteSpace(origin) || origin.Contains("localhost")
+                ? "https://antapp.fun"
+                : origin;
 
-            var verificationUri = QueryHelpers.AddQueryString(endpointUri.ToString(), "userId", user.Id.ToString());
-            verificationUri = QueryHelpers.AddQueryString(verificationUri, "code", code);
+            var route = "confirm-email";
+            var verificationUri = $"{baseUrl}/{route}?userId={user.Id}&code={code}";
 
-            return verificationUri;
+            await _emailService.SendAsync(new EmailRequest
+            {
+                To = user.Email,
+                Subject = "Confirm Your Email — AntAPP",
+                Body = $"Please confirm your email address by clicking the link below:<br/><br/><a href=\"{verificationUri}\">{verificationUri}</a><br/><br/>If you did not create an account, you can ignore this email.",
+            });
         }
 
         private RefreshToken GenerateRefreshToken(string ipAddress)
