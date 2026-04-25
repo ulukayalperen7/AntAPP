@@ -213,11 +213,14 @@ namespace Ant.Infrastructure.Services
             if (account == null) return;
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(account);
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var encodedEmail = Uri.EscapeDataString(model.Email);
+            var resetLink = $"{origin}/reset-password?token={encodedToken}&email={encodedEmail}";
             var emailRequest = new EmailRequest()
             {
-                Body = $"Your password reset token is: {code}",
+                Body = $"Click the link below to reset your password:<br/><br/><a href=\"{resetLink}\">{resetLink}</a><br/><br/>If you did not request this, you can ignore this email.",
                 To = model.Email,
-                Subject = "Reset Password",
+                Subject = "Reset Your Password",
             };
 
             try { await _emailService.SendAsync(emailRequest); } catch { }
@@ -228,7 +231,8 @@ namespace Ant.Infrastructure.Services
             var account = await _userManager.FindByEmailAsync(model.Email);
             if (account == null) throw new ApiException($"No Accounts Registered with {model.Email}.");
 
-            var result = await _userManager.ResetPasswordAsync(account, model.Token, model.Password);
+            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+            var result = await _userManager.ResetPasswordAsync(account, decodedToken, model.Password);
             if (result.Succeeded)
                 return "Password Reset Successful.";
             else

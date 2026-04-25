@@ -91,6 +91,7 @@ export default function LoginPage() {
       pending={isPending}
       error={error}
       onNavigateToRegister={() => router.push('/register')}
+      onNavigateToForgotPassword={() => router.push('/forgot-password')}
       mascot={mascotEl}
     />
   )
