@@ -13,6 +13,7 @@ namespace Ant.Application.Features.Posts.Commands.AddPostComment
     public class AddPostCommentCommand : IRequest<Response<PostCommentCreateViewModel>>
     {
         public Guid PostId { get; set; }
+        public Guid? ParentCommentId { get; set; }
         public string Content { get; set; }
     }
 
@@ -53,11 +54,19 @@ namespace Ant.Application.Features.Posts.Commands.AddPostComment
             var post = await _postRepository.GetPublicPostByIdAsync(request.PostId);
             if (post == null)
                 throw new ApiException("Post not found.");
+ 
+            if (request.ParentCommentId.HasValue)
+            {
+                var parentComment = await _commentRepository.GetByIdAsync(request.ParentCommentId.Value);
+                if (parentComment == null || parentComment.PostId != request.PostId || parentComment.IsDeleted)
+                    throw new ApiException("Parent comment not found or belongs to a different post.");
+            }
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
             var comment = new PostComment
             {
                 PostId = request.PostId,
+                ParentCommentId = request.ParentCommentId,
                 UserId = userId,
                 Content = content,
                 IsDeleted = false,

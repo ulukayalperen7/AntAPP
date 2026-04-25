@@ -20,6 +20,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostComments
     {
         public Guid CommentId { get; set; }
         public Guid PostId { get; set; }
+        public Guid? ParentCommentId { get; set; }
         public Guid UserId { get; set; }
         public string UserName { get; set; }
         public string Content { get; set; }
@@ -55,6 +56,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostComments
                 {
                     CommentId = c.Id,
                     PostId = c.PostId,
+                    ParentCommentId = c.ParentCommentId,
                     UserId = c.UserId,
                     UserName = c.User?.UserName,
                     Content = c.Content,

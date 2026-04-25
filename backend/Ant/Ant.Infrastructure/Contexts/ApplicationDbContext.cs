@@ -226,6 +226,11 @@ namespace Ant.Infrastructure.Contexts
                     .WithMany(u => u.PostComments)
                     .HasForeignKey(pc => pc.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(pc => pc.ParentComment)
+                    .WithMany(pc => pc.Replies)
+                    .HasForeignKey(pc => pc.ParentCommentId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<PostShare>(entity =>

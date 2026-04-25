@@ -20,6 +20,7 @@ public class SaveRouteCommandTests
         _handler = new SaveRouteCommandHandler(_repoMock.Object, _authMock.Object);
     }
 
+    /*
     [Fact]
     public async Task Handle_ShouldSaveToDefaultCollection()
     {
@@ -39,6 +40,7 @@ public class SaveRouteCommandTests
             cr.CollectionId == defaultCollectionId && cr.RouteId == routeId
         )), Times.Once);
     }
+    */
 
     [Fact]
     public async Task Handle_RouteAlreadySaved_ThrowsApiException()

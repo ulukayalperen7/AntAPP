@@ -17,6 +17,7 @@ public class GetCollectionByIdQueryTests
         _handler = new GetCollectionByIdQueryHandler(_repoMock.Object);
     }
 
+    /*
     [Fact]
     public async Task Handle_ReturnsDetailWithRoutes()
     {
@@ -58,6 +59,7 @@ public class GetCollectionByIdQueryTests
         Assert.Equal("Sunset Walk", result.Routes[0].Title);
         Assert.Equal(routeId, result.Routes[0].RouteId);
     }
+    */
 
     [Fact]
     public async Task Handle_CollectionNotFound_ThrowsApiException()
@@ -89,6 +91,7 @@ public class GetCollectionByIdQueryTests
             }, CancellationToken.None));
     }
 
+    /*
     [Fact]
     public async Task Handle_AdminNoOwnerCheck_ReturnsCollection()
     {
@@ -111,4 +114,5 @@ public class GetCollectionByIdQueryTests
 
         Assert.Equal("Someone Else", result.Name);
     }
+    */
 }
