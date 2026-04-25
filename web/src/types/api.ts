@@ -110,6 +110,14 @@ export type PostCommentItem = {
   createdAt: string
 }
 
+export type PostReactionItem = {
+  reactionId: string
+  postId: string
+  userId: string
+  userName: string | null
+  createdAt: string
+}
+
 export type PostReactionSummary = {
   postId: string
   isReactedByCurrentUser: boolean

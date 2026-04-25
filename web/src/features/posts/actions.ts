@@ -6,6 +6,7 @@ import type {
   PagedApiResponse,
   PostCommentCreateResult,
   PostCommentItem,
+  PostReactionItem,
   PostReactionSummary,
   PostShareSummary,
 } from '@/types/api'
@@ -39,6 +40,14 @@ export async function togglePostReaction(postId: string): Promise<PostReactionSu
   return apiFetchData<PostReactionSummary>(`/posts/${postId}/reactions/toggle`, {
     method: 'POST',
   })
+}
+
+export async function getPostReactions(
+  postId: string,
+  page = 1,
+  pageSize = 20,
+): Promise<PagedApiResponse<PostReactionItem>> {
+  return apiFetchPaged<PostReactionItem>(`/posts/${postId}/reactions?page=${page}&pageSize=${pageSize}`)
 }
 
 export async function getPostComments(
