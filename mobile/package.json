@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@antapp/app": "^0.0.1",
+    "@antapp/mobile-user": "file:",
     "@antapp/ui": "^0.0.1",
     "@expo/metro-runtime": "^55.0.6",
     "@react-navigation/bottom-tabs": "^7.7.3",

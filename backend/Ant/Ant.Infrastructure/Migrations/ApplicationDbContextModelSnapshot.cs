@@ -137,6 +137,9 @@ namespace Ant.Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("ParentCommentId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
 
@@ -144,6 +147,8 @@ namespace Ant.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ParentCommentId");
 
                     b.HasIndex("PostId", "CreatedAt");
 
@@ -785,6 +790,11 @@ namespace Ant.Infrastructure.Migrations
 
             modelBuilder.Entity("Ant.Core.Entities.PostComment", b =>
                 {
+                    b.HasOne("Ant.Core.Entities.PostComment", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Ant.Core.Entities.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
@@ -796,6 +806,8 @@ namespace Ant.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ParentComment");
 
                     b.Navigation("Post");
 
@@ -1092,6 +1104,11 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("Reactions");
 
                     b.Navigation("Shares");
+                });
+
+            modelBuilder.Entity("Ant.Core.Entities.PostComment", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Ant.Core.Entities.Route", b =>

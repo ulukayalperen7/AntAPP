@@ -30,6 +30,16 @@ namespace Ant.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+ 
+        public async Task<IReadOnlyList<PostComment>> GetRepliesAsync(Guid parentCommentId)
+        {
+            return await _comments
+                .AsNoTracking()
+                .Include(c => c.User)
+                .Where(c => c.ParentCommentId == parentCommentId && !c.IsDeleted)
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync();
+        }
 
         public Task<int> GetCountByPostAsync(Guid postId)
         {
