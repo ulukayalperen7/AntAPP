@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.14" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="MimeKit" Version="4.16.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.58" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ant.Application\Ant.Application.csproj" />

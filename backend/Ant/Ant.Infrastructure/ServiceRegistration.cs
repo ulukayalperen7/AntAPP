@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -46,8 +47,18 @@ namespace Ant.Infrastructure
 
 
 
-            services.AddMemoryCache();
-            services.AddSingleton<IAppCacheService, AppMemoryCacheService>();
+            if (string.Equals(configuration["Cache:Provider"], "Valkey", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(configuration["Cache:Provider"], "Redis", StringComparison.OrdinalIgnoreCase))
+            {
+                services.AddSingleton<IConnectionMultiplexer>(_ =>
+                    ConnectionMultiplexer.Connect(configuration.GetConnectionString("Valkey") ?? "localhost:6379"));
+                services.AddSingleton<IAppCacheService, ValkeyAppCacheService>();
+            }
+            else
+            {
+                services.AddMemoryCache();
+                services.AddSingleton<IAppCacheService, AppMemoryCacheService>();
+            }
 
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
             #region Services
