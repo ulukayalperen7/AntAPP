@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useTransition } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Share } from 'react-native'
-import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ScrollView, Badge } from '@antapp/ui'
+import { Linking, Share } from 'react-native'
+import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ScrollView, Badge, Image } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import type { RouteDetail } from '@/features/api/types'
@@ -83,6 +83,8 @@ export default function RouteDetailScreen() {
   const [error, setError] = useState<string | null>(null)
 
   const [collectionModalVisible, setCollectionModalVisible] = useState(false)
+  const [isTourMode, setIsTourMode] = useState(false)
+  const [currentStopIndex, setCurrentStopIndex] = useState(0)
   const [isForking, startFork] = useTransition()
 
   useEffect(() => {
@@ -154,6 +156,28 @@ export default function RouteDetailScreen() {
     ? Math.round(route.estimatedDurationSeconds / 60) + ' min'
     : '—'
 
+  const currentStop = route.stops[currentStopIndex] ?? route.stops[0]
+
+  const startTour = () => {
+    if (route.stops.length === 0) return
+    setCurrentStopIndex(0)
+    setIsTourMode(true)
+  }
+
+  const openCurrentStopInMaps = () => {
+    if (!currentStop) return
+    Linking.openURL(`https://www.google.com/maps/dir/?api=1&destination=${currentStop.latitude},${currentStop.longitude}`).catch(() => {})
+  }
+
+  const advanceTour = () => {
+    if (currentStopIndex < route.stops.length - 1) {
+      setCurrentStopIndex((index) => index + 1)
+      return
+    }
+
+    setIsTourMode(false)
+  }
+
   return (
     <YStack flex={1} backgroundColor="$background">
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -198,6 +222,17 @@ export default function RouteDetailScreen() {
                 <Text variant="caption" color="$ant200">{displayRating.toFixed(1)} avg rating</Text>
               </XStack>
             ) : null}
+
+            <Button
+              variant="solid"
+              size="md"
+              alignSelf="flex-start"
+              disabled={route.stops.length === 0}
+              onPress={startTour}
+              icon={<Feather name="navigation" size={16} color="#FFFFFF" />}
+            >
+              Start Navigation
+            </Button>
           </YStack>
 
           {/* Stats */}
@@ -360,6 +395,8 @@ export default function RouteDetailScreen() {
             variant="solid"
             size="lg"
             flex={1}
+            disabled={route.stops.length === 0}
+            onPress={startTour}
             icon={<Feather name="navigation" size={18} color="#FFFFFF" />}
           >
             Start
@@ -372,6 +409,94 @@ export default function RouteDetailScreen() {
         routeId={route.id}
         onClose={() => setCollectionModalVisible(false)}
       />
+
+      {isTourMode && currentStop ? (
+        <YStack
+          position="absolute"
+          top={0}
+          bottom={0}
+          left={0}
+          right={0}
+          backgroundColor="$background"
+          zIndex={1000}
+        >
+          <XStack
+            paddingHorizontal="$4"
+            paddingTop={insets.top + 12}
+            paddingBottom="$3"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottomWidth={1}
+            borderBottomColor="$borderColor"
+            backgroundColor="$backgroundStrong"
+            gap="$3"
+          >
+            <YStack flex={1} gap="$1">
+              <Text variant="label" color="$primary">Route Active</Text>
+              <Text variant="heading4" numberOfLines={1}>{route.title}</Text>
+            </YStack>
+            <Button variant="ghost" size="sm" onPress={() => setIsTourMode(false)} icon={<Feather name="x" size={18} />}>
+              Exit
+            </Button>
+          </XStack>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <YStack padding="$4" paddingBottom={insets.bottom + 32} gap="$5">
+              <XStack justifyContent="space-between" alignItems="center">
+                <Text variant="label" muted>
+                  Stop {currentStop.order || currentStopIndex + 1} of {route.stops.length}
+                </Text>
+                <Badge variant="info" size="sm">Tour Mode</Badge>
+              </XStack>
+
+              <YStack backgroundColor="$backgroundStrong" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$borderColor">
+                {currentStop.photoUrl ? (
+                  <YStack height={250} backgroundColor="$muted">
+                    <Image src={currentStop.photoUrl} width="100%" height="100%" objectFit="cover" />
+                  </YStack>
+                ) : null}
+                <YStack padding="$5" gap="$3">
+                  <XStack alignItems="center" gap="$3">
+                    <XStack width={42} height={42} borderRadius="$full" backgroundColor="$primary" alignItems="center" justifyContent="center">
+                      <Text variant="label" color="#FFFFFF">{currentStop.order || currentStopIndex + 1}</Text>
+                    </XStack>
+                    <YStack flex={1}>
+                      <Text variant="heading2">{currentStop.name}</Text>
+                      <Text variant="caption" muted>
+                        {currentStop.latitude.toFixed(5)}, {currentStop.longitude.toFixed(5)}
+                      </Text>
+                    </YStack>
+                  </XStack>
+                  {currentStop.description ? (
+                    <Text variant="body">{currentStop.description}</Text>
+                  ) : (
+                    <Text variant="body" muted>Arrive here, look around, then continue to the next stop.</Text>
+                  )}
+                </YStack>
+              </YStack>
+
+              <YStack gap="$3">
+                <Button
+                  size="lg"
+                  variant="solid"
+                  onPress={openCurrentStopInMaps}
+                  icon={<Feather name="navigation" size={18} color="#FFFFFF" />}
+                >
+                  Open in Google Maps
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onPress={advanceTour}
+                  icon={<Feather name="check-circle" size={18} />}
+                >
+                  {currentStopIndex < route.stops.length - 1 ? 'Arrived · Next Stop' : 'Finish Route'}
+                </Button>
+              </YStack>
+            </YStack>
+          </ScrollView>
+        </YStack>
+      ) : null}
     </YStack>
   )
 }

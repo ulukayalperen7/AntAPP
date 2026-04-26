@@ -1,8 +1,18 @@
 import { apiFetchData } from '@/features/api/client'
-import type { CurrentUser } from '@/features/api/types'
+import type { CurrentUser, PublicProfile, UserFollowSummary } from '@/features/api/types'
 
 export async function getCurrentUser(): Promise<CurrentUser> {
   return apiFetchData<CurrentUser>('/account/me')
+}
+
+export async function getPublicProfile(userId: string): Promise<PublicProfile> {
+  return apiFetchData<PublicProfile>(`/profiles/${userId}`)
+}
+
+export async function toggleProfileFollow(userId: string): Promise<UserFollowSummary> {
+  return apiFetchData<UserFollowSummary>(`/profiles/${userId}/follow`, {
+    method: 'POST',
+  })
 }
 
 export async function updateProfile(data: {

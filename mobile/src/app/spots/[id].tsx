@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useTransition } from 'react'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { YStack, XStack, Text, Button, StatBox, RatingDisplay, RouteCard, ScrollView, Badge } from '@antapp/ui'
+import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ScrollView } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { getSpotById, getSpotRoutes, rateSpot, toggleSpotFavorite } from '@/features/spots/api'
 import type { SpotDetail, SpotRouteItem } from '@/features/api/types'
 import { SpotDetailSkeleton } from '@/components/loading/page-skeletons'
+import { SpotMap } from '@/components/map/spot-map'
 
 function SpotRatingWidget({
   spotId,
@@ -220,18 +221,16 @@ export default function SpotDetailScreen() {
               <YStack
                 backgroundColor="$muted"
                 borderRadius="$3"
-                padding="$4"
-                alignItems="center"
-                justifyContent="center"
-                height={120}
-                gap="$2"
+                overflow="hidden"
+                height={220}
+                borderWidth={1}
+                borderColor="$borderColor"
               >
-                <Feather name="map" size={28} color="var(--color-mutedForeground, #999)" />
-                <Text variant="caption" muted>Map — Coming Soon</Text>
-                <Text variant="caption" muted>
-                  {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
-                </Text>
+                <SpotMap spot={spot} />
               </YStack>
+              <Text variant="caption" muted>
+                {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+              </Text>
             </YStack>
           </YStack>
 

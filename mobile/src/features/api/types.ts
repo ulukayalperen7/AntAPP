@@ -37,10 +37,96 @@ export type RouteListItem = {
   thumbnailUrl: string | null
   authorUserId: string
   authorUserName?: string | null
+  originalRouteId?: string | null
+  originalAuthorName?: string | null
+  postId?: string
+  postContent?: string | null
+  postImageUrls?: string[]
+  postReactionCount?: number
+  postCommentCount?: number
+  postShareCount?: number
+  isReactedByCurrentUser?: boolean
+  isSharedByCurrentUser?: boolean
   contentType: RouteContentType
   isPublic: boolean
   createdAt: string
   averageRating: number
+}
+
+export type PublicProfile = {
+  id: string
+  userName: string
+  profilePhotoUrl: string | null
+  followerCount: number
+  followingCount: number
+  publicRouteCount: number
+  postCount: number
+  isCurrentUser: boolean
+  isFollowingByCurrentUser: boolean
+}
+
+export type UserFollowSummary = {
+  userId: string
+  isFollowingByCurrentUser: boolean
+  followerCount: number
+  followingCount: number
+}
+
+export type FeedPostItem = {
+  postId: string
+  content: string | null
+  createdAt: string
+  isPublic: boolean
+  authorUserId: string
+  authorUserName: string | null
+  routeId: string
+  routeTitle: string
+  routeDescription: string | null
+  routeThumbnailUrl: string | null
+  routeContentType: RouteContentType
+  routeIsPublic: boolean
+  routeAverageRating: number
+  imageUrls: string[]
+  reactionCount: number
+  commentCount: number
+  shareCount: number
+  isReactedByCurrentUser: boolean
+  isSharedByCurrentUser: boolean
+}
+
+export type PostCommentItem = {
+  commentId: string
+  postId: string
+  userId: string
+  userName: string | null
+  content: string
+  createdAt: string
+}
+
+export type PostReactionItem = {
+  reactionId: string
+  postId: string
+  userId: string
+  userName: string | null
+  createdAt: string
+}
+
+export type PostReactionSummary = {
+  postId: string
+  isReactedByCurrentUser: boolean
+  reactionCount: number
+}
+
+export type PostShareSummary = {
+  postId: string
+  isSharedByCurrentUser: boolean
+  shareCount: number
+}
+
+export type PostCommentCreateResult = {
+  commentId: string
+  postId: string
+  commentCount: number
 }
 
 export type RouteStop = {
