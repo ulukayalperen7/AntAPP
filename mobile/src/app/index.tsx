@@ -382,7 +382,7 @@ function FeedPostCard({
         borderWidth={1}
         borderColor="$borderColor"
       >
-        <YStack minHeight={260} backgroundColor="$muted" onPress={onPress}>
+        <YStack height={260} maxHeight={260} flexShrink={0} backgroundColor="$muted" onPress={onPress}>
           {coverImage ? (
             <Image src={coverImage} width="100%" height="100%" objectFit="cover" />
           ) : null}
