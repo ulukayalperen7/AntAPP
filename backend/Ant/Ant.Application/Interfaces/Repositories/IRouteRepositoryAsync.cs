@@ -29,5 +29,7 @@ namespace Ant.Application.Interfaces.Repositories
             string visibility = null,
             RouteContentTypeEnum? contentType = null);
         Task<IReadOnlyList<Route>> GetNearbyRoutesAsync(double latitude, double longitude, double radiusInMeters, int pageNumber, int pageSize);
+        Task<Route> GetForkByOriginalAsync(Guid originalRouteId, Guid authorId);
+
     }
 }

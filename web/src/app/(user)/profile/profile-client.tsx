@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Avatar, RouteCard, StatBox } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import type { CurrentUser, RouteListItem } from '@/types/api'
-import { publishRoute, unpublishRoute } from '@/features/routes/actions'
-import { Plus, Share2, Globe, Lock, Pencil } from 'lucide-react'
+import { deleteRoute, publishRoute, unpublishRoute } from '@/features/routes/actions'
+import { Plus, Share2, Globe, Lock, Pencil, Trash2, GitFork } from 'lucide-react'
 
 function routeToCardData(route: RouteListItem): RouteCardData {
+  const source = route.originalAuthorName?.trim()
+
   return {
     id: route.id,
     title: route.title,
@@ -17,19 +19,24 @@ function routeToCardData(route: RouteListItem): RouteCardData {
     rating: route.averageRating > 0 ? route.averageRating : undefined,
     contentType: route.contentType,
     isOfficial: route.contentType === 'Official',
+    tag: source ? `Copy from ${source}` : 'Original route',
   }
 }
 
 function RouteActionCard({
   route,
   onPress,
+  onRemoved,
 }: {
   route: RouteListItem
   onPress: () => void
+  onRemoved: (routeId: string) => void
 }) {
   const router = useRouter()
   const [isPublic, setIsPublic] = useState(route.isPublic)
   const [isToggling, startToggle] = useTransition()
+  const [isRemoving, startRemove] = useTransition()
+  const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
   const handleTogglePublish = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -42,6 +49,19 @@ function RouteActionCard({
           await publishRoute(route.id)
           setIsPublic(true)
         }
+      } catch { /* ignore */ }
+    })
+  }
+
+  const handleRemoveCopy = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!isForkedCopy || isRemoving) return
+    if (!window.confirm('Remove this forked copy from My Routes? The original route will stay available.')) return
+
+    startRemove(async () => {
+      try {
+        await deleteRoute(route.id)
+        onRemoved(route.id)
       } catch { /* ignore */ }
     })
   }
@@ -78,9 +98,22 @@ function RouteActionCard({
             : <Lock size={13} color="#d1d5db" />
           }
           <Text variant="caption" color={isPublic ? '#4ade80' : '#d1d5db'} fontSize="$2">
-            {isPublic ? 'Public' : 'Private'}
+            {isPublic ? 'Public' : 'Private draft'}
           </Text>
         </XStack>
+
+        {isForkedCopy && (
+          <XStack
+            alignItems="center"
+            gap="$1"
+            padding="$1.5"
+            borderRadius="$2"
+            backgroundColor="rgba(255,255,255,0.1)"
+          >
+            <GitFork size={13} color="#FFFFFF" />
+            <Text variant="caption" color="#FFFFFF" fontSize="$2">Copy</Text>
+          </XStack>
+        )}
 
         {/* Toggle publish */}
         <XStack
@@ -108,6 +141,20 @@ function RouteActionCard({
         >
           <Pencil size={14} color="#FFFFFF" />
         </XStack>
+
+        {isForkedCopy && (
+          <XStack
+            cursor={isRemoving ? 'default' : 'pointer'}
+            padding="$1.5"
+            borderRadius="$2"
+            backgroundColor="rgba(220,38,38,0.85)"
+            hoverStyle={{ backgroundColor: 'rgba(220,38,38,1)' }}
+            onPress={(e: any) => handleRemoveCopy(e)}
+            opacity={isRemoving ? 0.5 : 1}
+          >
+            <Trash2 size={14} color="#FFFFFF" />
+          </XStack>
+        )}
       </XStack>
     </YStack>
   )
@@ -121,6 +168,11 @@ export default function ProfileClient({
   routes: RouteListItem[]
 }) {
   const router = useRouter()
+  const [routeItems, setRouteItems] = useState(routes)
+
+  useEffect(() => {
+    setRouteItems(routes)
+  }, [routes])
 
   if (!user) {
     return (
@@ -132,8 +184,8 @@ export default function ProfileClient({
   }
 
   const initials = user.userName?.slice(0, 2).toUpperCase() ?? 'U'
-  const publicCount = routes.filter((r) => r.isPublic).length
-  const privateCount = routes.length - publicCount
+  const publicCount = routeItems.filter((r) => r.isPublic).length
+  const privateCount = routeItems.length - publicCount
 
   return (
     <YStack gap="$5" flex={1}>
@@ -170,7 +222,7 @@ export default function ProfileClient({
 
       {/* Stats */}
       <XStack gap="$3" flexWrap="wrap">
-        <StatBox value={routes.length} label="Routes" />
+        <StatBox value={routeItems.length} label="Routes" />
         {publicCount > 0 && <StatBox value={publicCount} label="Public" />}
         {privateCount > 0 && <StatBox value={privateCount} label="Private" />}
       </XStack>
@@ -180,13 +232,14 @@ export default function ProfileClient({
           <Text variant="heading3">My Routes</Text>
         </XStack>
 
-        {routes.length > 0 ? (
+        {routeItems.length > 0 ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-            {routes.map((route) => (
+            {routeItems.map((route) => (
               <RouteActionCard
                 key={route.id}
                 route={route}
                 onPress={() => router.push(`/routes/${route.id}`)}
+                onRemoved={(routeId) => setRouteItems((current) => current.filter((item) => item.id !== routeId))}
               />
             ))}
             {/* Create placeholder */}

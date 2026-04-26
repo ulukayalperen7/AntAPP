@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Explore', href: '/dashboard', Icon: Compass },
   { label: 'Official', href: '/official', Icon: ShieldCheck },
   { label: 'Community', href: '/community', Icon: Users2 },
+  { label: 'Routes', href: '/routes', Icon: ShieldCheck },
   { label: 'Spots', href: '/spots', Icon: MapPinned },
   { label: 'My Routes', href: '/my-routes', Icon: Route },
   { label: 'Saved', href: '/collections', Icon: Bookmark },

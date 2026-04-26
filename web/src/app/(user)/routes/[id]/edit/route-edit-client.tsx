@@ -94,6 +94,7 @@ export default function RouteEditClient({
   const [isManagingStops, startManageStops] = useTransition()
   const [isMutatingStops, setIsMutatingStops] = useState(false)
   const isStopActionPending = isManagingStops || isMutatingStops
+  const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
   const refreshStops = async (successMessage?: string) => {
     const nextStops = await getRouteStops(route.id)
@@ -772,9 +773,12 @@ export default function RouteEditClient({
         <Divider />
         <XStack gap="$4" alignItems="center" flexWrap="wrap">
           <YStack flex={1} gap="$0.5">
-            <Text variant="label">Delete Route</Text>
+            <Text variant="label">{isForkedCopy ? 'Remove My Copy' : 'Delete Route'}</Text>
             <Text variant="caption" muted>
-              Permanently delete this route. This action cannot be undone.
+              {isForkedCopy
+                ? `Remove this forked copy from My Routes. The original route${route.originalAuthorName ? ` by ${route.originalAuthorName}` : ''} stays available.`
+                : 'Permanently delete your original route. This action cannot be undone.'
+              }
             </Text>
           </YStack>
           {!deleteConfirm ? (
@@ -784,7 +788,7 @@ export default function RouteEditClient({
               onPress={() => setDeleteConfirm(true)}
               icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}
             >
-              <Text variant="label" color="$error500">Delete</Text>
+              <Text variant="label" color="$error500">{isForkedCopy ? 'Remove Copy' : 'Delete'}</Text>
             </Button>
           ) : (
             <XStack gap="$2">
@@ -804,7 +808,7 @@ export default function RouteEditClient({
                 backgroundColor="$error500"
                 hoverStyle={{ backgroundColor: '$error400' }}
               >
-                <Text variant="label" color="#FFFFFF">Confirm Delete</Text>
+                <Text variant="label" color="#FFFFFF">{isForkedCopy ? 'Confirm Remove' : 'Confirm Delete'}</Text>
               </Button>
             </XStack>
           )}

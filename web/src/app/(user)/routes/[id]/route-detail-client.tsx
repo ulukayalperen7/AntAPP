@@ -13,18 +13,27 @@ import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 function StarRatingWidget({
   routeId,
+  initialRating,
   onRated,
 }: {
   routeId: string
+  initialRating?: number | null
   onRated: (result: RouteRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
-  const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState(initialRating || 0)
   const [isSubmitting, startSubmit] = useTransition()
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(!!initialRating)
+
+  useEffect(() => {
+    if (initialRating) {
+      setSelected(initialRating)
+      setSubmitted(true)
+    }
+  }, [initialRating])
 
   const handleRate = (score: number) => {
-    if (submitted) return
+    if (isSubmitting) return
     setSelected(score)
     startSubmit(async () => {
       try {
@@ -39,11 +48,11 @@ function StarRatingWidget({
 
   const active = hovered || selected
 
-  if (submitted) {
+  if (submitted && selected > 0) {
     return (
-      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3">
+      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3" onPress={() => setSubmitted(false)} cursor="pointer">
         <Star size={16} fill="var(--color-success500, #22C55E)" color="var(--color-success500, #22C55E)" />
-        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5</Text>
+        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5 (Click to change)</Text>
       </XStack>
     )
   }
@@ -347,6 +356,7 @@ export default function RouteDetailClient({
 
   // Rating state
   const [displayRating, setDisplayRating] = useState(route.averageRating)
+  const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
   // Tour Guide Mode state
   const [isTourMode, setIsTourMode] = useState(false)
@@ -437,7 +447,7 @@ export default function RouteDetailClient({
             alignItems="center"
           >
             {route.isPublic ? <Sparkles size={12} color="#4ADE80" /> : <Ellipsis size={12} color="#FBBF24" />}
-            <Text variant="caption" color="#FFFFFF">{route.isPublic ? 'Public' : 'Draft'}</Text>
+            <Text variant="caption" color="#FFFFFF">{route.isPublic ? 'Public' : 'Private draft'}</Text>
           </XStack>
         )}
 
@@ -447,8 +457,11 @@ export default function RouteDetailClient({
             {route.originalAuthorName && (
               <XStack alignItems="center" gap="$2" marginTop="$1">
                 <GitFork size={14} color="#FFFFFF" opacity={0.8} />
-                <Text variant="caption" color="#FFFFFF" opacity={0.8}>Forked from {route.originalAuthorName}</Text>
+                <Text variant="caption" color="#FFFFFF" opacity={0.8}>Your editable copy of {route.originalAuthorName}'s route</Text>
               </XStack>
+            )}
+            {!isForkedCopy && route.authorUserName && (
+              <Text variant="caption" color="#FFFFFF" opacity={0.8}>Created by {route.authorUserName}</Text>
             )}
             {displayRating > 0 && (
               <XStack alignItems="center" gap="$3" flexWrap="wrap">
@@ -474,22 +487,23 @@ export default function RouteDetailClient({
             </Button>
 
             <Button
-              variant="outline"
+              variant={isSaved ? 'solid' : 'outline'}
               size="md"
               loading={isSaving}
               disabled={isSaved || isSaving}
               onPress={handleSave}
-
-              style={{ backgroundColor: isSaved ? 'rgba(255,255,255,0.2)' : undefined }}
+              backgroundColor={isSaved ? '$success500' : '$backgroundStrong'}
+              borderColor={isSaved ? '$success500' : '$primary'}
+              hoverStyle={{ backgroundColor: isSaved ? '$success500' : '$backgroundHover' }}
             >
               <XStack alignItems="center" gap="$1.5">
                 {isSaved
                   ? <BookmarkCheck size={16} color="#FFFFFF" />
-                  : <Bookmark size={16} color="currentColor" />
+                  : <Bookmark size={16} color="var(--color-primary)" />
                 }
                 <YStack>
                   <XStack alignItems="center" gap="$1">
-                    <Text variant="label" color={isSaved ? '#FFFFFF' : undefined}>
+                    <Text variant="label" color={isSaved ? '#FFFFFF' : '$primary'}>
                       {isSaved ? 'In Collection' : 'Save to Collection'}
                     </Text>
                   </XStack>
@@ -679,6 +693,7 @@ export default function RouteDetailClient({
               <Text variant="heading4">Rate This Route</Text>
               <StarRatingWidget
                 routeId={route.id}
+                initialRating={route.currentUserRating}
                 onRated={(result) => setDisplayRating(result.averageRating)}
               />
             </YStack>

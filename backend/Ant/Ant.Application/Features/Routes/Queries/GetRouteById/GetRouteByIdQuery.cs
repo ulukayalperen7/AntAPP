@@ -27,6 +27,8 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         public string Description { get; set; }
         public string ThumbnailUrl { get; set; }
         public Guid AuthorUserId { get; set; }
+        public string AuthorUserName { get; set; }
+        public Guid? OriginalRouteId { get; set; }
         public string OriginalAuthorName { get; set; }
         public Ant.Core.Enums.RouteContentTypeEnum ContentType { get; set; }
         public bool IsPublic { get; set; }
@@ -47,6 +49,7 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
         /// Optimized by avoiding expensive grouping operations and returning pre-aggregated data.
         /// </summary>
         public double AverageRating { get; set; }
+        public int? CurrentUserRating { get; set; }
     }
 
     public class RouteSpotDto
@@ -69,59 +72,66 @@ namespace Ant.Application.Features.Routes.Queries.GetRouteById
     public class GetRouteByIdQueryHandler : IRequestHandler<GetRouteByIdQuery, Response<GetRouteByIdViewModel>>
     {
         private readonly IRouteRepositoryAsync _routeRepository;
-        private readonly IAppCacheService _cache;
+        private readonly IAuthenticatedUserService _authenticatedUserService;
+        private readonly IRouteRatingRepositoryAsync _routeRatingRepository;
 
-        public GetRouteByIdQueryHandler(IRouteRepositoryAsync routeRepository, IAppCacheService cache)
+        public GetRouteByIdQueryHandler(
+            IRouteRepositoryAsync routeRepository,
+            IAuthenticatedUserService authenticatedUserService,
+            IRouteRatingRepositoryAsync routeRatingRepository)
         {
             _routeRepository = routeRepository;
-            _cache = cache;
+            _authenticatedUserService = authenticatedUserService;
+            _routeRatingRepository = routeRatingRepository;
         }
 
         public async Task<Response<GetRouteByIdViewModel>> Handle(GetRouteByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _cache.GetOrCreateAsync(
-                AppCacheKeys.RouteDetail(request.Id),
-                async _ =>
+            var route = await _routeRepository.GetRouteWithSpotsAsync(request.Id);
+
+            if (route == null) throw new ApiException($"Route NOT FOUND.");
+
+            var viewModel = new GetRouteByIdViewModel
+            {
+                Id = route.Id,
+                Title = route.Title,
+                Description = route.Description,
+                ThumbnailUrl = route.ThumbnailUrl,
+                AuthorUserId = route.AuthorUserId,
+                AuthorUserName = route.AuthorUser?.UserName,
+                OriginalRouteId = route.OriginalRouteId,
+                OriginalAuthorName = route.OriginalRoute?.AuthorUser?.UserName,
+                ContentType = route.ContentType,
+                IsPublic = route.IsPublic,
+                EncodedPolyline = route.EncodedPolyline,
+                TotalDistanceMeters = route.TotalDistanceMeters,
+                EstimatedDurationSeconds = route.EstimatedDurationSeconds,
+                CenterLatitude = route.CenterLocation?.Y ?? 0,
+                CenterLongitude = route.CenterLocation?.X ?? 0,
+                AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
+                Stops = route.RouteSpots.OrderBy(rs => rs.SpotOrder).Select(rs => new RouteSpotDto
                 {
-                    var route = await _routeRepository.GetRouteWithSpotsAsync(request.Id);
+                    SpotId = rs.Spot.Id,
+                    Order = rs.SpotOrder,
+                    Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
+                    SpotName = rs.Spot.Name,
+                    CustomTitle = rs.CustomTitle,
+                    Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
+                    PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
+                    Latitude = rs.Spot.Location.Y,
+                    Longitude = rs.Spot.Location.X,
+                    GooglePlaceId = rs.Spot.GooglePlaceId
+                }).ToList()
+            };
 
-                    if (route == null) throw new ApiException($"Route NOT FOUND.");
+            if (!string.IsNullOrEmpty(_authenticatedUserService.UserId))
+            {
+                var userId = Guid.Parse(_authenticatedUserService.UserId);
+                var rating = await _routeRatingRepository.GetByUserAndRouteAsync(userId, route.Id);
+                viewModel.CurrentUserRating = rating?.Stars;
+            }
 
-                    var viewModel = new GetRouteByIdViewModel
-                    {
-                        Id = route.Id,
-                        Title = route.Title,
-                        Description = route.Description,
-                        ThumbnailUrl = route.ThumbnailUrl,
-                        AuthorUserId = route.AuthorUserId,
-                        OriginalAuthorName = route.OriginalRoute?.AuthorUser?.UserName,
-                        ContentType = route.ContentType,
-                        IsPublic = route.IsPublic,
-                        EncodedPolyline = route.EncodedPolyline,
-                        TotalDistanceMeters = route.TotalDistanceMeters,
-                        EstimatedDurationSeconds = route.EstimatedDurationSeconds,
-                        CenterLatitude = route.CenterLocation?.Y ?? 0,
-                        CenterLongitude = route.CenterLocation?.X ?? 0,
-                        AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
-                        Stops = route.RouteSpots.OrderBy(rs => rs.SpotOrder).Select(rs => new RouteSpotDto
-                        {
-                            SpotId = rs.Spot.Id,
-                            Order = rs.SpotOrder,
-                            Name = string.IsNullOrEmpty(rs.CustomTitle) ? rs.Spot.Name : rs.CustomTitle,
-                            SpotName = rs.Spot.Name,
-                            CustomTitle = rs.CustomTitle,
-                            Description = string.IsNullOrEmpty(rs.CustomDescription) ? rs.Spot.Description : rs.CustomDescription,
-                            PhotoUrl = string.IsNullOrEmpty(rs.CustomPhotoUrl) ? rs.Spot.PhotoUrl : rs.CustomPhotoUrl,
-                            Latitude = rs.Spot.Location.Y,
-                            Longitude = rs.Spot.Location.X,
-                            GooglePlaceId = rs.Spot.GooglePlaceId
-                        }).ToList()
-                    };
-
-                    return new Response<GetRouteByIdViewModel>(viewModel);
-                },
-                TimeSpan.FromMinutes(5),
-                cancellationToken);
+            return new Response<GetRouteByIdViewModel>(viewModel);
         }
     }
 }
