@@ -106,7 +106,7 @@ export default function PublicProfileClient({
     <YStack gap="$6" flex={1}>
       <Card variant="outline" size="md" backgroundColor="$backgroundStrong" padding="$5">
         <XStack gap="$5" alignItems="center" flexWrap="wrap">
-          <Avatar size="xl" initials={getInitials(profile.userName)} />
+          <Avatar size="xl" initials={getInitials(profile.userName)} src={profile.profilePhotoUrl ?? undefined} />
           <YStack flex={1} gap="$2" minWidth={220}>
             <Text variant="heading2">{profile.userName}</Text>
             <Text variant="body" muted>

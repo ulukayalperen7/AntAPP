@@ -1,5 +1,6 @@
 import { requireAuth } from '@/features/auth/guard'
 import { getServerSession } from '@/features/auth/session'
+import { getCurrentUser } from '@/features/account/actions'
 import { UserShellWrapper } from './user-shell-wrapper'
 
 export default async function UserLayout({
@@ -9,9 +10,11 @@ export default async function UserLayout({
 }) {
   await requireAuth('/')
   const session = await getServerSession()
+  const userResult = await Promise.allSettled([getCurrentUser()])
+  const user = userResult[0].status === 'fulfilled' ? userResult[0].value : null
 
   return (
-    <UserShellWrapper userId={session?.id} userName={session?.userName}>
+    <UserShellWrapper userId={session?.id} userName={user?.userName ?? session?.userName} profilePhotoUrl={user?.profilePhotoUrl}>
       {children}
     </UserShellWrapper>
   )

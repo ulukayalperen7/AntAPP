@@ -22,12 +22,14 @@ const COLLAPSED_WIDTH = 64
 export function AppSidebar({
   userId,
   userName,
+  profilePhotoUrl,
   onLogout,
   collapsed,
   onToggle,
 }: {
   userId?: string
   userName?: string
+  profilePhotoUrl?: string | null
   onLogout?: () => void
   collapsed?: boolean
   onToggle?: () => void
@@ -166,7 +168,7 @@ export function AppSidebar({
             hoverStyle={{ backgroundColor: '$backgroundHover' }}
             cursor="pointer"
           >
-            <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} />
+            <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} src={profilePhotoUrl ?? undefined} />
             {!collapsed && (
               <YStack flex={1}>
                 <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>

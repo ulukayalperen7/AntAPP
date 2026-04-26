@@ -35,26 +35,28 @@ namespace Ant.Application.Features.Profiles.Queries.GetPublicProfile
         private readonly IRouteRepositoryAsync _routeRepository;
         private readonly IPostRepositoryAsync _postRepository;
         private readonly IAuthenticatedUserService _authenticatedUser;
+        private readonly IIdentityService _identityService;
 
         public GetPublicProfileQueryHandler(
             IGenericRepositoryAsync<User> userRepository,
             IUserFollowRepositoryAsync followRepository,
             IRouteRepositoryAsync routeRepository,
             IPostRepositoryAsync postRepository,
-            IAuthenticatedUserService authenticatedUser)
+            IAuthenticatedUserService authenticatedUser,
+            IIdentityService identityService)
         {
             _userRepository = userRepository;
             _followRepository = followRepository;
             _routeRepository = routeRepository;
             _postRepository = postRepository;
             _authenticatedUser = authenticatedUser;
+            _identityService = identityService;
         }
 
         public async Task<Response<PublicProfileViewModel>> Handle(GetPublicProfileQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
-            if (user == null)
-                throw new ApiException("Profile not found.");
+            var identity = await _identityService.GetUserIdentityAsync(request.UserId);
 
             Guid? currentUserId = null;
             if (!string.IsNullOrEmpty(_authenticatedUser.UserId) && Guid.TryParse(_authenticatedUser.UserId, out var parsedUserId))
@@ -69,9 +71,9 @@ namespace Ant.Application.Features.Profiles.Queries.GetPublicProfile
 
             var profile = new PublicProfileViewModel
             {
-                Id = user.Id,
-                UserName = user.UserName,
-                ProfilePhotoUrl = user.ProfilePhotoUrl,
+                Id = request.UserId,
+                UserName = user?.UserName ?? identity.UserName,
+                ProfilePhotoUrl = user?.ProfilePhotoUrl,
                 FollowerCount = await _followRepository.GetFollowerCountAsync(request.UserId),
                 FollowingCount = await _followRepository.GetFollowingCountAsync(request.UserId),
                 PublicRouteCount = await _routeRepository.GetTotalRoutesCountAsync(authorId: request.UserId, visibility: "public"),

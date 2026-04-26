@@ -11,6 +11,7 @@ type FeedbackState = { ok: boolean; message: string } | null
 export default function SettingsClient({ user }: { user: CurrentUser | null }) {
   // Profile form
   const [userName, setUserName] = useState(user?.userName ?? '')
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(user?.profilePhotoUrl ?? '')
   const [profileFeedback, setProfileFeedback] = useState<FeedbackState>(null)
   const [isUpdatingProfile, startProfileUpdate] = useTransition()
 
@@ -25,7 +26,7 @@ export default function SettingsClient({ user }: { user: CurrentUser | null }) {
     setProfileFeedback(null)
     startProfileUpdate(async () => {
       try {
-        await updateProfile({ userName })
+        await updateProfile({ userName, profilePhotoUrl: profilePhotoUrl.trim() || '' })
         setProfileFeedback({ ok: true, message: 'Profile updated successfully.' })
       } catch (e) {
         setProfileFeedback({ ok: false, message: (e as Error).message ?? 'Failed to update profile.' })
@@ -71,7 +72,7 @@ export default function SettingsClient({ user }: { user: CurrentUser | null }) {
         <Divider />
 
         <XStack gap="$4" alignItems="center">
-          <Avatar size="lg" initials={initials} />
+          <Avatar size="lg" initials={initials} src={profilePhotoUrl.trim() || undefined} />
           <YStack gap="$0.5">
             <Text variant="body" weight="semibold">{user?.userName ?? '—'}</Text>
             <Text variant="caption" muted>{user?.email ?? '—'}</Text>
@@ -101,6 +102,18 @@ export default function SettingsClient({ user }: { user: CurrentUser | null }) {
           />
         </YStack>
 
+        <YStack gap="$1.5">
+          <Text variant="label" color="$mutedForeground">Profile photo URL</Text>
+          <Input
+            value={profilePhotoUrl}
+            onChangeText={setProfilePhotoUrl}
+            variant="outline"
+            size="md"
+            placeholder="https://example.com/avatar.jpg"
+            autoCapitalize="none"
+          />
+        </YStack>
+
         {profileFeedback && (
           <XStack gap="$2" alignItems="center">
             {profileFeedback.ok
@@ -118,7 +131,7 @@ export default function SettingsClient({ user }: { user: CurrentUser | null }) {
           size="md"
           alignSelf="flex-start"
           loading={isUpdatingProfile}
-          disabled={isUpdatingProfile || !userName.trim() || userName === user?.userName}
+          disabled={isUpdatingProfile || !userName.trim() || (userName === user?.userName && profilePhotoUrl === (user?.profilePhotoUrl ?? ''))}
           onPress={handleProfileSave}
         >
           Save Changes

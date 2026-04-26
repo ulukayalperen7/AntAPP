@@ -8,14 +8,16 @@ export function UserShellWrapper({
   children,
   userId,
   userName,
+  profilePhotoUrl,
 }: {
   children: React.ReactNode
   userId?: string
   userName?: string
+  profilePhotoUrl?: string | null
 }) {
   return (
     <Theme name="user">
-      <UserShell userId={userId} userName={userName} onLogout={() => logout()}>
+      <UserShell userId={userId} userName={userName} profilePhotoUrl={profilePhotoUrl} onLogout={() => logout()}>
         {children}
       </UserShell>
     </Theme>

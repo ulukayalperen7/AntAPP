@@ -9,11 +9,13 @@ export function UserShell({
   children,
   userId,
   userName,
+  profilePhotoUrl,
   onLogout,
 }: {
   children: React.ReactNode
   userId?: string
   userName?: string
+  profilePhotoUrl?: string | null
   onLogout?: () => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -24,6 +26,7 @@ export function UserShell({
       <AppSidebar
         userId={userId}
         userName={userName}
+        profilePhotoUrl={profilePhotoUrl}
         onLogout={onLogout}
         collapsed={collapsed}
         onToggle={() => setCollapsed((c) => !c)}

@@ -67,27 +67,32 @@ function RouteActionCard({
   }
 
   return (
-    <YStack flex={1} gap="$2">
+    <YStack flex={1} position="relative">
       <RouteCard
         data={routeToCardData(route)}
         onPress={onPress}
       />
       <XStack
-        backgroundColor="$backgroundStrong"
-        borderWidth={1}
-        borderColor="$borderColor"
-        borderRadius="$3"
-        padding="$2"
-        gap="$2"
-        justifyContent="space-between"
+        position="absolute"
+        top="$2"
+        left="$2"
+        right="$2"
+        gap="$1.5"
+        justifyContent="flex-end"
         alignItems="center"
         flexWrap="wrap"
+        pointerEvents="auto"
       >
         <XStack
+          position="absolute"
+          left="$0"
+          top="$0"
           alignItems="center"
           gap="$1.5"
-          flex={1}
-          minWidth={120}
+          backgroundColor="rgba(255,255,255,0.92)"
+          borderRadius="$full"
+          paddingHorizontal="$2"
+          paddingVertical="$1"
         >
           {isPublic
             ? <Globe size={13} color="var(--color-success500)" />
@@ -108,8 +113,8 @@ function RouteActionCard({
             <XStack
               paddingHorizontal="$2"
               paddingVertical="$1.5"
-              borderRadius="$2"
-              backgroundColor="$backgroundHover"
+              borderRadius="$full"
+              backgroundColor="rgba(255,255,255,0.92)"
               alignItems="center"
               gap="$1"
             >
@@ -121,9 +126,9 @@ function RouteActionCard({
             cursor="pointer"
             paddingHorizontal="$2"
             paddingVertical="$1.5"
-            borderRadius="$2"
-            backgroundColor="$backgroundHover"
-            hoverStyle={{ backgroundColor: '$backgroundPress' }}
+            borderRadius="$full"
+            backgroundColor="rgba(255,255,255,0.92)"
+            hoverStyle={{ backgroundColor: '$backgroundStrong' }}
             onPress={(e: any) => handleTogglePublish(e)}
             opacity={isToggling ? 0.5 : 1}
           >
@@ -135,9 +140,9 @@ function RouteActionCard({
           <XStack
             cursor="pointer"
             padding="$1.5"
-            borderRadius="$2"
-            backgroundColor="$backgroundHover"
-            hoverStyle={{ backgroundColor: '$backgroundPress' }}
+            borderRadius="$full"
+            backgroundColor="rgba(255,255,255,0.92)"
+            hoverStyle={{ backgroundColor: '$backgroundStrong' }}
             onPress={() => router.push(`/routes/${route.id}/edit`)}
           >
             <Pencil size={14} color="currentColor" />
@@ -147,7 +152,7 @@ function RouteActionCard({
             <XStack
               cursor={isRemoving ? 'default' : 'pointer'}
               padding="$1.5"
-              borderRadius="$2"
+              borderRadius="$full"
               backgroundColor="$error500"
               hoverStyle={{ opacity: 0.9 }}
               onPress={(e: any) => handleRemoveCopy(e)}
@@ -192,7 +197,7 @@ export default function ProfileClient({
   return (
     <YStack gap="$5" flex={1}>
       <XStack gap="$5" alignItems="center" flexWrap="wrap">
-        <Avatar size="xl" initials={initials} />
+        <Avatar size="xl" initials={initials} src={user.profilePhotoUrl ?? undefined} />
         <YStack flex={1} gap="$1">
           <Text variant="heading2">{user.userName}</Text>
           {user.email && (
