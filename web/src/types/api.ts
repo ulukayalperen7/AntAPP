@@ -42,6 +42,25 @@ export type CurrentUser = {
 
 // ─── Tags ───────────────────────────────────────────────
 
+export type PublicProfile = {
+  id: string
+  userName: string
+  profilePhotoUrl: string | null
+  followerCount: number
+  followingCount: number
+  publicRouteCount: number
+  postCount: number
+  isCurrentUser: boolean
+  isFollowingByCurrentUser: boolean
+}
+
+export type UserFollowSummary = {
+  userId: string
+  isFollowingByCurrentUser: boolean
+  followerCount: number
+  followingCount: number
+}
+
 export type Tag = {
   id: string
   name: string

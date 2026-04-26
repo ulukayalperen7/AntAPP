@@ -24,12 +24,14 @@ namespace Ant.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<FeedPostViewModel>))]
         public async Task<IActionResult> GetFeed(
             [FromQuery] string mode = "timeline",
+            [FromQuery] Guid? authorId = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20)
         {
             return Ok(await Mediator.Send(new GetFeedPostsQuery
             {
                 Mode = mode,
+                AuthorId = authorId,
                 PageNumber = page,
                 PageSize = pageSize
             }));

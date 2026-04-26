@@ -6,7 +6,7 @@ import { YStack, XStack, Text, Button, Avatar, RouteCard, StatBox } from '@antap
 import type { RouteCardData } from '@antapp/ui'
 import type { CurrentUser, RouteListItem } from '@/types/api'
 import { deleteRoute, publishRoute, unpublishRoute } from '@/features/routes/actions'
-import { Plus, Share2, Globe, Lock, Pencil, Trash2, GitFork } from 'lucide-react'
+import { Plus, Globe, Lock, Pencil, Trash2, GitFork } from 'lucide-react'
 
 function routeToCardData(route: RouteListItem): RouteCardData {
   const source = route.originalAuthorName?.trim()
@@ -67,94 +67,96 @@ function RouteActionCard({
   }
 
   return (
-    <YStack flex={1} position="relative">
+    <YStack flex={1} gap="$2">
       <RouteCard
         data={routeToCardData(route)}
         onPress={onPress}
       />
-      {/* Overlay action bar */}
       <XStack
-        position="absolute"
-        bottom="$0"
-        left="$0"
-        right="$0"
-        backgroundColor="rgba(0,0,0,0.65)"
-        borderBottomLeftRadius="$4"
-        borderBottomRightRadius="$4"
-        paddingHorizontal="$3"
-        paddingVertical="$2"
+        backgroundColor="$backgroundStrong"
+        borderWidth={1}
+        borderColor="$borderColor"
+        borderRadius="$3"
+        padding="$2"
         gap="$2"
-        justifyContent="flex-end"
+        justifyContent="space-between"
         alignItems="center"
+        flexWrap="wrap"
       >
-        {/* Publish status badge */}
         <XStack
-          flex={1}
           alignItems="center"
           gap="$1.5"
+          flex={1}
+          minWidth={120}
         >
           {isPublic
-            ? <Globe size={13} color="#4ade80" />
-            : <Lock size={13} color="#d1d5db" />
+            ? <Globe size={13} color="var(--color-success500)" />
+            : <Lock size={13} color="var(--color-mutedForeground)" />
           }
-          <Text variant="caption" color={isPublic ? '#4ade80' : '#d1d5db'} fontSize="$2">
+          <Text variant="caption" color={isPublic ? '$success500' : '$mutedForeground'} fontSize="$2">
             {isPublic ? 'Public' : 'Private draft'}
           </Text>
+          {isForkedCopy && (
+            <Text variant="caption" muted fontSize="$2">
+              Copy
+            </Text>
+          )}
         </XStack>
 
-        {isForkedCopy && (
+        <XStack gap="$1.5" alignItems="center">
+          {isForkedCopy && (
+            <XStack
+              paddingHorizontal="$2"
+              paddingVertical="$1.5"
+              borderRadius="$2"
+              backgroundColor="$backgroundHover"
+              alignItems="center"
+              gap="$1"
+            >
+              <GitFork size={13} color="currentColor" />
+              <Text variant="caption" fontSize="$2">Copy</Text>
+            </XStack>
+          )}
           <XStack
-            alignItems="center"
-            gap="$1"
+            cursor="pointer"
+            paddingHorizontal="$2"
+            paddingVertical="$1.5"
+            borderRadius="$2"
+            backgroundColor="$backgroundHover"
+            hoverStyle={{ backgroundColor: '$backgroundPress' }}
+            onPress={(e: any) => handleTogglePublish(e)}
+            opacity={isToggling ? 0.5 : 1}
+          >
+            <Text variant="caption" fontSize="$2">
+              {isPublic ? 'Unpublish' : 'Publish'}
+            </Text>
+          </XStack>
+
+          <XStack
+            cursor="pointer"
             padding="$1.5"
             borderRadius="$2"
-            backgroundColor="rgba(255,255,255,0.1)"
+            backgroundColor="$backgroundHover"
+            hoverStyle={{ backgroundColor: '$backgroundPress' }}
+            onPress={() => router.push(`/routes/${route.id}/edit`)}
           >
-            <GitFork size={13} color="#FFFFFF" />
-            <Text variant="caption" color="#FFFFFF" fontSize="$2">Copy</Text>
+            <Pencil size={14} color="currentColor" />
           </XStack>
-        )}
 
-        {/* Toggle publish */}
-        <XStack
-          cursor="pointer"
-          padding="$1.5"
-          borderRadius="$2"
-          backgroundColor="rgba(255,255,255,0.1)"
-          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          onPress={(e: any) => handleTogglePublish(e)}
-          opacity={isToggling ? 0.5 : 1}
-        >
-          <Text variant="caption" color="#FFFFFF" fontSize="$2">
-            {isPublic ? 'Unpublish' : 'Publish'}
-          </Text>
+          {isForkedCopy && (
+            <XStack
+              cursor={isRemoving ? 'default' : 'pointer'}
+              padding="$1.5"
+              borderRadius="$2"
+              backgroundColor="$error500"
+              hoverStyle={{ opacity: 0.9 }}
+              onPress={(e: any) => handleRemoveCopy(e)}
+              opacity={isRemoving ? 0.5 : 1}
+            >
+              <Trash2 size={14} color="#FFFFFF" />
+            </XStack>
+          )}
         </XStack>
-
-        {/* Edit */}
-        <XStack
-          cursor="pointer"
-          padding="$1.5"
-          borderRadius="$2"
-          backgroundColor="rgba(255,255,255,0.1)"
-          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          onPress={() => router.push(`/routes/${route.id}/edit`)}
-        >
-          <Pencil size={14} color="#FFFFFF" />
-        </XStack>
-
-        {isForkedCopy && (
-          <XStack
-            cursor={isRemoving ? 'default' : 'pointer'}
-            padding="$1.5"
-            borderRadius="$2"
-            backgroundColor="rgba(220,38,38,0.85)"
-            hoverStyle={{ backgroundColor: 'rgba(220,38,38,1)' }}
-            onPress={(e: any) => handleRemoveCopy(e)}
-            opacity={isRemoving ? 0.5 : 1}
-          >
-            <Trash2 size={14} color="#FFFFFF" />
-          </XStack>
-        )}
       </XStack>
     </YStack>
   )
@@ -189,7 +191,6 @@ export default function ProfileClient({
 
   return (
     <YStack gap="$5" flex={1}>
-      {/* Profile Header */}
       <XStack gap="$5" alignItems="center" flexWrap="wrap">
         <Avatar size="xl" initials={initials} />
         <YStack flex={1} gap="$1">
@@ -214,13 +215,9 @@ export default function ProfileClient({
           <Button variant="outline" size="md" onPress={() => router.push('/settings')}>
             Edit Profile
           </Button>
-          <Button variant="outline" size="md">
-            <Share2 size={18} color="currentColor" />
-          </Button>
         </XStack>
       </XStack>
 
-      {/* Stats */}
       <XStack gap="$3" flexWrap="wrap">
         <StatBox value={routeItems.length} label="Routes" />
         {publicCount > 0 && <StatBox value={publicCount} label="Public" />}
@@ -233,7 +230,7 @@ export default function ProfileClient({
         </XStack>
 
         {routeItems.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
             {routeItems.map((route) => (
               <RouteActionCard
                 key={route.id}

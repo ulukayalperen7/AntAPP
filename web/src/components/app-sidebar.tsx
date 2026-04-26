@@ -20,11 +20,13 @@ const EXPANDED_WIDTH = 220
 const COLLAPSED_WIDTH = 64
 
 export function AppSidebar({
+  userId,
   userName,
   onLogout,
   collapsed,
   onToggle,
 }: {
+  userId?: string
   userName?: string
   onLogout?: () => void
   collapsed?: boolean
@@ -153,7 +155,7 @@ export function AppSidebar({
 
         <Divider marginHorizontal="$2" />
 
-        <Link href="/profile" style={{ textDecoration: 'none' }}>
+        <Link href={userId ? `/profiles/${userId}` : '/profile'} style={{ textDecoration: 'none' }}>
           <XStack
             paddingHorizontal={collapsed ? '$0' : '$3'}
             paddingVertical="$2"

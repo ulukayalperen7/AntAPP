@@ -7,10 +7,12 @@ import { AppTopBar } from './app-topbar'
 
 export function UserShell({
   children,
+  userId,
   userName,
   onLogout,
 }: {
   children: React.ReactNode
+  userId?: string
   userName?: string
   onLogout?: () => void
 }) {
@@ -20,6 +22,7 @@ export function UserShell({
   return (
     <XStack flex={1} minHeight="100vh" backgroundColor="$background">
       <AppSidebar
+        userId={userId}
         userName={userName}
         onLogout={onLogout}
         collapsed={collapsed}

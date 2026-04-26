@@ -411,10 +411,14 @@ function FeedPostCard({
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
         <XStack gap="$3" flex={1}>
-          <Avatar size="lg" initials={author.initials} />
+          <Link href={`/profiles/${route.authorUserId}`} style={{ textDecoration: 'none' }}>
+            <Avatar size="lg" initials={author.initials} />
+          </Link>
           <YStack gap="$1.5" flex={1}>
             <XStack gap="$2" flexWrap="wrap" alignItems="center">
-              <Text variant="label">{author.name}</Text>
+              <Link href={`/profiles/${route.authorUserId}`} style={{ textDecoration: 'none' }}>
+                <Text variant="label" hoverStyle={{ color: '$primary' }}>{author.name}</Text>
+              </Link>
               <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
             </XStack>
             <Text variant="caption" muted>{author.role}</Text>

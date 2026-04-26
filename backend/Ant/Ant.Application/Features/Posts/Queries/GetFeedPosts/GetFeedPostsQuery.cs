@@ -16,6 +16,7 @@ namespace Ant.Application.Features.Posts.Queries.GetFeedPosts
         public string Mode { get; set; } = "timeline";
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 20;
+        public Guid? AuthorId { get; set; }
     }
 
     public class FeedPostViewModel
@@ -71,8 +72,8 @@ namespace Ant.Application.Features.Posts.Queries.GetFeedPosts
                 _ => null
             };
 
-            var posts = await _postRepository.GetFeedPostsAsync(contentType, validFilter.PageNumber, validFilter.PageSize);
-            var totalRecords = await _postRepository.GetFeedPostsCountAsync(contentType);
+            var posts = await _postRepository.GetFeedPostsAsync(contentType, validFilter.PageNumber, validFilter.PageSize, request.AuthorId);
+            var totalRecords = await _postRepository.GetFeedPostsCountAsync(contentType, request.AuthorId);
 
             var viewModel = posts.Select(post => new FeedPostViewModel
             {

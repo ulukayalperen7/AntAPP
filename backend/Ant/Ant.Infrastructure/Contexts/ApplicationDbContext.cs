@@ -43,6 +43,7 @@ namespace Ant.Infrastructure.Contexts
         public DbSet<PostReaction> PostReactions { get; set; }
         public DbSet<PostComment> PostComments { get; set; }
         public DbSet<PostShare> PostShares { get; set; }
+        public DbSet<UserFollow> UserFollows { get; set; }
         public DbSet<User> DomainUsers { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -51,8 +52,20 @@ namespace Ant.Infrastructure.Contexts
             SetTimestamps(ChangeTracker.Entries<Collection>());
             SetTimestamps(ChangeTracker.Entries<Spot>());
             SetTimestamps(ChangeTracker.Entries<Post>());
+            SetCreatedAt(ChangeTracker.Entries<UserFollow>());
 
             return base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void SetCreatedAt<TEntity>(IEnumerable<EntityEntry<TEntity>> entries) where TEntity : class
+        {
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property("CreatedAt").CurrentValue = _dateTime.NowUtc;
+                }
+            }
         }
 
         private void SetTimestamps<TEntity>(IEnumerable<EntityEntry<TEntity>> entries) where TEntity : class
@@ -246,6 +259,22 @@ namespace Ant.Infrastructure.Contexts
                 entity.HasOne(ps => ps.User)
                     .WithMany(u => u.PostShares)
                     .HasForeignKey(ps => ps.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<UserFollow>(entity =>
+            {
+                entity.HasIndex(f => new { f.FollowerUserId, f.FollowingUserId }).IsUnique();
+                entity.HasIndex(f => new { f.FollowingUserId, f.CreatedAt });
+
+                entity.HasOne(f => f.FollowerUser)
+                    .WithMany(u => u.FollowingUsers)
+                    .HasForeignKey(f => f.FollowerUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(f => f.FollowingUser)
+                    .WithMany(u => u.FollowerUsers)
+                    .HasForeignKey(f => f.FollowingUserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 

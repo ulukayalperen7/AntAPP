@@ -16,9 +16,17 @@ export type FeedMode = 'timeline' | 'official' | 'community'
 export async function getFeedPosts(
   mode: FeedMode,
   page = 1,
-  pageSize = 12
+  pageSize = 12,
+  authorId?: string
 ): Promise<PagedApiResponse<FeedPostItem>> {
-  return apiFetchPaged<FeedPostItem>(`/posts?mode=${mode}&page=${page}&pageSize=${pageSize}`)
+  const params = new URLSearchParams({
+    mode,
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+  if (authorId) params.set('authorId', authorId)
+
+  return apiFetchPaged<FeedPostItem>(`/posts?${params.toString()}`)
 }
 
 export async function createPost(data: {

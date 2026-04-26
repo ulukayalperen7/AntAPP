@@ -11,7 +11,7 @@ export default async function UserLayout({
   const session = await getServerSession()
 
   return (
-    <UserShellWrapper userName={session?.userName}>
+    <UserShellWrapper userId={session?.id} userName={session?.userName}>
       {children}
     </UserShellWrapper>
   )
