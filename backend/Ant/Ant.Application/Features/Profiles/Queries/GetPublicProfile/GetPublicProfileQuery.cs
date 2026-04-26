@@ -56,7 +56,12 @@ namespace Ant.Application.Features.Profiles.Queries.GetPublicProfile
         public async Task<Response<PublicProfileViewModel>> Handle(GetPublicProfileQuery request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
-            var identity = await _identityService.GetUserIdentityAsync(request.UserId);
+            var fallbackUserName = user?.UserName;
+            if (string.IsNullOrWhiteSpace(fallbackUserName))
+            {
+                var identity = await _identityService.GetUserIdentityAsync(request.UserId);
+                fallbackUserName = identity?.UserName ?? "Unknown User";
+            }
 
             Guid? currentUserId = null;
             if (!string.IsNullOrEmpty(_authenticatedUser.UserId) && Guid.TryParse(_authenticatedUser.UserId, out var parsedUserId))
@@ -72,7 +77,7 @@ namespace Ant.Application.Features.Profiles.Queries.GetPublicProfile
             var profile = new PublicProfileViewModel
             {
                 Id = request.UserId,
-                UserName = user?.UserName ?? identity.UserName,
+                UserName = fallbackUserName,
                 ProfilePhotoUrl = user?.ProfilePhotoUrl,
                 FollowerCount = await _followRepository.GetFollowerCountAsync(request.UserId),
                 FollowingCount = await _followRepository.GetFollowingCountAsync(request.UserId),

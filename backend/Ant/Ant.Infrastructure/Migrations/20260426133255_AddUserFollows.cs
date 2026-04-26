@@ -1,4 +1,6 @@
 using System;
+using Ant.Infrastructure.Contexts;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -6,6 +8,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ant.Infrastructure.Migrations
 {
     /// <inheritdoc />
+    [DbContext(typeof(ApplicationDbContext))]
+    [Migration("20260426133255_AddUserFollows")]
     public partial class AddUserFollows : Migration
     {
         /// <inheritdoc />
