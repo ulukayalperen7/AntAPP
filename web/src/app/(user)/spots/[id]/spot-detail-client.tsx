@@ -4,7 +4,7 @@ import { useState, useTransition, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Badge, RouteCard, RatingDisplay } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
-import type { SpotDetail, SpotRouteItem } from '@/types/api'
+import type { SpotDetail, SpotRatingResult, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
 import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
 import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
@@ -26,35 +26,53 @@ function routeToCardData(route: SpotRouteItem): RouteCardData {
 
 function SpotRatingWidget({
   spotId,
+  initialRating,
   onRated,
 }: {
   spotId: string
-  onRated: (score: number) => void
+  initialRating?: number | null
+  onRated: (result: SpotRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
-  const [selected, setSelected] = useState(0)
-  const [submitted, setSubmitted] = useState(false)
+  const [selected, setSelected] = useState(initialRating || 0)
+  const [submitted, setSubmitted] = useState(!!initialRating)
   const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    if (initialRating) {
+      setSelected(initialRating)
+      setSubmitted(true)
+    }
+  }, [initialRating])
 
   const active = hovered || selected
 
   const handleRate = (score: number) => {
-    if (submitted) return
+    if (isPending) return
 
     setSelected(score)
     startTransition(async () => {
       try {
-        await rateSpot(spotId, score)
+        const result = await rateSpot(spotId, score)
         setSubmitted(true)
-        onRated(score)
+        onRated(result)
       } catch {
         setSelected(0)
       }
     })
   }
 
+  if (submitted && selected > 0) {
+    return (
+      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3" onPress={() => setSubmitted(false)} cursor="pointer">
+        <Star size={16} fill="var(--color-success500, #22C55E)" color="var(--color-success500, #22C55E)" />
+        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5 (Click to change)</Text>
+      </XStack>
+    )
+  }
+
   return (
-    <YStack gap="$3">
+    <YStack gap="$2">
       <Text variant="label" color="$mutedForeground">Rate this spot</Text>
       <XStack gap="$1.5" alignItems="center">
         {[1, 2, 3, 4, 5].map((score) => (
@@ -62,27 +80,22 @@ function SpotRatingWidget({
             key={score}
             padding="$1"
             borderRadius="$2"
-            cursor={submitted || isPending ? 'default' : 'pointer'}
+            cursor={isPending ? 'default' : 'pointer'}
             onPress={() => handleRate(score)}
 
-            onMouseEnter={() => !submitted && !isPending && setHovered(score)}
+            onMouseEnter={() => !isPending && setHovered(score)}
             onMouseLeave={() => setHovered(0)}
           >
             <Star
               size={26}
-              fill={score <= active ? '#FF8C00' : 'transparent'}
-              color={score <= active ? '#FF8C00' : 'var(--color-mutedForeground)'}
-              strokeWidth={1.5}
+              fill={score <= active ? '#FF8C00' : 'rgba(148,163,184,0.18)'}
+              color={score <= active ? '#FF8C00' : '#64748B'}
+              strokeWidth={1.8}
             />
           </XStack>
         ))}
         {isPending && <Text variant="caption" muted>Saving...</Text>}
       </XStack>
-      {submitted && (
-        <XStack backgroundColor="$success50" borderRadius="$3" padding="$3">
-          <Text variant="caption" color="$success500">Thanks! You rated this spot {selected}/5.</Text>
-        </XStack>
-      )}
     </YStack>
   )
 }
@@ -377,17 +390,10 @@ export default function SpotDetailClient({
             <Text variant="heading4">Community feedback</Text>
             <SpotRatingWidget
               spotId={spot.id}
-              onRated={(score) => {
-                if (displayRatingCount === 0) {
-                  setDisplayRating(score)
-                  setDisplayRatingCount(1)
-                  return
-                }
-
-                const nextCount = displayRatingCount + 1
-                const nextAverage = ((displayRating * displayRatingCount) + score) / nextCount
-                setDisplayRating(parseFloat(nextAverage.toFixed(1)))
-                setDisplayRatingCount(nextCount)
+              initialRating={spot.currentUserRating}
+              onRated={(result) => {
+                setDisplayRating(result.averageRating)
+                setDisplayRatingCount(result.ratingCount)
               }}
             />
           </YStack>

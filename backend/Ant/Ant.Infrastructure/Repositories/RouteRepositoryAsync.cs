@@ -30,9 +30,10 @@ namespace Ant.Infrastructure.Repositories
                     .ThenInclude(rs => rs.Spot)
                 .Include(r => r.RouteTags)
                     .ThenInclude(rt => rt.Tag)
+                .Include(r => r.AuthorUser)
                 .Include(r => r.OriginalRoute)
                     .ThenInclude(or => or.AuthorUser)
-                .FirstOrDefaultAsync(r => r.Id == routeId);
+                .FirstOrDefaultAsync(r => r.Id == routeId && !r.IsDeleted);
         }
 
         public async Task<Route> GetRouteWithTrackingAsync(Guid routeId)
@@ -41,7 +42,7 @@ namespace Ant.Infrastructure.Repositories
                 .AsTracking()
                 .Include(r => r.RouteSpots)
                 .Include(r => r.RouteTags)
-                .FirstOrDefaultAsync(r => r.Id == routeId);
+                .FirstOrDefaultAsync(r => r.Id == routeId && !r.IsDeleted);
         }
 
         private IQueryable<Route> BuildFilteredQuery(
@@ -106,9 +107,12 @@ namespace Ant.Infrastructure.Repositories
 
             query = sort?.ToLower() switch
             {
-                "rating" => query.OrderByDescending(r => r.RatingCount == 0 ? 0 : (r.RatingSum * 1.0) / r.RatingCount),
-                "oldest" => query.OrderBy(r => r.CreatedAt),
-                _ => query.OrderByDescending(r => r.CreatedAt)
+                "rating" => query
+                    .OrderByDescending(r => r.RatingCount == 0 ? 0 : (r.RatingSum * 1.0) / r.RatingCount)
+                    .ThenByDescending(r => r.CreatedAt)
+                    .ThenBy(r => r.Id),
+                "oldest" => query.OrderBy(r => r.CreatedAt).ThenBy(r => r.Id),
+                _ => query.OrderByDescending(r => r.CreatedAt).ThenBy(r => r.Id)
             };
 
             return await query
@@ -138,6 +142,14 @@ namespace Ant.Infrastructure.Repositories
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<Route> GetForkByOriginalAsync(Guid originalRouteId, Guid authorId)
+        {
+            return await _dbContext.Routes
+                .FirstOrDefaultAsync(r => r.OriginalRouteId == originalRouteId
+                                        && r.AuthorUserId == authorId
+                                        && !r.IsDeleted);
         }
     }
 }

@@ -43,10 +43,22 @@ namespace Ant.Application.Features.Routes.Commands.ForkRoute
 
             var userId = Guid.Parse(_authenticatedUser.UserId);
 
+            if (original.AuthorUserId == userId)
+            {
+                return new Response<Guid>(original.Id, message: "You already own this route.");
+            }
+
+            var originalRootId = original.OriginalRouteId ?? original.Id;
+            var existingFork = await _routeRepository.GetForkByOriginalAsync(originalRootId, userId);
+            if (existingFork != null)
+            {
+                return new Response<Guid>(existingFork.Id, message: "Opened existing copy.");
+            }
+
             var forked = new Route
             {
                 AuthorUserId = userId,
-                OriginalRouteId = original.AuthorUserId == userId ? null : original.Id,
+                OriginalRouteId = originalRootId,
                 Title = original.Title,
                 Description = original.Description,
                 ThumbnailUrl = original.ThumbnailUrl,

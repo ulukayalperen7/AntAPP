@@ -39,10 +39,14 @@ public class RateRouteCommandTests
         _ratingRepoMock.Setup(r => r.GetByUserAndRouteAsync(userId, routeId)).ReturnsAsync((RouteRating?)null);
         _ratingRepoMock.Setup(r => r.AddAsync(It.IsAny<RouteRating>())).ReturnsAsync((RouteRating r) => r);
 
-        await _handler.Handle(new RateRouteCommand { RouteId = routeId, Stars = 4 }, CancellationToken.None);
+        var result = await _handler.Handle(new RateRouteCommand { RouteId = routeId, Stars = 4 }, CancellationToken.None);
 
         Assert.Equal(11, route.RatingSum);
         Assert.Equal(3, route.RatingCount);
+        Assert.Equal(routeId, result.Data.RouteId);
+        Assert.Equal(4, result.Data.CurrentUserRating);
+        Assert.Equal(3.7, result.Data.AverageRating);
+        Assert.Equal(3, result.Data.RatingCount);
         _ratingRepoMock.Verify(r => r.AddAsync(It.Is<RouteRating>(rr => rr.Stars == 4)), Times.Once);
         _routeRepoMock.Verify(r => r.UpdateAsync(route), Times.Once);
     }
@@ -62,10 +66,12 @@ public class RateRouteCommandTests
 
         var result = await _handler.Handle(new RateRouteCommand { RouteId = routeId, Stars = 5 }, CancellationToken.None);
 
-        Assert.Equal(existingId, result);
+        Assert.Equal(existingId, result.Data.RatingId);
         Assert.Equal(5, existing.Stars);
         Assert.Equal(13, route.RatingSum);
         Assert.Equal(3, route.RatingCount);
+        Assert.Equal(4.3, result.Data.AverageRating);
+        Assert.Equal(3, result.Data.RatingCount);
         _ratingRepoMock.Verify(r => r.UpdateAsync(existing), Times.Once);
         _ratingRepoMock.Verify(r => r.AddAsync(It.IsAny<RouteRating>()), Times.Never);
     }

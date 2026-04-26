@@ -19,5 +19,7 @@ namespace Ant.Core.Entities
         public virtual ICollection<PostReaction> PostReactions { get; set; }
         public virtual ICollection<PostComment> PostComments { get; set; }
         public virtual ICollection<PostShare> PostShares { get; set; }
+        public virtual ICollection<UserFollow> FollowingUsers { get; set; }
+        public virtual ICollection<UserFollow> FollowerUsers { get; set; }
     }
 }

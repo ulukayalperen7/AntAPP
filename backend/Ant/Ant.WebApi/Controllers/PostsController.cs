@@ -5,6 +5,7 @@ using Ant.Application.Features.Posts.Commands.SharePost;
 using Ant.Application.Features.Posts.Commands.DeletePostComment;
 using Ant.Application.Features.Posts.Queries.GetFeedPosts;
 using Ant.Application.Features.Posts.Queries.GetPostComments;
+using Ant.Application.Features.Posts.Queries.GetPostReactions;
 using Ant.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,12 +24,14 @@ namespace Ant.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<FeedPostViewModel>))]
         public async Task<IActionResult> GetFeed(
             [FromQuery] string mode = "timeline",
+            [FromQuery] Guid? authorId = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20)
         {
             return Ok(await Mediator.Send(new GetFeedPostsQuery
             {
                 Mode = mode,
+                AuthorId = authorId,
                 PageNumber = page,
                 PageSize = pageSize
             }));
@@ -48,6 +51,21 @@ namespace Ant.WebApi.Controllers
             return Ok(await Mediator.Send(new TogglePostReactionCommand
             {
                 PostId = postId
+            }));
+        }
+
+        [HttpGet("{postId}/reactions")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<PostReactionViewModel>))]
+        public async Task<IActionResult> GetReactions(
+            Guid postId,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            return Ok(await Mediator.Send(new GetPostReactionsQuery
+            {
+                PostId = postId,
+                PageNumber = page,
+                PageSize = pageSize
             }));
         }
 

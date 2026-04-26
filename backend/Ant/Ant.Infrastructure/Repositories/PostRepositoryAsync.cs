@@ -20,9 +20,9 @@ namespace Ant.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<IReadOnlyList<Post>> GetFeedPostsAsync(RouteContentTypeEnum? contentType, int pageNumber, int pageSize)
+        public async Task<IReadOnlyList<Post>> GetFeedPostsAsync(RouteContentTypeEnum? contentType, int pageNumber, int pageSize, Guid? authorId = null)
         {
-            var query = BuildFeedQuery(contentType)
+            var query = BuildFeedQuery(contentType, authorId)
                 .OrderByDescending(p => p.CreatedAt);
 
             return await query
@@ -31,9 +31,9 @@ namespace Ant.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public Task<int> GetFeedPostsCountAsync(RouteContentTypeEnum? contentType)
+        public Task<int> GetFeedPostsCountAsync(RouteContentTypeEnum? contentType, Guid? authorId = null)
         {
-            return BuildFeedQuery(contentType).CountAsync();
+            return BuildFeedQuery(contentType, authorId).CountAsync();
         }
 
         public Task<Post> GetPublicPostByIdAsync(Guid postId)
@@ -41,7 +41,7 @@ namespace Ant.Infrastructure.Repositories
             return BuildFeedQuery(null).FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        private IQueryable<Post> BuildFeedQuery(RouteContentTypeEnum? contentType)
+        private IQueryable<Post> BuildFeedQuery(RouteContentTypeEnum? contentType, Guid? authorId = null)
         {
             var query = _dbContext.Posts
                 .AsNoTracking()
@@ -56,6 +56,11 @@ namespace Ant.Infrastructure.Repositories
             if (contentType.HasValue)
             {
                 query = query.Where(p => p.Route.ContentType == contentType.Value);
+            }
+
+            if (authorId.HasValue)
+            {
+                query = query.Where(p => p.AuthorUserId == authorId.Value);
             }
 
             return query;

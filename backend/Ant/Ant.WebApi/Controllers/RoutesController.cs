@@ -182,7 +182,7 @@ namespace Ant.WebApi.Controllers
         // PUT /api/routes/{routeId}/rating
         [HttpPut("{routeId}/rating")]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<RouteRatingResultViewModel>))]
         public async Task<IActionResult> Rate(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore, [FromBody] RateRouteCommand command)
         {
             command.RouteId = routeId;

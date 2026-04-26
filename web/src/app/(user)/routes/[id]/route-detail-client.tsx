@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay } from '@antapp/ui'
-import type { RouteDetail } from '@/types/api'
+import type { RouteDetail, RouteRatingResult } from '@/types/api'
 import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle, Sparkles, Ellipsis } from 'lucide-react'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
 import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
@@ -13,24 +13,33 @@ import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 function StarRatingWidget({
   routeId,
+  initialRating,
   onRated,
 }: {
   routeId: string
-  onRated: (score: number) => void
+  initialRating?: number | null
+  onRated: (result: RouteRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
-  const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState(initialRating || 0)
   const [isSubmitting, startSubmit] = useTransition()
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted] = useState(!!initialRating)
+
+  useEffect(() => {
+    if (initialRating) {
+      setSelected(initialRating)
+      setSubmitted(true)
+    }
+  }, [initialRating])
 
   const handleRate = (score: number) => {
-    if (submitted) return
+    if (isSubmitting) return
     setSelected(score)
     startSubmit(async () => {
       try {
-        await rateRoute(routeId, score)
+        const result = await rateRoute(routeId, score)
         setSubmitted(true)
-        onRated(score)
+        onRated(result)
       } catch {
         setSelected(0)
       }
@@ -39,11 +48,11 @@ function StarRatingWidget({
 
   const active = hovered || selected
 
-  if (submitted) {
+  if (submitted && selected > 0) {
     return (
-      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3">
+      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3" onPress={() => setSubmitted(false)} cursor="pointer">
         <Star size={16} fill="var(--color-success500, #22C55E)" color="var(--color-success500, #22C55E)" />
-        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5</Text>
+        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5 (Click to change)</Text>
       </XStack>
     )
   }
@@ -65,9 +74,9 @@ function StarRatingWidget({
           >
             <Star
               size={28}
-              fill={star <= active ? '#FF8C00' : 'transparent'}
-              color={star <= active ? '#FF8C00' : 'var(--color-mutedForeground)'}
-              strokeWidth={1.5}
+              fill={star <= active ? '#FF8C00' : 'rgba(148,163,184,0.18)'}
+              color={star <= active ? '#FF8C00' : '#64748B'}
+              strokeWidth={1.8}
             />
           </XStack>
         ))}
@@ -347,6 +356,7 @@ export default function RouteDetailClient({
 
   // Rating state
   const [displayRating, setDisplayRating] = useState(route.averageRating)
+  const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
   // Tour Guide Mode state
   const [isTourMode, setIsTourMode] = useState(false)
@@ -437,7 +447,7 @@ export default function RouteDetailClient({
             alignItems="center"
           >
             {route.isPublic ? <Sparkles size={12} color="#4ADE80" /> : <Ellipsis size={12} color="#FBBF24" />}
-            <Text variant="caption" color="#FFFFFF">{route.isPublic ? 'Public' : 'Draft'}</Text>
+            <Text variant="caption" color="#FFFFFF">{route.isPublic ? 'Public' : 'Private draft'}</Text>
           </XStack>
         )}
 
@@ -447,8 +457,16 @@ export default function RouteDetailClient({
             {route.originalAuthorName && (
               <XStack alignItems="center" gap="$2" marginTop="$1">
                 <GitFork size={14} color="#FFFFFF" opacity={0.8} />
-                <Text variant="caption" color="#FFFFFF" opacity={0.8}>Forked from {route.originalAuthorName}</Text>
+                <Text variant="caption" color="#FFFFFF" opacity={0.8}>
+                  {isOwner
+                    ? `Your editable copy of ${route.originalAuthorName}'s route`
+                    : `${route.authorUserName?.trim() || 'Route Explorer'}'s copy of ${route.originalAuthorName}'s route`
+                  }
+                </Text>
               </XStack>
+            )}
+            {!isForkedCopy && route.authorUserName && (
+              <Text variant="caption" color="#FFFFFF" opacity={0.8}>Created by {route.authorUserName}</Text>
             )}
             {displayRating > 0 && (
               <XStack alignItems="center" gap="$3" flexWrap="wrap">
@@ -474,22 +492,23 @@ export default function RouteDetailClient({
             </Button>
 
             <Button
-              variant="outline"
+              variant={isSaved ? 'solid' : 'outline'}
               size="md"
               loading={isSaving}
               disabled={isSaved || isSaving}
               onPress={handleSave}
-
-              style={{ backgroundColor: isSaved ? 'rgba(255,255,255,0.2)' : undefined }}
+              backgroundColor={isSaved ? '$success500' : '$backgroundStrong'}
+              borderColor={isSaved ? '$success500' : '$primary'}
+              hoverStyle={{ backgroundColor: isSaved ? '$success500' : '$backgroundHover' }}
             >
               <XStack alignItems="center" gap="$1.5">
                 {isSaved
                   ? <BookmarkCheck size={16} color="#FFFFFF" />
-                  : <Bookmark size={16} color="currentColor" />
+                  : <Bookmark size={16} color="#EA580C" />
                 }
                 <YStack>
                   <XStack alignItems="center" gap="$1">
-                    <Text variant="label" color={isSaved ? '#FFFFFF' : undefined}>
+                    <Text variant="label" color={isSaved ? '#FFFFFF' : '#EA580C'}>
                       {isSaved ? 'In Collection' : 'Save to Collection'}
                     </Text>
                   </XStack>
@@ -666,6 +685,46 @@ export default function RouteDetailClient({
 
         {/* Right Sidebar */}
         <YStack gap="$4">
+          {isOwner && (
+            <YStack
+              backgroundColor="$backgroundStrong"
+              borderRadius="$4"
+              padding="$4"
+              gap="$3"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
+              <XStack alignItems="center" gap="$2">
+                {isForkedCopy ? <GitFork size={18} color="var(--color-primary)" /> : <Pencil size={18} color="var(--color-primary)" />}
+                <Text variant="heading4">{isForkedCopy ? 'Your Route Copy' : 'Your Original Route'}</Text>
+              </XStack>
+              <Text variant="body" muted>
+                {isForkedCopy
+                  ? 'This copy belongs to you. Edit the stops, title, or description, then publish it when you want others to see your version.'
+                  : 'Only you can edit or remove this original route. Other users can fork it into their own editable copies.'
+                }
+              </Text>
+              <Button
+                variant="solid"
+                size="md"
+                onPress={() => router.push(`/routes/${route.id}/edit`)}
+                icon={<Pencil size={16} color="#FFFFFF" />}
+              >
+                Edit Route
+              </Button>
+              {isForkedCopy && route.originalRouteId ? (
+                <Button
+                  variant="outline"
+                  size="md"
+                  onPress={() => router.push(`/routes/${route.originalRouteId}`)}
+                  icon={<GitFork size={16} color="currentColor" />}
+                >
+                  Open Original Route
+                </Button>
+              ) : null}
+            </YStack>
+          )}
+
           {/* Rating Widget */}
           {!isOwner && (
             <YStack
@@ -679,12 +738,8 @@ export default function RouteDetailClient({
               <Text variant="heading4">Rate This Route</Text>
               <StarRatingWidget
                 routeId={route.id}
-                onRated={(score) => {
-                  // Optimistically blend the new score into averageRating
-                  setDisplayRating((prev) =>
-                    parseFloat(((prev + score) / 2).toFixed(1))
-                  )
-                }}
+                initialRating={route.currentUserRating}
+                onRated={(result) => setDisplayRating(result.averageRating)}
               />
             </YStack>
           )}
@@ -727,7 +782,7 @@ export default function RouteDetailClient({
                 <Text variant="heading4">Customize This Route</Text>
               </XStack>
               <Text variant="body" muted>
-                Want to make changes? Fork this route to create your own editable copy in your profile.
+                Fork this route once to create your own private editable copy in My Routes. The original route stays unchanged.
               </Text>
               {forkError && (
                 <Text variant="caption" color="$error500">{forkError}</Text>

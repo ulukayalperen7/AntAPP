@@ -1,5 +1,6 @@
 using Ant.Application.Features.RouteRatings.Commands.RateRoute;
 using Ant.Application.Features.RouteRatings.Queries.GetRouteAverageRating;
+using Ant.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace Ant.WebApi.Controllers
     {
         [HttpPut]
         [Authorize]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Guid))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<RouteRatingResultViewModel>))]
         public async Task<IActionResult> Rate([FromBody] RateRouteCommand command)
         {
             return Ok(await Mediator.Send(command));

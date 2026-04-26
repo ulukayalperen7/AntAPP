@@ -3,6 +3,7 @@ using Ant.Application.Common.Caching;
 using Ant.Application.Exceptions;
 using Ant.Application.Interfaces;
 using Ant.Application.Interfaces.Repositories;
+using Ant.Application.Wrappers;
 using MediatR;
 using System;
 using System.Threading;
@@ -10,14 +11,23 @@ using System.Threading.Tasks;
 
 namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
 {
-    public class RateRouteCommand : IRequest<Guid>
+    public class RateRouteCommand : IRequest<Response<RouteRatingResultViewModel>>
     {
         public Guid RouteId { get; set; }
         public short Stars { get; set; }
         public short? Score { get; set; }
     }
 
-    public class RateRouteCommandHandler : IRequestHandler<RateRouteCommand, Guid>
+    public class RouteRatingResultViewModel
+    {
+        public Guid RatingId { get; set; }
+        public Guid RouteId { get; set; }
+        public short CurrentUserRating { get; set; }
+        public double AverageRating { get; set; }
+        public long RatingCount { get; set; }
+    }
+
+    public class RateRouteCommandHandler : IRequestHandler<RateRouteCommand, Response<RouteRatingResultViewModel>>
     {
         private readonly IRouteRatingRepositoryAsync _ratingRepository;
         private readonly IGenericRepositoryAsync<Route> _routeRepository;
@@ -36,7 +46,7 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
             _cache = cache;
         }
 
-        public async Task<Guid> Handle(RateRouteCommand request, CancellationToken cancellationToken)
+        public async Task<Response<RouteRatingResultViewModel>> Handle(RateRouteCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(_authenticatedUser.UserId))
                 throw new ApiException("Authentication required.");
@@ -61,7 +71,7 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
                 await _ratingRepository.UpdateAsync(existing);
                 await _routeRepository.UpdateAsync(route);
                 await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
-                return existing.Id;
+                return new Response<RouteRatingResultViewModel>(ToResult(existing.Id, route, stars));
             }
 
             var rating = new RouteRating
@@ -78,7 +88,19 @@ namespace Ant.Application.Features.RouteRatings.Commands.RateRoute
             await _ratingRepository.AddAsync(rating);
             await _routeRepository.UpdateAsync(route);
             await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
-            return rating.Id;
+            return new Response<RouteRatingResultViewModel>(ToResult(rating.Id, route, stars));
+        }
+
+        private static RouteRatingResultViewModel ToResult(Guid ratingId, Route route, short currentUserRating)
+        {
+            return new RouteRatingResultViewModel
+            {
+                RatingId = ratingId,
+                RouteId = route.Id,
+                CurrentUserRating = currentUserRating,
+                AverageRating = route.RatingCount == 0 ? 0 : Math.Round(route.RatingSum / (double)route.RatingCount, 1),
+                RatingCount = route.RatingCount
+            };
         }
     }
 }

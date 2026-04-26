@@ -153,6 +153,7 @@ namespace Ant.Infrastructure
             services.AddTransient<IPostReactionRepositoryAsync, PostReactionRepositoryAsync>();
             services.AddTransient<IPostCommentRepositoryAsync, PostCommentRepositoryAsync>();
             services.AddTransient<IPostShareRepositoryAsync, PostShareRepositoryAsync>();
+            services.AddTransient<IUserFollowRepositoryAsync, UserFollowRepositoryAsync>();
             #endregion
         }
     }

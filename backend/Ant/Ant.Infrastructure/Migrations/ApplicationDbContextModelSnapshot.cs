@@ -541,6 +541,31 @@ namespace Ant.Infrastructure.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.UserFollow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("FollowerUserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FollowingUserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FollowerUserId", "FollowingUserId")
+                        .IsUnique();
+
+                    b.HasIndex("FollowingUserId", "CreatedAt");
+
+                    b.ToTable("UserFollows");
+                });
+
             modelBuilder.Entity("Ant.Infrastructure.Models.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -994,6 +1019,25 @@ namespace Ant.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Ant.Core.Entities.UserFollow", b =>
+                {
+                    b.HasOne("Ant.Core.Entities.User", "FollowerUser")
+                        .WithMany("FollowingUsers")
+                        .HasForeignKey("FollowerUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Ant.Core.Entities.User", "FollowingUser")
+                        .WithMany("FollowerUsers")
+                        .HasForeignKey("FollowingUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FollowerUser");
+
+                    b.Navigation("FollowingUser");
+                });
+
             modelBuilder.Entity("Ant.Infrastructure.Models.ApplicationUser", b =>
                 {
                     b.OwnsMany("Ant.Application.DTOs.Account.RefreshToken", "RefreshTokens", b1 =>
@@ -1145,6 +1189,10 @@ namespace Ant.Infrastructure.Migrations
                     b.Navigation("Collections");
 
                     b.Navigation("FavoriteSpots");
+
+                    b.Navigation("FollowerUsers");
+
+                    b.Navigation("FollowingUsers");
 
                     b.Navigation("OwnedSpots");
 

@@ -1,7 +1,7 @@
 'use server'
 
 import { apiFetchData, apiFetchPaged, publicApiFetchData, publicApiFetchPaged } from '@/lib/api'
-import type { RouteListItem, RouteDetail, RouteStopItem, Tag, PagedApiResponse } from '@/types/api'
+import type { RouteListItem, RouteDetail, RouteStopItem, Tag, PagedApiResponse, RouteRatingResult } from '@/types/api'
 
 export type GetRoutesParams = {
   search?: string
@@ -137,16 +137,40 @@ export async function publishRoute(id: string): Promise<void> {
   await apiFetchData<string>(`/routes/${id}/publish`, { method: 'POST' })
 }
 
+export async function tryPublishRoute(id: string): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await publishRoute(id)
+    return { ok: true }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Failed to publish route.',
+    }
+  }
+}
+
 export async function unpublishRoute(id: string): Promise<void> {
   await apiFetchData<string>(`/routes/${id}/unpublish`, { method: 'POST' })
+}
+
+export async function tryUnpublishRoute(id: string): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await unpublishRoute(id)
+    return { ok: true }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Failed to unpublish route.',
+    }
+  }
 }
 
 export async function forkRoute(id: string): Promise<string> {
   return apiFetchData<string>(`/routes/${id}/fork`, { method: 'POST' })
 }
 
-export async function rateRoute(routeId: string, score: number): Promise<void> {
-  await apiFetchData<string>(`/routes/${routeId}/rating`, {
+export async function rateRoute(routeId: string, score: number): Promise<RouteRatingResult> {
+  return apiFetchData<RouteRatingResult>(`/routes/${routeId}/rating`, {
     method: 'PUT',
     body: JSON.stringify({ stars: score }),
   })

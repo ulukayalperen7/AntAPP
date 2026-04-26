@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Explore', href: '/dashboard', Icon: Compass },
   { label: 'Official', href: '/official', Icon: ShieldCheck },
   { label: 'Community', href: '/community', Icon: Users2 },
+  { label: 'Routes', href: '/routes', Icon: ShieldCheck },
   { label: 'Spots', href: '/spots', Icon: MapPinned },
   { label: 'My Routes', href: '/my-routes', Icon: Route },
   { label: 'Saved', href: '/collections', Icon: Bookmark },
@@ -19,12 +20,16 @@ const EXPANDED_WIDTH = 220
 const COLLAPSED_WIDTH = 64
 
 export function AppSidebar({
+  userId,
   userName,
+  profilePhotoUrl,
   onLogout,
   collapsed,
   onToggle,
 }: {
+  userId?: string
   userName?: string
+  profilePhotoUrl?: string | null
   onLogout?: () => void
   collapsed?: boolean
   onToggle?: () => void
@@ -152,7 +157,7 @@ export function AppSidebar({
 
         <Divider marginHorizontal="$2" />
 
-        <Link href="/profile" style={{ textDecoration: 'none' }}>
+        <Link href={userId ? `/profiles/${userId}` : '/profile'} style={{ textDecoration: 'none' }}>
           <XStack
             paddingHorizontal={collapsed ? '$0' : '$3'}
             paddingVertical="$2"
@@ -163,7 +168,7 @@ export function AppSidebar({
             hoverStyle={{ backgroundColor: '$backgroundHover' }}
             cursor="pointer"
           >
-            <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} />
+            <Avatar size="sm" initials={userName?.charAt(0)?.toUpperCase() ?? 'U'} src={profilePhotoUrl ?? undefined} />
             {!collapsed && (
               <YStack flex={1}>
                 <Text variant="label" fontSize="$3" truncate>{userName ?? 'User'}</Text>

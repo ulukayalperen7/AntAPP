@@ -92,6 +92,7 @@ namespace Ant.Application.Features.Routes.Commands.CreateRoute
                 Description = request.Description,
                 ThumbnailUrl = request.ThumbnailUrl,
                 RouteType = RouteTypeEnum.Walking,
+                ContentType = RouteContentTypeEnum.Community,
                 IsPublic = request.IsPublic,
                 RouteTags = new List<RouteTag>(),
                 RouteSpots = new List<RouteSpot>()

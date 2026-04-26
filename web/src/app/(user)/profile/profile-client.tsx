@@ -1,114 +1,154 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Avatar, RouteCard, StatBox } from '@antapp/ui'
-import type { RouteCardData } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Avatar, Image, StatBox } from '@antapp/ui'
 import type { CurrentUser, RouteListItem } from '@/types/api'
-import { publishRoute, unpublishRoute } from '@/features/routes/actions'
-import { Plus, Share2, Globe, Lock, Pencil } from 'lucide-react'
-
-function routeToCardData(route: RouteListItem): RouteCardData {
-  return {
-    id: route.id,
-    title: route.title,
-    description: route.description ?? undefined,
-    image: route.thumbnailUrl ?? undefined,
-    rating: route.averageRating > 0 ? route.averageRating : undefined,
-    contentType: route.contentType,
-    isOfficial: route.contentType === 'Official',
-  }
-}
+import { deleteRoute, tryPublishRoute, tryUnpublishRoute } from '@/features/routes/actions'
+import { AlertCircle, Globe, Lock, Pencil, Plus, Trash2 } from 'lucide-react'
 
 function RouteActionCard({
   route,
   onPress,
+  onRemoved,
 }: {
   route: RouteListItem
   onPress: () => void
+  onRemoved: (routeId: string) => void
 }) {
   const router = useRouter()
   const [isPublic, setIsPublic] = useState(route.isPublic)
+  const [feedback, setFeedback] = useState<string | null>(null)
   const [isToggling, startToggle] = useTransition()
+  const [isRemoving, startRemove] = useTransition()
+  const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
-  const handleTogglePublish = (e: React.MouseEvent) => {
+  const handleTogglePublish = (e: { stopPropagation: () => void }) => {
     e.stopPropagation()
+    setFeedback(null)
     startToggle(async () => {
+      const result = isPublic
+        ? await tryUnpublishRoute(route.id)
+        : await tryPublishRoute(route.id)
+
+      if (!result.ok) {
+        setFeedback(result.message ?? 'Could not change visibility.')
+        return
+      }
+
+      setIsPublic((current) => !current)
+    })
+  }
+
+  const handleRemoveCopy = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation()
+    if (!isForkedCopy || isRemoving) return
+    if (!window.confirm('Remove this forked copy from My Routes? The original route will stay available.')) return
+
+    startRemove(async () => {
       try {
-        if (isPublic) {
-          await unpublishRoute(route.id)
-          setIsPublic(false)
-        } else {
-          await publishRoute(route.id)
-          setIsPublic(true)
-        }
+        await deleteRoute(route.id)
+        onRemoved(route.id)
       } catch { /* ignore */ }
     })
   }
 
   return (
-    <YStack flex={1} position="relative">
-      <RouteCard
-        data={routeToCardData(route)}
-        onPress={onPress}
-      />
-      {/* Overlay action bar */}
-      <XStack
-        position="absolute"
-        bottom="$0"
-        left="$0"
-        right="$0"
-        backgroundColor="rgba(0,0,0,0.65)"
-        borderBottomLeftRadius="$4"
-        borderBottomRightRadius="$4"
-        paddingHorizontal="$3"
-        paddingVertical="$2"
-        gap="$2"
-        justifyContent="flex-end"
-        alignItems="center"
-      >
-        {/* Publish status badge */}
+    <YStack
+      flex={1}
+      backgroundColor="$card"
+      borderRadius="$4"
+      overflow="hidden"
+      cursor="pointer"
+      onPress={onPress}
+      pressStyle={{ scale: 0.98, opacity: 0.95 }}
+      hoverStyle={{ opacity: 0.95 }}
+    >
+      <YStack height={180} backgroundColor="$muted" position="relative">
+        {route.thumbnailUrl ? (
+          <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+        ) : (
+          <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="$backgroundHover">
+            <Text variant="caption" muted>No image</Text>
+          </YStack>
+        )}
+
         <XStack
-          flex={1}
+          position="absolute"
+          top="$2"
+          left="$2"
+          backgroundColor="rgba(255,255,255,0.92)"
+          paddingHorizontal="$2"
+          paddingVertical="$1"
+          borderRadius="$full"
+          gap="$1"
           alignItems="center"
-          gap="$1.5"
+          pointerEvents="none"
         >
-          {isPublic
-            ? <Globe size={13} color="#4ade80" />
-            : <Lock size={13} color="#d1d5db" />
-          }
-          <Text variant="caption" color={isPublic ? '#4ade80' : '#d1d5db'} fontSize="$2">
-            {isPublic ? 'Public' : 'Private'}
+          {isPublic ? <Globe size={12} color="#16A34A" /> : <Lock size={12} color="#64748B" />}
+          <Text variant="caption" fontSize="$2" color={isPublic ? '$success500' : '$mutedForeground'}>
+            {isPublic ? 'Published' : 'Private draft'}
           </Text>
         </XStack>
 
-        {/* Toggle publish */}
-        <XStack
-          cursor="pointer"
-          padding="$1.5"
-          borderRadius="$2"
-          backgroundColor="rgba(255,255,255,0.1)"
-          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          onPress={(e: any) => handleTogglePublish(e)}
-          opacity={isToggling ? 0.5 : 1}
-        >
-          <Text variant="caption" color="#FFFFFF" fontSize="$2">
+      </YStack>
+
+      <YStack padding="$3" gap="$2.5" flex={1}>
+        <Text fontSize="$2" fontWeight="600" color="$primary" textTransform="uppercase">
+          {route.originalAuthorName?.trim() ? `Copy from ${route.originalAuthorName}` : 'Original route'}
+        </Text>
+        <Text fontFamily="$heading" fontSize="$5" fontWeight="600" color="$color" numberOfLines={2}>
+          {route.title}
+        </Text>
+        {route.description ? (
+          <Text fontSize="$3" color="$mutedForeground" numberOfLines={2}>
+            {route.description}
+          </Text>
+        ) : null}
+
+        {feedback ? (
+          <XStack gap="$2" alignItems="flex-start" backgroundColor="$warning50" borderWidth={1} borderColor="$warning200" borderRadius="$2" padding="$2">
+            <AlertCircle size={14} color="var(--color-warning500)" />
+            <Text variant="caption" color="$warning500" flex={1}>{feedback}</Text>
+          </XStack>
+        ) : null}
+
+        <XStack gap="$2" flexWrap="wrap" marginTop="auto">
+          <Button
+            variant={isPublic ? 'outline' : 'solid'}
+            size="sm"
+            loading={isToggling}
+            disabled={isToggling}
+            onPress={(e: any) => handleTogglePublish(e)}
+            icon={isPublic ? <Lock size={14} color="currentColor" /> : <Globe size={14} color={isPublic ? 'currentColor' : '#FFFFFF'} />}
+          >
             {isPublic ? 'Unpublish' : 'Publish'}
-          </Text>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onPress={(e: any) => {
+              e.stopPropagation()
+              router.push(`/routes/${route.id}/edit`)
+            }}
+            icon={<Pencil size={14} color="currentColor" />}
+          >
+            Edit
+          </Button>
+          {isForkedCopy ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isRemoving}
+              onPress={(e: any) => handleRemoveCopy(e)}
+              color="$error500"
+              icon={<Trash2 size={14} color="var(--color-error500)" />}
+            >
+              Remove
+            </Button>
+          ) : null}
         </XStack>
-
-        {/* Edit */}
-        <XStack
-          cursor="pointer"
-          padding="$1.5"
-          borderRadius="$2"
-          backgroundColor="rgba(255,255,255,0.1)"
-          hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-          onPress={() => router.push(`/routes/${route.id}/edit`)}
-        >
-          <Pencil size={14} color="#FFFFFF" />
-        </XStack>
-      </XStack>
+      </YStack>
     </YStack>
   )
 }
@@ -121,6 +161,11 @@ export default function ProfileClient({
   routes: RouteListItem[]
 }) {
   const router = useRouter()
+  const [routeItems, setRouteItems] = useState(routes)
+
+  useEffect(() => {
+    setRouteItems(routes)
+  }, [routes])
 
   if (!user) {
     return (
@@ -132,14 +177,13 @@ export default function ProfileClient({
   }
 
   const initials = user.userName?.slice(0, 2).toUpperCase() ?? 'U'
-  const publicCount = routes.filter((r) => r.isPublic).length
-  const privateCount = routes.length - publicCount
+  const publicCount = routeItems.filter((r) => r.isPublic).length
+  const privateCount = routeItems.length - publicCount
 
   return (
     <YStack gap="$5" flex={1}>
-      {/* Profile Header */}
       <XStack gap="$5" alignItems="center" flexWrap="wrap">
-        <Avatar size="xl" initials={initials} />
+        <Avatar size="xl" initials={initials} src={user.profilePhotoUrl ?? undefined} />
         <YStack flex={1} gap="$1">
           <Text variant="heading2">{user.userName}</Text>
           {user.email && (
@@ -162,15 +206,11 @@ export default function ProfileClient({
           <Button variant="outline" size="md" onPress={() => router.push('/settings')}>
             Edit Profile
           </Button>
-          <Button variant="outline" size="md">
-            <Share2 size={18} color="currentColor" />
-          </Button>
         </XStack>
       </XStack>
 
-      {/* Stats */}
       <XStack gap="$3" flexWrap="wrap">
-        <StatBox value={routes.length} label="Routes" />
+        <StatBox value={routeItems.length} label="Routes" />
         {publicCount > 0 && <StatBox value={publicCount} label="Public" />}
         {privateCount > 0 && <StatBox value={privateCount} label="Private" />}
       </XStack>
@@ -180,69 +220,69 @@ export default function ProfileClient({
           <Text variant="heading3">My Routes</Text>
         </XStack>
 
-        {routes.length > 0 ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
-            {routes.map((route) => (
-              <RouteActionCard
-                key={route.id}
-                route={route}
-                onPress={() => router.push(`/routes/${route.id}`)}
-              />
-            ))}
-            {/* Create placeholder */}
-            <YStack
-              borderRadius="$4"
-              borderWidth={2}
-              borderStyle="dashed"
-              borderColor="$borderColor"
-              alignItems="center"
-              justifyContent="center"
-              minHeight={280}
-              cursor="pointer"
-              gap="$3"
-              onPress={() => router.push('/routes/create')}
-              hoverStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
-              pressStyle={{ scale: 0.985 }}
-            >
-              <YStack
-                backgroundColor="$muted"
-                borderRadius="$round"
-                padding="$3"
-              >
-                <Plus size={24} color="var(--color-primary)" />
+        {routeItems.length > 0 ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: 24,
+          }}>
+            {routeItems.map((route) => (
+              <YStack key={route.id} minWidth={0}>
+                <RouteActionCard
+                  route={route}
+                  onPress={() => router.push(`/routes/${route.id}`)}
+                  onRemoved={(routeId) => setRouteItems((current) => current.filter((item) => item.id !== routeId))}
+                />
               </YStack>
-              <YStack alignItems="center" gap="$1">
-                <Text variant="label" color="$primary">Create Route</Text>
-                <Text variant="caption" muted>Share your latest adventure</Text>
+            ))}
+            <YStack minWidth={0}>
+              <YStack
+                borderRadius="$4"
+                borderWidth={2}
+                borderStyle="dashed"
+                borderColor="$borderColor"
+                alignItems="center"
+                justifyContent="center"
+                minHeight={280}
+                cursor="pointer"
+                hoverStyle={{ backgroundColor: '$backgroundHover' }}
+                onPress={() => router.push('/routes/create')}
+                gap="$3"
+              >
+                <YStack
+                  width={48}
+                  height={48}
+                  borderRadius="$3"
+                  backgroundColor="$backgroundHover"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Plus size={24} color="gray" />
+                </YStack>
+                <YStack alignItems="center">
+                  <Text variant="body" weight="medium">Create Route</Text>
+                  <Text variant="caption" muted>Share your latest adventure</Text>
+                </YStack>
               </YStack>
             </YStack>
           </div>
         ) : (
           <YStack
-            borderRadius="$4"
-            borderWidth={2}
-            borderStyle="dashed"
-            borderColor="$borderColor"
+            flex={1}
             alignItems="center"
             justifyContent="center"
-            minHeight={280}
+            backgroundColor="$backgroundStrong"
+            borderRadius="$4"
+            padding="$8"
+            borderWidth={1}
+            borderColor="$borderColor"
             gap="$3"
             cursor="pointer"
             onPress={() => router.push('/routes/create')}
-            hoverStyle={{ borderColor: '$primary', backgroundColor: '$ant50' }}
-            pressStyle={{ scale: 0.985 }}
           >
-            <YStack
-              backgroundColor="$muted"
-              borderRadius="$round"
-              padding="$4"
-            >
-              <Plus size={32} color="var(--color-primary)" />
-            </YStack>
-            <YStack gap="$1" alignItems="center">
-              <Text variant="label" color="$primary">Create Route</Text>
-              <Text variant="body" muted>Share your latest adventure</Text>
-            </YStack>
+            <Plus size={32} color="var(--color-primary)" />
+            <Text variant="heading3">No routes yet?</Text>
+            <Text variant="body" muted>Create your first route and share your adventure with others.</Text>
           </YStack>
         )}
       </YStack>

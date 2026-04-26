@@ -1,15 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from '@antapp/ui'
-import { addPostComment, deletePostComment, getPostComments, sharePost, togglePostReaction } from '@/features/posts/actions'
-import type { PostCommentItem, RouteListItem } from '@/types/api'
-import { Bell, Camera, CircleDot, Clock3, Compass, Ellipsis, Image as ImageIcon, MapPinned, MessageCircle, Plus, Send, Share2, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
+import { addPostComment, deletePostComment, getPostComments, getPostReactions, sharePost, togglePostReaction } from '@/features/posts/actions'
+import type { PostCommentItem, PostReactionItem, RouteListItem } from '@/types/api'
+import { Bell, CircleDot, Clock3, Compass, Copy, Ellipsis, MessageCircle, Plus, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
 
 type FeedMode = 'timeline' | 'official' | 'community'
 const COMMENTS_PAGE_SIZE = 20
+const REACTIONS_PAGE_SIZE = 20
 
 type HomeClientProps = {
   mode: FeedMode
@@ -28,24 +29,24 @@ const PAGE_COPY: Record<FeedMode, {
 }> = {
   timeline: {
     title: 'Explore Feed',
-    subtitle: 'Public routes now behave like social posts. Fresh shares, official highlights, and community motion all meet here first.',
-    composer: "Share a new route, drop a scenic update, or post today's route draft...",
+    subtitle: 'A social feed for public route posts. Use Search or Spots when you only want to browse routes.',
+    composer: 'Choose a public route, add a caption, and attach optional photos.',
     railTitle: 'Trending now',
-    railSubtitle: 'Routes getting the strongest pull in the public flow.',
+    railSubtitle: 'Public routes and posts getting the strongest pull.',
   },
   official: {
     title: 'Official Feed',
-    subtitle: 'A cleaner editorial stream for curated and promoted route drops.',
-    composer: 'Queue a featured route or spotlight an official collection...',
+    subtitle: 'Curated route posts promoted by the AntAPP team.',
+    composer: 'Choose a curated route and publish an official update.',
     railTitle: 'Editorial watchlist',
-    railSubtitle: 'Fresh official cards the product can push harder.',
+    railSubtitle: 'Fresh official routes and posts to watch.',
   },
   community: {
     title: 'Community Feed',
-    subtitle: 'A faster social lane for user-created route posts, experiments, and daily shares.',
-    composer: 'What route did the community just post today?',
+    subtitle: 'Community route posts from users. Official promotions stay out of this lane.',
+    composer: 'Choose a community route and publish a post.',
     railTitle: 'Community momentum',
-    railSubtitle: 'Recent public posts climbing fastest in the feed.',
+    railSubtitle: 'Recent community routes and posts climbing fastest.',
   },
 }
 
@@ -93,7 +94,7 @@ function getPostTone(route: RouteListItem) {
     case 'Sponsored':
       return { badge: 'Sponsored', variant: 'warning' as const, label: 'Partner feature' }
     default:
-      return { badge: 'Community', variant: 'default' as const, label: 'Community post' }
+      return { badge: 'Community', variant: 'default' as const, label: 'Community share' }
   }
 }
 
@@ -117,7 +118,7 @@ function getAuthor(route: RouteListItem) {
 
   return {
     name: displayName,
-    role: 'Community creator',
+    role: 'Route creator',
     initials,
   }
 }
@@ -134,85 +135,8 @@ function getInitials(name?: string | null) {
     .join('')
 }
 
-function StoryCard({
-  route,
-  action = false,
-}: {
-  route?: RouteListItem
-  action?: boolean
-}) {
-  if (action) {
-    return (
-      <Link href="/posts/create?intent=story" style={{ textDecoration: 'none' }}>
-        <Card
-          variant="outline"
-          size="sm"
-          backgroundColor="$backgroundStrong"
-          overflow="hidden"
-          width={140}
-          minWidth={140}
-          gap="$0"
-          padding={0}
-          pressable
-        >
-          <YStack height={120} backgroundColor="$muted" />
-          <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
-            <XStack
-              width={44}
-              height={44}
-              borderRadius="$full"
-              backgroundColor="$primary"
-              alignItems="center"
-              justifyContent="center"
-              marginTop={-26}
-              borderWidth={4}
-              borderColor="$backgroundStrong"
-            >
-              <Plus size={18} color="#FFFFFF" />
-            </XStack>
-            <Text variant="label" align="center">Create Story</Text>
-          </YStack>
-        </Card>
-      </Link>
-    )
-  }
-
-  if (!route) return null
-
-  const tone = getPostTone(route)
-  const storyImage = route.postImageUrls?.[0] || route.thumbnailUrl
-
-  return (
-    <Link href={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
-      <Card
-        variant="outline"
-        size="sm"
-        backgroundColor="$backgroundStrong"
-        overflow="hidden"
-        width={140}
-        minWidth={140}
-        gap="$0"
-        padding={0}
-        pressable
-      >
-        <YStack position="relative" height={190} backgroundColor="$muted">
-          {storyImage ? (
-            <Image src={storyImage} width="100%" height="100%" objectFit="cover" />
-          ) : null}
-          <YStack position="absolute" inset={0} backgroundColor="rgba(15,23,42,0.22)" />
-          <XStack position="absolute" top="$3" left="$3">
-            <Avatar size="md" initials={getAuthor(route).initials} />
-          </XStack>
-          <YStack position="absolute" bottom="$3" left="$3" right="$3" gap="$1.5">
-            <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
-            <Text variant="label" color="#FFFFFF" numberOfLines={2}>
-              {route.title}
-            </Text>
-          </YStack>
-        </YStack>
-      </Card>
-    </Link>
-  )
+function formatSocialCount(count: number, singular: string, plural: string) {
+  return `${count} ${count === 1 ? singular : plural}`
 }
 
 function FeedPostCard({
@@ -231,6 +155,7 @@ function FeedPostCard({
   const coverImage = media[0] ?? null
   const postId = route.postId ?? null
   const isInteractivePost = Boolean(postId)
+  const feedLabel = isInteractivePost ? tone.label : 'Route preview'
 
   const [reactionCount, setReactionCount] = useState(route.postReactionCount ?? 0)
   const [commentCount, setCommentCount] = useState(route.postCommentCount ?? 0)
@@ -239,21 +164,35 @@ function FeedPostCard({
   const [isShared, setIsShared] = useState(route.isSharedByCurrentUser ?? false)
 
   const [comments, setComments] = useState<PostCommentItem[]>([])
+  const [reactions, setReactions] = useState<PostReactionItem[]>([])
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
+  const [isReactionsOpen, setIsReactionsOpen] = useState(false)
   const [commentsLoaded, setCommentsLoaded] = useState(false)
+  const [reactionsLoaded, setReactionsLoaded] = useState(false)
   const [commentsPage, setCommentsPage] = useState(1)
+  const [reactionsPage, setReactionsPage] = useState(1)
   const [hasMoreComments, setHasMoreComments] = useState(false)
+  const [hasMoreReactions, setHasMoreReactions] = useState(false)
   const [commentDraft, setCommentDraft] = useState('')
+  const [shareNotice, setShareNotice] = useState<string | null>(null)
+  const [shareCopied, setShareCopied] = useState(false)
   const [socialError, setSocialError] = useState<string | null>(null)
+  const shareCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [isLiking, startLiking] = useTransition()
+  const [isReactionLoading, startReactionLoading] = useTransition()
   const [isCommentLoading, startCommentLoading] = useTransition()
   const [isCommentPosting, startCommentPosting] = useTransition()
   const [isSharing, startSharing] = useTransition()
 
-  const openCreatePost = (intent: 'post' | 'live' | 'photo' | 'checkin' | 'react' | 'comment' | 'share') => {
+  useEffect(() => () => {
+    if (shareCopiedTimerRef.current) {
+      clearTimeout(shareCopiedTimerRef.current)
+    }
+  }, [])
+
+  const openCreatePost = () => {
     const params = new URLSearchParams({
-      intent,
       routeId: route.id,
     })
     router.push(`/posts/create?${params.toString()}`)
@@ -288,9 +227,39 @@ function FeedPostCard({
     })
   }
 
+  const loadReactions = (page = 1, append = false) => {
+    if (!postId) return
+
+    startReactionLoading(async () => {
+      try {
+        const response = await getPostReactions(postId, page, REACTIONS_PAGE_SIZE)
+        setReactions((current) => {
+          if (!append) return response.data
+
+          const merged = [...current]
+          const existing = new Set(current.map((reaction) => reaction.reactionId))
+          for (const item of response.data) {
+            if (!existing.has(item.reactionId)) {
+              merged.push(item)
+            }
+          }
+          return merged
+        })
+        setReactionsLoaded(true)
+        setReactionsPage(page)
+        setHasMoreReactions(page * REACTIONS_PAGE_SIZE < response.totalRecords)
+        setReactionCount((current) => Math.max(current, response.totalRecords))
+        setShareNotice(null)
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to load likes.')
+      }
+    })
+  }
+
   const handleToggleReaction = () => {
     if (!postId) {
-      openCreatePost('react')
+      openCreatePost()
       return
     }
     if (isLiking) return
@@ -300,6 +269,13 @@ function FeedPostCard({
         const result = await togglePostReaction(postId)
         setIsReacted(result.isReactedByCurrentUser)
         setReactionCount(result.reactionCount)
+        setReactionsLoaded(false)
+        setReactionsPage(1)
+        setHasMoreReactions(false)
+        if (isReactionsOpen) {
+          loadReactions(1, false)
+        }
+        setShareNotice(null)
         setSocialError(null)
       } catch (e) {
         setSocialError((e as Error).message ?? 'Failed to update reaction.')
@@ -309,7 +285,7 @@ function FeedPostCard({
 
   const handleToggleComments = () => {
     if (!postId) {
-      openCreatePost('comment')
+      openCreatePost()
       return
     }
 
@@ -317,6 +293,19 @@ function FeedPostCard({
     setIsCommentsOpen(nextOpen)
     if (nextOpen && !commentsLoaded) {
       loadComments(1, false)
+    }
+  }
+
+  const handleToggleReactions = () => {
+    if (!postId) {
+      openCreatePost()
+      return
+    }
+
+    const nextOpen = !isReactionsOpen
+    setIsReactionsOpen(nextOpen)
+    if (nextOpen && !reactionsLoaded) {
+      loadReactions(1, false)
     }
   }
 
@@ -337,6 +326,7 @@ function FeedPostCard({
         setCommentsLoaded(false)
         setCommentsPage(1)
         setHasMoreComments(false)
+        setShareNotice(null)
         if (isCommentsOpen) {
           loadComments(1, false)
         }
@@ -356,6 +346,7 @@ function FeedPostCard({
         await deletePostComment(postId, commentId)
         setComments(current => current.filter(c => c.commentId !== commentId))
         setCommentCount(c => Math.max(0, c - 1))
+        setShareNotice(null)
         setSocialError(null)
       } catch (e) {
         setSocialError((e as Error).message ?? 'Failed to delete comment.')
@@ -365,25 +356,37 @@ function FeedPostCard({
 
   const handleShare = () => {
     if (!postId) {
-      openCreatePost('share')
+      openCreatePost()
       return
     }
-    if (isSharing) return
+    if (isSharing || shareCopied) return
 
     startSharing(async () => {
       try {
         const result = await sharePost(postId)
         setIsShared(result.isSharedByCurrentUser)
         setShareCount(result.shareCount)
+        let copied = false
         const routeLink = `${window.location.origin}/routes/${route.id}`
         if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
           try {
             await navigator.clipboard.writeText(routeLink)
+            copied = true
           } catch {
           }
         }
+        setShareCopied(true)
+        setShareNotice(copied ? null : 'Link share saved.')
+        if (shareCopiedTimerRef.current) {
+          clearTimeout(shareCopiedTimerRef.current)
+        }
+        shareCopiedTimerRef.current = setTimeout(() => {
+          setShareCopied(false)
+          shareCopiedTimerRef.current = null
+        }, 2500)
         setSocialError(null)
       } catch (e) {
+        setShareNotice(null)
         setSocialError((e as Error).message ?? 'Failed to share post.')
       }
     })
@@ -392,6 +395,11 @@ function FeedPostCard({
   const handleLoadMoreComments = () => {
     if (!postId || isCommentLoading || !hasMoreComments) return
     loadComments(commentsPage + 1, true)
+  }
+
+  const handleLoadMoreReactions = () => {
+    if (!postId || isReactionLoading || !hasMoreReactions) return
+    loadReactions(reactionsPage + 1, true)
   }
 
   return (
@@ -403,17 +411,21 @@ function FeedPostCard({
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
         <XStack gap="$3" flex={1}>
-          <Avatar size="lg" initials={author.initials} />
+          <Link href={`/profiles/${route.authorUserId}`} style={{ textDecoration: 'none' }}>
+            <Avatar size="lg" initials={author.initials} />
+          </Link>
           <YStack gap="$1.5" flex={1}>
             <XStack gap="$2" flexWrap="wrap" alignItems="center">
-              <Text variant="label">{author.name}</Text>
+              <Link href={`/profiles/${route.authorUserId}`} style={{ textDecoration: 'none' }}>
+                <Text variant="label" hoverStyle={{ color: '$primary' }}>{author.name}</Text>
+              </Link>
               <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
             </XStack>
             <Text variant="caption" muted>{author.role}</Text>
             <XStack gap="$2" flexWrap="wrap" alignItems="center">
               <Text variant="caption" muted>{formatRelativeDate(route.createdAt, referenceNowMs)}</Text>
               <CircleDot size={10} color="var(--color-mutedForeground)" />
-              <Text variant="caption" muted>{tone.label}</Text>
+              <Text variant="caption" muted>{feedLabel}</Text>
             </XStack>
           </YStack>
         </XStack>
@@ -467,9 +479,11 @@ function FeedPostCard({
             </XStack>
 
             <YStack gap="$2">
-              <Text variant="label" color="$primary">Route Snapshot</Text>
+              <Text variant="label" color="$primary">{isInteractivePost ? 'Post details' : 'Route preview'}</Text>
               <Text variant="body" muted>
-                Published {formatFullDate(route.createdAt)}. This card is rendered as a social post but still points into the same route detail experience.
+                {isInteractivePost
+                  ? `Shared on ${formatFullDate(route.createdAt)}. People can like, comment, and copy this route link.`
+                  : `Published ${formatFullDate(route.createdAt)}. Publish this route as a post to turn on likes, comments, and link copies.`}
               </Text>
             </YStack>
 
@@ -529,21 +543,34 @@ function FeedPostCard({
 
       {isInteractivePost && (
         <>
-          <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
-            <XStack gap="$3" alignItems="center">
-              <XStack alignItems="center" gap="$1.5">
-                <ThumbsUp size={14} color="var(--color-primary)" />
-                <Text variant="caption" muted>{reactionCount} reacts</Text>
-              </XStack>
-              <XStack alignItems="center" gap="$1.5">
-                <MessageCircle size={14} color="var(--color-mutedForeground)" />
-                <Text variant="caption" muted>{commentCount} comments</Text>
-              </XStack>
+          <XStack justifyContent="space-between" gap="$2" flexWrap="wrap">
+            <XStack
+              cursor="pointer"
+              onPress={handleToggleReactions}
+              paddingVertical="$1"
+              paddingHorizontal="$2"
+              borderRadius="$2"
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            >
+              <Text variant="caption" color={isReactionsOpen ? '$primary' : '$mutedForeground'}>
+                {formatSocialCount(reactionCount, 'like', 'likes')}
+              </Text>
             </XStack>
-            <XStack alignItems="center" gap="$1.5">
-              <Send size={14} color="var(--color-mutedForeground)" />
-              <Text variant="caption" muted>{shareCount} shares</Text>
+            <XStack
+              cursor="pointer"
+              onPress={handleToggleComments}
+              paddingVertical="$1"
+              paddingHorizontal="$2"
+              borderRadius="$2"
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            >
+              <Text variant="caption" color={isCommentsOpen ? '$primary' : '$mutedForeground'}>
+                {formatSocialCount(commentCount, 'comment', 'comments')}
+              </Text>
             </XStack>
+            <Text variant="caption" muted paddingVertical="$1" paddingHorizontal="$2">
+              {formatSocialCount(shareCount, 'copy', 'copies')}
+            </Text>
           </XStack>
 
           <XStack
@@ -554,51 +581,82 @@ function FeedPostCard({
             gap="$2"
             flexWrap="wrap"
           >
-            <Button
-              variant={isReacted ? 'solid' : 'ghost'}
-              size="sm"
-              disabled={isLiking}
-              loading={isLiking}
-              icon={<ThumbsUp size={16} color="currentColor" />}
-              onPress={handleToggleReaction}
-            >
-              Like
+            <Button variant={isReacted ? 'solid' : 'ghost'} size="sm" disabled={isLiking} loading={isLiking} icon={<ThumbsUp size={16} color="currentColor" />} onPress={handleToggleReaction}>
+              Like {reactionCount > 0 ? `(${reactionCount})` : ''}
             </Button>
-            <Button
-              variant={isCommentsOpen ? 'outline' : 'ghost'}
-              size="sm"
-              icon={<MessageCircle size={16} color="currentColor" />}
-              onPress={handleToggleComments}
-            >
-              Comment
+            <Button variant={isCommentsOpen ? 'outline' : 'ghost'} size="sm" icon={<MessageCircle size={16} color="currentColor" />} onPress={handleToggleComments}>
+              Comment {commentCount > 0 ? `(${commentCount})` : ''}
             </Button>
-            <Button
-              variant={isShared ? 'solid' : 'ghost'}
-              size="sm"
-              disabled={isSharing}
-              loading={isSharing}
-              icon={<Share2 size={16} color="currentColor" />}
-              onPress={handleShare}
-            >
-              Share
+            <Button variant="ghost" size="sm" disabled={isSharing || shareCopied} loading={isSharing} icon={<Copy size={16} color="currentColor" />} onPress={handleShare}>
+              {shareCopied ? 'Link copied' : 'Copy link'}
             </Button>
           </XStack>
+
+          {shareNotice ? (
+            <YStack backgroundColor="$success50" borderRadius="$3" padding="$3" borderWidth={1} borderColor="$success200">
+              <Text variant="caption" color="$success500">{shareNotice}</Text>
+            </YStack>
+          ) : null}
         </>
       )}
 
       {!isInteractivePost ? (
         <YStack gap="$2">
           <Text variant="caption" muted>
-            This card comes from route listing. Publish a post for this route to activate social interactions.
+            Publish this route as a post to enable likes, comments, and link copies.
           </Text>
-          <Button variant="outline" size="sm" onPress={() => openCreatePost('post')}>
-            Create post from this route
+          <Button variant="outline" size="sm" onPress={openCreatePost}>
+            Publish as post
           </Button>
+        </YStack>
+      ) : null}
+
+      {isReactionsOpen ? (
+        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
+          <XStack justifyContent="space-between" alignItems="center" gap="$3">
+            <Text variant="label">Liked by</Text>
+            <Text variant="caption" muted>{formatSocialCount(reactionCount, 'like', 'likes')}</Text>
+          </XStack>
+
+          {isReactionLoading ? (
+            <Text variant="caption" muted>Loading likes...</Text>
+          ) : reactions.length === 0 ? (
+            <Text variant="caption" muted>No likes yet.</Text>
+          ) : (
+            <YStack gap="$2">
+              {reactions.map((reaction) => (
+                <XStack key={reaction.reactionId} gap="$2.5" alignItems="center">
+                  <Avatar size="sm" initials={getInitials(reaction.userName)} />
+                  <YStack gap="$0.5" flex={1}>
+                    <Text variant="label">{reaction.userName?.trim() || 'Route Explorer'}</Text>
+                    <Text variant="caption" muted>{formatRelativeDate(reaction.createdAt, referenceNowMs)}</Text>
+                  </YStack>
+                </XStack>
+              ))}
+
+              {hasMoreReactions ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={isReactionLoading}
+                  disabled={isReactionLoading}
+                  onPress={handleLoadMoreReactions}
+                >
+                  Load more likes
+                </Button>
+              ) : null}
+            </YStack>
+          )}
         </YStack>
       ) : null}
 
       {isCommentsOpen ? (
         <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
+          <XStack justifyContent="space-between" alignItems="center" gap="$3">
+            <Text variant="label">Comments</Text>
+            <Text variant="caption" muted>{formatSocialCount(commentCount, 'comment', 'comments')}</Text>
+          </XStack>
+
           <XStack gap="$2">
             <Input
               value={commentDraft}
@@ -622,11 +680,13 @@ function FeedPostCard({
           {isCommentLoading ? (
             <Text variant="caption" muted>Loading comments...</Text>
           ) : comments.length === 0 ? (
-            <Text variant="caption" muted>No comments yet.</Text>
+            <YStack backgroundColor="$background" borderRadius="$3" padding="$3" borderWidth={1} borderColor="$borderColor">
+              <Text variant="caption" muted>No comments yet. Start the conversation.</Text>
+            </YStack>
           ) : (
             <YStack gap="$2">
               {comments.map((comment) => (
-                <XStack key={comment.commentId} gap="$2.5" alignItems="flex-start">
+                <XStack key={comment.commentId} gap="$2.5" alignItems="flex-start" backgroundColor="$background" borderRadius="$3" padding="$3">
                   <Avatar size="sm" initials={getInitials(comment.userName)} />
                   <YStack gap="$1" flex={1}>
                     <XStack gap="$2" alignItems="center" flexWrap="wrap">
@@ -735,70 +795,27 @@ export default function HomeClient({
         </Card>
 
         <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
-          <XStack gap="$3" alignItems="center">
+          <XStack gap="$3" alignItems="center" flexWrap="wrap">
             <Avatar size="lg" initials={composerInitials} />
             <XStack
               flex={1}
-              minHeight={48}
-              alignItems="center"
-              paddingHorizontal="$4"
-              borderRadius="$full"
-              backgroundColor="$background"
-              borderWidth={1}
-              borderColor="$borderColor"
-              cursor="pointer"
-              hoverStyle={{ backgroundColor: '$backgroundHover' }}
-              onPress={() => router.push('/posts/create?intent=post')}
+              minWidth={220}
+              flexDirection="column"
+              gap="$1"
             >
-              <Text variant="body" muted>{copy.composer}</Text>
+              <Text variant="label">Create a route post</Text>
+              <Text variant="caption" muted>{copy.composer}</Text>
             </XStack>
-          </XStack>
-
-          <XStack
-            borderTopWidth={1}
-            borderTopColor="$borderColor"
-            paddingTop="$3"
-            gap="$2"
-            flexWrap="wrap"
-          >
             <Button
-              variant="ghost"
+              variant="solid"
               size="sm"
-              icon={<Camera size={16} color="#E11D48" />}
-              onPress={() => router.push('/posts/create?intent=live')}
+              icon={<Plus size={14} color="#FFFFFF" />}
+              onPress={() => router.push('/posts/create')}
             >
-              Live
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<ImageIcon size={16} color="#16A34A" />}
-              onPress={() => router.push('/posts/create?intent=photo')}
-            >
-              Photo
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={<MapPinned size={16} color="#0EA5E9" />}
-              onPress={() => router.push('/posts/create?intent=checkin')}
-            >
-              Check in
+              Create post
             </Button>
           </XStack>
         </Card>
-
-        <XStack
-          gap="$3"
-          overflow="scroll"
-          paddingBottom="$1"
-          style={{ overflowY: 'hidden', scrollbarWidth: 'none' }}
-        >
-          <StoryCard action />
-          {spotlightRoutes.slice(0, 5).map((route) => (
-            <StoryCard key={`${route.postId ?? route.id}-${route.createdAt}`} route={route} />
-          ))}
-        </XStack>
 
         <YStack gap="$4">
           {timelineRoutes.length > 0 ? (
@@ -869,11 +886,15 @@ export default function HomeClient({
           </YStack>
         </RightRailCard>
 
-        <RightRailCard title="Today in feed" subtitle="A compact status rail like a social network dashboard">
+        <RightRailCard title="Today in feed" subtitle="What is actually visible in this feed right now">
           <YStack gap="$3">
             <XStack justifyContent="space-between" alignItems="center">
-              <Text variant="caption" muted>New public posts</Text>
-              <Text variant="label">{timelineRoutes.length}</Text>
+              <Text variant="caption" muted>Real posts</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => route.postId).length}</Text>
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Text variant="caption" muted>Route previews</Text>
+              <Text variant="label">{timelineRoutes.filter((route) => !route.postId).length}</Text>
             </XStack>
             <XStack justifyContent="space-between" alignItems="center">
               <Text variant="caption" muted>Official cards</Text>
@@ -895,7 +916,7 @@ export default function HomeClient({
 
         <RightRailCard title="Quick actions" subtitle="Keep route creation close to the feed">
           <YStack gap="$2.5">
-            <Link href="/posts/create?intent=post" style={{ textDecoration: 'none' }}>
+            <Link href="/posts/create" style={{ textDecoration: 'none' }}>
               <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />}>Create post</Button>
             </Link>
             <Link href="/my-routes" style={{ textDecoration: 'none' }}>

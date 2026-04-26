@@ -42,6 +42,25 @@ export type CurrentUser = {
 
 // ─── Tags ───────────────────────────────────────────────
 
+export type PublicProfile = {
+  id: string
+  userName: string
+  profilePhotoUrl: string | null
+  followerCount: number
+  followingCount: number
+  publicRouteCount: number
+  postCount: number
+  isCurrentUser: boolean
+  isFollowingByCurrentUser: boolean
+}
+
+export type UserFollowSummary = {
+  userId: string
+  isFollowingByCurrentUser: boolean
+  followerCount: number
+  followingCount: number
+}
+
 export type Tag = {
   id: string
   name: string
@@ -64,6 +83,7 @@ export type RouteListItem = {
   thumbnailUrl: string | null
   authorUserId: string
   authorUserName?: string | null
+  originalRouteId?: string | null
   originalAuthorName?: string | null
   postId?: string
   postContent?: string | null
@@ -77,6 +97,7 @@ export type RouteListItem = {
   isPublic: boolean
   createdAt: string
   averageRating: number
+  currentUserRating?: number | null
 }
 
 export type FeedPostItem = {
@@ -107,6 +128,14 @@ export type PostCommentItem = {
   userId: string
   userName: string | null
   content: string
+  createdAt: string
+}
+
+export type PostReactionItem = {
+  reactionId: string
+  postId: string
+  userId: string
+  userName: string | null
   createdAt: string
 }
 
@@ -146,10 +175,13 @@ export type RouteDetail = {
   description: string | null
   thumbnailUrl: string | null
   authorUserId: string
+  authorUserName?: string | null
+  originalRouteId?: string | null
   originalAuthorName?: string | null
   isPublic: boolean
   contentType: RouteContentType
   averageRating: number
+  currentUserRating?: number | null
   encodedPolyline: string | null
   totalDistanceMeters: number
   estimatedDurationSeconds: number
@@ -239,6 +271,7 @@ export type SpotListItem = {
   latitude: number
   longitude: number
   averageRating: number
+  currentUserRating?: number | null
 }
 
 export type SpotDetail = SpotListItem & {
@@ -253,6 +286,7 @@ export type SpotRouteItem = {
   thumbnailUrl: string | null
   authorUserId: string
   averageRating: number
+  currentUserRating?: number | null
 }
 
 export type BusinessSpotItem = {
@@ -264,6 +298,7 @@ export type BusinessSpotItem = {
   longitude: number
   isActive: boolean
   averageRating: number
+  currentUserRating?: number | null
   createdAt: string
 }
 
@@ -275,4 +310,20 @@ export type RouteRating = {
   userId: string
   score: number
   createdAt: string
+}
+
+export type RouteRatingResult = {
+  ratingId: string
+  routeId: string
+  currentUserRating: number
+  averageRating: number
+  ratingCount: number
+}
+
+export type SpotRatingResult = {
+  ratingId: string
+  spotId: string
+  currentUserRating: number
+  averageRating: number
+  ratingCount: number
 }
