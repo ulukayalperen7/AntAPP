@@ -457,7 +457,12 @@ export default function RouteDetailClient({
             {route.originalAuthorName && (
               <XStack alignItems="center" gap="$2" marginTop="$1">
                 <GitFork size={14} color="#FFFFFF" opacity={0.8} />
-                <Text variant="caption" color="#FFFFFF" opacity={0.8}>Your editable copy of {route.originalAuthorName}'s route</Text>
+                <Text variant="caption" color="#FFFFFF" opacity={0.8}>
+                  {isOwner
+                    ? `Your editable copy of ${route.originalAuthorName}'s route`
+                    : `${route.authorUserName?.trim() || 'Route Explorer'}'s copy of ${route.originalAuthorName}'s route`
+                  }
+                </Text>
               </XStack>
             )}
             {!isForkedCopy && route.authorUserName && (
@@ -499,11 +504,11 @@ export default function RouteDetailClient({
               <XStack alignItems="center" gap="$1.5">
                 {isSaved
                   ? <BookmarkCheck size={16} color="#FFFFFF" />
-                  : <Bookmark size={16} color="var(--color-primary)" />
+                  : <Bookmark size={16} color="#EA580C" />
                 }
                 <YStack>
                   <XStack alignItems="center" gap="$1">
-                    <Text variant="label" color={isSaved ? '#FFFFFF' : '$primary'}>
+                    <Text variant="label" color={isSaved ? '#FFFFFF' : '#EA580C'}>
                       {isSaved ? 'In Collection' : 'Save to Collection'}
                     </Text>
                   </XStack>
@@ -680,6 +685,46 @@ export default function RouteDetailClient({
 
         {/* Right Sidebar */}
         <YStack gap="$4">
+          {isOwner && (
+            <YStack
+              backgroundColor="$backgroundStrong"
+              borderRadius="$4"
+              padding="$4"
+              gap="$3"
+              borderWidth={1}
+              borderColor="$borderColor"
+            >
+              <XStack alignItems="center" gap="$2">
+                {isForkedCopy ? <GitFork size={18} color="var(--color-primary)" /> : <Pencil size={18} color="var(--color-primary)" />}
+                <Text variant="heading4">{isForkedCopy ? 'Your Route Copy' : 'Your Original Route'}</Text>
+              </XStack>
+              <Text variant="body" muted>
+                {isForkedCopy
+                  ? 'This copy belongs to you. Edit the stops, title, or description, then publish it when you want others to see your version.'
+                  : 'Only you can edit or remove this original route. Other users can fork it into their own editable copies.'
+                }
+              </Text>
+              <Button
+                variant="solid"
+                size="md"
+                onPress={() => router.push(`/routes/${route.id}/edit`)}
+                icon={<Pencil size={16} color="#FFFFFF" />}
+              >
+                Edit Route
+              </Button>
+              {isForkedCopy && route.originalRouteId ? (
+                <Button
+                  variant="outline"
+                  size="md"
+                  onPress={() => router.push(`/routes/${route.originalRouteId}`)}
+                  icon={<GitFork size={16} color="currentColor" />}
+                >
+                  Open Original Route
+                </Button>
+              ) : null}
+            </YStack>
+          )}
+
           {/* Rating Widget */}
           {!isOwner && (
             <YStack
@@ -737,7 +782,7 @@ export default function RouteDetailClient({
                 <Text variant="heading4">Customize This Route</Text>
               </XStack>
               <Text variant="body" muted>
-                Want to make changes? Fork this route to create your own editable copy in your profile.
+                Fork this route once to create your own private editable copy in My Routes. The original route stays unchanged.
               </Text>
               {forkError && (
                 <Text variant="caption" color="$error500">{forkError}</Text>

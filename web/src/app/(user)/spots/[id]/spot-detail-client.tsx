@@ -26,20 +26,29 @@ function routeToCardData(route: SpotRouteItem): RouteCardData {
 
 function SpotRatingWidget({
   spotId,
+  initialRating,
   onRated,
 }: {
   spotId: string
+  initialRating?: number | null
   onRated: (result: SpotRatingResult) => void
 }) {
   const [hovered, setHovered] = useState(0)
-  const [selected, setSelected] = useState(0)
-  const [submitted, setSubmitted] = useState(false)
+  const [selected, setSelected] = useState(initialRating || 0)
+  const [submitted, setSubmitted] = useState(!!initialRating)
   const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    if (initialRating) {
+      setSelected(initialRating)
+      setSubmitted(true)
+    }
+  }, [initialRating])
 
   const active = hovered || selected
 
   const handleRate = (score: number) => {
-    if (submitted) return
+    if (isPending) return
 
     setSelected(score)
     startTransition(async () => {
@@ -53,8 +62,17 @@ function SpotRatingWidget({
     })
   }
 
+  if (submitted && selected > 0) {
+    return (
+      <XStack alignItems="center" gap="$2" padding="$3" backgroundColor="$success50" borderRadius="$3" onPress={() => setSubmitted(false)} cursor="pointer">
+        <Star size={16} fill="var(--color-success500, #22C55E)" color="var(--color-success500, #22C55E)" />
+        <Text variant="caption" color="$success500">Thanks! You rated this {selected}/5 (Click to change)</Text>
+      </XStack>
+    )
+  }
+
   return (
-    <YStack gap="$3">
+    <YStack gap="$2">
       <Text variant="label" color="$mutedForeground">Rate this spot</Text>
       <XStack gap="$1.5" alignItems="center">
         {[1, 2, 3, 4, 5].map((score) => (
@@ -62,10 +80,10 @@ function SpotRatingWidget({
             key={score}
             padding="$1"
             borderRadius="$2"
-            cursor={submitted || isPending ? 'default' : 'pointer'}
+            cursor={isPending ? 'default' : 'pointer'}
             onPress={() => handleRate(score)}
 
-            onMouseEnter={() => !submitted && !isPending && setHovered(score)}
+            onMouseEnter={() => !isPending && setHovered(score)}
             onMouseLeave={() => setHovered(0)}
           >
             <Star
@@ -78,11 +96,6 @@ function SpotRatingWidget({
         ))}
         {isPending && <Text variant="caption" muted>Saving...</Text>}
       </XStack>
-      {submitted && (
-        <XStack backgroundColor="$success50" borderRadius="$3" padding="$3">
-          <Text variant="caption" color="$success500">Thanks! You rated this spot {selected}/5.</Text>
-        </XStack>
-      )}
     </YStack>
   )
 }
@@ -377,6 +390,7 @@ export default function SpotDetailClient({
             <Text variant="heading4">Community feedback</Text>
             <SpotRatingWidget
               spotId={spot.id}
+              initialRating={spot.currentUserRating}
               onRated={(result) => {
                 setDisplayRating(result.averageRating)
                 setDisplayRatingCount(result.ratingCount)

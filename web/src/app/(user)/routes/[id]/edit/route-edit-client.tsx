@@ -740,12 +740,19 @@ export default function RouteEditClient({
           }
           <YStack flex={1} gap="$0.5">
             <Text variant="label" weight="semibold">
-              {isPublic ? 'Public' : 'Private'}
+              {isForkedCopy
+                ? isPublic ? 'Public copy' : 'Private copy'
+                : isPublic ? 'Public' : 'Private'
+              }
             </Text>
             <Text variant="caption" muted>
-              {isPublic
-                ? 'This route is visible to everyone on the platform.'
-                : 'Only you can see this route.'
+              {isForkedCopy
+                ? isPublic
+                  ? 'Your edited version is visible to everyone. The original route is still separate.'
+                  : 'Only you can see this copy. Edit it, then publish your version when it is ready.'
+                : isPublic
+                  ? 'This original route is visible to everyone on the platform.'
+                  : 'Only you can see this route.'
               }
             </Text>
           </YStack>
@@ -756,7 +763,7 @@ export default function RouteEditClient({
             disabled={isTogglingPublish}
             onPress={handleTogglePublish}
           >
-            {isPublic ? 'Unpublish' : 'Publish'}
+            {isPublic ? 'Unpublish' : isForkedCopy ? 'Publish copy' : 'Publish'}
           </Button>
         </XStack>
       </YStack>

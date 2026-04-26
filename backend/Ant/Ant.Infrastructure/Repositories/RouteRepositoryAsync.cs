@@ -42,7 +42,7 @@ namespace Ant.Infrastructure.Repositories
                 .AsTracking()
                 .Include(r => r.RouteSpots)
                 .Include(r => r.RouteTags)
-                .FirstOrDefaultAsync(r => r.Id == routeId);
+                .FirstOrDefaultAsync(r => r.Id == routeId && !r.IsDeleted);
         }
 
         private IQueryable<Route> BuildFilteredQuery(

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from '@antapp/ui'
 import { addPostComment, deletePostComment, getPostComments, getPostReactions, sharePost, togglePostReaction } from '@/features/posts/actions'
@@ -175,13 +175,21 @@ function FeedPostCard({
   const [hasMoreReactions, setHasMoreReactions] = useState(false)
   const [commentDraft, setCommentDraft] = useState('')
   const [shareNotice, setShareNotice] = useState<string | null>(null)
+  const [shareCopied, setShareCopied] = useState(false)
   const [socialError, setSocialError] = useState<string | null>(null)
+  const shareCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [isLiking, startLiking] = useTransition()
   const [isReactionLoading, startReactionLoading] = useTransition()
   const [isCommentLoading, startCommentLoading] = useTransition()
   const [isCommentPosting, startCommentPosting] = useTransition()
   const [isSharing, startSharing] = useTransition()
+
+  useEffect(() => () => {
+    if (shareCopiedTimerRef.current) {
+      clearTimeout(shareCopiedTimerRef.current)
+    }
+  }, [])
 
   const openCreatePost = () => {
     const params = new URLSearchParams({
@@ -351,7 +359,7 @@ function FeedPostCard({
       openCreatePost()
       return
     }
-    if (isSharing) return
+    if (isSharing || shareCopied) return
 
     startSharing(async () => {
       try {
@@ -367,7 +375,15 @@ function FeedPostCard({
           } catch {
           }
         }
-        setShareNotice(copied ? 'Route link copied.' : 'Link share saved.')
+        setShareCopied(true)
+        setShareNotice(copied ? null : 'Link share saved.')
+        if (shareCopiedTimerRef.current) {
+          clearTimeout(shareCopiedTimerRef.current)
+        }
+        shareCopiedTimerRef.current = setTimeout(() => {
+          setShareCopied(false)
+          shareCopiedTimerRef.current = null
+        }, 2500)
         setSocialError(null)
       } catch (e) {
         setShareNotice(null)
@@ -523,7 +539,35 @@ function FeedPostCard({
 
       {isInteractivePost && (
         <>
-          
+          <XStack justifyContent="space-between" gap="$2" flexWrap="wrap">
+            <XStack
+              cursor="pointer"
+              onPress={handleToggleReactions}
+              paddingVertical="$1"
+              paddingHorizontal="$2"
+              borderRadius="$2"
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            >
+              <Text variant="caption" color={isReactionsOpen ? '$primary' : '$mutedForeground'}>
+                {formatSocialCount(reactionCount, 'like', 'likes')}
+              </Text>
+            </XStack>
+            <XStack
+              cursor="pointer"
+              onPress={handleToggleComments}
+              paddingVertical="$1"
+              paddingHorizontal="$2"
+              borderRadius="$2"
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+            >
+              <Text variant="caption" color={isCommentsOpen ? '$primary' : '$mutedForeground'}>
+                {formatSocialCount(commentCount, 'comment', 'comments')}
+              </Text>
+            </XStack>
+            <Text variant="caption" muted paddingVertical="$1" paddingHorizontal="$2">
+              {formatSocialCount(shareCount, 'copy', 'copies')}
+            </Text>
+          </XStack>
 
           <XStack
             borderTopWidth={1}
@@ -539,8 +583,8 @@ function FeedPostCard({
             <Button variant={isCommentsOpen ? 'outline' : 'ghost'} size="sm" icon={<MessageCircle size={16} color="currentColor" />} onPress={handleToggleComments}>
               Comment {commentCount > 0 ? `(${commentCount})` : ''}
             </Button>
-            <Button variant={isShared ? 'solid' : 'ghost'} size="sm" disabled={isSharing} loading={isSharing} icon={<Copy size={16} color="currentColor" />} onPress={handleShare}>
-              Copy link
+            <Button variant="ghost" size="sm" disabled={isSharing || shareCopied} loading={isSharing} icon={<Copy size={16} color="currentColor" />} onPress={handleShare}>
+              {shareCopied ? 'Link copied' : 'Copy link'}
             </Button>
           </XStack>
 
