@@ -34,6 +34,7 @@ export default function ExploreScreen() {
   const [results, setResults] = useState<RouteListItem[]>([])
   const [totalResults, setTotalResults] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getTags(100).then(setTags).catch(() => {})
@@ -51,9 +52,11 @@ export default function ExploreScreen() {
       })
       setResults(result.data)
       setTotalResults(result.totalRecords)
-    } catch {
+      setError(null)
+    } catch (e) {
       setResults([])
       setTotalResults(0)
+      setError((e as Error).message ?? 'Failed to load routes.')
     } finally {
       setLoading(false)
     }
@@ -123,6 +126,18 @@ export default function ExploreScreen() {
               {loading ? 'Searching...' : `${totalResults} routes found`}
             </Text>
           </XStack>
+
+          {error ? (
+            <YStack
+              backgroundColor="$error50"
+              borderRadius="$3"
+              borderWidth={1}
+              borderColor="$error200"
+              padding="$3"
+            >
+              <Text variant="caption" color="$error500">{error}</Text>
+            </YStack>
+          ) : null}
 
           {results.length > 0 ? (
             <YStack gap="$4">

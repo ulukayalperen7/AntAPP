@@ -583,12 +583,18 @@ export default function HomeScreen() {
 
     Promise.allSettled([
       getFeedPosts('timeline', 1, 10),
+      getRoutes({ sort: 'newest', pageSize: 10 }),
       getRoutes({ sort: 'rating', type: 'official', pageSize: 5 }),
     ]).then((results) => {
       if (!mounted) return
 
-      const [timelineResult, spotlightResult] = results
-      setTimelineRoutes(timelineResult.status === 'fulfilled' ? mapFeedPostsToRouteCards(timelineResult.value.data) : [])
+      const [feedResult, fallbackResult, spotlightResult] = results
+      const feedRoutes = feedResult.status === 'fulfilled'
+        ? mapFeedPostsToRouteCards(feedResult.value.data)
+        : []
+      const fallbackRoutes = fallbackResult.status === 'fulfilled' ? fallbackResult.value.data : []
+
+      setTimelineRoutes(feedRoutes.length > 0 ? feedRoutes : fallbackRoutes)
       setSpotlightRoutes(spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : [])
       setLoading(false)
     })
