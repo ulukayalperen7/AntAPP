@@ -137,8 +137,32 @@ export async function publishRoute(id: string): Promise<void> {
   await apiFetchData<string>(`/routes/${id}/publish`, { method: 'POST' })
 }
 
+export async function tryPublishRoute(id: string): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await publishRoute(id)
+    return { ok: true }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Failed to publish route.',
+    }
+  }
+}
+
 export async function unpublishRoute(id: string): Promise<void> {
   await apiFetchData<string>(`/routes/${id}/unpublish`, { method: 'POST' })
+}
+
+export async function tryUnpublishRoute(id: string): Promise<{ ok: boolean; message?: string }> {
+  try {
+    await unpublishRoute(id)
+    return { ok: true }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Failed to unpublish route.',
+    }
+  }
 }
 
 export async function forkRoute(id: string): Promise<string> {

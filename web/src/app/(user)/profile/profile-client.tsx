@@ -4,8 +4,8 @@ import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Avatar, Image, StatBox } from '@antapp/ui'
 import type { CurrentUser, RouteListItem } from '@/types/api'
-import { deleteRoute, publishRoute, unpublishRoute } from '@/features/routes/actions'
-import { Plus, Globe, Lock, Pencil, Trash2 } from 'lucide-react'
+import { deleteRoute, tryPublishRoute, tryUnpublishRoute } from '@/features/routes/actions'
+import { AlertCircle, Globe, Lock, Pencil, Plus, Trash2 } from 'lucide-react'
 
 function RouteActionCard({
   route,
@@ -18,22 +18,25 @@ function RouteActionCard({
 }) {
   const router = useRouter()
   const [isPublic, setIsPublic] = useState(route.isPublic)
+  const [feedback, setFeedback] = useState<string | null>(null)
   const [isToggling, startToggle] = useTransition()
   const [isRemoving, startRemove] = useTransition()
   const isForkedCopy = !!route.originalRouteId || !!route.originalAuthorName
 
   const handleTogglePublish = (e: { stopPropagation: () => void }) => {
     e.stopPropagation()
+    setFeedback(null)
     startToggle(async () => {
-      try {
-        if (isPublic) {
-          await unpublishRoute(route.id)
-          setIsPublic(false)
-        } else {
-          await publishRoute(route.id)
-          setIsPublic(true)
-        }
-      } catch { /* ignore */ }
+      const result = isPublic
+        ? await tryUnpublishRoute(route.id)
+        : await tryPublishRoute(route.id)
+
+      if (!result.ok) {
+        setFeedback(result.message ?? 'Could not change visibility.')
+        return
+      }
+
+      setIsPublic((current) => !current)
     })
   }
 
@@ -64,7 +67,11 @@ function RouteActionCard({
       <YStack height={180} backgroundColor="$muted" position="relative">
         {route.thumbnailUrl ? (
           <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
-        ) : null}
+        ) : (
+          <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="$backgroundHover">
+            <Text variant="caption" muted>No image</Text>
+          </YStack>
+        )}
 
         <XStack
           position="absolute"
@@ -80,64 +87,13 @@ function RouteActionCard({
         >
           {isPublic ? <Globe size={12} color="#16A34A" /> : <Lock size={12} color="#64748B" />}
           <Text variant="caption" fontSize="$2" color={isPublic ? '$success500' : '$mutedForeground'}>
-            {isPublic ? 'Public' : 'Draft'}
+            {isPublic ? 'Published' : 'Private draft'}
           </Text>
         </XStack>
 
-        <XStack position="absolute" top="$2" right="$2" gap="$1">
-          <XStack
-            cursor="pointer"
-            width={30}
-            height={30}
-            borderRadius="$full"
-            backgroundColor="rgba(255,255,255,0.92)"
-            alignItems="center"
-            justifyContent="center"
-            hoverStyle={{ backgroundColor: '$backgroundStrong' }}
-            onPress={(e: any) => handleTogglePublish(e)}
-            opacity={isToggling ? 0.5 : 1}
-          >
-            {isPublic
-              ? <Lock size={15} color="currentColor" />
-              : <Globe size={15} color="currentColor" />
-            }
-          </XStack>
-          <XStack
-            cursor="pointer"
-            width={30}
-            height={30}
-            borderRadius="$full"
-            backgroundColor="rgba(255,255,255,0.92)"
-            alignItems="center"
-            justifyContent="center"
-            hoverStyle={{ backgroundColor: '$backgroundStrong' }}
-            onPress={(e: any) => {
-              e.stopPropagation()
-              router.push(`/routes/${route.id}/edit`)
-            }}
-          >
-            <Pencil size={15} color="currentColor" />
-          </XStack>
-          {isForkedCopy && (
-            <XStack
-              cursor={isRemoving ? 'default' : 'pointer'}
-              width={30}
-              height={30}
-              borderRadius="$full"
-              backgroundColor="$error500"
-              alignItems="center"
-              justifyContent="center"
-              hoverStyle={{ opacity: 0.9 }}
-              onPress={(e: any) => handleRemoveCopy(e)}
-              opacity={isRemoving ? 0.5 : 1}
-            >
-              <Trash2 size={15} color="#FFFFFF" />
-            </XStack>
-          )}
-        </XStack>
       </YStack>
 
-      <YStack padding="$3" gap="$1.5" flex={1}>
+      <YStack padding="$3" gap="$2.5" flex={1}>
         <Text fontSize="$2" fontWeight="600" color="$primary" textTransform="uppercase">
           {route.originalAuthorName?.trim() ? `Copy from ${route.originalAuthorName}` : 'Original route'}
         </Text>
@@ -149,6 +105,49 @@ function RouteActionCard({
             {route.description}
           </Text>
         ) : null}
+
+        {feedback ? (
+          <XStack gap="$2" alignItems="flex-start" backgroundColor="$warning50" borderWidth={1} borderColor="$warning200" borderRadius="$2" padding="$2">
+            <AlertCircle size={14} color="var(--color-warning500)" />
+            <Text variant="caption" color="$warning500" flex={1}>{feedback}</Text>
+          </XStack>
+        ) : null}
+
+        <XStack gap="$2" flexWrap="wrap" marginTop="auto">
+          <Button
+            variant={isPublic ? 'outline' : 'solid'}
+            size="sm"
+            loading={isToggling}
+            disabled={isToggling}
+            onPress={(e: any) => handleTogglePublish(e)}
+            icon={isPublic ? <Lock size={14} color="currentColor" /> : <Globe size={14} color={isPublic ? 'currentColor' : '#FFFFFF'} />}
+          >
+            {isPublic ? 'Unpublish' : 'Publish'}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onPress={(e: any) => {
+              e.stopPropagation()
+              router.push(`/routes/${route.id}/edit`)
+            }}
+            icon={<Pencil size={14} color="currentColor" />}
+          >
+            Edit
+          </Button>
+          {isForkedCopy ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isRemoving}
+              onPress={(e: any) => handleRemoveCopy(e)}
+              color="$error500"
+              icon={<Trash2 size={14} color="var(--color-error500)" />}
+            >
+              Remove
+            </Button>
+          ) : null}
+        </XStack>
       </YStack>
     </YStack>
   )

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Avatar, Badge, Button, Card, Image, RouteCard, StatBox, Text, XStack, YStack } from '@antapp/ui'
+import { Avatar, Badge, Button, Card, Image, RouteCard, Text, XStack, YStack } from '@antapp/ui'
 import type { RouteCardData } from '@antapp/ui'
 import { toggleProfileFollow } from '@/features/account/actions'
 import type { PublicProfile, RouteListItem } from '@/types/api'
@@ -46,8 +46,8 @@ function ProfilePostCard({
 
   return (
     <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" padding="$0" overflow="hidden" pressable onPress={onOpen}>
-      <XStack flexDirection="row" $md={{ flexDirection: 'column' }}>
-        <YStack width={220} minHeight={160} backgroundColor="$muted" $md={{ width: '100%', minHeight: 220 }}>
+      <YStack>
+        <YStack height={190} backgroundColor="$muted">
           {image ? (
             <Image src={image} width="100%" height="100%" objectFit="cover" />
           ) : (
@@ -56,25 +56,34 @@ function ProfilePostCard({
             </YStack>
           )}
         </YStack>
-        <YStack flex={1} padding="$4" gap="$3">
+        <YStack padding="$4" gap="$3">
           <XStack gap="$2" flexWrap="wrap">
             <Badge variant={route.contentType === 'Official' ? 'info' : 'default'} size="sm">{route.contentType}</Badge>
             <Badge variant="success" size="sm">Public</Badge>
           </XStack>
           <YStack gap="$1.5">
-            <Text variant="heading4">{route.title}</Text>
-            <Text variant="body" muted numberOfLines={3}>
+            <Text variant="heading4" numberOfLines={2}>{route.title}</Text>
+            <Text variant="body" muted numberOfLines={2}>
               {route.postContent?.trim() || route.description?.trim() || 'Shared a route update.'}
             </Text>
           </YStack>
-          <XStack gap="$4" flexWrap="wrap">
+          <XStack gap="$3" flexWrap="wrap">
             <Text variant="caption" muted>{route.postReactionCount ?? 0} likes</Text>
             <Text variant="caption" muted>{route.postCommentCount ?? 0} comments</Text>
             <Text variant="caption" muted>{route.postShareCount ?? 0} copies</Text>
           </XStack>
         </YStack>
-      </XStack>
+      </YStack>
     </Card>
+  )
+}
+
+function ProfileStat({ value, label }: { value: number; label: string }) {
+  return (
+    <YStack flex={1} minWidth={150} alignItems="center" padding="$4" gap="$1">
+      <Text variant="heading3">{value}</Text>
+      <Text variant="caption" muted textTransform="uppercase">{label}</Text>
+    </YStack>
   )
 }
 
@@ -104,8 +113,8 @@ export default function PublicProfileClient({
 
   return (
     <YStack gap="$6" flex={1}>
-      <Card variant="outline" size="md" backgroundColor="$backgroundStrong" padding="$5">
-        <XStack gap="$5" alignItems="center" flexWrap="wrap">
+      <Card variant="outline" size="md" backgroundColor="$backgroundStrong" padding="$0" overflow="hidden">
+        <XStack gap="$5" alignItems="center" flexWrap="wrap" padding="$5">
           <Avatar size="xl" initials={getInitials(profile.userName)} src={profile.profilePhotoUrl ?? undefined} />
           <YStack flex={1} gap="$2" minWidth={220}>
             <Text variant="heading2">{profile.userName}</Text>
@@ -132,14 +141,13 @@ export default function PublicProfileClient({
             )}
           </XStack>
         </XStack>
+        <XStack borderTopWidth={1} borderTopColor="$borderColor" flexWrap="wrap">
+          <ProfileStat value={followerCount} label="Followers" />
+          <ProfileStat value={profile.followingCount} label="Following" />
+          <ProfileStat value={profile.postCount} label="Posts" />
+          <ProfileStat value={profile.publicRouteCount} label="Public routes" />
+        </XStack>
       </Card>
-
-      <XStack gap="$3" flexWrap="wrap">
-        <StatBox value={followerCount} label="Followers" />
-        <StatBox value={profile.followingCount} label="Following" />
-        <StatBox value={profile.postCount} label="Posts" />
-        <StatBox value={profile.publicRouteCount} label="Public routes" />
-      </XStack>
 
       <YStack gap="$4">
         <XStack alignItems="center" gap="$2">
@@ -147,7 +155,7 @@ export default function PublicProfileClient({
           <Text variant="heading3">Posts</Text>
         </XStack>
         {posts.length > 0 ? (
-          <YStack gap="$3">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
             {posts.map((post) => (
               <ProfilePostCard
                 key={`${post.postId ?? post.id}-${post.createdAt}`}
@@ -155,7 +163,7 @@ export default function PublicProfileClient({
                 onOpen={() => router.push(`/routes/${post.id}`)}
               />
             ))}
-          </YStack>
+          </div>
         ) : (
           <YStack borderWidth={1} borderColor="$borderColor" borderRadius="$3" padding="$5" backgroundColor="$backgroundStrong" alignItems="center" gap="$2">
             <Users size={24} color="var(--color-mutedForeground)" />

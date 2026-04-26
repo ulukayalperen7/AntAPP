@@ -5,6 +5,8 @@ import { XStack, YStack } from '@antapp/ui'
 import { AppSidebar, EXPANDED_WIDTH, COLLAPSED_WIDTH } from './app-sidebar'
 import { AppTopBar } from './app-topbar'
 
+const CONTENT_MAX_WIDTH = 1520
+
 export function UserShell({
   children,
   userId,
@@ -38,8 +40,10 @@ export function UserShell({
         $md={{ marginLeft: 0 }}
       >
         <AppTopBar />
-        <YStack flex={1} padding="$5" gap="$5">
-          {children}
+        <YStack flex={1} padding="$5" gap="$5" alignItems="center">
+          <YStack width="100%" maxWidth={CONTENT_MAX_WIDTH} flex={1}>
+            {children}
+          </YStack>
         </YStack>
       </YStack>
     </XStack>
