@@ -3,9 +3,9 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
-import { LogOut, ArrowLeft, Star, Map, Trash2 } from 'lucide-react'
+import { LogOut, ArrowLeft, Star, Map, Trash2, RefreshCw } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
-import { deleteAdminRoute, promoteRoute } from '@/features/admin/routes-actions'
+import { deleteAdminRoute, promoteRoute, redrawRoute } from '@/features/admin/routes-actions'
 import type { RouteListItem } from '@/types/api'
 import { RouteMapModal } from './route-map-modal'
 
@@ -42,6 +42,17 @@ export default function AdminRoutesClient({
                 setRoutes(prev => prev.filter(r => r.id !== id))
             } else {
                 alert('Failed to delete route.')
+            }
+        })
+    }
+
+    const handleRedraw = (id: string) => {
+        startTransition(async () => {
+            const success = await redrawRoute(id)
+            if (success) {
+                alert('Route redrawn successfully!')
+            } else {
+                alert('Failed to redraw route.')
             }
         })
     }
@@ -157,6 +168,15 @@ export default function AdminRoutesClient({
                                         {contentTypeStr !== 'Community' && (
                                             <Button size="sm" variant="outline" onPress={() => handlePromote(route.id, 'Community')} disabled={isPending}>Revert</Button>
                                         )}
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            icon={<RefreshCw size={14} />}
+                                            onPress={() => handleRedraw(route.id)}
+                                            disabled={isPending}
+                                        >
+                                            Redraw
+                                        </Button>
                                         <Button size="sm" variant="ghost" onPress={() => handleDelete(route.id)} disabled={isPending} icon={<Trash2 size={14} color="var(--color-error500, #DC2626)" />}>
                                             <Text variant="label" color="$error500">Delete</Text>
                                         </Button>

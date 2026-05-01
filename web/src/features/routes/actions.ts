@@ -181,3 +181,27 @@ export async function promoteRouteToOfficial(routeId: string): Promise<void> {
     method: 'POST',
   })
 }
+
+export type RouteGeometryResult = {
+  encodedPolyline: string
+  distanceMeters: number
+  durationSeconds: number
+  centerLatitude: number
+  centerLongitude: number
+}
+
+export async function redrawRoute(id: string): Promise<RouteGeometryResult> {
+  return await apiFetchData<RouteGeometryResult>(`/routes/${id}/redraw`, { method: 'PUT' })
+}
+
+export async function tryRedrawRoute(id: string): Promise<{ ok: boolean; data?: RouteGeometryResult; message?: string }> {
+  try {
+    const data = await redrawRoute(id)
+    return { ok: true, data }
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Failed to redraw route.',
+    }
+  }
+}
