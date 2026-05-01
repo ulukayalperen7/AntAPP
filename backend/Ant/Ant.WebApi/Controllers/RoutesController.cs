@@ -1,9 +1,11 @@
+using Ant.Application.DTOs;
 using Ant.Application.Features.Routes.Commands.CreateRoute;
 using Ant.Application.Features.Routes.Commands.DeleteRoute;
 using Ant.Application.Features.Routes.Commands.ForkRoute;
 using Ant.Application.Features.Routes.Commands.PublishRoute;
 using Ant.Application.Features.Routes.Commands.UnpublishRoute;
 using Ant.Application.Features.Routes.Commands.UpdateRoute;
+using Ant.Application.Features.Routes.Commands.RedrawRoute;
 using Ant.Application.Features.Routes.Queries.GetPagedRoutes;
 using Ant.Application.Features.Routes.Queries.GetRouteById;
 using Ant.Application.Features.RouteRatings.Commands.RateRoute;
@@ -187,6 +189,17 @@ namespace Ant.WebApi.Controllers
         {
             command.RouteId = routeId;
             var response = await Mediator.Send(command);
+            await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
+            return Ok(response);
+        }
+
+        // PUT /api/routes/{routeId}/redraw
+        [HttpPut("{routeId}/redraw")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<RouteGeometryResult>))]
+        public async Task<IActionResult> Redraw(Guid routeId, [FromServices] IOutputCacheStore outputCacheStore)
+        {
+            var response = await Mediator.Send(new RedrawRouteCommand { Id = routeId });
             await OutputCacheTags.EvictRoutesAsync(outputCacheStore, HttpContext.RequestAborted);
             return Ok(response);
         }
