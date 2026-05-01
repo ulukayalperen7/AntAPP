@@ -69,6 +69,11 @@ namespace Ant.Application.Features.Routes.Commands.RedrawRoute
             route.CenterLocation = geometryResult.CenterPoint;
             route.UpdatedAt = DateTime.UtcNow;
 
+            route.RouteSpots = null;
+            route.RouteTags = null;
+            route.AuthorUser = null;
+            route.OriginalRoute = null;
+
             await _routeRepository.UpdateAsync(route);
             await _cache.RemoveByPrefixAsync(AppCacheKeys.RoutesPrefix, cancellationToken);
 
