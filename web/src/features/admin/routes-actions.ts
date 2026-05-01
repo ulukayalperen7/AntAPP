@@ -63,6 +63,17 @@ export async function deleteAdminRoute(id: string): Promise<boolean> {
     }
 }
 
+export async function redrawRoute(id: string): Promise<boolean> {
+    try {
+        await apiFetch(`/routes/${id}/redraw`, {
+            method: 'PUT',
+        })
+        return true
+    } catch {
+        return false
+    }
+}
+
 export async function getRouteDetail(id: string): Promise<RouteDetailViewModel | null> {
     try {
         const res = await apiFetch<{ data: RouteDetailViewModel }>(`/routes/${id}`)

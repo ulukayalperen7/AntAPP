@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay } from '@antapp/ui'
 import type { RouteDetail, RouteRatingResult } from '@/types/api'
-import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle, Sparkles, Ellipsis } from 'lucide-react'
+import { Navigation, Bookmark, BookmarkCheck, Map, Star, GitFork, Pencil, Crown, X, CheckCircle, Sparkles, Ellipsis, RefreshCw } from 'lucide-react'
 import { SaveToCollectionModal } from '@/features/collections/save-to-collection-modal'
-import { rateRoute, forkRoute, promoteRouteToOfficial } from '@/features/routes/actions'
+import { rateRoute, forkRoute, promoteRouteToOfficial, tryRedrawRoute } from '@/features/routes/actions'
 import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
 
 // ─── Star Rating Widget ───────────────────────────────────────────────────────
@@ -153,14 +153,20 @@ export default function RouteDetailClient({
   const [mapError, setMapError] = useState<string | null>(null)
   const [shouldLoadMap, setShouldLoadMap] = useState(false)
 
+  const [geometry, setGeometry] = useState({
+    encodedPolyline: route.encodedPolyline,
+    centerLatitude: route.centerLatitude,
+    centerLongitude: route.centerLongitude
+  })
+
   const polylineCoordinates = useMemo(() => {
-    if (!route.encodedPolyline) return []
+    if (!geometry.encodedPolyline) return []
     try {
-      return decodePolyline(route.encodedPolyline)
+      return decodePolyline(geometry.encodedPolyline)
     } catch {
       return []
     }
-  }, [route.encodedPolyline])
+  }, [geometry.encodedPolyline])
 
   const stopPoints = useMemo(
     () => route.stops
@@ -198,11 +204,11 @@ export default function RouteDetailClient({
         const maplibre = await loadMapLibre()
         if (cancelled || !mapContainerRef.current || mapRef.current) return
 
-        const hasCenter = Number.isFinite(route.centerLatitude) && Number.isFinite(route.centerLongitude)
+        const hasCenter = Number.isFinite(geometry.centerLatitude) && Number.isFinite(geometry.centerLongitude)
         const map = new maplibre.Map({
           container: mapContainerRef.current,
           style: 'https://tiles.openfreemap.org/styles/liberty',
-          center: hasCenter ? [route.centerLongitude, route.centerLatitude] : [30.7133, 36.8969],
+          center: hasCenter ? [geometry.centerLongitude!, geometry.centerLatitude!] : [30.7133, 36.8969],
           zoom: hasCenter ? 11 : 10,
         })
 
@@ -336,7 +342,7 @@ export default function RouteDetailClient({
       }
       mapRef.current = null
     }
-  }, [route.centerLatitude, route.centerLongitude, routeLineCoordinates, shouldLoadMap, stopCoordinates, stopPoints])
+  }, [geometry.centerLatitude, geometry.centerLongitude, routeLineCoordinates, shouldLoadMap, stopCoordinates, stopPoints])
 
   // Save state
   const [isSaved, setIsSaved] = useState(false)
@@ -392,6 +398,25 @@ export default function RouteDetailClient({
         setIsPromoted(true)
       } catch (e) {
         setPromoteError((e as Error).message ?? 'Failed to promote route')
+      }
+    })
+  }
+
+  const [isRedrawing, startRedraw] = useTransition()
+  const handleRedraw = () => {
+    if (isRedrawing) return
+    startRedraw(async () => {
+      const result = await tryRedrawRoute(route.id)
+      if (result.ok && result.data) {
+        setGeometry({
+          encodedPolyline: result.data.encodedPolyline,
+          centerLatitude: result.data.centerLatitude,
+          centerLongitude: result.data.centerLongitude
+        })
+        alert('Route geometry updated successfully.')
+        router.refresh()
+      } else {
+        alert(result.message || 'Failed to redraw route')
       }
     })
   }
@@ -701,7 +726,7 @@ export default function RouteDetailClient({
               <Text variant="body" muted>
                 {isForkedCopy
                   ? 'This copy belongs to you. Edit the stops, title, or description, then publish it when you want others to see your version.'
-                  : 'Only you can edit or remove this original route. Other users can fork it into their own editable copies.'
+                  : 'Only you can edit, redraw or remove this original route. Other users can fork it into their own editable copies.'
                 }
               </Text>
               <Button
@@ -711,6 +736,16 @@ export default function RouteDetailClient({
                 icon={<Pencil size={16} color="#FFFFFF" />}
               >
                 Edit Route
+              </Button>
+              <Button
+                variant="outline"
+                size="md"
+                loading={isRedrawing}
+                disabled={isRedrawing}
+                onPress={handleRedraw}
+                icon={<RefreshCw size={16} color="currentColor" />}
+              >
+                Redraw Route
               </Button>
               {isForkedCopy && route.originalRouteId ? (
                 <Button
