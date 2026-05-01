@@ -45,6 +45,10 @@ async function request<T>(path: string, options?: ApiFetchOptions): Promise<T> {
       if (body?.message) message = body.message
       else if (body?.errors && Array.isArray(body.errors)) message = body.errors[0]
     } catch {}
+    
+    // Log the actual backend fetch failure clearly to the Next.js console
+    console.error(`[API Fetch Failed] ${options?.method || 'GET'} ${API_URL}${path} -> ${res.status} ${message}`)
+    
     throw new Error(message)
   }
 
