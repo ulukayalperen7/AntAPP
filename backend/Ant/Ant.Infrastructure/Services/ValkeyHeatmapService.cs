@@ -67,6 +67,12 @@ namespace Ant.Infrastructure.Services
             await _database.HashSetAsync(TokenMapKey, tokenHash, userId);
         }
 
+        public async Task RemoveTokenAsync(string tokenHash, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _database.HashDeleteAsync(TokenMapKey, tokenHash);
+        }
+
         public async Task<bool> UpdateUserLocationAsync(string userId, string newTileKey, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

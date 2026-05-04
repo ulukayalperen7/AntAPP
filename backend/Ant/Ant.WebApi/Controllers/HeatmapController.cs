@@ -60,7 +60,15 @@ namespace Ant.WebApi.Controllers
 
             var userId = await _heatmapService.GetUserIdByTokenAsync(tokenHash, HttpContext.RequestAborted);
 
-            if (userId == null)
+            if (userId != null)
+            {
+                if (IsTokenExpired(token))
+                {
+                    await _heatmapService.RemoveTokenAsync(tokenHash, HttpContext.RequestAborted);
+                    return Unauthorized("Token has expired.");
+                }
+            }
+            else
             {
                 userId = ValidateTokenAndExtractUserId(token);
                 if (userId == null)
@@ -106,6 +114,20 @@ namespace Ant.WebApi.Controllers
             catch
             {
                 return null;
+            }
+        }
+
+        private static bool IsTokenExpired(string token)
+        {
+            try
+            {
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+                return jwt.ValidTo < DateTime.UtcNow;
+            }
+            catch
+            {
+                return true;
             }
         }
 
