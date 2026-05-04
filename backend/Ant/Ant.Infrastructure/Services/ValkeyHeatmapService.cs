@@ -10,6 +10,7 @@ namespace Ant.Infrastructure.Services
 {
     public class ValkeyHeatmapService : IHeatmapService
     {
+        private const string TokenMapKey = "antapp:heatmap:tokens";
         private const string UsersHashKey = "antapp:heatmap:users";
         private const string TilesHashKey = "antapp:heatmap:tiles";
         private const string ActivitySortedSetKey = "antapp:heatmap:activity";
@@ -34,11 +35,11 @@ namespace Ant.Infrastructure.Services
         private static readonly string SweepScript = """
             local expired = redis.call("ZRANGEBYSCORE", KEYS[1], "-inf", ARGV[1])
 
-            for _, tokenHash in ipairs(expired) do
-                local tile = redis.call("HGET", KEYS[2], tokenHash)
+            for _, userId in ipairs(expired) do
+                local tile = redis.call("HGET", KEYS[2], userId)
                 if tile then
                     redis.call("HINCRBY", KEYS[3], tile, -1)
-                    redis.call("HDEL", KEYS[2], tokenHash)
+                    redis.call("HDEL", KEYS[2], userId)
                 end
             end
 
@@ -53,7 +54,20 @@ namespace Ant.Infrastructure.Services
             _database = connectionMultiplexer.GetDatabase();
         }
 
-        public async Task<bool> UpdateUserLocationAsync(string tokenHash, string newTileKey, CancellationToken cancellationToken = default)
+        public async Task<string> GetUserIdByTokenAsync(string tokenHash, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var userId = await _database.HashGetAsync(TokenMapKey, tokenHash);
+            return userId.HasValue ? userId.ToString() : null;
+        }
+
+        public async Task RegisterTokenAsync(string tokenHash, string userId, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _database.HashSetAsync(TokenMapKey, tokenHash, userId);
+        }
+
+        public async Task<bool> UpdateUserLocationAsync(string userId, string newTileKey, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -62,7 +76,7 @@ namespace Ant.Infrastructure.Services
             var result = await _database.ScriptEvaluateAsync(
                 UpdateScript,
                 new RedisKey[] { UsersHashKey, TilesHashKey, ActivitySortedSetKey },
-                new RedisValue[] { tokenHash, newTileKey, timestamp });
+                new RedisValue[] { userId, newTileKey, timestamp });
 
             return (int)result == 1;
         }

@@ -13,7 +13,7 @@ namespace Ant.Application.Features.Heatmap.Commands.UpdateLocation
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         [JsonIgnore]
-        public string TokenHash { get; set; }
+        public string UserId { get; set; }
     }
 
     public class UpdateLocationCommandHandler : IRequestHandler<UpdateLocationCommand, Response<bool>>
@@ -27,13 +27,13 @@ namespace Ant.Application.Features.Heatmap.Commands.UpdateLocation
 
         public async Task<Response<bool>> Handle(UpdateLocationCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrEmpty(request.TokenHash))
+            if (string.IsNullOrEmpty(request.UserId))
             {
-                return new Response<bool>("Missing or invalid Authorization header.");
+                return new Response<bool>("User identity could not be resolved.");
             }
 
             var tileKey = TileCoordinate.ToTileKey(request.Latitude, request.Longitude);
-            var changed = await _heatmapService.UpdateUserLocationAsync(request.TokenHash, tileKey, cancellationToken);
+            var changed = await _heatmapService.UpdateUserLocationAsync(request.UserId, tileKey, cancellationToken);
 
             return new Response<bool>(changed);
         }
