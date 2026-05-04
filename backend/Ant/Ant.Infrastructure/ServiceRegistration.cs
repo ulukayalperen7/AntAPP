@@ -53,6 +53,7 @@ namespace Ant.Infrastructure
                 services.AddSingleton<IConnectionMultiplexer>(_ =>
                     ConnectionMultiplexer.Connect(configuration.GetConnectionString("Valkey") ?? "localhost:6379"));
                 services.AddSingleton<IAppCacheService, ValkeyAppCacheService>();
+                services.AddSingleton<IHeatmapService, ValkeyHeatmapService>();
             }
             else
             {

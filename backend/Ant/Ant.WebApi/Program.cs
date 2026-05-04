@@ -90,6 +90,12 @@ builder.Services.AddResponseCompression(options =>
 builder.Services.AddScoped<IAuthenticatedUserService, AuthenticatedUserService>();
 builder.Services.AddHttpContextAccessor();
 
+if (string.Equals(builder.Configuration["Cache:Provider"], "Valkey", StringComparison.OrdinalIgnoreCase) ||
+    string.Equals(builder.Configuration["Cache:Provider"], "Redis", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddHostedService<Ant.Infrastructure.Services.HeatmapSweepService>();
+}
+
 //Build the application
 var app = builder.Build();
 
