@@ -19,6 +19,21 @@ services:
     networks:
       - antapp
 
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: antapp-valkey
+    restart: unless-stopped
+    command: ["valkey-server", "--appendonly", "yes", "--save", "60", "1000"]
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - antapp
+
   backend:
     image: ${DOCKER_HUB_USERNAME}/antapp-backend:${IMAGE_TAG:-latest}
     container_name: antapp-backend
@@ -26,10 +41,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      valkey:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:5000
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-antapp};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Trust Server Certificate=true;CommandTimeout=300;"
+      ConnectionStrings__Valkey: "valkey:6379,abortConnect=false"
+      Cache__Provider: "Valkey"
       JWTSettings__Key: ${JWT_SECRET}
       JWTSettings__Issuer: AntAppBackend
       JWTSettings__Audience: AntAppUser
@@ -76,6 +95,7 @@ services:
 
 volumes:
   postgres_data:
+  valkey_data:
 
 networks:
   antapp:
