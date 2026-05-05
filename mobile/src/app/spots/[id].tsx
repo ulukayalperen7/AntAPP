@@ -1,12 +1,26 @@
 import React, { useEffect, useState, useTransition } from 'react'
+import { Alert } from 'react-native'
+import * as Location from 'expo-location'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { YStack, XStack, Text, Button, StatBox, RatingDisplay, ScrollView } from '@antapp/ui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Feather } from '@expo/vector-icons'
 import { getSpotById, getSpotRoutes, rateSpot, toggleSpotFavorite } from '@/features/spots/api'
+import { pingHeatmap } from '@/features/heatmap/api'
 import type { SpotDetail, SpotRouteItem } from '@/features/api/types'
 import { SpotDetailSkeleton } from '@/components/loading/page-skeletons'
 import { SpotMap } from '@/components/map/spot-map'
+
+const CHECK_IN_RADIUS_METERS = 30000
+
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
 
 function SpotRatingWidget({
   spotId,
@@ -82,6 +96,8 @@ export default function SpotDetailScreen() {
   const [routesLoading, setRoutesLoading] = useState(false)
   const [routePage, setRoutePage] = useState(1)
   const [routeTotalPages, setRouteTotalPages] = useState(1)
+  const [checkedIn, setCheckedIn] = useState(false)
+  const [isCheckingIn, startCheckIn] = useTransition()
 
   useEffect(() => {
     if (!id) return
@@ -118,6 +134,35 @@ export default function SpotDetailScreen() {
       setRouteTotalPages(result.totalPages)
     } catch {}
     setRoutesLoading(false)
+  }
+
+  const handleCheckIn = () => {
+    if (!spot) return
+    startCheckIn(async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync()
+        if (status !== 'granted') {
+          Alert.alert('Location required', 'Enable location access to check in.')
+          return
+        }
+
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
+        const distance = haversineMeters(pos.coords.latitude, pos.coords.longitude, spot.latitude, spot.longitude)
+
+        if (distance > CHECK_IN_RADIUS_METERS) {
+          Alert.alert(
+            'You are too far',
+            `You need to be within ${CHECK_IN_RADIUS_METERS}m of this spot. Current distance: ${Math.round(distance)}m.`
+          )
+          return
+        }
+
+        await pingHeatmap(pos.coords.latitude, pos.coords.longitude)
+        setCheckedIn(true)
+      } catch (err) {
+        Alert.alert('Check in failed', err instanceof Error ? err.message : 'Try again later.')
+      }
+    })
   }
 
   const handleToggleFavorite = () => {
@@ -231,6 +276,16 @@ export default function SpotDetailScreen() {
               <Text variant="caption" muted>
                 {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
               </Text>
+              <Button
+                variant={checkedIn ? 'outline' : 'solid'}
+                size="md"
+                loading={isCheckingIn}
+                disabled={isCheckingIn || checkedIn}
+                onPress={handleCheckIn}
+                icon={<Feather name="map-pin" size={16} color={checkedIn ? 'var(--color-primary)' : '#FFFFFF'} />}
+              >
+                {checkedIn ? 'Checked in' : "I'm here"}
+              </Button>
             </YStack>
           </YStack>
 

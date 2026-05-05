@@ -6,8 +6,20 @@ import { YStack, XStack, Text, Button, Badge, RouteCard, RatingDisplay } from '@
 import type { RouteCardData } from '@antapp/ui'
 import type { SpotDetail, SpotRatingResult, SpotRouteItem } from '@/types/api'
 import { rateSpot, toggleSpotFavorite, getSavedSpots } from '@/features/spots/actions'
-import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart } from 'lucide-react'
+import { pingHeatmap } from '@/features/heatmap/actions'
+import { ArrowLeft, MapPinned, Route as RouteIcon, Star, Heart, MapPin } from 'lucide-react'
 import { loadMapLibre, runWhenBrowserIdle } from '@/lib/maplibre'
+
+const CHECK_IN_RADIUS_METERS = 30000
+
+function haversineMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(a))
+}
 
 type SpotPreviewMap = {
   addControl: (control: unknown, position?: string) => void
@@ -114,6 +126,9 @@ export default function SpotDetailClient({
   const [displayRatingCount, setDisplayRatingCount] = useState(spot.ratingCount)
   const [isSaved, setIsSaved] = useState(false)
   const [isSaving, startSavingTransition] = useTransition()
+  const [checkedIn, setCheckedIn] = useState(false)
+  const [isCheckingIn, startCheckIn] = useTransition()
+  const [checkInError, setCheckInError] = useState<string | null>(null)
   const [spotMapError, setSpotMapError] = useState<string | null>(null)
   const spotMapContainerRef = useRef<HTMLDivElement | null>(null)
   const spotMapRef = useRef<SpotPreviewMap | null>(null)
@@ -189,6 +204,43 @@ export default function SpotDetailClient({
       } catch {
         // Ignored
       }
+    })
+  }
+
+  const handleCheckIn = () => {
+    setCheckInError(null)
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setCheckInError('Geolocation not supported in this browser.')
+      return
+    }
+
+    startCheckIn(() => {
+      return new Promise<void>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            try {
+              const distance = haversineMeters(pos.coords.latitude, pos.coords.longitude, spot.latitude, spot.longitude)
+              if (distance > CHECK_IN_RADIUS_METERS) {
+                setCheckInError(`Too far from spot (${Math.round(distance)}m). Get within ${CHECK_IN_RADIUS_METERS}m.`)
+                resolve()
+                return
+              }
+              await pingHeatmap(pos.coords.latitude, pos.coords.longitude)
+              setCheckedIn(true)
+            } catch (err) {
+              setCheckInError(err instanceof Error ? err.message : 'Check in failed.')
+            } finally {
+              resolve()
+            }
+          },
+          (err) => {
+            setCheckInError(err.message || 'Could not read your location.')
+            resolve()
+          },
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 30000 },
+        )
+      })
     })
   }
 
@@ -370,6 +422,19 @@ export default function SpotDetailClient({
             >
               {isSaving ? 'Updating...' : (isSaved ? 'Saved in Favorites' : 'Save this Spot')}
             </Button>
+
+            <Button
+              variant={checkedIn ? 'outline' : 'solid'}
+              size="md"
+              icon={<MapPin size={18} color={checkedIn ? 'var(--color-primary)' : 'white'} />}
+              onPress={handleCheckIn}
+              disabled={isCheckingIn || checkedIn}
+            >
+              {isCheckingIn ? 'Locating...' : (checkedIn ? 'Checked in' : "I'm here")}
+            </Button>
+            {checkInError ? (
+              <Text variant="caption" color="$error500">{checkInError}</Text>
+            ) : null}
 
             <Button variant="outline" size="md" onPress={() => router.push('/spots')}>
               Browse More Spots

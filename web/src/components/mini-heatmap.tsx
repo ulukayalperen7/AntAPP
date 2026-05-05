@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -11,6 +12,8 @@ const MIN_LNG = 25.0
 const MAX_LAT = 42.5
 const MAX_LNG = 45.0
 const ZOOM = 6
+const FALLBACK_CENTER: [number, number] = [30.7133, 36.8969]
+const FALLBACK_ZOOM = 9
 
 type Tile = { x: number; y: number; zoom: number; count: number }
 
@@ -24,6 +27,7 @@ function tileCenterToLngLat(x: number, y: number, z: number): [number, number] {
 
 export function MiniHeatmap() {
   const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     if (!ref.current) return
@@ -42,8 +46,8 @@ export function MiniHeatmap() {
         },
         layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
       },
-      center: [(MIN_LNG + MAX_LNG) / 2, (MIN_LAT + MAX_LAT) / 2],
-      zoom: 4.5,
+      bounds: [[MIN_LNG, MIN_LAT], [MAX_LNG, MAX_LAT]],
+      fitBoundsOptions: { padding: 4 },
       attributionControl: false,
       interactive: false,
     })
@@ -57,6 +61,17 @@ export function MiniHeatmap() {
         if (!res.ok || cancelled) return
         const wrapped = await res.json()
         const tiles: Tile[] = wrapped?.data ?? []
+
+        if (cancelled || !map.getStyle()) return
+
+        if (tiles.length > 0) {
+          const hottest = tiles.reduce((a, b) => (b.count > a.count ? b : a))
+          const [lng, lat] = tileCenterToLngLat(hottest.x, hottest.y, hottest.zoom)
+          map.jumpTo({ center: [lng, lat], zoom: FALLBACK_ZOOM })
+        } else {
+          map.jumpTo({ center: FALLBACK_CENTER, zoom: FALLBACK_ZOOM })
+        }
+
         const features = tiles.map((t) => {
           const [lng, lat] = tileCenterToLngLat(t.x, t.y, t.zoom)
           return {
@@ -65,8 +80,6 @@ export function MiniHeatmap() {
             geometry: { type: 'Point' as const, coordinates: [lng, lat] },
           }
         })
-
-        if (cancelled || !map.getStyle()) return
 
         map.addSource('heat', {
           type: 'geojson',
@@ -105,8 +118,25 @@ export function MiniHeatmap() {
 
   return (
     <div
-      ref={ref}
-      style={{ width: '100%', height: 180, borderRadius: 12, overflow: 'hidden' }}
-    />
+      onClick={() => router.push('/heatmap')}
+      style={{ width: '100%', height: 180, borderRadius: 12, overflow: 'hidden', cursor: 'pointer', position: 'relative' }}
+    >
+      <div ref={ref} style={{ width: '100%', height: '100%' }} />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          right: 8,
+          background: 'rgba(0,0,0,0.65)',
+          color: '#fff',
+          fontSize: 11,
+          padding: '4px 8px',
+          borderRadius: 6,
+          pointerEvents: 'none',
+        }}
+      >
+        Tap to expand
+      </div>
+    </div>
   )
 }

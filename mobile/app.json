@@ -12,7 +12,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.user"
+      "bundleIdentifier": "com.anonymous.user",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "AntAPP uses your location to check you in at spots and show live activity on the map."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -57,6 +60,12 @@
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "AntAPP uses your location to check you in at spots and show live activity on the map."
         }
       ]
     ],
