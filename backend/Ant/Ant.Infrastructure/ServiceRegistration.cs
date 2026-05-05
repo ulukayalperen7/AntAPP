@@ -50,8 +50,10 @@ namespace Ant.Infrastructure
             if (string.Equals(configuration["Cache:Provider"], "Valkey", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(configuration["Cache:Provider"], "Redis", StringComparison.OrdinalIgnoreCase))
             {
-                services.AddSingleton<IConnectionMultiplexer>(_ =>
-                    ConnectionMultiplexer.Connect(configuration.GetConnectionString("Valkey") ?? "localhost:6379"));
+                var connectionString = configuration.GetConnectionString("Valkey") ?? "localhost:6379";
+                if (!connectionString.Contains("abortConnect")) connectionString += ",abortConnect=false";
+                
+                services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(connectionString));
                 services.AddSingleton<IAppCacheService, ValkeyAppCacheService>();
                 services.AddSingleton<IHeatmapService, ValkeyHeatmapService>();
             }
@@ -59,6 +61,12 @@ namespace Ant.Infrastructure
             {
                 services.AddMemoryCache();
                 services.AddSingleton<IAppCacheService, AppMemoryCacheService>();
+                
+                // Register ValkeyHeatmapService even in Memory mode as a fallback to prevent DI errors.
+                // It will attempt to connect in the background without crashing the app.
+                var connectionString = "localhost:6379,abortConnect=false";
+                services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(connectionString));
+                services.AddSingleton<IHeatmapService, ValkeyHeatmapService>();
             }
 
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
