@@ -24,9 +24,9 @@ stages:
               containerRegistry: DockerHubConnection
 
           - task: Docker@2
-            displayName: Build backend image
+            displayName: Build & push backend image
             inputs:
-              command: build
+              command: buildAndPush
               dockerfile: backend/Dockerfile
               buildContext: backend
               repository: $(DOCKER_HUB_USERNAME)/antapp-backend
@@ -36,18 +36,9 @@ stages:
                 latest
 
           - task: Docker@2
-            displayName: Push backend image
+            displayName: Build & push web image
             inputs:
-              command: push
-              repository: $(DOCKER_HUB_USERNAME)/antapp-backend
-              tags: |
-                $(IMAGE_TAG)
-                latest
-
-          - task: Docker@2
-            displayName: Build web image
-            inputs:
-              command: build
+              command: buildAndPush
               dockerfile: web/Dockerfile
               buildContext: .
               repository: $(DOCKER_HUB_USERNAME)/antapp-web
@@ -59,14 +50,11 @@ stages:
                 $(IMAGE_TAG)
                 latest
 
-          - task: Docker@2
-            displayName: Push web image
-            inputs:
-              command: push
-              repository: $(DOCKER_HUB_USERNAME)/antapp-web
-              tags: |
-                $(IMAGE_TAG)
-                latest
+          - script: |
+              docker image prune -f
+              docker builder prune -f --keep-storage=4gb
+            displayName: Cleanup dangling images on agent
+            condition: always()
 
   - stage: Deploy
     displayName: Deploy to Server
