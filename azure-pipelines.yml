@@ -36,9 +36,9 @@ stages:
                 latest
 
           - task: Docker@2
-            displayName: Build & push web image
+            displayName: Build web image
             inputs:
-              command: buildAndPush
+              command: build
               dockerfile: web/Dockerfile
               buildContext: .
               repository: $(DOCKER_HUB_USERNAME)/antapp-web
@@ -46,6 +46,21 @@ stages:
                 --no-cache
                 --build-arg NEXT_PUBLIC_API_URL=$(NEXT_PUBLIC_API_URL)
                 --build-arg NEXT_PUBLIC_APP_URL=$(NEXT_PUBLIC_APP_URL)
+              tags: |
+                $(IMAGE_TAG)
+                latest
+
+          - script: |
+              set -e
+              docker tag $(DOCKER_HUB_USERNAME)/antapp-web:$(IMAGE_TAG) $(DOCKER_HUB_USERNAME)/antapp-web:latest
+              docker images $(DOCKER_HUB_USERNAME)/antapp-web
+            displayName: Verify web tags
+
+          - task: Docker@2
+            displayName: Push web image
+            inputs:
+              command: push
+              repository: $(DOCKER_HUB_USERNAME)/antapp-web
               tags: |
                 $(IMAGE_TAG)
                 latest
