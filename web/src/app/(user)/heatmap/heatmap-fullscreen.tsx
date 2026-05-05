@@ -14,6 +14,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 const TURKEY_BOUNDS: [[number, number], [number, number]] = [[25.0, 35.5], [45.0, 42.5]]
 const FALLBACK_CENTER: [number, number] = [30.7133, 36.8969]
 const FALLBACK_ZOOM = 6
+const STORAGE_ZOOM = 14
 
 type Tile = { x: number; y: number; zoom: number; count: number; centroidLat?: number; centroidLng?: number }
 
@@ -30,6 +31,12 @@ function tileCoords(t: Tile): [number, number] {
     return [t.centroidLng, t.centroidLat]
   }
   return tileCenterToLngLat(t.x, t.y, t.zoom)
+}
+
+function pickQueryZoom(mapZoom: number): number {
+  // Match storage granularity when zoomed in; aggregate when zoomed out.
+  // Adds +1 so points stay distinguishable as user zooms past tile boundaries.
+  return Math.max(4, Math.min(STORAGE_ZOOM, Math.round(mapZoom + 1)))
 }
 
 export function HeatmapFullscreen() {
@@ -65,49 +72,49 @@ export function HeatmapFullscreen() {
     mapRef.current = map
 
     let cancelled = false
+    let initialized = false
+    let inFlight: AbortController | null = null
 
-    map.on('load', async () => {
+    async function loadTiles(): Promise<Tile[]> {
+      if (inFlight) inFlight.abort()
+      const controller = new AbortController()
+      inFlight = controller
+
+      const bounds = map.getBounds()
+      const queryZoom = pickQueryZoom(map.getZoom())
+      const url = `${API_URL}/heatmap/tiles?minLat=${bounds.getSouth()}&minLng=${bounds.getWest()}&maxLat=${bounds.getNorth()}&maxLng=${bounds.getEast()}&zoom=${queryZoom}`
+
       try {
-        const bounds = map.getBounds()
-        const url = `${API_URL}/heatmap/tiles?minLat=${bounds.getSouth()}&minLng=${bounds.getWest()}&maxLat=${bounds.getNorth()}&maxLng=${bounds.getEast()}&zoom=8`
-        const res = await fetch(url, { cache: 'no-store' })
-        if (!res.ok || cancelled) return
+        const res = await fetch(url, { cache: 'no-store', signal: controller.signal })
+        if (!res.ok || cancelled) return []
         const wrapped = await res.json()
-        const tiles: Tile[] = wrapped?.data ?? []
-        setTileCount(tiles.length)
+        return (wrapped?.data ?? []) as Tile[]
+      } catch {
+        return []
+      }
+    }
 
-        if (cancelled || !map.getStyle()) return
-
-        if (tiles.length === 0) {
-          map.jumpTo({ center: FALLBACK_CENTER, zoom: FALLBACK_ZOOM })
-        } else if (tiles.length === 1) {
-          const [lng, lat] = tileCoords(tiles[0])
-          map.jumpTo({ center: [lng, lat], zoom: 8 })
-        } else {
-          let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity
-          for (const t of tiles) {
-            const [lng, lat] = tileCoords(t)
-            if (lng < minLng) minLng = lng
-            if (lng > maxLng) maxLng = lng
-            if (lat < minLat) minLat = lat
-            if (lat > maxLat) maxLat = lat
-          }
-          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 80, maxZoom: 8, animate: false })
-        }
-
-        const features = tiles.map((t) => {
+    function buildFeatures(tiles: Tile[]): GeoJSON.FeatureCollection {
+      return {
+        type: 'FeatureCollection',
+        features: tiles.map((t) => {
           const [lng, lat] = tileCoords(t)
           return {
-            type: 'Feature' as const,
+            type: 'Feature',
             properties: { count: t.count },
-            geometry: { type: 'Point' as const, coordinates: [lng, lat] },
+            geometry: { type: 'Point', coordinates: [lng, lat] },
           }
-        })
+        }),
+      }
+    }
 
-        map.addSource('heat', {
-          type: 'geojson',
-          data: { type: 'FeatureCollection', features },
-        })
+    function setHeatData(tiles: Tile[]) {
+      const fc = buildFeatures(tiles)
+      const src = map.getSource('heat') as maplibregl.GeoJSONSource | undefined
+      if (src) {
+        src.setData(fc)
+      } else {
+        map.addSource('heat', { type: 'geojson', data: fc })
         map.addLayer({
           id: 'heat-layer',
           type: 'heatmap',
@@ -128,59 +135,108 @@ export function HeatmapFullscreen() {
             ],
           },
         })
+      }
+    }
 
-        try {
-          const spotsPaged = await getSpots({ pageSize: 200 })
-          if (cancelled || !map.getStyle()) return
+    async function refreshHeat() {
+      const tiles = await loadTiles()
+      if (cancelled || !map.getStyle()) return
+      setTileCount(tiles.length)
+      setHeatData(tiles)
+    }
 
-          const spotFeatures = (spotsPaged.data ?? [])
-            .filter((s: SpotListItem) => Number.isFinite(s.latitude) && Number.isFinite(s.longitude))
-            .map((s: SpotListItem) => ({
-              type: 'Feature' as const,
-              properties: { id: s.id, name: s.name, rating: s.averageRating },
-              geometry: { type: 'Point' as const, coordinates: [s.longitude, s.latitude] },
-            }))
+    map.on('load', async () => {
+      const tiles = await loadTiles()
+      if (cancelled || !map.getStyle()) return
+      setTileCount(tiles.length)
 
-          map.addSource('spots', {
-            type: 'geojson',
-            data: { type: 'FeatureCollection', features: spotFeatures },
-          })
-
-          map.addLayer({
-            id: 'spots-layer',
-            type: 'circle',
-            source: 'spots',
-            paint: {
-              'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 3, 10, 6, 14, 10],
-              'circle-color': '#FF8C00',
-              'circle-stroke-color': '#FFFFFF',
-              'circle-stroke-width': 2,
-              'circle-opacity': 0.95,
-            },
-          })
-
-          map.on('click', 'spots-layer', (e) => {
-            const f = e.features?.[0]
-            if (!f) return
-            const id = f.properties?.id
-            if (typeof id === 'string') router.push(`/spots/${id}`)
-          })
-          map.on('mouseenter', 'spots-layer', () => { map.getCanvas().style.cursor = 'pointer' })
-          map.on('mouseleave', 'spots-layer', () => { map.getCanvas().style.cursor = '' })
-        } catch {
-          /* swallow */
+      if (tiles.length === 0) {
+        map.jumpTo({ center: FALLBACK_CENTER, zoom: FALLBACK_ZOOM })
+      } else if (tiles.length === 1) {
+        const [lng, lat] = tileCoords(tiles[0])
+        map.jumpTo({ center: [lng, lat], zoom: 11 })
+      } else {
+        let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity
+        for (const t of tiles) {
+          const [lng, lat] = tileCoords(t)
+          if (lng < minLng) minLng = lng
+          if (lng > maxLng) maxLng = lng
+          if (lat < minLat) minLat = lat
+          if (lat > maxLat) maxLat = lat
         }
+        map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 80, maxZoom: 11, animate: false })
+      }
+
+      setHeatData(tiles)
+      initialized = true
+
+      // Re-fetch with viewport-appropriate zoom after the autofit completes.
+      const fresh = await loadTiles()
+      if (cancelled || !map.getStyle()) return
+      setTileCount(fresh.length)
+      setHeatData(fresh)
+
+      // Spots overlay (one-time)
+      try {
+        const spotsPaged = await getSpots({ pageSize: 200 })
+        if (cancelled || !map.getStyle()) return
+
+        const spotFeatures = (spotsPaged.data ?? [])
+          .filter((s: SpotListItem) => Number.isFinite(s.latitude) && Number.isFinite(s.longitude))
+          .map((s: SpotListItem) => ({
+            type: 'Feature' as const,
+            properties: { id: s.id, name: s.name, rating: s.averageRating },
+            geometry: { type: 'Point' as const, coordinates: [s.longitude, s.latitude] },
+          }))
+
+        map.addSource('spots', {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: spotFeatures },
+        })
+
+        map.addLayer({
+          id: 'spots-layer',
+          type: 'circle',
+          source: 'spots',
+          paint: {
+            'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 3, 10, 6, 14, 10],
+            'circle-color': '#FF8C00',
+            'circle-stroke-color': '#FFFFFF',
+            'circle-stroke-width': 2,
+            'circle-opacity': 0.95,
+          },
+        })
+
+        map.on('click', 'spots-layer', (e) => {
+          const f = e.features?.[0]
+          if (!f) return
+          const id = f.properties?.id
+          if (typeof id === 'string') router.push(`/spots/${id}`)
+        })
+        map.on('mouseenter', 'spots-layer', () => { map.getCanvas().style.cursor = 'pointer' })
+        map.on('mouseleave', 'spots-layer', () => { map.getCanvas().style.cursor = '' })
       } catch {
         /* swallow */
       }
     })
 
+    let refetchTimer: ReturnType<typeof setTimeout> | null = null
+    map.on('moveend', () => {
+      if (!initialized) return
+      if (refetchTimer) clearTimeout(refetchTimer)
+      refetchTimer = setTimeout(() => {
+        refreshHeat()
+      }, 250)
+    })
+
     return () => {
       cancelled = true
+      if (inFlight) inFlight.abort()
+      if (refetchTimer) clearTimeout(refetchTimer)
       map.remove()
       mapRef.current = null
     }
-  }, [refreshKey])
+  }, [refreshKey, router])
 
   return (
     <YStack flex={1} gap="$3">

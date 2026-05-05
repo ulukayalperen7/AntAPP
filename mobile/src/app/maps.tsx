@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { WebView } from 'react-native-webview'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
@@ -10,16 +10,22 @@ import type { ApiResponse, SpotListItem } from '@/features/api/types'
 
 const TURKEY_BOUNDS = { minLng: 25.0, minLat: 35.5, maxLng: 45.0, maxLat: 42.5 }
 const FALLBACK_CENTER: [number, number] = [30.7133, 36.8969]
-const QUERY_ZOOM = 8
+const STORAGE_ZOOM = 14
 
 type Tile = { x: number; y: number; zoom: number; count: number; centroidLat?: number; centroidLng?: number }
 type SpotMarker = { id: string; name: string; lat: number; lng: number; rating: number }
+type ViewportMessage = { type: 'viewport'; minLat: number; minLng: number; maxLat: number; maxLng: number; zoom: number; reqId: number }
+type SpotClickMessage = { type: 'spot'; id: string }
+type WebMessage = ViewportMessage | SpotClickMessage
 
-function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
+function pickQueryZoom(mapZoom: number): number {
+  return Math.max(4, Math.min(STORAGE_ZOOM, Math.round(mapZoom + 1)))
+}
+
+function buildHeatmapHTML(spots: SpotMarker[]): string {
   const config = JSON.stringify({
     bounds: TURKEY_BOUNDS,
     fallbackCenter: FALLBACK_CENTER,
-    tiles,
     spots,
   })
 
@@ -48,6 +54,9 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
       attributionControl: false
     });
 
+    var nav = new maplibregl.NavigationControl({ showCompass: false });
+    map.addControl(nav, 'top-right');
+
     function tileCenterToLngLat(x, y, z) {
       var n = Math.pow(2, z);
       var lng = ((x + 0.5) / n) * 360 - 180;
@@ -62,37 +71,22 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
       return tileCenterToLngLat(t.x, t.y, t.zoom);
     }
 
-    map.on('load', function() {
-      var tiles = cfg.tiles || [];
+    function buildFeatureCollection(tiles) {
+      return {
+        type: 'FeatureCollection',
+        features: tiles.map(function(t) {
+          return {
+            type: 'Feature',
+            properties: { count: t.count },
+            geometry: { type: 'Point', coordinates: tileCoords(t) }
+          };
+        })
+      };
+    }
 
-      if (tiles.length === 0) {
-        map.jumpTo({ center: cfg.fallbackCenter, zoom: 6 });
-      } else if (tiles.length === 1) {
-        map.jumpTo({ center: tileCoords(tiles[0]), zoom: 8 });
-      } else {
-        var minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
-        tiles.forEach(function(t) {
-          var c = tileCoords(t);
-          if (c[0] < minLng) minLng = c[0];
-          if (c[0] > maxLng) maxLng = c[0];
-          if (c[1] < minLat) minLat = c[1];
-          if (c[1] > maxLat) maxLat = c[1];
-        });
-        map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, maxZoom: 8, animate: false });
-      }
-
-      var features = tiles.map(function(t) {
-        return {
-          type: 'Feature',
-          properties: { count: t.count },
-          geometry: { type: 'Point', coordinates: tileCoords(t) }
-        };
-      });
-
-      map.addSource('heat', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: features }
-      });
+    function ensureHeatLayer() {
+      if (map.getSource('heat')) return;
+      map.addSource('heat', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
       map.addLayer({
         id: 'heat-layer',
         type: 'heatmap',
@@ -113,20 +107,22 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
           ]
         }
       });
+    }
 
-      var spotFeatures = (cfg.spots || []).map(function(s) {
+    function ensureSpotsLayer() {
+      var spots = cfg.spots || [];
+      if (map.getSource('spots')) return;
+      var spotFeatures = spots.map(function(s) {
         return {
           type: 'Feature',
           properties: { id: s.id, name: s.name, rating: s.rating },
           geometry: { type: 'Point', coordinates: [s.lng, s.lat] }
         };
       });
-
       map.addSource('spots', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: spotFeatures }
       });
-
       map.addLayer({
         id: 'spots-layer',
         type: 'circle',
@@ -139,7 +135,6 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
           'circle-opacity': 0.95
         }
       });
-
       map.on('click', 'spots-layer', function(e) {
         var f = e.features && e.features[0];
         if (!f) return;
@@ -147,9 +142,61 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
           window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'spot', id: f.properties.id }));
         }
       });
-      map.on('mouseenter', 'spots-layer', function() { map.getCanvas().style.cursor = 'pointer'; });
-      map.on('mouseleave', 'spots-layer', function() { map.getCanvas().style.cursor = ''; });
+    }
+
+    var reqCounter = 0;
+    function notifyViewport() {
+      var b = map.getBounds();
+      reqCounter++;
+      if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'viewport',
+          minLat: b.getSouth(),
+          minLng: b.getWest(),
+          maxLat: b.getNorth(),
+          maxLng: b.getEast(),
+          zoom: map.getZoom(),
+          reqId: reqCounter
+        }));
+      }
+    }
+
+    map.on('load', function() {
+      ensureHeatLayer();
+      ensureSpotsLayer();
+      notifyViewport();
     });
+
+    var moveTimer = null;
+    map.on('moveend', function() {
+      if (moveTimer) clearTimeout(moveTimer);
+      moveTimer = setTimeout(notifyViewport, 250);
+    });
+
+    // Receives tile updates from native side.
+    window.applyTiles = function(tiles, opts) {
+      ensureHeatLayer();
+      var src = map.getSource('heat');
+      if (src) src.setData(buildFeatureCollection(tiles || []));
+
+      if (opts && opts.fit) {
+        if (!tiles || tiles.length === 0) {
+          map.jumpTo({ center: cfg.fallbackCenter, zoom: 6 });
+        } else if (tiles.length === 1) {
+          map.jumpTo({ center: tileCoords(tiles[0]), zoom: 11 });
+        } else {
+          var minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+          tiles.forEach(function(t) {
+            var c = tileCoords(t);
+            if (c[0] < minLng) minLng = c[0];
+            if (c[0] > maxLng) maxLng = c[0];
+            if (c[1] < minLat) minLat = c[1];
+            if (c[1] > maxLat) maxLat = c[1];
+          });
+          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 60, maxZoom: 11, animate: false });
+        }
+      }
+    };
   </script>
 </body>
 </html>`
@@ -158,52 +205,105 @@ function buildHeatmapHTML(tiles: Tile[], spots: SpotMarker[]): string {
 export default function MapsScreen() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
-  const [tiles, setTiles] = useState<Tile[] | null>(null)
-  const [spots, setSpots] = useState<SpotMarker[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const webRef = useRef<WebView>(null)
 
-  const loadAll = useCallback(async () => {
-    setError(null)
-    try {
-      const b = TURKEY_BOUNDS
-      const tilesPath = `/heatmap/tiles?minLat=${b.minLat}&minLng=${b.minLng}&maxLat=${b.maxLat}&maxLng=${b.maxLng}&zoom=${QUERY_ZOOM}`
-      const [tilesRes, spotsRes] = await Promise.all([
-        apiFetch<ApiResponse<Tile[]>>(tilesPath),
-        getSpots({ pageSize: 200 }),
-      ])
-      setTiles(tilesRes.data ?? [])
-      setSpots(
-        (spotsRes.data ?? []).map((s: SpotListItem) => ({
-          id: s.id,
-          name: s.name,
-          lat: s.latitude,
-          lng: s.longitude,
-          rating: s.averageRating,
-        }))
-      )
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load map.')
-      setTiles([])
+  const [spots, setSpots] = useState<SpotMarker[]>([])
+  const [spotsReady, setSpotsReady] = useState(false)
+  const [tileCount, setTileCount] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const initialFitDoneRef = useRef(false)
+  const lastReqRef = useRef(0)
+
+  useEffect(() => {
+    let active = true
+    getSpots({ pageSize: 200 })
+      .then((paged) => {
+        if (!active) return
+        setSpots(
+          (paged.data ?? []).map((s: SpotListItem) => ({
+            id: s.id,
+            name: s.name,
+            lat: s.latitude,
+            lng: s.longitude,
+            rating: s.averageRating,
+          }))
+        )
+      })
+      .catch(() => {
+        if (active) setSpots([])
+      })
+      .finally(() => {
+        if (active) setSpotsReady(true)
+      })
+    return () => {
+      active = false
     }
   }, [])
 
-  useEffect(() => {
-    loadAll()
-  }, [loadAll])
+  const html = useMemo(() => (spotsReady ? buildHeatmapHTML(spots) : null), [spotsReady, spots])
 
-  const html = useMemo(() => (tiles === null ? null : buildHeatmapHTML(tiles, spots)), [tiles, spots])
+  const fetchTilesForViewport = useCallback(async (msg: ViewportMessage) => {
+    const queryZoom = pickQueryZoom(msg.zoom)
+    const path = `/heatmap/tiles?minLat=${msg.minLat}&minLng=${msg.minLng}&maxLat=${msg.maxLat}&maxLng=${msg.maxLng}&zoom=${queryZoom}`
+    try {
+      const wrapped = await apiFetch<ApiResponse<Tile[]>>(path)
+      // Stale request guard.
+      if (msg.reqId < lastReqRef.current) return
+      lastReqRef.current = msg.reqId
+      const tiles = wrapped.data ?? []
+      setTileCount(tiles.length)
+      setError(null)
+
+      const fit = !initialFitDoneRef.current
+      initialFitDoneRef.current = true
+      const payload = JSON.stringify({ tiles, opts: { fit } })
+      webRef.current?.injectJavaScript(`window.applyTiles && window.applyTiles(${JSON.stringify(tiles)}, { fit: ${fit} }); true;`)
+      // Re-fetch once after autofit, since fit changes the viewport.
+      if (fit) {
+        // Trigger viewport notify by no-op; the moveend listener inside the webview will re-emit after fitBounds.
+        void payload
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load heatmap.')
+      setTileCount(0)
+    }
+  }, [])
 
   const onMessage = useCallback(
     (event: { nativeEvent: { data: string } }) => {
       try {
-        const msg = JSON.parse(event.nativeEvent.data)
-        if (msg.type === 'spot' && msg.id) {
+        const msg = JSON.parse(event.nativeEvent.data) as WebMessage
+        if (msg.type === 'viewport') {
+          fetchTilesForViewport(msg)
+        } else if (msg.type === 'spot' && msg.id) {
           router.push(`/spots/${msg.id}` as Parameters<typeof router.push>[0])
         }
       } catch {}
     },
-    [router]
+    [fetchTilesForViewport, router]
   )
+
+  const handleRefresh = () => {
+    initialFitDoneRef.current = false
+    setTileCount(null)
+    setError(null)
+    // Re-trigger by reloading WebView state.
+    webRef.current?.injectJavaScript(`
+      (function () {
+        var b = map.getBounds();
+        reqCounter++;
+        if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+          window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'viewport',
+            minLat: b.getSouth(), minLng: b.getWest(),
+            maxLat: b.getNorth(), maxLng: b.getEast(),
+            zoom: map.getZoom(), reqId: reqCounter
+          }));
+        }
+      })();
+      true;
+    `)
+  }
 
   return (
     <YStack flex={1} backgroundColor="$background">
@@ -220,22 +320,19 @@ export default function MapsScreen() {
           <YStack flex={1}>
             <Text variant="heading2">Live activity</Text>
             <Text variant="caption" muted>
-              {tiles === null
+              {tileCount === null
                 ? 'Loading…'
                 : error
                   ? error
-                  : tiles.length === 0
+                  : tileCount === 0
                     ? 'No active pings right now'
-                    : `${tiles.length} active areas`}
+                    : `${tileCount} active areas`}
             </Text>
           </YStack>
           <Button
             variant="outline"
             size="sm"
-            onPress={() => {
-              setTiles(null)
-              loadAll()
-            }}
+            onPress={handleRefresh}
             icon={<Feather name="refresh-cw" size={14} color="var(--color-foreground)" />}
           >
             Refresh
@@ -246,7 +343,7 @@ export default function MapsScreen() {
       <YStack flex={1} paddingBottom={80}>
         {html ? (
           <WebView
-            key={`${tiles?.length}-${spots.length}`}
+            ref={webRef}
             source={{ html }}
             style={{ flex: 1 }}
             javaScriptEnabled
