@@ -29,7 +29,7 @@ namespace Ant.WebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var origin = Request.Headers["origin"].FirstOrDefault() ?? "http://localhost:3000";
+            var origin = GetRequestOrigin();
             var result = await _authService.RegisterAsync(request, origin);
             return Ok(new { message = result });
         }
@@ -66,15 +66,38 @@ namespace Ant.WebApi.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest model)
         {
-            var origin = Request.Headers["origin"].FirstOrDefault() ?? "http://localhost:3000";
+            var origin = GetRequestOrigin();
             await _authService.ForgotPassword(model, origin);
             return Ok("If an account with that email exists, a reset link has been sent.");
+        }
+
+        [HttpPost("resend-confirmation-email")]
+        public async Task<IActionResult> ResendEmailConfirmation(ForgotPasswordRequest model)
+        {
+            var origin = GetRequestOrigin();
+            await _authService.ResendEmailConfirmationAsync(model, origin);
+            return Ok("If an unconfirmed account with that email exists, a confirmation link has been sent.");
         }
 
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest model)
         {
             return Ok(await _authService.ResetPassword(model));
+        }
+
+        private string GetRequestOrigin()
+        {
+            var origin = Request.Headers["X-App-Origin"].FirstOrDefault()
+                ?? Request.Headers["origin"].FirstOrDefault();
+
+            if (!string.IsNullOrWhiteSpace(origin))
+                return origin;
+
+            var referer = Request.Headers["referer"].FirstOrDefault();
+            if (System.Uri.TryCreate(referer, System.UriKind.Absolute, out var refererUri))
+                return $"{refererUri.Scheme}://{refererUri.Authority}";
+
+            return string.Empty;
         }
 
         private string GetIpAddress()

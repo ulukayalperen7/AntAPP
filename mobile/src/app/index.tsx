@@ -6,10 +6,11 @@ import { Feather } from '@expo/vector-icons'
 import { Share } from 'react-native'
 import { useAuth } from '@/features/auth/context'
 import { getRoutes } from '@/features/routes/api'
-import { addPostComment, getFeedPosts, getPostComments, getPostReactions, sharePost, togglePostReaction } from '@/features/posts/api'
+import { addPostComment, deletePostComment, updatePostComment, getFeedPosts, getPostComments, getPostReactions, sharePost, togglePostReaction } from '@/features/posts/api'
 import { mapFeedPostsToRouteCards } from '@/features/posts/mappers'
 import type { PostCommentItem, PostReactionItem, RouteListItem } from '@/features/api/types'
 import { HomeScreenSkeleton } from '@/components/loading/page-skeletons'
+import { RouteMapChip } from '@/components/map/route-map-chip'
 
 const PAGE_COPY = {
   title: 'Explore Feed',
@@ -36,16 +37,6 @@ function formatRelativeDate(value: string) {
   return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short' }).format(new Date(value))
 }
 
-function formatFullDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return 'Recently'
-
-  return new Intl.DateTimeFormat('tr-TR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(date)
-}
 
 function getPostTone(route: RouteListItem) {
   switch (route.contentType) {
@@ -180,11 +171,13 @@ function FeedPostCard({
   onPress,
   onOpenProfile,
   onCreatePost,
+  currentUserName,
 }: {
   route: RouteListItem
   onPress: () => void
   onOpenProfile: () => void
   onCreatePost: () => void
+  currentUserName?: string | null
 }) {
   const tone = getPostTone(route)
   const author = getAuthor(route)
@@ -197,6 +190,7 @@ function FeedPostCard({
   const [commentCount, setCommentCount] = useState(route.postCommentCount ?? 0)
   const [shareCount, setShareCount] = useState(route.postShareCount ?? 0)
   const [isReacted, setIsReacted] = useState(route.isReactedByCurrentUser ?? false)
+  const [isFollowed, setIsFollowed] = useState(false)
   const [isCommentsOpen, setIsCommentsOpen] = useState(false)
   const [isReactionsOpen, setIsReactionsOpen] = useState(false)
   const [commentsLoaded, setCommentsLoaded] = useState(false)
@@ -206,6 +200,9 @@ function FeedPostCard({
   const [commentDraft, setCommentDraft] = useState('')
   const [socialError, setSocialError] = useState<string | null>(null)
   const [shareNotice, setShareNotice] = useState<string | null>(null)
+
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
+  const [editDraft, setEditDraft] = useState('')
 
   const [isLiking, startLiking] = useTransition()
   const [isCommentLoading, startCommentLoading] = useTransition()
@@ -314,6 +311,47 @@ function FeedPostCard({
     })
   }
 
+  const handleDeleteComment = (commentId: string) => {
+    if (!postId || isCommentPosting) return
+    startCommentPosting(async () => {
+      try {
+        await deletePostComment(postId, commentId)
+        setComments(current => current.filter(c => c.commentId !== commentId))
+        setCommentCount(c => Math.max(0, c - 1))
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to delete comment.')
+      }
+    })
+  }
+
+  const handleStartEdit = (comment: PostCommentItem) => {
+    setEditingCommentId(comment.commentId)
+    setEditDraft(comment.content)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null)
+    setEditDraft('')
+  }
+
+  const handleSaveEdit = (commentId: string) => {
+    if (!postId || isCommentPosting) return
+    const content = editDraft.trim()
+    if (!content) return
+    startCommentPosting(async () => {
+      try {
+        await updatePostComment(postId, commentId, content)
+        setComments(current => current.map(c => c.commentId === commentId ? { ...c, content } : c))
+        setEditingCommentId(null)
+        setEditDraft('')
+        setSocialError(null)
+      } catch (e) {
+        setSocialError((e as Error).message ?? 'Failed to update comment.')
+      }
+    })
+  }
+
   const handleShare = () => {
     if (!postId) {
       openCreatePost()
@@ -338,148 +376,122 @@ function FeedPostCard({
   }
 
   return (
-    <Card
-      variant="outline"
-      size="sm"
-      backgroundColor="$backgroundStrong"
-      gap="$4"
-    >
-      <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
-        <XStack gap="$3" flex={1}>
-          <XStack onPress={onOpenProfile}>
-            <Avatar size="lg" initials={author.initials} />
-          </XStack>
-          <YStack gap="$1.5" flex={1}>
-            <XStack gap="$2" flexWrap="wrap" alignItems="center">
-              <Text variant="label" onPress={onOpenProfile}>{author.name}</Text>
-              <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
-            </XStack>
-            <Text variant="caption" muted>{author.role}</Text>
-            <XStack gap="$2" flexWrap="wrap" alignItems="center">
-              <Text variant="caption" muted>{formatRelativeDate(route.createdAt)}</Text>
-              <Text variant="caption" muted>•</Text>
-              <Text variant="caption" muted>{isInteractivePost ? tone.label : 'Route preview'}</Text>
-            </XStack>
-          </YStack>
+    <YStack backgroundColor="$backgroundStrong" borderBottomWidth={1} borderBottomColor="$borderColor">
+      {/* Author row */}
+      <XStack gap="$2.5" alignItems="center" paddingHorizontal="$3" paddingVertical="$2.5">
+        <XStack onPress={onOpenProfile}>
+          <Avatar size="sm" initials={author.initials} />
         </XStack>
-
-        <XStack padding="$1">
-          <Feather name="more-horizontal" size={18} color="currentColor" />
+        <XStack flex={1} gap="$2" alignItems="center" onPress={onOpenProfile}>
+          <Text variant="label">{author.name}</Text>
+          <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+        </XStack>
+        {currentUserName !== route.authorUserName ? (
+          <Button
+            variant={isFollowed ? 'outline' : 'ghost'}
+            size="sm"
+            onPress={() => setIsFollowed(f => !f)}
+          >
+            {isFollowed ? 'Followed' : 'Follow'}
+          </Button>
+        ) : null}
+        <XStack paddingLeft="$1">
+          <Feather name="more-horizontal" size={16} color="currentColor" />
         </XStack>
       </XStack>
 
-      <YStack gap="$2.5">
-        <Text variant="heading3">{route.title}</Text>
-        <Text variant="body">
-          {route.postContent?.trim() || route.description?.trim() || 'A newly shared route just dropped into the public feed. Open the post to inspect the route map, stops, and full detail.'}
-        </Text>
-      </YStack>
-
+      {/* Full-width image */}
       <YStack
-        borderRadius="$4"
-        overflow="hidden"
+        width="100%"
+        height={400}
         backgroundColor="$muted"
-        borderWidth={1}
-        borderColor="$borderColor"
+        overflow="hidden"
+        position="relative"
+        onPress={onPress}
       >
-        <YStack height={260} maxHeight={260} flexShrink={0} backgroundColor="$muted" onPress={onPress}>
-          {coverImage ? (
-            <Image src={coverImage} width="100%" height="100%" objectFit="cover" />
-          ) : null}
-        </YStack>
-
-        <YStack padding="$4" gap="$3" backgroundColor="$background">
-          <XStack gap="$2" flexWrap="wrap">
-            <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
-            <Badge variant="success" size="sm">{route.isPublic ? 'Public' : 'Draft'}</Badge>
-          </XStack>
-
-          <YStack gap="$2">
-            <Text variant="label" color="$primary">{isInteractivePost ? 'Post details' : 'Route snapshot'}</Text>
-            <Text variant="body" muted>
-              {isInteractivePost
-                ? `Shared on ${formatFullDate(route.createdAt)}. People can like, comment, and share this route.`
-                : `Published ${formatFullDate(route.createdAt)}. Publish this route as a post to enable social actions.`}
-            </Text>
+        {coverImage ? (
+          <Image src={coverImage} width="100%" height="100%" objectFit="cover" />
+        ) : (
+          <YStack flex={1} alignItems="center" justifyContent="center">
+            <Feather name="compass" size={36} color="currentColor" />
           </YStack>
+        )}
 
-          {media.length > 1 ? (
-            <XStack gap="$2">
-              {media.slice(1, 4).map((url, index) => (
-                <YStack key={`${route.postId ?? route.id}-${index}`} width={58} height={44} borderRadius="$2" overflow="hidden" backgroundColor="$muted">
-                  <Image src={url} width="100%" height="100%" objectFit="cover" />
-                </YStack>
-              ))}
-            </XStack>
-          ) : null}
-
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text variant="caption" muted>Average rating</Text>
-            <XStack alignItems="center" gap="$1">
-              <Feather name="star" size={14} color="#F59E0B" />
-              <Text variant="caption" weight="semibold">
-                {route.averageRating > 0 ? route.averageRating.toFixed(1) : 'New'}
-              </Text>
-            </XStack>
-          </XStack>
-        </YStack>
+        <RouteMapChip routeId={route.id} onPress={onPress} />
       </YStack>
 
-      {isInteractivePost ? (
-        <>
-          <XStack justifyContent="space-between" alignItems="center" flexWrap="wrap" gap="$3">
-            <XStack onPress={handleToggleReactions} paddingVertical="$1" paddingHorizontal="$2">
-              <Text variant="caption" color={isReactionsOpen ? '$primary' : '$mutedForeground'}>
-                {formatSocialCount(reactionCount, 'like', 'likes')}
-              </Text>
-            </XStack>
-            <XStack onPress={handleToggleComments} paddingVertical="$1" paddingHorizontal="$2">
-              <Text variant="caption" color={isCommentsOpen ? '$primary' : '$mutedForeground'}>
-                {formatSocialCount(commentCount, 'comment', 'comments')}
-              </Text>
-            </XStack>
-            <Text variant="caption" muted paddingVertical="$1" paddingHorizontal="$2">
-              {formatSocialCount(shareCount, 'share', 'shares')}
-            </Text>
+      {/* Action icons */}
+      <XStack paddingHorizontal="$3" paddingTop="$3" paddingBottom="$1" justifyContent="space-between" alignItems="center">
+        <XStack gap="$4" alignItems="center">
+          <XStack onPress={handleToggleReaction} opacity={isLiking ? 0.4 : 1}>
+            <Feather
+              name="thumbs-up"
+              size={22}
+              color={isReacted ? 'var(--color-primary)' : 'currentColor'}
+            />
           </XStack>
-
-          <XStack
-            borderTopWidth={1}
-            borderTopColor="$borderColor"
-            paddingTop="$3"
-            justifyContent="space-between"
-            gap="$2"
-            flexWrap="wrap"
-          >
-            <Button variant={isReacted ? 'solid' : 'ghost'} size="sm" loading={isLiking} disabled={isLiking} icon={<Feather name="thumbs-up" size={16} color="currentColor" />} onPress={handleToggleReaction}>
-              Like
-            </Button>
-            <Button variant={isCommentsOpen ? 'outline' : 'ghost'} size="sm" icon={<Feather name="message-circle" size={16} color="currentColor" />} onPress={handleToggleComments}>
-              Comment
-            </Button>
-            <Button variant="ghost" size="sm" loading={isSharing} disabled={isSharing} icon={<Feather name="share-2" size={16} color="currentColor" />} onPress={handleShare}>
-              Share
-            </Button>
+          <XStack onPress={handleToggleComments}>
+            <Feather name="message-circle" size={22} color="currentColor" />
           </XStack>
+          <XStack onPress={handleShare} opacity={isSharing ? 0.4 : 1}>
+            <Feather name="share-2" size={22} color="currentColor" />
+          </XStack>
+        </XStack>
+        <XStack onPress={onPress}>
+          <Feather name="compass" size={22} color="currentColor" />
+        </XStack>
+      </XStack>
 
-          {shareNotice ? <Text variant="caption" color="$success500">{shareNotice}</Text> : null}
-        </>
-      ) : (
-        <YStack gap="$2">
-          <Text variant="caption" muted>Publish this route as a post to enable likes, comments, and shares.</Text>
-          <Button variant="outline" size="sm" onPress={() => openCreatePost()}>
-            Publish as post
-          </Button>
-        </YStack>
-      )}
+      {/* Like count */}
+      {reactionCount > 0 ? (
+        <XStack paddingHorizontal="$3" paddingTop="$1" onPress={handleToggleReactions}>
+          <Text variant="label">{formatSocialCount(reactionCount, 'like', 'likes')}</Text>
+        </XStack>
+      ) : null}
 
+      {/* Route title + caption inline */}
+      <XStack paddingHorizontal="$3" paddingTop="$1.5" paddingBottom="$0.5" flexWrap="wrap" gap="$1.5" alignItems="flex-start">
+        <Text variant="label">{route.title}</Text>
+        {(route.postContent?.trim() || route.description?.trim()) ? (
+          <Text variant="body" numberOfLines={2} color="$color">
+            {route.postContent?.trim() || route.description?.trim()}
+          </Text>
+        ) : null}
+      </XStack>
+
+      {/* View all comments */}
+      {isInteractivePost && commentCount > 0 ? (
+        <XStack paddingHorizontal="$3" paddingTop="$0.5" onPress={handleToggleComments}>
+          <Text variant="caption" muted>View all {commentCount} comments</Text>
+        </XStack>
+      ) : null}
+
+      {/* Publish prompt */}
+      {!isInteractivePost ? (
+        <XStack paddingHorizontal="$3" paddingTop="$1" onPress={() => openCreatePost()}>
+          <Text variant="caption" color="$primary">Publish as post →</Text>
+        </XStack>
+      ) : null}
+
+      {shareNotice ? (
+        <XStack paddingHorizontal="$3" paddingTop="$1">
+          <Text variant="caption" color="$success500">{shareNotice}</Text>
+        </XStack>
+      ) : null}
+      {socialError ? (
+        <XStack paddingHorizontal="$3">
+          <Text variant="caption" color="$error500">{socialError}</Text>
+        </XStack>
+      ) : null}
+
+      {/* Timestamp */}
+      <Text variant="caption" muted paddingHorizontal="$3" paddingTop="$1" paddingBottom="$3">
+        {formatRelativeDate(route.createdAt)}
+      </Text>
+
+      {/* Reactions panel */}
       {isReactionsOpen ? (
-        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text variant="label">Liked by</Text>
-            <Text variant="caption" muted>{formatSocialCount(reactionCount, 'like', 'likes')}</Text>
-          </XStack>
-
+        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingHorizontal="$3" paddingTop="$3" paddingBottom="$3">
           {isReactionLoading ? (
             <Text variant="caption" muted>Loading likes...</Text>
           ) : reactions.length === 0 ? (
@@ -500,13 +512,9 @@ function FeedPostCard({
         </YStack>
       ) : null}
 
+      {/* Comments panel */}
       {isCommentsOpen ? (
-        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingTop="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text variant="label">Comments</Text>
-            <Text variant="caption" muted>{formatSocialCount(commentCount, 'comment', 'comments')}</Text>
-          </XStack>
-
+        <YStack gap="$3" borderTopWidth={1} borderTopColor="$borderColor" paddingHorizontal="$3" paddingTop="$3" paddingBottom="$3">
           <XStack gap="$2">
             <Input
               value={commentDraft}
@@ -523,30 +531,55 @@ function FeedPostCard({
           {isCommentLoading ? (
             <Text variant="caption" muted>Loading comments...</Text>
           ) : comments.length === 0 ? (
-            <YStack backgroundColor="$background" borderRadius="$3" padding="$3" borderWidth={1} borderColor="$borderColor">
-              <Text variant="caption" muted>No comments yet. Start the conversation.</Text>
-            </YStack>
+            <Text variant="caption" muted>No comments yet.</Text>
           ) : (
-            <YStack gap="$2">
-              {comments.map((comment) => (
-                <XStack key={comment.commentId} gap="$2.5" alignItems="flex-start" backgroundColor="$background" borderRadius="$3" padding="$3">
-                  <Avatar size="sm" initials={getInitials(comment.userName)} />
-                  <YStack flex={1} gap="$1">
-                    <XStack gap="$2" alignItems="center" flexWrap="wrap">
-                      <Text variant="label">{comment.userName?.trim() || 'Route Explorer'}</Text>
-                      <Text variant="caption" muted>{formatRelativeDate(comment.createdAt)}</Text>
-                    </XStack>
-                    <Text variant="body">{comment.content}</Text>
-                  </YStack>
-                </XStack>
-              ))}
+            <YStack gap="$2.5">
+              {comments.map((comment) => {
+                const isOwn = Boolean(currentUserName && comment.userName === currentUserName)
+                const isEditing = editingCommentId === comment.commentId
+                return (
+                  <XStack key={comment.commentId} gap="$2" alignItems="flex-start">
+                    <Avatar size="sm" initials={getInitials(comment.userName)} />
+                    <YStack flex={1} gap="$0.5">
+                      <XStack gap="$1.5" alignItems="center" flexWrap="wrap">
+                        <Text variant="label">{comment.userName?.trim() || 'Route Explorer'}</Text>
+                        <Text variant="caption" muted>{formatRelativeDate(comment.createdAt)}</Text>
+                        {isOwn && !isEditing ? (
+                          <>
+                            <Text variant="caption" muted onPress={() => handleStartEdit(comment)}>Düzenle</Text>
+                            <Text variant="caption" muted onPress={() => handleDeleteComment(comment.commentId)}>Sil</Text>
+                          </>
+                        ) : null}
+                      </XStack>
+                      {isEditing ? (
+                        <YStack gap="$2">
+                          <Input
+                            value={editDraft}
+                            onChangeText={setEditDraft}
+                            variant="outline"
+                            placeholder="Edit comment..."
+                          />
+                          <XStack gap="$2">
+                            <Button variant="solid" size="sm" loading={isCommentPosting} disabled={isCommentPosting} onPress={() => handleSaveEdit(comment.commentId)}>
+                              Save
+                            </Button>
+                            <Button variant="ghost" size="sm" disabled={isCommentPosting} onPress={handleCancelEdit}>
+                              Cancel
+                            </Button>
+                          </XStack>
+                        </YStack>
+                      ) : (
+                        <Text variant="body">{comment.content}</Text>
+                      )}
+                    </YStack>
+                  </XStack>
+                )
+              })}
             </YStack>
           )}
         </YStack>
       ) : null}
-
-      {socialError ? <Text variant="caption" color="$error500">{socialError}</Text> : null}
-    </Card>
+    </YStack>
   )
 }
 
@@ -561,9 +594,9 @@ function RailCard({
 }) {
   return (
     <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$3">
-      <YStack gap="$1">
+      <YStack gap="$0.5">
         <Text variant="heading4">{title}</Text>
-        <Text variant="body" muted>{subtitle}</Text>
+        {subtitle ? <Text variant="caption" muted>{subtitle}</Text> : null}
       </YStack>
       {children}
     </Card>
@@ -612,31 +645,10 @@ export default function HomeScreen() {
     <YStack flex={1} backgroundColor="$background">
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$4">
-          <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
-            <XStack justifyContent="space-between" alignItems="flex-start" gap="$3">
-              <YStack gap="$1">
-                <Text variant="heading2">{PAGE_COPY.title}</Text>
-                <Text variant="body" muted>
-                  {PAGE_COPY.subtitle}
-                </Text>
-              </YStack>
-              <Avatar size="md" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'A'} />
-            </XStack>
-
-            <XStack gap="$2" flexWrap="wrap">
-              <Button variant="solid" size="sm">Timeline</Button>
-              <Button variant="outline" size="sm" onPress={() => router.push('/explore?type=official')}>Official</Button>
-              <Button variant="outline" size="sm" onPress={() => router.push('/explore?type=community')}>Community</Button>
-            </XStack>
-          </Card>
-
-          <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
+<Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
             <XStack gap="$3" alignItems="center" flexWrap="wrap">
               <Avatar size="lg" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'A'} />
-              <YStack flex={1} minWidth={160} gap="$1">
-                <Text variant="label">Create a route post</Text>
-                <Text variant="caption" muted>{PAGE_COPY.composer}</Text>
-              </YStack>
+              <Text variant="label" flex={1} minWidth={160}>Create a route post</Text>
               <Button
                 variant="solid"
                 size="sm"
@@ -661,7 +673,7 @@ export default function HomeScreen() {
             </XStack>
           </ScrollView>
 
-          <YStack gap="$4">
+          <YStack>
             {timelineRoutes.length > 0 ? (
               timelineRoutes.map((route) => (
                 <FeedPostCard
@@ -670,6 +682,7 @@ export default function HomeScreen() {
                   onPress={() => router.push(`/routes/${route.id}`)}
                   onOpenProfile={() => router.push(`/profiles/${route.authorUserId}`)}
                   onCreatePost={() => router.push(`/posts/create?routeId=${route.id}`)}
+                  currentUserName={user?.userName}
                 />
               ))
             ) : (
@@ -712,79 +725,16 @@ export default function HomeScreen() {
             </YStack>
           </RailCard>
 
-          <RailCard
-            title="Sponsored"
-            subtitle="Native placements inside the route feed"
-          >
-            <YStack gap="$3">
-              <YStack
-                borderRadius="$4"
-                overflow="hidden"
-                backgroundColor="$background"
-                borderWidth={1}
-                borderColor="$borderColor"
-              >
-                <YStack height={148} backgroundColor="$muted">
-                  {spotlightRoutes[0]?.thumbnailUrl ? (
-                    <Image src={spotlightRoutes[0].thumbnailUrl} width="100%" height="100%" objectFit="cover" />
-                  ) : null}
-                </YStack>
-                <YStack padding="$3" gap="$1.5">
-                  <Text variant="label">Featured stays near popular routes</Text>
-                  <Text variant="caption" muted>Blend route discovery with local stays, tours, or partner placements.</Text>
-                </YStack>
-              </YStack>
-            </YStack>
-          </RailCard>
-
-          <RailCard
-            title="Today in feed"
-            subtitle="A compact status rail like a social network dashboard"
-          >
-            <YStack gap="$3">
-              <XStack justifyContent="space-between" alignItems="center">
-                <Text variant="caption" muted>New public posts</Text>
-                <Text variant="label">{timelineRoutes.length}</Text>
-              </XStack>
-              <XStack justifyContent="space-between" alignItems="center">
-                <Text variant="caption" muted>Official cards</Text>
-                <Text variant="label">{timelineRoutes.filter((route) => route.contentType === 'Official').length}</Text>
-              </XStack>
-              <XStack justifyContent="space-between" alignItems="center">
-                <Text variant="caption" muted>Community cards</Text>
-                <Text variant="label">{timelineRoutes.filter((route) => route.contentType === 'Community').length}</Text>
-              </XStack>
-              <XStack justifyContent="space-between" alignItems="center">
-                <Text variant="caption" muted>Alerts</Text>
-                <XStack gap="$1.5" alignItems="center">
-                  <Feather name="bell" size={14} color="currentColor" />
-                  <Text variant="label">{Math.max(1, spotlightRoutes.length)}</Text>
-                </XStack>
-              </XStack>
-            </YStack>
-          </RailCard>
-
-          <RailCard
-            title="Quick actions"
-            subtitle="Keep route creation close to the feed"
-          >
-            <YStack gap="$2.5">
-              <Button
-                variant="solid"
-                size="sm"
-                icon={<Feather name="plus" size={14} color="#FFFFFF" />}
-                onPress={() => router.push('/posts/create')}
-              >
-                Create route post
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                icon={<Feather name="grid" size={14} color="currentColor" />}
-                onPress={() => router.push('/profile')}
-              >
-                Manage my routes
-              </Button>
+          <RailCard title="Sponsored" subtitle="">
+            <YStack
+              borderRadius="$4"
+              overflow="hidden"
+              backgroundColor="$muted"
+              height={148}
+            >
+              {spotlightRoutes[0]?.thumbnailUrl ? (
+                <Image src={spotlightRoutes[0].thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+              ) : null}
             </YStack>
           </RailCard>
         </YStack>

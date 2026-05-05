@@ -1,7 +1,7 @@
 'use server'
 
 import { apiFetchData } from '@/lib/api'
-import type { CurrentUser, PublicProfile, UserFollowSummary } from '@/types/api'
+import type { CurrentUser, ProfileConnection, PublicProfile, UserFollowSummary } from '@/types/api'
 
 export async function getCurrentUser(): Promise<CurrentUser> {
   return apiFetchData<CurrentUser>('/account/me')
@@ -15,6 +15,14 @@ export async function toggleProfileFollow(userId: string): Promise<UserFollowSum
   return apiFetchData<UserFollowSummary>(`/profiles/${userId}/follow`, {
     method: 'POST',
   })
+}
+
+export async function getProfileFollowers(userId: string): Promise<ProfileConnection[]> {
+  return apiFetchData<ProfileConnection[]>(`/profiles/${userId}/followers`)
+}
+
+export async function getProfileFollowing(userId: string): Promise<ProfileConnection[]> {
+  return apiFetchData<ProfileConnection[]>(`/profiles/${userId}/following`)
 }
 
 export async function updateProfile(data: {

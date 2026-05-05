@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -35,7 +36,9 @@ namespace Ant.Infrastructure.Services
         private readonly JWTSettings _jwtSettings;
         private readonly IDateTimeService _dateTimeService;
         private readonly ApplicationDbContext _dbContext;
+        private readonly ILogger<AuthService> _logger;
         private readonly bool _autoConfirmEmail;
+        private readonly string _webBaseUrl;
 
         public AuthService(UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole<Guid>> roleManager,
@@ -44,7 +47,9 @@ namespace Ant.Infrastructure.Services
             SignInManager<ApplicationUser> signInManager,
             IEmailService emailService,
             ApplicationDbContext dbContext,
-            IHostEnvironment environment)
+            IHostEnvironment environment,
+            IConfiguration configuration,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -53,7 +58,9 @@ namespace Ant.Infrastructure.Services
             _signInManager = signInManager;
             _emailService = emailService;
             _dbContext = dbContext;
-            _autoConfirmEmail = environment.IsDevelopment();
+            _logger = logger;
+            _autoConfirmEmail = configuration.GetValue<bool?>("Auth:AutoConfirmEmail") ?? environment.IsDevelopment();
+            _webBaseUrl = NormalizeBaseUrl(configuration["AppUrls:Web"] ?? configuration["AppUrls:WebBaseUrl"] ?? "http://localhost:3000");
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request, string ipAddress)
@@ -185,10 +192,20 @@ namespace Ant.Infrastructure.Services
                         await _userManager.AddToRoleAsync(user, roleName);
 
                     if (!_autoConfirmEmail)
-                        await SendVerificationEmail(user, origin);
+                    {
+                        try
+                        {
+                            await SendVerificationEmail(user, origin);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Confirmation email could not be sent for user {UserId}.", user.Id);
+                            return "Account created successfully, but the confirmation email could not be sent. Please request a new confirmation email.";
+                        }
+                    }
 
                     return _autoConfirmEmail
-                        ? "Account created and auto-confirmed (development mode)."
+                        ? "Account created and auto-confirmed."
                         : "Account created successfully. Please check your email to confirm your account.";
                 }
                 else
@@ -207,9 +224,9 @@ namespace Ant.Infrastructure.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) throw new ApiException("User not found.");
 
-            code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
+            var decodedCode = DecodeToken(code);
 
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+            var result = await _userManager.ConfirmEmailAsync(user, decodedCode);
             if (result.Succeeded)
                 return $"Account Confirmed for {user.Email}. You can now log in.";
             else
@@ -221,9 +238,7 @@ namespace Ant.Infrastructure.Services
             var account = await _userManager.FindByEmailAsync(model.Email);
             if (account == null) return;
 
-            var baseUrl = string.IsNullOrWhiteSpace(origin) || origin.Contains("localhost")
-                ? "https://antapp.fun"
-                : origin;
+            var baseUrl = ResolveWebBaseUrl(origin);
 
             var code = await _userManager.GeneratePasswordResetTokenAsync(account);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -236,7 +251,29 @@ namespace Ant.Infrastructure.Services
                 Subject = "Reset Your Password",
             };
 
-            try { await _emailService.SendAsync(emailRequest); } catch { }
+            try
+            {
+                await _emailService.SendAsync(emailRequest);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Password reset email could not be sent for account {AccountId}.", account.Id);
+            }
+        }
+
+        public async Task ResendEmailConfirmationAsync(ForgotPasswordRequest model, string origin)
+        {
+            var account = await _userManager.FindByEmailAsync(model.Email);
+            if (account == null || account.EmailConfirmed) return;
+
+            try
+            {
+                await SendVerificationEmail(account, origin);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Confirmation email could not be resent for user {UserId}.", account.Id);
+            }
         }
 
         public async Task<string> ResetPassword(ResetPasswordRequest model)
@@ -244,7 +281,7 @@ namespace Ant.Infrastructure.Services
             var account = await _userManager.FindByEmailAsync(model.Email);
             if (account == null) throw new ApiException($"No Accounts Registered with {model.Email}.");
 
-            var decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Token));
+            var decodedToken = DecodeToken(model.Token);
             var result = await _userManager.ResetPasswordAsync(account, decodedToken, model.Password);
             if (result.Succeeded)
                 return "Password Reset Successful.";
@@ -298,9 +335,7 @@ namespace Ant.Infrastructure.Services
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
-            var baseUrl = string.IsNullOrWhiteSpace(origin) || origin.Contains("localhost")
-                ? "https://antapp.fun"
-                : origin;
+            var baseUrl = ResolveWebBaseUrl(origin);
 
             var route = "confirm-email";
             var verificationUri = $"{baseUrl}/{route}?userId={user.Id}&code={code}";
@@ -311,6 +346,29 @@ namespace Ant.Infrastructure.Services
                 Subject = "Confirm Your Email — AntAPP",
                 Body = $"Please confirm your email address by clicking the link below:<br/><br/><a href=\"{verificationUri}\">{verificationUri}</a><br/><br/>If you did not create an account, you can ignore this email.",
             });
+        }
+
+        private string ResolveWebBaseUrl(string origin)
+        {
+            var baseUrl = string.IsNullOrWhiteSpace(origin) ? _webBaseUrl : origin;
+            return NormalizeBaseUrl(baseUrl);
+        }
+
+        private static string NormalizeBaseUrl(string baseUrl)
+        {
+            return baseUrl.Trim().TrimEnd('/');
+        }
+
+        private static string DecodeToken(string token)
+        {
+            try
+            {
+                return Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+            }
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
+            {
+                throw new ApiException("Invalid or expired token.");
+            }
         }
 
         private RefreshToken GenerateRefreshToken(string ipAddress)

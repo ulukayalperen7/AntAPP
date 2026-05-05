@@ -7,6 +7,7 @@ import {
   ACCESS_MAX_AGE,
   ACCESS_TOKEN_COOKIE,
   API_URL,
+  APP_URL,
   REFRESH_MAX_AGE,
   REFRESH_TOKEN_COOKIE,
 } from './constants'
@@ -112,7 +113,10 @@ export async function register(
   try {
     const res = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(APP_URL ? { 'X-App-Origin': APP_URL } : {}),
+      },
       body: JSON.stringify({
         userType,
         email,
@@ -164,7 +168,10 @@ export async function forgotPassword(
   try {
     const res = await fetch(`${API_URL}/auth/forgot-password`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(APP_URL ? { 'X-App-Origin': APP_URL } : {}),
+      },
       body: JSON.stringify({ email }),
       cache: 'no-store',
     })

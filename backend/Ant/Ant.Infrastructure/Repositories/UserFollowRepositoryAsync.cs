@@ -4,6 +4,8 @@ using Ant.Infrastructure.Contexts;
 using Ant.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ant.Infrastructure.Repositories
@@ -38,6 +40,30 @@ namespace Ant.Infrastructure.Repositories
         public Task<int> GetFollowingCountAsync(Guid userId)
         {
             return _dbContext.UserFollows.CountAsync(f => f.FollowerUserId == userId);
+        }
+
+        public async Task<IReadOnlyList<UserFollow>> GetFollowersAsync(Guid userId, int pageNumber, int pageSize)
+        {
+            return await _dbContext.UserFollows
+                .AsNoTracking()
+                .Include(f => f.FollowerUser)
+                .Where(f => f.FollowingUserId == userId)
+                .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<UserFollow>> GetFollowingAsync(Guid userId, int pageNumber, int pageSize)
+        {
+            return await _dbContext.UserFollows
+                .AsNoTracking()
+                .Include(f => f.FollowingUser)
+                .Where(f => f.FollowerUserId == userId)
+                .OrderByDescending(f => f.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }

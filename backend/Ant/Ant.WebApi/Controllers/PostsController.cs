@@ -3,6 +3,7 @@ using Ant.Application.Features.Posts.Commands.TogglePostReaction;
 using Ant.Application.Features.Posts.Commands.AddPostComment;
 using Ant.Application.Features.Posts.Commands.SharePost;
 using Ant.Application.Features.Posts.Commands.DeletePostComment;
+using Ant.Application.Features.Posts.Commands.UpdatePostComment;
 using Ant.Application.Features.Posts.Queries.GetFeedPosts;
 using Ant.Application.Features.Posts.Queries.GetPostComments;
 using Ant.Application.Features.Posts.Queries.GetPostReactions;
@@ -100,6 +101,15 @@ namespace Ant.WebApi.Controllers
             {
                 PostId = postId
             }));
+        }
+
+        [HttpPut("{postId}/comments/{commentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
+        public async Task<IActionResult> UpdateComment(Guid postId, Guid commentId, [FromBody] UpdatePostCommentCommand command)
+        {
+            command.PostId = postId;
+            command.CommentId = commentId;
+            return Ok(await Mediator.Send(command));
         }
 
         [HttpDelete("{postId}/comments/{commentId}")]

@@ -7,7 +7,7 @@ set -euo pipefail
 # Prerequisites:
 #   - Backend running locally (dotnet run / dotnet watch)
 #   - Valkey running on localhost:6379
-#   - ASPNETCORE_ENVIRONMENT=Development (auto-confirms email on register)
+#   - Auth:AutoConfirmEmail=true for load-test users (or pre-confirm them manually)
 #
 # Usage:
 #   chmod +x heatmap_test.sh

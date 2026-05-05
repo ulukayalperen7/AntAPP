@@ -1,4 +1,5 @@
 using Ant.Application.Features.Profiles.Commands.ToggleUserFollow;
+using Ant.Application.Features.Profiles.Queries.GetProfileConnections;
 using Ant.Application.Features.Profiles.Queries.GetPublicProfile;
 using Ant.Application.Wrappers;
 using Microsoft.AspNetCore.Authorization;
@@ -18,6 +19,32 @@ namespace Ant.WebApi.Controllers
         public async Task<IActionResult> Get(Guid userId)
         {
             return Ok(await Mediator.Send(new GetPublicProfileQuery { UserId = userId }));
+        }
+
+        [HttpGet("{userId}/followers")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<System.Collections.Generic.List<ProfileConnectionViewModel>>))]
+        public async Task<IActionResult> GetFollowers(Guid userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50)
+        {
+            return Ok(await Mediator.Send(new GetProfileConnectionsQuery
+            {
+                UserId = userId,
+                Type = "followers",
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            }));
+        }
+
+        [HttpGet("{userId}/following")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<System.Collections.Generic.List<ProfileConnectionViewModel>>))]
+        public async Task<IActionResult> GetFollowing(Guid userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 50)
+        {
+            return Ok(await Mediator.Send(new GetProfileConnectionsQuery
+            {
+                UserId = userId,
+                Type = "following",
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            }));
         }
 
         [HttpPost("{userId}/follow")]

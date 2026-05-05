@@ -73,6 +73,13 @@ export async function addPostComment(postId: string, content: string): Promise<P
   })
 }
 
+export async function updatePostComment(postId: string, commentId: string, content: string): Promise<void> {
+  return apiFetchData<void>(`/posts/${postId}/comments/${commentId}`, {
+    method: 'PUT',
+    body: JSON.stringify({ content }),
+  })
+}
+
 export async function deletePostComment(postId: string, commentId: string): Promise<void> {
   return apiFetchData<void>(`/posts/${postId}/comments/${commentId}`, {
     method: 'DELETE',

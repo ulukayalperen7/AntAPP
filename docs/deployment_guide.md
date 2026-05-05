@@ -83,6 +83,16 @@ Host: 178.104.6.236 | Port: 5432 | DB: antapp
 User: antapp_user | Pass: b3JIvWwXGkrPq2mO0ijLzNaqaCAnNSDa
 ```
 
-## Bilinen Eksikler
+## Mail
 
-- SMTP ayarlanmadı (MailSettings env var'ları `.env`'de boş)
+Resend kullanılıyor. Prod secret'lar `/opt/antapp/.env` içinde tutulur:
+
+```bash
+RESEND_FROM_EMAIL="AntAPP <noreply@antapp.fun>"
+RESEND_API_KEY="re_..."
+RESEND_BASE_URL="https://api.resend.com"
+MAIL_DISPLAY_NAME="AntAPP"
+WEB_URL="https://antapp.fun"
+```
+
+`docker-compose.yml` bu değerleri `MailSettings__*` ve `AppUrls__Web` olarak backend'e geçirir.

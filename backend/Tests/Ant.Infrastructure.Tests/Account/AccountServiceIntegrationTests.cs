@@ -1,4 +1,5 @@
 using Ant.Application.DTOs.Account;
+using Ant.Application.DTOs.Email;
 using Ant.Core.Enums;
 using Ant.Application.Interfaces;
 using Ant.Application.Settings;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Moq;
 
 namespace Ant.Infrastructure.Tests.Account;
@@ -32,11 +34,18 @@ public class AuthServiceIntegrationTests : IAsyncDisposable
 
         var authenticatedUserMock = new Mock<IAuthenticatedUserService>();
         var emailServiceMock = new Mock<IEmailService>();
+        emailServiceMock
+            .Setup(service => service.SendAsync(It.IsAny<EmailRequest>()))
+            .Returns(Task.CompletedTask);
+        var environmentMock = new Mock<IHostEnvironment>();
+        environmentMock.SetupGet(environment => environment.EnvironmentName).Returns(Environments.Production);
         var services = new ServiceCollection();
 
         services.AddLogging();
+        services.AddSingleton<IConfiguration>(configuration);
         services.AddHttpContextAccessor();
         services.AddSingleton(authenticatedUserMock.Object);
+        services.AddSingleton(environmentMock.Object);
         services.AddSingleton<IDateTimeService>(new DateTimeService());
         services.AddSingleton(emailServiceMock.Object);
         services.Configure<JWTSettings>(configuration.GetSection("JWTSettings"));
@@ -77,7 +86,7 @@ public class AuthServiceIntegrationTests : IAsyncDisposable
 
         Assert.Equal(request.UserType, applicationUser.UserType);
         Assert.Equal(request.UserName, domainUser.UserName);
-        Assert.Contains("confirm-email", result);
+        Assert.Contains("check your email", result, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

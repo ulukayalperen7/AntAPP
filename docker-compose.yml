@@ -31,13 +31,13 @@ services:
       JWTSettings__Issuer: AntAppBackend
       JWTSettings__Audience: AntAppUser
       JWTSettings__DurationInMinutes: ${JWT_DURATION_MINUTES:-60}
-      MailSettings__EmailFrom: ${MAIL_FROM}
-      MailSettings__SmtpHost: ${SMTP_HOST}
-      MailSettings__SmtpPort: ${SMTP_PORT:-587}
-      MailSettings__SmtpUser: ${SMTP_USER}
-      MailSettings__SmtpPass: ${SMTP_PASS}
-      MailSettings__DisplayName: ${MAIL_DISPLAY_NAME:-AntApp}
-      AllowedOrigins__0: ${WEB_URL}
+      MailSettings__EmailFrom: ${RESEND_FROM_EMAIL:-AntAPP <noreply@antapp.fun>}
+      MailSettings__DisplayName: ${MAIL_DISPLAY_NAME:-AntAPP}
+      MailSettings__ResendApiKey: ${RESEND_API_KEY}
+      MailSettings__ResendBaseUrl: ${RESEND_BASE_URL:-https://api.resend.com}
+      AppUrls__Web: ${WEB_URL:-https://antapp.fun}
+      Auth__AutoConfirmEmail: "false"
+      AllowedOrigins__0: ${WEB_URL:-https://antapp.fun}
     ports:
       - "5000:5000"
     networks:

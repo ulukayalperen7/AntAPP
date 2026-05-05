@@ -25,12 +25,22 @@
   },
 
   "MailSettings": {
-    "EmailFrom": "test@ornek.com",
-    "SmtpHost": "smtp.ethereal.email",   // Test için: https://ethereal.email
+    "EmailFrom": "AntAPP <onboarding@resend.dev>", // Prod: "AntAPP <noreply@antapp.fun>"
+    "DisplayName": "AntAPP",
+    "ResendApiKey": "re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "ResendBaseUrl": "https://api.resend.com",
+    "SmtpHost": "",
     "SmtpPort": 587,
-    "SmtpUser": "ethereal_kullanici",
-    "SmtpPass": "ethereal_sifre",
-    "DisplayName": "AntAPP"
+    "SmtpUser": "",
+    "SmtpPass": ""
+  },
+
+  "AppUrls": {
+    "Web": "http://localhost:3000"
+  },
+
+  "Auth": {
+    "AutoConfirmEmail": false // Heatmap/load test için true yapabilirsiniz.
   },
 
   "JWTSettings": {

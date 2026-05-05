@@ -61,6 +61,14 @@ export type UserFollowSummary = {
   followingCount: number
 }
 
+export type ProfileConnection = {
+  id: string
+  userName: string
+  profilePhotoUrl: string | null
+  isCurrentUser: boolean
+  isFollowingByCurrentUser: boolean
+}
+
 export type Tag = {
   id: string
   name: string

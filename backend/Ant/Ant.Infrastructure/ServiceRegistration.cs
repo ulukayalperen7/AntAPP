@@ -144,7 +144,10 @@ namespace Ant.Infrastructure
 
             services.Configure<MailSettings>(configuration.GetSection("MailSettings"));
             services.AddTransient<IDateTimeService, DateTimeService>();
-            services.AddTransient<IEmailService, EmailService>();
+            services.AddHttpClient<IEmailService, EmailService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(15);
+            });
 
 
             #region Repositories

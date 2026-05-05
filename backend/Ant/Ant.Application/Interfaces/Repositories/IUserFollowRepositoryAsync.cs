@@ -1,5 +1,6 @@
 using Ant.Core.Entities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Ant.Application.Interfaces.Repositories
@@ -10,5 +11,7 @@ namespace Ant.Application.Interfaces.Repositories
         Task<bool> IsFollowingAsync(Guid followerUserId, Guid followingUserId);
         Task<int> GetFollowerCountAsync(Guid userId);
         Task<int> GetFollowingCountAsync(Guid userId);
+        Task<IReadOnlyList<UserFollow>> GetFollowersAsync(Guid userId, int pageNumber, int pageSize);
+        Task<IReadOnlyList<UserFollow>> GetFollowingAsync(Guid userId, int pageNumber, int pageSize);
     }
 }
