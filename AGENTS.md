@@ -47,6 +47,10 @@ AntAPP/
 
 ## Build & Run
 
+### Prerequisites
+```bash
+systemctl start valkey
+```
 ### Backend
 ```bash
 cd backend
@@ -75,6 +79,11 @@ npm run build --workspace=web
 cd backend && dotnet build Ant.sln
 ```
 
+### heatmap test run
+```bash
+cd backend/Ant
+./tests/heatmap_test.sh
+```
 ---
 
 ## Environment Setup
