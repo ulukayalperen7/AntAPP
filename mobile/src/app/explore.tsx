@@ -78,7 +78,22 @@ export default function ExploreScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$4">
           <YStack gap="$3">
-            <Text variant="heading2">Explore Routes</Text>
+            <XStack alignItems="center" justifyContent="space-between">
+              <Text variant="heading2">Explore Routes</Text>
+              <XStack
+                width={36}
+                height={36}
+                borderRadius="$round"
+                backgroundColor="$primary"
+                alignItems="center"
+                justifyContent="center"
+                cursor="pointer"
+                pressStyle={{ opacity: 0.8 }}
+                onPress={() => router.push('/create')}
+              >
+                <Feather name="plus" size={20} color="#FFFFFF" />
+              </XStack>
+            </XStack>
             <SearchInput
               value={search}
               onChangeText={setSearch}

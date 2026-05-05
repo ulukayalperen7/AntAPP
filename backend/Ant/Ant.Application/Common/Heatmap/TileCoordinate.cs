@@ -37,6 +37,14 @@ namespace Ant.Application.Common.Heatmap
             return (int.Parse(parts[2]), int.Parse(parts[3]));
         }
 
+        public static (double Lat, double Lng) TileCenter(int x, int y, int zoom)
+        {
+            var n = 1 << zoom;
+            var lng = ((x + 0.5) / n) * 360.0 - 180.0;
+            var latRad = System.Math.Atan(System.Math.Sinh(System.Math.PI * (1.0 - 2.0 * (y + 0.5) / n)));
+            return (latRad * 180.0 / System.Math.PI, lng);
+        }
+
         public static int ParseZoom(string tileKey)
         {
             var parts = tileKey.Split(':');

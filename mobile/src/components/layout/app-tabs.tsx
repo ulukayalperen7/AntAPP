@@ -13,8 +13,8 @@ type TabItem = {
 const TABS: TabItem[] = [
   { route: '/',        label: 'Home',    icon: 'home' },
   { route: '/explore', label: 'Explore', icon: 'compass' },
+  { route: '/maps',    label: 'Maps',    icon: 'map' },
   { route: '/spots',   label: 'Spots',   icon: 'map-pin' },
-  { route: '/create',  label: 'Create',  icon: 'plus-circle' },
   { route: '/profile', label: 'Profile', icon: 'user' },
 ]
 

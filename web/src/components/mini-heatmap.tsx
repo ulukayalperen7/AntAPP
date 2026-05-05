@@ -15,7 +15,7 @@ const ZOOM = 6
 const FALLBACK_CENTER: [number, number] = [30.7133, 36.8969]
 const FALLBACK_ZOOM = 9
 
-type Tile = { x: number; y: number; zoom: number; count: number }
+type Tile = { x: number; y: number; zoom: number; count: number; centroidLat?: number; centroidLng?: number }
 
 function tileCenterToLngLat(x: number, y: number, z: number): [number, number] {
   const n = Math.pow(2, z)
@@ -23,6 +23,13 @@ function tileCenterToLngLat(x: number, y: number, z: number): [number, number] {
   const latRad = Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 0.5)) / n)))
   const lat = (latRad * 180) / Math.PI
   return [lng, lat]
+}
+
+function tileCoords(t: Tile): [number, number] {
+  if (typeof t.centroidLat === 'number' && typeof t.centroidLng === 'number') {
+    return [t.centroidLng, t.centroidLat]
+  }
+  return tileCenterToLngLat(t.x, t.y, t.zoom)
 }
 
 export function MiniHeatmap() {
@@ -64,16 +71,25 @@ export function MiniHeatmap() {
 
         if (cancelled || !map.getStyle()) return
 
-        if (tiles.length > 0) {
-          const hottest = tiles.reduce((a, b) => (b.count > a.count ? b : a))
-          const [lng, lat] = tileCenterToLngLat(hottest.x, hottest.y, hottest.zoom)
-          map.jumpTo({ center: [lng, lat], zoom: FALLBACK_ZOOM })
-        } else {
+        if (tiles.length === 0) {
           map.jumpTo({ center: FALLBACK_CENTER, zoom: FALLBACK_ZOOM })
+        } else if (tiles.length === 1) {
+          const [lng, lat] = tileCoords(tiles[0])
+          map.jumpTo({ center: [lng, lat], zoom: 8 })
+        } else {
+          let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity
+          for (const t of tiles) {
+            const [lng, lat] = tileCoords(t)
+            if (lng < minLng) minLng = lng
+            if (lng > maxLng) maxLng = lng
+            if (lat < minLat) minLat = lat
+            if (lat > maxLat) maxLat = lat
+          }
+          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 24, maxZoom: 8, animate: false })
         }
 
         const features = tiles.map((t) => {
-          const [lng, lat] = tileCenterToLngLat(t.x, t.y, t.zoom)
+          const [lng, lat] = tileCoords(t)
           return {
             type: 'Feature' as const,
             properties: { count: t.count },

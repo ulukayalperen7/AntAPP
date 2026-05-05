@@ -66,7 +66,16 @@ namespace Ant.Application.Features.Heatmap.Queries.GetHeatmapTiles
                     .Select(kv =>
                     {
                         var (x, y) = TileCoordinate.ParseTileKey(kv.Key);
-                        return new HeatmapTileDto { X = x, Y = y, Zoom = zoom, Count = kv.Value };
+                        var (cLat, cLng) = TileCoordinate.TileCenter(x, y, zoom);
+                        return new HeatmapTileDto
+                        {
+                            X = x,
+                            Y = y,
+                            Zoom = zoom,
+                            Count = kv.Value,
+                            CentroidLat = cLat,
+                            CentroidLng = cLng,
+                        };
                     })
                     .ToList();
 
@@ -75,7 +84,7 @@ namespace Ant.Application.Features.Heatmap.Queries.GetHeatmapTiles
 
             var shift = storageZoom - zoom;
             var allTiles = await _heatmapService.GetAllActiveTilesAsync(cancellationToken);
-            var aggregated = new Dictionary<(int X, int Y), long>();
+            var aggregated = new Dictionary<(int X, int Y), (long Count, double LatSum, double LngSum)>();
 
             foreach (var (key, count) in allTiles)
             {
@@ -85,13 +94,26 @@ namespace Ant.Application.Features.Heatmap.Queries.GetHeatmapTiles
                 var parentY = y14 >> shift;
                 if (parentX < minX || parentX > maxX || parentY < minY || parentY > maxY) continue;
 
+                var (childLat, childLng) = TileCoordinate.TileCenter(x14, y14, storageZoom);
                 var bucket = (parentX, parentY);
                 aggregated.TryGetValue(bucket, out var existing);
-                aggregated[bucket] = existing + count;
+                aggregated[bucket] = (
+                    existing.Count + count,
+                    existing.LatSum + childLat * count,
+                    existing.LngSum + childLng * count
+                );
             }
 
             var tiles = aggregated
-                .Select(kv => new HeatmapTileDto { X = kv.Key.X, Y = kv.Key.Y, Zoom = zoom, Count = kv.Value })
+                .Select(kv => new HeatmapTileDto
+                {
+                    X = kv.Key.X,
+                    Y = kv.Key.Y,
+                    Zoom = zoom,
+                    Count = kv.Value.Count,
+                    CentroidLat = kv.Value.LatSum / kv.Value.Count,
+                    CentroidLng = kv.Value.LngSum / kv.Value.Count,
+                })
                 .ToList();
 
             return new Response<List<HeatmapTileDto>>(tiles);

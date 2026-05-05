@@ -6,5 +6,7 @@ namespace Ant.Application.DTOs
         public int Y { get; set; }
         public int Zoom { get; set; }
         public long Count { get; set; }
+        public double CentroidLat { get; set; }
+        public double CentroidLng { get; set; }
     }
 }

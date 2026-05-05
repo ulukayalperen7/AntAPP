@@ -6,6 +6,8 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { YStack, XStack, Text, Button } from '@antapp/ui'
 import { ArrowLeft, RefreshCw } from 'lucide-react'
+import { getSpots } from '@/features/spots/actions'
+import type { SpotListItem } from '@/types/api'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
@@ -13,7 +15,7 @@ const TURKEY_BOUNDS: [[number, number], [number, number]] = [[25.0, 35.5], [45.0
 const FALLBACK_CENTER: [number, number] = [30.7133, 36.8969]
 const FALLBACK_ZOOM = 6
 
-type Tile = { x: number; y: number; zoom: number; count: number }
+type Tile = { x: number; y: number; zoom: number; count: number; centroidLat?: number; centroidLng?: number }
 
 function tileCenterToLngLat(x: number, y: number, z: number): [number, number] {
   const n = Math.pow(2, z)
@@ -21,6 +23,13 @@ function tileCenterToLngLat(x: number, y: number, z: number): [number, number] {
   const latRad = Math.atan(Math.sinh(Math.PI * (1 - (2 * (y + 0.5)) / n)))
   const lat = (latRad * 180) / Math.PI
   return [lng, lat]
+}
+
+function tileCoords(t: Tile): [number, number] {
+  if (typeof t.centroidLat === 'number' && typeof t.centroidLng === 'number') {
+    return [t.centroidLng, t.centroidLat]
+  }
+  return tileCenterToLngLat(t.x, t.y, t.zoom)
 }
 
 export function HeatmapFullscreen() {
@@ -69,16 +78,25 @@ export function HeatmapFullscreen() {
 
         if (cancelled || !map.getStyle()) return
 
-        if (tiles.length > 0) {
-          const hottest = tiles.reduce((a, b) => (b.count > a.count ? b : a))
-          const [lng, lat] = tileCenterToLngLat(hottest.x, hottest.y, hottest.zoom)
-          map.jumpTo({ center: [lng, lat], zoom: 9 })
-        } else {
+        if (tiles.length === 0) {
           map.jumpTo({ center: FALLBACK_CENTER, zoom: FALLBACK_ZOOM })
+        } else if (tiles.length === 1) {
+          const [lng, lat] = tileCoords(tiles[0])
+          map.jumpTo({ center: [lng, lat], zoom: 8 })
+        } else {
+          let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity
+          for (const t of tiles) {
+            const [lng, lat] = tileCoords(t)
+            if (lng < minLng) minLng = lng
+            if (lng > maxLng) maxLng = lng
+            if (lat < minLat) minLat = lat
+            if (lat > maxLat) maxLat = lat
+          }
+          map.fitBounds([[minLng, minLat], [maxLng, maxLat]], { padding: 80, maxZoom: 8, animate: false })
         }
 
         const features = tiles.map((t) => {
-          const [lng, lat] = tileCenterToLngLat(t.x, t.y, t.zoom)
+          const [lng, lat] = tileCoords(t)
           return {
             type: 'Feature' as const,
             properties: { count: t.count },
@@ -110,6 +128,48 @@ export function HeatmapFullscreen() {
             ],
           },
         })
+
+        try {
+          const spotsPaged = await getSpots({ pageSize: 200 })
+          if (cancelled || !map.getStyle()) return
+
+          const spotFeatures = (spotsPaged.data ?? [])
+            .filter((s: SpotListItem) => Number.isFinite(s.latitude) && Number.isFinite(s.longitude))
+            .map((s: SpotListItem) => ({
+              type: 'Feature' as const,
+              properties: { id: s.id, name: s.name, rating: s.averageRating },
+              geometry: { type: 'Point' as const, coordinates: [s.longitude, s.latitude] },
+            }))
+
+          map.addSource('spots', {
+            type: 'geojson',
+            data: { type: 'FeatureCollection', features: spotFeatures },
+          })
+
+          map.addLayer({
+            id: 'spots-layer',
+            type: 'circle',
+            source: 'spots',
+            paint: {
+              'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 3, 10, 6, 14, 10],
+              'circle-color': '#FF8C00',
+              'circle-stroke-color': '#FFFFFF',
+              'circle-stroke-width': 2,
+              'circle-opacity': 0.95,
+            },
+          })
+
+          map.on('click', 'spots-layer', (e) => {
+            const f = e.features?.[0]
+            if (!f) return
+            const id = f.properties?.id
+            if (typeof id === 'string') router.push(`/spots/${id}`)
+          })
+          map.on('mouseenter', 'spots-layer', () => { map.getCanvas().style.cursor = 'pointer' })
+          map.on('mouseleave', 'spots-layer', () => { map.getCanvas().style.cursor = '' })
+        } catch {
+          /* swallow */
+        }
       } catch {
         /* swallow */
       }
