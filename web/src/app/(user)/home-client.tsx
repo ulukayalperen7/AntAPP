@@ -7,6 +7,7 @@ import { Avatar, Badge, Button, Card, Image, Input, Text, XStack, YStack } from 
 import { addPostComment, deletePostComment, getPostComments, getPostReactions, sharePost, togglePostReaction } from '@/features/posts/actions'
 import type { PostCommentItem, PostReactionItem, RouteListItem } from '@/types/api'
 import { Bell, CircleDot, Clock3, Compass, Copy, Ellipsis, MessageCircle, Plus, Sparkles, Star, ThumbsUp, Trash2 } from 'lucide-react'
+import { MiniHeatmap } from '@/components/mini-heatmap'
 
 type FeedMode = 'timeline' | 'official' | 'community'
 const COMMENTS_PAGE_SIZE = 20
@@ -840,6 +841,10 @@ export default function HomeClient({
         $md={{ width: '100%', minWidth: 0 }}
         style={{ position: 'sticky', top: '88px' }}
       >
+        <RightRailCard title="Live activity" subtitle="Where users are pinging right now">
+          <MiniHeatmap />
+        </RightRailCard>
+
         <RightRailCard title={copy.railTitle} subtitle={copy.railSubtitle}>
           <YStack gap="$3">
             {spotlightRoutes.slice(0, 4).map((route) => (
