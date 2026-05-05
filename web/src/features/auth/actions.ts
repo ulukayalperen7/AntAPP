@@ -64,8 +64,11 @@ async function setAuthCookies(accessToken: string, refreshToken: string) {
 
 async function clearAuthCookies() {
   const jar = await cookies()
-  jar.delete(ACCESS_TOKEN_COOKIE)
-  jar.delete(REFRESH_TOKEN_COOKIE)
+  const opts = { ...cookieOpts(), maxAge: 0, expires: new Date(0) }
+  jar.set(ACCESS_TOKEN_COOKIE, '', opts)
+  jar.set(REFRESH_TOKEN_COOKIE, '', opts)
+  jar.delete({ name: ACCESS_TOKEN_COOKIE, path: '/' })
+  jar.delete({ name: REFRESH_TOKEN_COOKIE, path: '/' })
 }
 
 export async function login(
@@ -90,6 +93,8 @@ export async function login(
   }
 
   await setAuthCookies(data.jwToken, data.refreshToken)
+  const { revalidatePath } = await import('next/cache')
+  revalidatePath('/', 'layout')
   const landingPath = getLandingPathByRoles(data.roles, data.userName)
   redirect(landingPath)
 }

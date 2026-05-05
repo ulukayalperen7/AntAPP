@@ -8,7 +8,7 @@ export default async function UserLayout({
 }: {
   children: React.ReactNode
 }) {
-  await requireAuth('/')
+  await requireAuth('/dashboard')
   const session = await getServerSession()
   const userResult = await Promise.allSettled([getCurrentUser()])
   const user = userResult[0].status === 'fulfilled' ? userResult[0].value : null
