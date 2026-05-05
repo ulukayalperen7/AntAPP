@@ -631,27 +631,20 @@ export default function HomeScreen() {
           </Card>
 
           <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
-            <XStack gap="$3" alignItems="center">
-              <Avatar size="lg" initials="AE" />
-              <XStack
-                flex={1}
-                minHeight={48}
-                alignItems="center"
-                paddingHorizontal="$4"
-                borderRadius="$full"
-                backgroundColor="$background"
-                borderWidth={1}
-                borderColor="$borderColor"
+            <XStack gap="$3" alignItems="center" flexWrap="wrap">
+              <Avatar size="lg" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'A'} />
+              <YStack flex={1} minWidth={160} gap="$1">
+                <Text variant="label">Create a route post</Text>
+                <Text variant="caption" muted>{PAGE_COPY.composer}</Text>
+              </YStack>
+              <Button
+                variant="solid"
+                size="sm"
+                icon={<Feather name="plus" size={14} color="#FFFFFF" />}
                 onPress={() => router.push('/posts/create')}
               >
-                <Text variant="body" muted>{PAGE_COPY.composer}</Text>
-              </XStack>
-            </XStack>
-
-            <XStack gap="$2" flexWrap="wrap">
-              <Button variant="ghost" size="sm" icon={<Feather name="video" size={16} color="#E11D48" />}>Live</Button>
-              <Button variant="ghost" size="sm" icon={<Feather name="image" size={16} color="#16A34A" />}>Photo</Button>
-              <Button variant="ghost" size="sm" icon={<Feather name="map-pin" size={16} color="#0EA5E9" />}>Check in</Button>
+                Create post
+              </Button>
             </XStack>
           </Card>
 
