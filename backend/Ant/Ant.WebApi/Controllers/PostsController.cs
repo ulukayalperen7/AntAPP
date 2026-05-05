@@ -4,7 +4,9 @@ using Ant.Application.Features.Posts.Commands.AddPostComment;
 using Ant.Application.Features.Posts.Commands.SharePost;
 using Ant.Application.Features.Posts.Commands.DeletePostComment;
 using Ant.Application.Features.Posts.Commands.UpdatePostComment;
+using Ant.Application.Features.Posts.Commands.UpdatePost;
 using Ant.Application.Features.Posts.Queries.GetFeedPosts;
+using Ant.Application.Features.Posts.Queries.GetPostById;
 using Ant.Application.Features.Posts.Queries.GetPostComments;
 using Ant.Application.Features.Posts.Queries.GetPostReactions;
 using Ant.Application.Wrappers;
@@ -38,10 +40,25 @@ namespace Ant.WebApi.Controllers
             }));
         }
 
+        [HttpGet("{postId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<FeedPostViewModel>))]
+        public async Task<IActionResult> GetById(Guid postId)
+        {
+            return Ok(await Mediator.Send(new GetPostByIdQuery { PostId = postId }));
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<System.Guid>))]
         public async Task<IActionResult> Create([FromBody] CreatePostCommand command)
         {
+            return Ok(await Mediator.Send(command));
+        }
+
+        [HttpPut("{postId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<System.Guid>))]
+        public async Task<IActionResult> Update(Guid postId, [FromBody] UpdatePostCommand command)
+        {
+            command.PostId = postId;
             return Ok(await Mediator.Send(command));
         }
 

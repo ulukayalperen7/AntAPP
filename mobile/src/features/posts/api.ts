@@ -89,3 +89,20 @@ export async function sharePost(postId: string): Promise<PostShareSummary> {
     method: 'POST',
   })
 }
+
+export async function getPostById(postId: string): Promise<FeedPostItem> {
+  return apiFetchData<FeedPostItem>(`/posts/${postId}`)
+}
+
+export async function updatePost(
+  postId: string,
+  data: { content?: string; imageUrls?: string[] },
+): Promise<void> {
+  return apiFetchData<void>(`/posts/${postId}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      content: data.content ?? '',
+      imageUrls: data.imageUrls ?? [],
+    }),
+  })
+}

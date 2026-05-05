@@ -85,81 +85,50 @@ function formatSocialCount(count: number, singular: string, plural: string) {
 
 function StoryCard({
   route,
-  action = false,
   onPress,
 }: {
-  route?: RouteListItem
-  action?: boolean
+  route: RouteListItem
   onPress: () => void
 }) {
-  if (action) {
-    return (
-      <Card
-        variant="outline"
-        size="sm"
-        backgroundColor="$backgroundStrong"
-        overflow="hidden"
-        width={124}
-        minWidth={124}
-        gap="$0"
-        padding={0}
-        pressable
-        onPress={onPress}
-      >
-        <YStack height={110} backgroundColor="$muted" />
-        <YStack padding="$3" gap="$2" alignItems="center" justifyContent="center">
-          <XStack
-            width={42}
-            height={42}
-            borderRadius="$full"
-            backgroundColor="$primary"
-            alignItems="center"
-            justifyContent="center"
-            marginTop={-24}
-            borderWidth={4}
-            borderColor="$backgroundStrong"
-          >
-            <Feather name="plus" size={18} color="#FFFFFF" />
-          </XStack>
-          <Text variant="label" align="center">Create Post</Text>
-        </YStack>
-      </Card>
-    )
-  }
-
-  if (!route) return null
-
   const tone = getPostTone(route)
+  const author = getAuthor(route)
 
   return (
-    <Card
-      variant="outline"
-      size="sm"
-      backgroundColor="$backgroundStrong"
-      overflow="hidden"
-      width={124}
-      minWidth={124}
-      gap="$0"
-      padding={0}
-      pressable
-      onPress={onPress}
-    >
-      <YStack position="relative" height={184} backgroundColor="$muted">
-        {route.thumbnailUrl ? (
-          <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
-        ) : null}
-        <YStack position="absolute" top="$3" left="$3">
-          <Avatar size="md" initials={getAuthor(route).initials} />
-        </YStack>
-        <YStack position="absolute" inset={0} backgroundColor="rgba(15,23,42,0.2)" />
-        <YStack position="absolute" bottom="$3" left="$3" right="$3" gap="$1.5">
-          <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
-          <Text variant="label" color="#FFFFFF" numberOfLines={2}>
-            {route.title}
-          </Text>
+    <YStack width={86} minWidth={86} alignItems="center" gap="$2" onPress={onPress}>
+      <YStack
+        width={72}
+        height={72}
+        borderRadius="$full"
+        padding={3}
+        backgroundColor={route.contentType === 'Official' ? '$info500' : '$primary'}
+        alignItems="center"
+        justifyContent="center"
+      >
+        <YStack
+          width="100%"
+          height="100%"
+          borderRadius="$full"
+          overflow="hidden"
+          backgroundColor="$muted"
+          borderWidth={3}
+          borderColor="$backgroundStrong"
+          alignItems="center"
+          justifyContent="center"
+        >
+          {route.thumbnailUrl ? (
+            <Image src={route.thumbnailUrl} width="100%" height="100%" objectFit="cover" />
+          ) : (
+            <Avatar size="lg" initials={author.initials} />
+          )}
         </YStack>
       </YStack>
-    </Card>
+      <YStack alignItems="center" gap="$1" width="100%">
+        <Text variant="caption" weight="semibold" align="center" numberOfLines={2}>
+          {route.title}
+        </Text>
+        <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+      </YStack>
+    </YStack>
   )
 }
 
@@ -627,8 +596,11 @@ export default function HomeScreen() {
         : []
       const fallbackRoutes = fallbackResult.status === 'fulfilled' ? fallbackResult.value.data : []
 
-      setTimelineRoutes(feedRoutes.length > 0 ? feedRoutes : fallbackRoutes)
-      setSpotlightRoutes(spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : [])
+      const timeline = feedRoutes.length > 0 ? feedRoutes : fallbackRoutes
+      const spotlight = spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : []
+
+      setTimelineRoutes(timeline)
+      setSpotlightRoutes(spotlight.length > 0 ? spotlight : timeline.slice(0, 8))
       setLoading(false)
     })
 
@@ -645,33 +617,38 @@ export default function HomeScreen() {
     <YStack flex={1} backgroundColor="$background">
       <ScrollView showsVerticalScrollIndicator={false}>
         <YStack paddingHorizontal="$4" paddingTop={insets.top + 12} paddingBottom={100} gap="$4">
-<Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
-            <XStack gap="$3" alignItems="center" flexWrap="wrap">
-              <Avatar size="lg" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'A'} />
-              <Text variant="label" flex={1} minWidth={160}>Create a route post</Text>
+          {spotlightRoutes.length > 0 ? (
+            <YStack gap="$2">
+              <Text variant="caption" muted textTransform="uppercase">Featured routes</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <XStack gap="$3" paddingBottom="$1">
+                  {spotlightRoutes.slice(0, 8).map((route, index) => (
+                    <StoryCard
+                      key={`${route.postId ?? route.id}-${index}`}
+                      route={route}
+                      onPress={() => router.push(`/routes/${route.id}`)}
+                    />
+                  ))}
+                </XStack>
+              </ScrollView>
+            </YStack>
+          ) : null}
+
+          <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" padding="$4" gap="$0">
+            <XStack gap="$3" alignItems="center">
+              <Avatar size="md" initials={user?.userName?.charAt(0)?.toUpperCase() ?? 'A'} />
+              <Text variant="body" weight="semibold" flex={1} numberOfLines={1}>Create a route post</Text>
               <Button
                 variant="solid"
                 size="sm"
-                icon={<Feather name="plus" size={14} color="#FFFFFF" />}
+                borderRadius="$full"
+                icon={<Feather name="plus" size={13} color="#FFFFFF" />}
                 onPress={() => router.push('/posts/create')}
               >
-                Create post
+                Post
               </Button>
             </XStack>
           </Card>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <XStack gap="$3" paddingBottom="$1">
-              <StoryCard action onPress={() => router.push('/posts/create')} />
-              {spotlightRoutes.slice(0, 5).map((route) => (
-                <StoryCard
-                  key={route.id}
-                  route={route}
-                  onPress={() => router.push(`/routes/${route.id}`)}
-                />
-              ))}
-            </XStack>
-          </ScrollView>
 
           <YStack>
             {timelineRoutes.length > 0 ? (
@@ -679,7 +656,7 @@ export default function HomeScreen() {
                 <FeedPostCard
                   key={route.postId ?? route.id}
                   route={route}
-                  onPress={() => router.push(`/routes/${route.id}`)}
+                  onPress={() => router.push(route.postId ? `/posts/${route.postId}` : `/routes/${route.id}`)}
                   onOpenProfile={() => router.push(`/profiles/${route.authorUserId}`)}
                   onCreatePost={() => router.push(`/posts/create?routeId=${route.id}`)}
                   currentUserName={user?.userName}

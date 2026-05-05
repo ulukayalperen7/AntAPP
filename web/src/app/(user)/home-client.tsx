@@ -1,5 +1,4 @@
 'use client';
-import "./_home-client.css"
 
 const _cn69 = "is_View _pos-relative _fd-column _btlr-t-radius-4 _btrr-t-radius-4 _bbrr-t-radius-4 _bblr-t-radius-4 _ox-hidden _oy-hidden _bg-muted _h-148px ";
 const _cn68 = "is_Text font_body _col-mutedForegr3422748 _ff-f-family _userSelect-text _fontWeight-400 _textAlign-left _fs-f-size-3 _lh-f-lineHeigh112922 ";
@@ -500,7 +499,7 @@ function FeedPostCard({
       </div>
 
       {/* Full-width image */}
-      <div className={_cn6} onClick={() => router.push(`/routes/${route.id}`)}>
+      <div className={_cn6} onClick={() => router.push(route.postId ? `/posts/${route.postId}` : `/routes/${route.id}`)}>
         {coverImage ? <Image src={coverImage} width="100%" height="100%" objectFit="cover" /> : <div className={_cn7}>
             <Compass size={36} color="var(--color-mutedForeground)" />
           </div>}
@@ -522,7 +521,7 @@ function FeedPostCard({
             <Copy size={22} color={shareCopied ? 'var(--color-primary)' : 'currentColor'} />
           </div>
         </div>
-        <div className={_cn15} onClick={() => router.push(`/routes/${route.id}`)}>
+        <div className={_cn15} onClick={() => router.push(route.postId ? `/posts/${route.postId}` : `/routes/${route.id}`)}>
           <Compass size={22} color="currentColor" />
         </div>
       </div>
@@ -639,6 +638,25 @@ function RightRailCard({
       {children}
     </Card>;
 }
+function StoryRouteBubble({ route }: { route: RouteListItem }) {
+  const image = route.postImageUrls?.[0] || route.thumbnailUrl;
+  const tone = getPostTone(route);
+  const author = getAuthor(route);
+
+  return <Link href={`/routes/${route.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <YStack width={92} minWidth={92} alignItems="center" gap="$2" cursor="pointer">
+        <YStack width={76} height={76} borderRadius="$full" padding={3} backgroundColor={route.contentType === 'Official' ? '$info500' : '$primary'} alignItems="center" justifyContent="center">
+          <YStack width="100%" height="100%" borderRadius="$full" overflow="hidden" backgroundColor="$muted" borderWidth={3} borderColor="$backgroundStrong" alignItems="center" justifyContent="center">
+            {image ? <Image src={image} width="100%" height="100%" objectFit="cover" /> : <Avatar size="lg" initials={author.initials} />}
+          </YStack>
+        </YStack>
+        <YStack alignItems="center" gap="$1" width="100%">
+          <Text variant="caption" weight="semibold" align="center" numberOfLines={2}>{route.title}</Text>
+          <Badge variant={tone.variant} size="sm">{tone.badge}</Badge>
+        </YStack>
+      </YStack>
+    </Link>;
+}
 export default function HomeClient({
   mode,
   timelineRoutes,
@@ -650,9 +668,17 @@ export default function HomeClient({
   const copy = PAGE_COPY[mode];
   const composerInitials = getInitials(currentUserName);
   const referenceNowMs = parseApiDate(referenceNowIso)?.getTime() ?? 0;
+  const featuredRoutes = (spotlightRoutes.length > 0 ? spotlightRoutes : timelineRoutes).slice(0, 10);
   return <div className={_cn55}>
       <div className={_cn56}>
-<Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
+        {featuredRoutes.length > 0 ? <YStack gap="$2">
+            <Text variant="caption" muted textTransform="uppercase">Featured routes</Text>
+            <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 6, WebkitOverflowScrolling: 'touch' }}>
+              {featuredRoutes.map((route, index) => <StoryRouteBubble key={`${route.postId ?? route.id}-${index}`} route={route} />)}
+            </div>
+          </YStack> : null}
+
+        <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
           <div className={_cn57}>
             <Avatar size="lg" initials={composerInitials} />
             <span className={_cn58}>Create a route post</span>

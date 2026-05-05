@@ -41,6 +41,31 @@ namespace Ant.Infrastructure.Repositories
             return BuildFeedQuery(null).FirstOrDefaultAsync(p => p.Id == postId);
         }
 
+        public Task<Post> GetPostForUpdateAsync(Guid postId)
+        {
+            return _dbContext.Posts
+                .AsTracking()
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == postId && !p.IsDeleted);
+        }
+
+        public async Task ReplacePostImagesAsync(Post post, IReadOnlyList<string> imageUrls)
+        {
+            _dbContext.PostImages.RemoveRange(post.Images ?? new List<PostImage>());
+
+            var images = imageUrls
+                .Select((url, index) => new PostImage
+                {
+                    PostId = post.Id,
+                    ImageUrl = url,
+                    SortOrder = index + 1
+                })
+                .ToList();
+
+            await _dbContext.PostImages.AddRangeAsync(images);
+            await _dbContext.SaveChangesAsync();
+        }
+
         private IQueryable<Post> BuildFeedQuery(RouteContentTypeEnum? contentType, Guid? authorId = null)
         {
             var query = _dbContext.Posts
