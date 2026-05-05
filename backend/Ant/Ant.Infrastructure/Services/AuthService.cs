@@ -11,6 +11,8 @@ using Ant.Infrastructure.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -33,6 +35,7 @@ namespace Ant.Infrastructure.Services
         private readonly JWTSettings _jwtSettings;
         private readonly IDateTimeService _dateTimeService;
         private readonly ApplicationDbContext _dbContext;
+        private readonly bool _autoConfirmEmail;
 
         public AuthService(UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole<Guid>> roleManager,
@@ -40,7 +43,8 @@ namespace Ant.Infrastructure.Services
             IDateTimeService dateTimeService,
             SignInManager<ApplicationUser> signInManager,
             IEmailService emailService,
-            ApplicationDbContext dbContext)
+            ApplicationDbContext dbContext,
+            IHostEnvironment environment)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -49,6 +53,7 @@ namespace Ant.Infrastructure.Services
             _signInManager = signInManager;
             _emailService = emailService;
             _dbContext = dbContext;
+            _autoConfirmEmail = environment.IsDevelopment();
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request, string ipAddress)
@@ -143,7 +148,7 @@ namespace Ant.Infrastructure.Services
                 Email = request.Email,
                 UserName = request.UserName,
                 UserType = request.UserType,
-                EmailConfirmed = false
+                EmailConfirmed = _autoConfirmEmail
             };
 
             var domainUser = new User
@@ -179,8 +184,12 @@ namespace Ant.Infrastructure.Services
                     foreach (var roleName in roleNames.Distinct())
                         await _userManager.AddToRoleAsync(user, roleName);
 
-                    await SendVerificationEmail(user, origin);
-                    return "Account created successfully. Please check your email to confirm your account.";
+                    if (!_autoConfirmEmail)
+                        await SendVerificationEmail(user, origin);
+
+                    return _autoConfirmEmail
+                        ? "Account created and auto-confirmed (development mode)."
+                        : "Account created successfully. Please check your email to confirm your account.";
                 }
                 else
                 {
