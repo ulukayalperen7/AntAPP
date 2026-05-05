@@ -1,24 +1,4 @@
 services:
-  postgres:
-    image: postgis/postgis:16-3.4
-    container_name: antapp-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-antapp}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB:-antapp}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - antapp
-
   valkey:
     image: valkey/valkey:8-alpine
     container_name: antapp-valkey
@@ -39,14 +19,12 @@ services:
     container_name: antapp-backend
     restart: unless-stopped
     depends_on:
-      postgres:
-        condition: service_healthy
       valkey:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-antapp};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Trust Server Certificate=true;CommandTimeout=300;"
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
       ConnectionStrings__Valkey: "valkey:6379,abortConnect=false"
       Cache__Provider: "Valkey"
       JWTSettings__Key: ${JWT_SECRET}
@@ -94,7 +72,6 @@ services:
       - "traefik.docker.network=coolify"
 
 volumes:
-  postgres_data:
   valkey_data:
 
 networks:
