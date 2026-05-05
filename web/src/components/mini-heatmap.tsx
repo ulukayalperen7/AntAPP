@@ -77,10 +77,19 @@ export function MiniHeatmap() {
           type: 'heatmap',
           source: 'heat',
           paint: {
-            'heatmap-weight': ['interpolate', ['linear'], ['get', 'count'], 0, 0, 100, 1],
-            'heatmap-intensity': 1.2,
-            'heatmap-radius': 22,
-            'heatmap-opacity': 0.75,
+            'heatmap-weight': ['interpolate', ['linear'], ['get', 'count'], 0, 0, 5, 1],
+            'heatmap-intensity': 2.5,
+            'heatmap-radius': 50,
+            'heatmap-opacity': 0.85,
+            'heatmap-color': [
+              'interpolate', ['linear'], ['heatmap-density'],
+              0, 'rgba(0,0,255,0)',
+              0.2, 'rgba(0,150,255,0.6)',
+              0.4, 'rgba(0,255,150,0.7)',
+              0.6, 'rgba(255,255,0,0.8)',
+              0.8, 'rgba(255,150,0,0.9)',
+              1, 'rgba(255,0,0,1)',
+            ],
           },
         })
       } catch {

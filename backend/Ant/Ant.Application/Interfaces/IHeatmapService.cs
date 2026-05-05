@@ -12,6 +12,7 @@ namespace Ant.Application.Interfaces
         Task RemoveTokenAsync(string tokenHash, CancellationToken cancellationToken = default);
         Task<bool> UpdateUserLocationAsync(string userId, string newTileKey, CancellationToken cancellationToken = default);
         Task<Dictionary<string, long>> GetTileCountsAsync(IEnumerable<string> tileKeys, CancellationToken cancellationToken = default);
+        Task<Dictionary<string, long>> GetAllActiveTilesAsync(CancellationToken cancellationToken = default);
         Task<int> SweepExpiredUsersAsync(TimeSpan maxInactivity, CancellationToken cancellationToken = default);
     }
 }

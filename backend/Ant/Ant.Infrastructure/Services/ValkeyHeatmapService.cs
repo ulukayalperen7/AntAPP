@@ -110,6 +110,22 @@ namespace Ant.Infrastructure.Services
             return result;
         }
 
+        public async Task<Dictionary<string, long>> GetAllActiveTilesAsync(CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var entries = await _database.HashGetAllAsync(TilesHashKey);
+            var result = new Dictionary<string, long>(entries.Length);
+            foreach (var entry in entries)
+            {
+                if (entry.Value.TryParse(out long count) && count > 0)
+                {
+                    result[entry.Name.ToString()] = count;
+                }
+            }
+            return result;
+        }
+
         public async Task<int> SweepExpiredUsersAsync(TimeSpan maxInactivity, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -33,6 +33,7 @@ namespace Ant.Application.Features.Heatmap.Queries.GetHeatmapTiles
         public async Task<Response<List<HeatmapTileDto>>> Handle(GetHeatmapTilesQuery request, CancellationToken cancellationToken)
         {
             var zoom = Math.Clamp(request.Zoom, 1, 18);
+            var storageZoom = TileCoordinate.DefaultZoom;
 
             var (minX, maxY) = TileCoordinate.FromLatLng(request.MinLat, request.MinLng, zoom);
             var (maxX, minY) = TileCoordinate.FromLatLng(request.MaxLat, request.MaxLng, zoom);
@@ -40,37 +41,57 @@ namespace Ant.Application.Features.Heatmap.Queries.GetHeatmapTiles
             if (minX > maxX) (minX, maxX) = (maxX, minX);
             if (minY > maxY) (minY, maxY) = (maxY, minY);
 
-            var tileCount = (long)(maxX - minX + 1) * (maxY - minY + 1);
-            if (tileCount > MaxTilesPerRequest)
+            if (zoom >= storageZoom)
             {
-                return new Response<List<HeatmapTileDto>>(
-                    $"Bounding box too large: {tileCount} tiles requested, max is {MaxTilesPerRequest}. Zoom in or reduce the area.");
-            }
-
-            var tileKeys = new List<string>();
-            for (var x = minX; x <= maxX; x++)
-            {
-                for (var y = minY; y <= maxY; y++)
+                var tileCount = (long)(maxX - minX + 1) * (maxY - minY + 1);
+                if (tileCount > MaxTilesPerRequest)
                 {
-                    tileKeys.Add(TileCoordinate.ToTileKey(x, y, zoom));
+                    return new Response<List<HeatmapTileDto>>(
+                        $"Bounding box too large: {tileCount} tiles requested, max is {MaxTilesPerRequest}. Zoom in or reduce the area.");
                 }
+
+                var tileKeys = new List<string>();
+                for (var x = minX; x <= maxX; x++)
+                {
+                    for (var y = minY; y <= maxY; y++)
+                    {
+                        tileKeys.Add(TileCoordinate.ToTileKey(x, y, zoom));
+                    }
+                }
+
+                var counts = await _heatmapService.GetTileCountsAsync(tileKeys, cancellationToken);
+
+                var exact = counts
+                    .Where(kv => kv.Value > 0)
+                    .Select(kv =>
+                    {
+                        var (x, y) = TileCoordinate.ParseTileKey(kv.Key);
+                        return new HeatmapTileDto { X = x, Y = y, Zoom = zoom, Count = kv.Value };
+                    })
+                    .ToList();
+
+                return new Response<List<HeatmapTileDto>>(exact);
             }
 
-            var counts = await _heatmapService.GetTileCountsAsync(tileKeys, cancellationToken);
+            var shift = storageZoom - zoom;
+            var allTiles = await _heatmapService.GetAllActiveTilesAsync(cancellationToken);
+            var aggregated = new Dictionary<(int X, int Y), long>();
 
-            var tiles = counts
-                .Where(kv => kv.Value > 0)
-                .Select(kv =>
-                {
-                    var (x, y) = TileCoordinate.ParseTileKey(kv.Key);
-                    return new HeatmapTileDto
-                    {
-                        X = x,
-                        Y = y,
-                        Zoom = zoom,
-                        Count = kv.Value
-                    };
-                })
+            foreach (var (key, count) in allTiles)
+            {
+                if (TileCoordinate.ParseZoom(key) != storageZoom) continue;
+                var (x14, y14) = TileCoordinate.ParseTileKey(key);
+                var parentX = x14 >> shift;
+                var parentY = y14 >> shift;
+                if (parentX < minX || parentX > maxX || parentY < minY || parentY > maxY) continue;
+
+                var bucket = (parentX, parentY);
+                aggregated.TryGetValue(bucket, out var existing);
+                aggregated[bucket] = existing + count;
+            }
+
+            var tiles = aggregated
+                .Select(kv => new HeatmapTileDto { X = kv.Key.X, Y = kv.Key.Y, Zoom = zoom, Count = kv.Value })
                 .ToList();
 
             return new Response<List<HeatmapTileDto>>(tiles);

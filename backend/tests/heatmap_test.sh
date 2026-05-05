@@ -92,7 +92,7 @@ for i in $(seq 1 "$USER_COUNT"); do
         }")
 
     HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-    BODY=$(echo "$RESPONSE" | head -n -1)
+    BODY=$(echo "$RESPONSE" | sed '$d')
 
     if [[ "$HTTP_CODE" == "200" ]]; then
         ok "Registered ${USERNAME} (${EMAIL})"
@@ -131,7 +131,7 @@ for i in $(seq 1 "$USER_COUNT"); do
     RESPONSE=$(api_call "POST" "/auth/login" "{\"email\": \"${EMAIL}\", \"password\": \"${PASSWORD}\"}")
 
     HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-    BODY=$(echo "$RESPONSE" | head -n -1)
+    BODY=$(echo "$RESPONSE" | sed '$d')
 
     if [[ "$HTTP_CODE" == "200" ]]; then
         TOKEN=$(echo "$BODY" | python3 -c "import sys,json; print(json.load(sys.stdin)['jwToken'])" 2>/dev/null || echo "")
@@ -165,7 +165,7 @@ FIRST_TOKEN=$(head -1 "$TOKENS_FILE")
 RESPONSE=$(api_call "POST" "/heatmap/ping" '{"latitude": 36.8969, "longitude": 30.7133}' "$FIRST_TOKEN")
 
 PING_CODE=$(echo "$RESPONSE" | tail -1)
-PING_BODY=$(echo "$RESPONSE" | head -n -1)
+PING_BODY=$(echo "$RESPONSE" | sed '$d')
 
 if [[ "$PING_CODE" == "200" ]]; then
     ok "Ping endpoint works: ${PING_BODY}"
@@ -178,7 +178,7 @@ fi
 RESPONSE=$(api_call "GET" "/heatmap/tiles?minLat=36.85&minLng=30.65&maxLat=36.95&maxLng=30.75&zoom=14")
 
 TILES_CODE=$(echo "$RESPONSE" | tail -1)
-TILES_BODY=$(echo "$RESPONSE" | head -n -1)
+TILES_BODY=$(echo "$RESPONSE" | sed '$d')
 
 if [[ "$TILES_CODE" == "200" ]]; then
     TILE_COUNT=$(echo "$TILES_BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('data',[])))" 2>/dev/null || echo "?")
