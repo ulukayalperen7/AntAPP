@@ -246,9 +246,9 @@ namespace Ant.Infrastructure.Services
             var resetLink = $"{baseUrl}/reset-password?token={encodedToken}&email={encodedEmail}";
             var emailRequest = new EmailRequest()
             {
-                Body = $"Click the link below to reset your password:<br/><br/><a href=\"{resetLink}\">{resetLink}</a><br/><br/>If you did not request this, you can ignore this email.",
+                Body = EmailTemplates.ResetPassword(resetLink),
                 To = model.Email,
-                Subject = "Reset Your Password",
+                Subject = "Reset Your Password — AntAPP",
             };
 
             try
@@ -344,7 +344,7 @@ namespace Ant.Infrastructure.Services
             {
                 To = user.Email,
                 Subject = "Confirm Your Email — AntAPP",
-                Body = $"Please confirm your email address by clicking the link below:<br/><br/><a href=\"{verificationUri}\">{verificationUri}</a><br/><br/>If you did not create an account, you can ignore this email.",
+                Body = EmailTemplates.ConfirmEmail(verificationUri),
             });
         }
 

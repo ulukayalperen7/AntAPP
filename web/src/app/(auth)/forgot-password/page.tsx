@@ -93,7 +93,6 @@ export default function ForgotPasswordPage() {
                 loading={isPending}
                 disabled={isPending}
                 icon={<Mail size={16} color="#fff" />}
-                // @ts-ignore — web-only HTML type attribute
                 htmlType="submit"
               >
                 Send Reset Link

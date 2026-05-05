@@ -101,6 +101,7 @@ export type ButtonProps = Omit<GetProps<typeof ButtonFrame>, 'variant'> & {
   icon?: React.ReactNode
   iconAfter?: React.ReactNode
   children?: React.ReactNode
+  htmlType?: 'submit' | 'button' | 'reset'
 }
 
 export function Button({
@@ -112,6 +113,7 @@ export function Button({
   variant = 'solid',
   size = 'md',
   color,
+  htmlType,
   accessibilityLabel,
   accessibilityRole,
   role,
@@ -138,6 +140,8 @@ export function Button({
 
   return (
     <ButtonFrame
+      tag={htmlType ? 'button' : undefined}
+      type={htmlType}
       variant={variant}
       size={size}
       disabled={isDisabled}
