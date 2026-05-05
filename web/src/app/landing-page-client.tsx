@@ -30,19 +30,6 @@ function AntGlyph({ size = 20 }: { size?: number }) {
   )
 }
 
-function StatItem({ num, label }: { num: string; label: string }) {
-  return (
-    <YStack alignItems="center" gap="$2" flex={1} minWidth={140}>
-      <Text fontSize={44} fontWeight="800" color="$primary" letterSpacing={-1} lineHeight={44}>
-        {num}
-      </Text>
-      <Text color="$mutedForeground" fontSize={14} fontWeight="500">
-        {label}
-      </Text>
-    </YStack>
-  )
-}
-
 function FeatureCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <Card
@@ -675,23 +662,6 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
           </XStack>
         </YStack>
 
-        {/* ============ STATS ============ */}
-        <YStack backgroundColor="$ant50" paddingVertical="$12" paddingHorizontal="$6">
-          <XStack
-            width="100%"
-            maxWidth={1200}
-            marginHorizontal="auto"
-            gap="$8"
-            flexWrap="wrap"
-            justifyContent="space-between"
-          >
-            <StatItem num="10,000+" label="Routes Mapped" />
-            <StatItem num="50K+"    label="Active Explorers" />
-            <StatItem num="4.8★"    label="Average Rating" />
-            <StatItem num="120+"    label="Cities Covered" />
-          </XStack>
-        </YStack>
-
         {/* ============ FEATURED ROUTES ============ */}
         <YStack paddingVertical="$16" paddingHorizontal="$6">
           <YStack width="100%" maxWidth={1200} marginHorizontal="auto" gap="$10">
@@ -809,29 +779,39 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
             >
               Ready to Explore Your City?
             </Text>
-            <Text fontSize={18} color="white" opacity={0.92} textAlign="center">
-              Join thousands of adventurers. Free forever.
-            </Text>
-            <XStack gap="$3" flexWrap="wrap" justifyContent="center">
+            <XStack gap="$3" flexWrap="wrap" justifyContent="center" marginTop="$4">
               <Button
-                {...({ size: '$5' } as any)}
+                height={52}
+                paddingHorizontal={28}
                 backgroundColor="white"
                 color="$primary"
-                hoverStyle={{ backgroundColor: '$ant50' }}
-                borderRadius="$10"
+                fontSize={16}
+                fontWeight="700"
+                hoverStyle={{ backgroundColor: '$ant50', scale: 1.03 }}
+                pressStyle={{ scale: 0.97 }}
+                borderRadius={999}
+                shadowColor="rgba(0,0,0,0.18)"
+                shadowOffset={{ width: 0, height: 8 }}
+                shadowRadius={20}
+                {...({ style: { transition: 'all 200ms ease' } } as any)}
                 onPress={() => router.push('/register')}
               >
                 Sign Up Free
               </Button>
               <Button
-                {...({ size: '$5' } as any)}
+                height={52}
+                paddingHorizontal={28}
                 backgroundColor="transparent"
                 color="white"
+                fontSize={16}
+                fontWeight="700"
                 borderColor="rgba(255,255,255,0.7)"
                 borderWidth={1.5}
-                hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'white' }}
-                borderRadius="$10"
-                icon={<Download size={16} />}
+                hoverStyle={{ backgroundColor: 'rgba(255,255,255,0.12)', borderColor: 'white', scale: 1.03 }}
+                pressStyle={{ scale: 0.97 }}
+                borderRadius={999}
+                {...({ style: { transition: 'all 200ms ease' } } as any)}
+                icon={<Download size={18} />}
               >
                 Download App
               </Button>
@@ -869,7 +849,7 @@ export function LandingPageClient({ featuredRoutes }: { featuredRoutes: Featured
               </YStack>
               <Text fontSize={15} fontWeight="800" color="$primary">AntAPP</Text>
             </XStack>
-            <Text fontSize={14} color="$mutedForeground">© 2025 AntAPP. Made for explorers.</Text>
+            <Text fontSize={14} color="$mutedForeground">© 2026 AntAPP. Made for explorers.</Text>
             <XStack gap="$3">
               <Text fontSize={14} color="$mutedForeground" cursor="pointer" hoverStyle={{ color: '$primary' }}>
                 Privacy
