@@ -140,8 +140,6 @@ export function Button({
 
   return (
     <ButtonFrame
-      tag={htmlType ? 'button' : undefined}
-      type={htmlType}
       variant={variant}
       size={size}
       disabled={isDisabled}
