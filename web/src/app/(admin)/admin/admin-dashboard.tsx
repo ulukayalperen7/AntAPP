@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Card } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Card, Avatar } from '@antapp/ui'
 import { LogOut, Grid3x3, Tag, Users, TrendingUp, MapPin } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { getAdminStats, type AdminStats } from '@/features/admin/dashboard-actions'
@@ -13,10 +13,12 @@ type AdminSection = 'overview' | 'tags' | 'routes' | 'users' | 'spots'
 export default function AdminDashboard({
   userName,
   email,
+  profilePhotoUrl,
   roles,
 }: {
   userName: string
   email: string
+  profilePhotoUrl?: string | null
   roles: string[]
 }) {
   const router = useRouter()
@@ -99,7 +101,7 @@ export default function AdminDashboard({
       {/* Header */}
       <XStack justifyContent="space-between" alignItems="center" borderBottomWidth={1} borderBottomColor="$borderColor" paddingBottom="$4">
         <XStack alignItems="center" gap="$4" flex={1}>
-          <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+          <Avatar size="md" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
           <YStack gap="$2">
             <Text variant="heading1" color="$primary">Admin Panel</Text>
             <Text variant="body" muted>Welcome, {userName}</Text>

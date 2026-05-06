@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Avatar } from '@antapp/ui'
 import { LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { updateUserStatus, AdminUserItem } from '@/features/admin/users-actions'
@@ -10,10 +10,12 @@ import { updateUserStatus, AdminUserItem } from '@/features/admin/users-actions'
 export default function AdminUsersClient({
     userName,
     email,
+    profilePhotoUrl,
     initialUsers,
 }: {
     userName: string
     email: string
+    profilePhotoUrl?: string | null
     initialUsers: AdminUserItem[]
 }) {
     const router = useRouter()
@@ -49,7 +51,7 @@ export default function AdminUsersClient({
                     >
                         Back
                     </Button>
-                    <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                    <Avatar size="sm" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
                     <YStack gap="$1">
                         <XStack alignItems="center" gap="$2">
                             <Text variant="heading2">Users</Text>
@@ -86,10 +88,13 @@ export default function AdminUsersClient({
 
                         {users.map((user) => (
                             <XStack key={user.id} padding="$3" borderBottomWidth={1} borderBottomColor="$borderColor" gap="$3" alignItems="center">
-                                <YStack flex={2} flexBasis={0} minWidth={0}>
-                                    <Text variant="body" weight="semibold" numberOfLines={1}>{user.email}</Text>
-                                    <Text variant="caption" muted numberOfLines={1}>{user.userName}</Text>
-                                </YStack>
+                                <XStack flex={2} flexBasis={0} minWidth={0} gap="$2" alignItems="center">
+                                    <Avatar size="sm" initials={user.userName.charAt(0).toUpperCase()} src={user.profilePhotoUrl ?? undefined} />
+                                    <YStack flex={1} minWidth={0}>
+                                        <Text variant="body" weight="semibold" numberOfLines={1}>{user.email}</Text>
+                                        <Text variant="caption" muted numberOfLines={1}>{user.userName}</Text>
+                                    </YStack>
+                                </XStack>
                                 <XStack flex={1} flexBasis={0} minWidth={0} justifyContent="center">
                                     <Text variant="caption" muted textAlign="center">{user.roles.join(', ') || 'User'}</Text>
                                 </XStack>

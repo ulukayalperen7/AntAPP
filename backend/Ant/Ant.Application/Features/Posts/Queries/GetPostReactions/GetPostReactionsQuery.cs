@@ -23,6 +23,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostReactions
         public Guid PostId { get; set; }
         public Guid UserId { get; set; }
         public string UserName { get; set; }
+        public string UserProfilePhotoUrl { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -57,6 +58,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostReactions
                     PostId = r.PostId,
                     UserId = r.UserId,
                     UserName = r.User?.UserName,
+                    UserProfilePhotoUrl = r.User?.ProfilePhotoUrl,
                     CreatedAt = r.CreatedAt
                 })
                 .ToList();

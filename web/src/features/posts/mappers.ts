@@ -8,6 +8,7 @@ export function mapFeedPostsToRouteCards(posts: FeedPostItem[]): RouteListItem[]
     thumbnailUrl: post.routeThumbnailUrl,
     authorUserId: post.authorUserId,
     authorUserName: post.authorUserName,
+    authorProfilePhotoUrl: post.authorProfilePhotoUrl,
     postId: post.postId,
     postContent: post.content,
     postImageUrls: post.imageUrls,

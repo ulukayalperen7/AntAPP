@@ -29,12 +29,16 @@ namespace Ant.Infrastructure.Services
                 throw new EntityNotFoundException(nameof(ApplicationUser), userId);
 
             var roles = await _userManager.GetRolesAsync(user);
+            var domainUser = await _dbContext.DomainUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(item => item.Id == user.Id);
 
             return new UserIdentityDto
             {
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
+                ProfilePhotoUrl = domainUser?.ProfilePhotoUrl,
                 IsVerified = user.EmailConfirmed,
                 IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
                 Roles = roles.ToList()
@@ -43,7 +47,10 @@ namespace Ant.Infrastructure.Services
 
         public async Task<IEnumerable<UserIdentityDto>> GetAllUsersAsync()
         {
-            var users = await _dbContext.Users.AsNoTracking().ToListAsync();
+            var users = await _dbContext.Users
+                .AsNoTracking()
+                .Include(user => user.User)
+                .ToListAsync();
             var roleNamesById = await _dbContext.Roles.AsNoTracking()
                 .ToDictionaryAsync(role => role.Id, role => role.Name);
             var roleNamesByUserId = await _dbContext.UserRoles.AsNoTracking()
@@ -60,6 +67,7 @@ namespace Ant.Infrastructure.Services
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
+                ProfilePhotoUrl = user.User?.ProfilePhotoUrl,
                 IsVerified = user.EmailConfirmed,
                 IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
                 Roles = roleNamesByUserId.GetValueOrDefault(user.Id) ?? new List<string>()

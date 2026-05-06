@@ -47,6 +47,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostById
                 IsPublic = post.IsPublic,
                 AuthorUserId = post.AuthorUserId,
                 AuthorUserName = post.AuthorUser?.UserName,
+                AuthorProfilePhotoUrl = post.AuthorUser?.ProfilePhotoUrl,
                 RouteId = post.RouteId,
                 RouteTitle = post.Route?.Title,
                 RouteDescription = post.Route?.Description,

@@ -2,16 +2,18 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Card, Anchor } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Card, Anchor, Avatar } from '@antapp/ui'
 import { ArrowLeft, Plus, MapPin, Edit2, Trash2, X, Save } from 'lucide-react'
 import { AdminSpotItem, createSpot, updateSpot, deleteSpot } from '@/features/admin/spots-actions'
 import { SpotMapModal } from './spot-map-modal'
 
 export default function AdminSpotsClient({
     userName,
+    profilePhotoUrl,
     initialSpots,
 }: {
     userName: string
+    profilePhotoUrl?: string | null
     initialSpots: AdminSpotItem[]
 }) {
     const router = useRouter()
@@ -108,6 +110,7 @@ export default function AdminSpotsClient({
                         onPress={() => router.push('/admin')}
                         borderRadius="$10"
                     />
+                    <Avatar size="sm" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
                     <YStack>
                         <Text variant="heading2" color="$primary">Spots Management</Text>
                         <Text variant="caption" muted>Manage points of interest and locations</Text>

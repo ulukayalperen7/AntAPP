@@ -283,7 +283,7 @@ export default function PostDetailClient({ post, currentUserName }: Props) {
         }}
       >
         <Link href={`/profiles/${post.authorUserId}`} style={{ textDecoration: 'none' }}>
-          <Avatar size="sm" initials={authorInitials} />
+          <Avatar size="sm" initials={authorInitials} src={post.authorProfilePhotoUrl ?? undefined} />
         </Link>
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <Link href={`/profiles/${post.authorUserId}`} style={{ textDecoration: 'none' }}>
@@ -526,7 +526,7 @@ export default function PostDetailClient({ post, currentUserName }: Props) {
           ) : (
             reactions.map((r) => (
               <div key={r.reactionId} style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <Avatar size="sm" initials={getInitials(r.userName)} />
+                <Avatar size="sm" initials={getInitials(r.userName)} src={r.userProfilePhotoUrl ?? undefined} />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>
                     {r.userName?.trim() || 'Route Explorer'}
@@ -601,7 +601,7 @@ export default function PostDetailClient({ post, currentUserName }: Props) {
                     key={comment.commentId}
                     style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}
                   >
-                    <Avatar size="sm" initials={getInitials(comment.userName)} />
+                    <Avatar size="sm" initials={getInitials(comment.userName)} src={comment.userProfilePhotoUrl ?? undefined} />
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <div
                         style={{
