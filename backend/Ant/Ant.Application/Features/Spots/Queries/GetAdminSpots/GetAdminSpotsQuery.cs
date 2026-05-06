@@ -46,8 +46,8 @@ namespace Ant.Application.Features.Spots.Queries.GetAdminSpots
                 SearchTerm = request.SearchTerm 
             };
 
-            var spots = await _spotRepository.GetPagedSpotsAsync(validFilter.PageNumber, validFilter.PageSize, validFilter.SearchTerm);
-            var totalRecords = await _spotRepository.GetTotalSpotsCountAsync(validFilter.SearchTerm);
+            var spots = await _spotRepository.GetAdminPagedSpotsAsync(validFilter.PageNumber, validFilter.PageSize, validFilter.SearchTerm);
+            var totalRecords = await _spotRepository.GetAdminSpotsCountAsync(validFilter.SearchTerm);
 
             var mappedData = spots.Select(s => new AdminSpotViewModel
             {

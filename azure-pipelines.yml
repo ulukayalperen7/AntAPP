@@ -96,6 +96,11 @@ stages:
                     export DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME)
                     export IMAGE_TAG=$(IMAGE_TAG)
 
+                    if [ -f .env ] && [ ! -r .env ]; then
+                      sudo -n chgrp "$(id -gn)" .env
+                      sudo -n chmod 640 .env
+                    fi
+
                     echo "Deploying AntAPP images with tag: ${IMAGE_TAG}"
                     docker compose config --images
 

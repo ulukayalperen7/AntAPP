@@ -56,6 +56,39 @@ namespace Ant.Infrastructure.Repositories
             return await query.CountAsync();
         }
 
+        public async Task<IReadOnlyList<Spot>> GetAdminPagedSpotsAsync(int pageNumber, int pageSize, string searchTerm = null)
+        {
+            var query = _dbContext.Spots
+                .AsNoTracking()
+                .Include(s => s.RouteSpots)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var pattern = $"%{searchTerm.Trim()}%";
+                query = query.Where(s => EF.Functions.ILike(s.Name, pattern) || EF.Functions.ILike(s.Description, pattern));
+            }
+
+            return await query
+                .OrderByDescending(s => s.CreatedAt)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetAdminSpotsCountAsync(string searchTerm = null)
+        {
+            var query = _dbContext.Spots.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var pattern = $"%{searchTerm.Trim()}%";
+                query = query.Where(s => EF.Functions.ILike(s.Name, pattern) || EF.Functions.ILike(s.Description, pattern));
+            }
+
+            return await query.CountAsync();
+        }
+
         public async Task<IReadOnlyList<Route>> GetRoutesForSpotAsync(Guid spotId, int pageNumber, int pageSize)
         {
             return await _dbContext.Routes.AsNoTracking()

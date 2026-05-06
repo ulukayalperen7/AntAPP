@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input, Card, Anchor, Avatar } from '@antapp/ui'
 import { ArrowLeft, Plus, MapPin, Edit2, Trash2, X, Save } from 'lucide-react'
@@ -34,6 +34,10 @@ export default function AdminSpotsClient({
         longitude: 30.7040,
         isActive: true
     })
+
+    useEffect(() => {
+        setSpots(initialSpots)
+    }, [initialSpots])
 
     const handleOpenModal = (spot: AdminSpotItem | null = null) => {
         if (spot) {

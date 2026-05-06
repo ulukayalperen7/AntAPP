@@ -10,6 +10,8 @@ namespace Ant.Application.Interfaces.Repositories
         Task<Spot> GetSpotWithDetailsAsync(Guid spotId);
         Task<IReadOnlyList<Spot>> GetPagedSpotsAsync(int pageNumber, int pageSize, string searchTerm = null);
         Task<int> GetTotalSpotsCountAsync(string searchTerm = null);
+        Task<IReadOnlyList<Spot>> GetAdminPagedSpotsAsync(int pageNumber, int pageSize, string searchTerm = null);
+        Task<int> GetAdminSpotsCountAsync(string searchTerm = null);
         Task<IReadOnlyList<Route>> GetRoutesForSpotAsync(Guid spotId, int pageNumber, int pageSize);
         Task<int> GetRoutesForSpotCountAsync(Guid spotId);
         Task<IReadOnlyList<Spot>> GetBusinessSpotsAsync(Guid ownerUserId, int pageNumber, int pageSize);

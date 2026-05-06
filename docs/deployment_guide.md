@@ -18,7 +18,8 @@ originSessionId: b0464f4c-9dc1-46b5-90fc-9459152c5bc5
 | `antapp-web` | 3001→3000 | `efekurucay/antapp-web:latest` |
 | `antapp-db` | 5432 | `postgis/postgis:16-3.4` |
 
-Config dosyaları: `/opt/antapp/.env` (secrets) ve `/opt/antapp/docker-compose.yml`
+Config dosyaları: `/opt/antapp/.env` (secrets) ve `/opt/antapp/docker-compose.yml`.
+Azure self-hosted agent `docker compose` çalıştırırken `.env` dosyasını client tarafında okur; dosya world-readable olmamalı, deploy kullanıcısının primary group'una `0640` ile okunabilir olmalı.
 
 ## CI/CD Pipeline (Azure DevOps → azure-pipelines.yml)
 
