@@ -27,5 +27,6 @@ ENV PORT=3000
 COPY --from=builder /app/web/.next/standalone ./
 COPY --from=builder /app/web/.next/static ./web/.next/static
 COPY --from=builder /app/web/public ./web/public
+RUN node -e "const fs=require('fs');const p='/app/web/.next/server/app/page_client-reference-manifest.js';if(fs.existsSync(p)){const s=fs.readFileSync(p,'utf8');const a='globalThis.__RSC_MANIFEST[\\\"/\\\"]=globalThis.__RSC_MANIFEST[\\\"/page\\\"];';if(s.includes('__RSC_MANIFEST[\\\"/page\\\"]')&&!s.includes('__RSC_MANIFEST[\\\"/\\\"]'))fs.appendFileSync(p,'\\n'+a+'\\n');}"
 EXPOSE 3000
 CMD ["node", "web/server.js"]
