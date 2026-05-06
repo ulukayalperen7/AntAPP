@@ -14,7 +14,7 @@ export default async function UserLayout({
   const user = userResult[0].status === 'fulfilled' ? userResult[0].value : null
 
   return (
-    <UserShellWrapper userId={session?.id} userName={user?.userName ?? session?.userName} profilePhotoUrl={user?.profilePhotoUrl}>
+    <UserShellWrapper userId={session?.id} userName={user?.userName ?? session?.userName} profilePhotoUrl={user?.profilePhotoUrl} roles={session?.roles ?? []}>
       {children}
     </UserShellWrapper>
   )

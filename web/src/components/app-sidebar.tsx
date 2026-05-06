@@ -4,7 +4,8 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { YStack, XStack, Text, Avatar, Divider, Image } from '@antapp/ui'
 import { useTheme } from 'tamagui'
-import { Compass, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen, ShieldCheck, Users2 } from 'lucide-react'
+import { Compass, Route, Bookmark, MapPinned, Settings, LogOut, PanelLeftClose, PanelLeftOpen, ShieldCheck, Users2, Building2 } from 'lucide-react'
+import { canAccessBusiness } from '@/features/auth/roles'
 
 const NAV_ITEMS = [
   { label: 'Explore', href: '/dashboard', Icon: Compass },
@@ -23,6 +24,7 @@ export function AppSidebar({
   userId,
   userName,
   profilePhotoUrl,
+  roles,
   onLogout,
   collapsed,
   onToggle,
@@ -30,6 +32,7 @@ export function AppSidebar({
   userId?: string
   userName?: string
   profilePhotoUrl?: string | null
+  roles?: string[]
   onLogout?: () => void
   collapsed?: boolean
   onToggle?: () => void
@@ -38,6 +41,7 @@ export function AppSidebar({
   const theme = useTheme()
   const activeNavIconColor = theme.primary?.get() ?? '#EA580C'
   const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH
+  const hasBusiness = canAccessBusiness(roles ?? [])
 
   return (
     <YStack
@@ -139,6 +143,23 @@ export function AppSidebar({
 
       {/* Bottom Section */}
       <YStack paddingHorizontal="$2" gap="$2">
+        {hasBusiness && (
+          <Link href="/business" style={{ textDecoration: 'none' }}>
+            <XStack
+              paddingHorizontal={collapsed ? '$0' : '$3'}
+              paddingVertical="$2.5"
+              borderRadius="$3"
+              gap="$2.5"
+              alignItems="center"
+              justifyContent={collapsed ? 'center' : 'flex-start'}
+              hoverStyle={{ backgroundColor: '$backgroundHover' }}
+              cursor="pointer"
+            >
+              <Building2 size={20} color="currentColor" />
+              {!collapsed && <Text variant="body" color="$mutedForeground">Business Panel</Text>}
+            </XStack>
+          </Link>
+        )}
         <Link href="/settings" style={{ textDecoration: 'none' }}>
           <XStack
             paddingHorizontal={collapsed ? '$0' : '$3'}

@@ -12,12 +12,14 @@ export function UserShell({
   userId,
   userName,
   profilePhotoUrl,
+  roles,
   onLogout,
 }: {
   children: React.ReactNode
   userId?: string
   userName?: string
   profilePhotoUrl?: string | null
+  roles?: string[]
   onLogout?: () => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -29,6 +31,7 @@ export function UserShell({
         userId={userId}
         userName={userName}
         profilePhotoUrl={profilePhotoUrl}
+        roles={roles}
         onLogout={onLogout}
         collapsed={collapsed}
         onToggle={() => setCollapsed((c) => !c)}

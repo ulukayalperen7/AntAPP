@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
@@ -15,6 +15,7 @@ function ResetPasswordForm() {
   const token = searchParams.get('token') ?? ''
   const router = useRouter()
 
+  const formRef = useRef<HTMLFormElement>(null)
   const [error, action, isPending] = useActionState<string | null | undefined, FormData>(resetPassword, undefined)
   const success = error === null
 
@@ -79,7 +80,7 @@ function ResetPasswordForm() {
               </YStack>
             )}
 
-            <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form ref={formRef} action={action} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <input type="hidden" name="email" value={email} />
               <input type="hidden" name="token" value={token} />
 
@@ -117,8 +118,7 @@ function ResetPasswordForm() {
                 loading={isPending}
                 disabled={isPending || !email || !token}
                 icon={<Lock size={16} color="#fff" />}
-                // @ts-ignore — web-only HTML type attribute
-                htmlType="submit"
+                onPress={() => formRef.current?.requestSubmit()}
               >
                 Set New Password
               </Button>

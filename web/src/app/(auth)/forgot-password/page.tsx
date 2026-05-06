@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
 import { forgotPassword } from '@/features/auth/actions'
@@ -9,6 +9,7 @@ import Link from 'next/link'
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
+  const formRef = useRef<HTMLFormElement>(null)
   const [error, action, isPending] = useActionState<string | null | undefined, FormData>(forgotPassword, undefined)
 
   // null error state = başarı gönderim tamamlandı
@@ -68,7 +69,7 @@ export default function ForgotPasswordPage() {
               </Text>
             </YStack>
 
-            <form action={action} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <form ref={formRef} action={action} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <YStack gap="$1.5">
                 <Text variant="label" color="$mutedForeground">Email</Text>
                 <Input
@@ -93,7 +94,7 @@ export default function ForgotPasswordPage() {
                 loading={isPending}
                 disabled={isPending}
                 icon={<Mail size={16} color="#fff" />}
-                htmlType="submit"
+                onPress={() => formRef.current?.requestSubmit()}
               >
                 Send Reset Link
               </Button>
