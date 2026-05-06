@@ -633,7 +633,7 @@ function RightRailCard({
   subtitle: string;
   children: React.ReactNode;
 }) {
-  return <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$3">
+  return <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$3" overflow="hidden">
       <div className={_cn52}>
         <span className={_cn53}>{title}</span>
         {subtitle ? <span className={_cn54}>{subtitle}</span> : null}
@@ -716,13 +716,16 @@ export default function HomeClient({
         <RightRailCard title={copy.railTitle} subtitle={copy.railSubtitle}>
           <div className={_cn62}>
             {spotlightRoutes.slice(0, 4).map(route => <Link key={route.id} href={`/routes/${route.id}`} style={{
-            textDecoration: 'none'
+            textDecoration: 'none',
+            display: 'block',
+            width: '100%',
+            color: 'inherit'
           }}>
-                <div className={_cn63}>
-                  <div className={_cn64}>
+                <div className={_cn63} style={{ width: '100%', minWidth: 0, overflow: 'hidden' }}>
+                  <div className={_cn64} style={{ width: 72, height: 72, minWidth: 72, flex: '0 0 72px' }}>
                     {route.postImageUrls?.[0] || route.thumbnailUrl ? <Image src={route.postImageUrls?.[0] || route.thumbnailUrl || ''} width="100%" height="100%" objectFit="cover" /> : null}
                   </div>
-                  <div className={_cn65}>
+                  <div className={_cn65} style={{ minWidth: 0, overflow: 'hidden' }}>
                     <Badge variant={getPostTone(route).variant} size="sm">{route.contentType}</Badge>
                     <span className={_cn66}>{route.title}</span>
                     <div className={_cn67}>

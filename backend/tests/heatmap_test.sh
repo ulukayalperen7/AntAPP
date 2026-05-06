@@ -15,7 +15,7 @@ set -euo pipefail
 #   ./heatmap_test.sh 10 100       # 10 users, 100 pings each
 ###############################################################################
 
-API_URL="${API_URL:-http://localhost:5001/api}"
+API_URL="${API_URL:-https://antapp.fun/api}"
 USER_COUNT="${1:-20}"
 PINGS_PER_USER="${2:-50}"
 PASSWORD="Test1234!"
