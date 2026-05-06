@@ -91,6 +91,7 @@ export type RouteListItem = {
   thumbnailUrl: string | null
   authorUserId: string
   authorUserName?: string | null
+  authorProfilePhotoUrl?: string | null
   originalRouteId?: string | null
   originalAuthorName?: string | null
   postId?: string
@@ -115,6 +116,7 @@ export type FeedPostItem = {
   isPublic: boolean
   authorUserId: string
   authorUserName: string | null
+  authorProfilePhotoUrl: string | null
   routeId: string
   routeTitle: string
   routeDescription: string | null
@@ -135,6 +137,7 @@ export type PostCommentItem = {
   postId: string
   userId: string
   userName: string | null
+  userProfilePhotoUrl: string | null
   content: string
   createdAt: string
 }
@@ -144,6 +147,7 @@ export type PostReactionItem = {
   postId: string
   userId: string
   userName: string | null
+  userProfilePhotoUrl: string | null
   createdAt: string
 }
 

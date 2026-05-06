@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input, Badge, SearchInput } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Badge, SearchInput, Avatar } from '@antapp/ui'
 import type { BusinessSpotItem } from '@/types/api'
 import { logout } from '@/features/auth/actions'
 import {
@@ -106,6 +106,7 @@ function formatDate(value: string) {
 export default function BusinessSpotsClient({
   userName,
   email,
+  profilePhotoUrl,
   roles,
   isAdmin,
   initialSpots,
@@ -113,6 +114,7 @@ export default function BusinessSpotsClient({
 }: {
   userName: string
   email: string
+  profilePhotoUrl?: string | null
   roles: string[]
   isAdmin: boolean
   initialSpots: BusinessSpotItem[]
@@ -327,9 +329,14 @@ export default function BusinessSpotsClient({
               borderColor="rgba(255,255,255,0.2)"
               gap="$1"
             >
-              <Text variant="caption" color="#FFFFFF">Signed in as</Text>
-              <Text variant="heading4" color="#FFFFFF">{userName}</Text>
-              <Text variant="caption" color="#FFFFFF">{email}</Text>
+              <XStack alignItems="center" gap="$3">
+                <Avatar size="md" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
+                <YStack gap="$1" minWidth={0}>
+                  <Text variant="caption" color="#FFFFFF">Signed in as</Text>
+                  <Text variant="heading4" color="#FFFFFF">{userName}</Text>
+                  <Text variant="caption" color="#FFFFFF">{email}</Text>
+                </YStack>
+              </XStack>
             </YStack>
 
             <YStack

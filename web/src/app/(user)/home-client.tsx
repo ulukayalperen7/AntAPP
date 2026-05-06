@@ -89,6 +89,7 @@ type HomeClientProps = {
   timelineRoutes: RouteListItem[];
   spotlightRoutes: RouteListItem[];
   currentUserName?: string | null;
+  currentUserProfilePhotoUrl?: string | null;
   referenceNowIso: string;
 };
 const PAGE_COPY: Record<FeedMode, {
@@ -180,7 +181,8 @@ function getAuthor(route: RouteListItem) {
     return {
       name: 'AntAPP Official',
       role: 'Curated route desk',
-      initials: 'AO'
+      initials: 'AO',
+      profilePhotoUrl: null
     };
   }
   const displayName = route.authorUserName?.trim() || 'Route Explorer';
@@ -188,7 +190,8 @@ function getAuthor(route: RouteListItem) {
   return {
     name: displayName,
     role: 'Route creator',
-    initials
+    initials,
+    profilePhotoUrl: route.authorProfilePhotoUrl
   };
 }
 function getInitials(name?: string | null) {
@@ -479,7 +482,7 @@ function FeedPostCard({
         <Link href={`/profiles/${route.authorUserId}`} style={{
         textDecoration: 'none'
       }}>
-          <Avatar size="sm" initials={author.initials} />
+          <Avatar size="sm" initials={author.initials} src={author.profilePhotoUrl ?? undefined} />
         </Link>
         <Link href={`/profiles/${route.authorUserId}`} style={{
         textDecoration: 'none',
@@ -566,7 +569,7 @@ function FeedPostCard({
       {isReactionsOpen ? <div className={_cn30}>
           {isReactionLoading ? <span className={_cn31}>Loading likes...</span> : reactions.length === 0 ? <span className={_cn32}>No likes yet.</span> : <div className={_cn33}>
               {reactions.map(reaction => <div className={_cn34} key={reaction.reactionId}>
-                  <Avatar size="sm" initials={getInitials(reaction.userName)} />
+                  <Avatar size="sm" initials={getInitials(reaction.userName)} src={reaction.userProfilePhotoUrl ?? undefined} />
                   <div className={_cn35}>
                     <span className={_cn36}>{reaction.userName?.trim() || 'Route Explorer'}</span>
                     <span className={_cn37}>{formatRelativeDate(reaction.createdAt, referenceNowMs)}</span>
@@ -592,7 +595,7 @@ function FeedPostCard({
           const isOwn = Boolean(currentUserName && comment.userName === currentUserName);
           const isEditing = editingCommentId === comment.commentId;
           return <div className={_cn43} key={comment.commentId}>
-                    <Avatar size="sm" initials={getInitials(comment.userName)} />
+                    <Avatar size="sm" initials={getInitials(comment.userName)} src={comment.userProfilePhotoUrl ?? undefined} />
                     <div className={_cn44}>
                       <div className={_cn45}>
                         <span className={_cn46}>{comment.userName?.trim() || 'Route Explorer'}</span>
@@ -647,7 +650,7 @@ function StoryRouteBubble({ route }: { route: RouteListItem }) {
       <YStack width={92} minWidth={92} alignItems="center" gap="$2" cursor="pointer">
         <YStack width={76} height={76} borderRadius="$full" padding={3} backgroundColor={route.contentType === 'Official' ? '$info500' : '$primary'} alignItems="center" justifyContent="center">
           <YStack width="100%" height="100%" borderRadius="$full" overflow="hidden" backgroundColor="$muted" borderWidth={3} borderColor="$backgroundStrong" alignItems="center" justifyContent="center">
-            {image ? <Image src={image} width="100%" height="100%" objectFit="cover" /> : <Avatar size="lg" initials={author.initials} />}
+            {image ? <Image src={image} width="100%" height="100%" objectFit="cover" /> : <Avatar size="lg" initials={author.initials} src={author.profilePhotoUrl ?? undefined} />}
           </YStack>
         </YStack>
         <YStack alignItems="center" gap="$1" width="100%">
@@ -662,6 +665,7 @@ export default function HomeClient({
   timelineRoutes,
   spotlightRoutes,
   currentUserName,
+  currentUserProfilePhotoUrl,
   referenceNowIso
 }: HomeClientProps) {
   const router = useRouter();
@@ -680,7 +684,7 @@ export default function HomeClient({
 
         <Card variant="outline" size="sm" backgroundColor="$backgroundStrong" gap="$4">
           <div className={_cn57}>
-            <Avatar size="lg" initials={composerInitials} />
+            <Avatar size="lg" initials={composerInitials} src={currentUserProfilePhotoUrl ?? undefined} />
             <span className={_cn58}>Create a route post</span>
             <Button variant="solid" size="sm" icon={<Plus size={14} color="#FFFFFF" />} onPress={() => router.push('/posts/create')}>
               Create post

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { styled, GetProps, XStack, Text as TamaguiText, Image } from 'tamagui'
 import { splitAccessibilityProps } from './accessibility-props'
 
@@ -35,11 +35,24 @@ export type AvatarProps = Omit<GetProps<typeof AvatarFrame>, 'size'> & {
 
 export function Avatar({ size = 'md', initials, src, ...rest }: AvatarProps) {
   const { rest: avatarRest, accessibilityProps } = splitAccessibilityProps(rest)
+  const [hasLoadError, setHasLoadError] = useState(false)
+  const shouldShowImage = Boolean(src && !hasLoadError)
+
+  useEffect(() => {
+    setHasLoadError(false)
+  }, [src])
 
   return (
     <AvatarFrame size={size} {...accessibilityProps} {...avatarRest}>
-      {src ? (
-        <Image source={{ uri: src }} width="100%" height="100%" objectFit="cover" />
+      {shouldShowImage ? (
+        <Image
+          source={{ uri: src }}
+          src={src}
+          width="100%"
+          height="100%"
+          objectFit="cover"
+          onError={() => setHasLoadError(true)}
+        />
       ) : initials ? (
         <TamaguiText fontSize={initialsSize[size]} fontWeight="600" color="$mutedForeground">
           {initials}

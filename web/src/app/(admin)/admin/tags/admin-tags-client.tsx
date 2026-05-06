@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button, Input } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Input, Avatar } from '@antapp/ui'
 import { Plus, Trash2, LogOut, ArrowLeft } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { createAdminTag, deleteAdminTag, getAdminTags, updateAdminTag } from '@/features/admin/tags-actions'
@@ -16,10 +16,12 @@ type FeedbackState = {
 export default function AdminTagsClient({
   userName,
   email,
+  profilePhotoUrl,
   initialTags,
 }: {
   userName: string
   email: string
+  profilePhotoUrl?: string | null
   initialTags: Array<Tag & { id: string }>
 }) {
   const router = useRouter()
@@ -95,7 +97,7 @@ export default function AdminTagsClient({
           >
             Back
           </Button>
-          <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          <Avatar size="sm" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
           <YStack gap="$1">
             <XStack alignItems="center" gap="$2">
               <Text variant="heading2">Tags</Text>

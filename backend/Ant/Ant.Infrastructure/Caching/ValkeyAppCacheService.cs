@@ -24,7 +24,16 @@ namespace Ant.Infrastructure.Caching
 
         public async Task<T> GetOrCreateAsync<T>(string key, Func<CancellationToken, Task<T>> factory, TimeSpan ttl, CancellationToken cancellationToken = default)
         {
-            var cachedValue = await GetAsync<T>(key);
+            CacheValue<T> cachedValue;
+            try
+            {
+                cachedValue = await GetAsync<T>(key);
+            }
+            catch (RedisException)
+            {
+                return await factory(cancellationToken);
+            }
+
             if (cachedValue.HasValue)
             {
                 return cachedValue.Value;
@@ -32,31 +41,66 @@ namespace Ant.Infrastructure.Caching
 
             var lockKey = GetLockKey(key);
             var lockToken = Guid.NewGuid().ToString("N");
-            var lockAcquired = await TryAcquireLockAsync(lockKey, lockToken, cancellationToken);
+            bool lockAcquired;
+            try
+            {
+                lockAcquired = await TryAcquireLockAsync(lockKey, lockToken, cancellationToken);
+            }
+            catch (RedisException)
+            {
+                return await factory(cancellationToken);
+            }
 
             if (!lockAcquired)
             {
                 var valueWithoutLock = await factory(cancellationToken);
-                await SetAsync(key, valueWithoutLock, ttl);
+                try
+                {
+                    await SetAsync(key, valueWithoutLock, ttl);
+                }
+                catch (RedisException)
+                {
+                }
+
                 return valueWithoutLock;
             }
 
             try
             {
-                cachedValue = await GetAsync<T>(key);
+                try
+                {
+                    cachedValue = await GetAsync<T>(key);
+                }
+                catch (RedisException)
+                {
+                    cachedValue = CacheValue<T>.Empty;
+                }
+
                 if (cachedValue.HasValue)
                 {
                     return cachedValue.Value;
                 }
 
                 var value = await factory(cancellationToken);
-                await SetAsync(key, value, ttl);
+                try
+                {
+                    await SetAsync(key, value, ttl);
+                }
+                catch (RedisException)
+                {
+                }
 
                 return value;
             }
             finally
             {
-                await ReleaseLockAsync(lockKey, lockToken);
+                try
+                {
+                    await ReleaseLockAsync(lockKey, lockToken);
+                }
+                catch (RedisException)
+                {
+                }
             }
         }
 
@@ -64,13 +108,28 @@ namespace Ant.Infrastructure.Caching
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _database.KeyDeleteAsync(key);
-            await _database.SetRemoveAsync(KeyIndexSet, key);
+            try
+            {
+                await _database.KeyDeleteAsync(key);
+                await _database.SetRemoveAsync(KeyIndexSet, key);
+            }
+            catch (RedisException)
+            {
+            }
         }
 
         public async Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
         {
-            var keys = await _database.SetMembersAsync(KeyIndexSet);
+            RedisValue[] keys;
+            try
+            {
+                keys = await _database.SetMembersAsync(KeyIndexSet);
+            }
+            catch (RedisException)
+            {
+                return;
+            }
+
             var matchingKeys = keys
                 .Where(key => key.HasValue && key.ToString().StartsWith(prefix, StringComparison.Ordinal))
                 .ToArray();
@@ -82,9 +141,15 @@ namespace Ant.Infrastructure.Caching
                 return;
             }
 
-            var redisKeys = matchingKeys.Select(key => (RedisKey)key.ToString()).ToArray();
-            await _database.KeyDeleteAsync(redisKeys);
-            await _database.SetRemoveAsync(KeyIndexSet, matchingKeys);
+            try
+            {
+                var redisKeys = matchingKeys.Select(key => (RedisKey)key.ToString()).ToArray();
+                await _database.KeyDeleteAsync(redisKeys);
+                await _database.SetRemoveAsync(KeyIndexSet, matchingKeys);
+            }
+            catch (RedisException)
+            {
+            }
         }
 
         private async Task<CacheValue<T>> GetAsync<T>(string key)

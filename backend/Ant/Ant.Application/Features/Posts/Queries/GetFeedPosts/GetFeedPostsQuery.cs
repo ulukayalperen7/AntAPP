@@ -28,6 +28,7 @@ namespace Ant.Application.Features.Posts.Queries.GetFeedPosts
 
         public Guid AuthorUserId { get; set; }
         public string AuthorUserName { get; set; }
+        public string AuthorProfilePhotoUrl { get; set; }
 
         public Guid RouteId { get; set; }
         public string RouteTitle { get; set; }
@@ -83,6 +84,7 @@ namespace Ant.Application.Features.Posts.Queries.GetFeedPosts
                 IsPublic = post.IsPublic,
                 AuthorUserId = post.AuthorUserId,
                 AuthorUserName = post.AuthorUser?.UserName,
+                AuthorProfilePhotoUrl = post.AuthorUser?.ProfilePhotoUrl,
                 RouteId = post.RouteId,
                 RouteTitle = post.Route?.Title,
                 RouteDescription = post.Route?.Description,

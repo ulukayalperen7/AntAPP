@@ -7,6 +7,7 @@ export type AdminUserItem = {
     id: string
     userName: string
     email: string
+    profilePhotoUrl: string | null
     isVerified: boolean
     isActive: boolean
     roles: string[]

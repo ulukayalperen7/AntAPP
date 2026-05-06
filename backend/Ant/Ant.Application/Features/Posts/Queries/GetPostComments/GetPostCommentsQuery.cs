@@ -23,6 +23,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostComments
         public Guid? ParentCommentId { get; set; }
         public Guid UserId { get; set; }
         public string UserName { get; set; }
+        public string UserProfilePhotoUrl { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
     }
@@ -59,6 +60,7 @@ namespace Ant.Application.Features.Posts.Queries.GetPostComments
                     ParentCommentId = c.ParentCommentId,
                     UserId = c.UserId,
                     UserName = c.User?.UserName,
+                    UserProfilePhotoUrl = c.User?.ProfilePhotoUrl,
                     Content = c.Content,
                     CreatedAt = c.CreatedAt
                 })

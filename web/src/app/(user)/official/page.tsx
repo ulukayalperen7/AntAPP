@@ -21,6 +21,7 @@ export default async function OfficialPage() {
   const timelineRoutes = feedRoutes.length > 0 ? feedRoutes : fallbackRoutes
   const spotlightRoutes = spotlightResult.status === 'fulfilled' ? spotlightResult.value.data : []
   const currentUserName = userResult.status === 'fulfilled' ? userResult.value.userName : null
+  const currentUserProfilePhotoUrl = userResult.status === 'fulfilled' ? userResult.value.profilePhotoUrl : null
 
   return (
     <HomeClient
@@ -28,6 +29,7 @@ export default async function OfficialPage() {
       timelineRoutes={timelineRoutes}
       spotlightRoutes={spotlightRoutes}
       currentUserName={currentUserName}
+      currentUserProfilePhotoUrl={currentUserProfilePhotoUrl}
       referenceNowIso={new Date().toISOString()}
     />
   )

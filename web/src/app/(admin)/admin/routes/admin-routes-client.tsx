@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { YStack, XStack, Text, Button } from '@antapp/ui'
+import { YStack, XStack, Text, Button, Avatar } from '@antapp/ui'
 import { LogOut, ArrowLeft, Star, Map, Trash2, RefreshCw } from 'lucide-react'
 import { logout } from '@/features/auth/actions'
 import { deleteAdminRoute, promoteRoute, redrawRoute } from '@/features/admin/routes-actions'
@@ -12,10 +12,12 @@ import { RouteMapModal } from './route-map-modal'
 export default function AdminRoutesClient({
     userName,
     email,
+    profilePhotoUrl,
     initialRoutes,
 }: {
     userName: string
     email: string
+    profilePhotoUrl?: string | null
     initialRoutes: RouteListItem[]
 }) {
     const router = useRouter()
@@ -76,7 +78,7 @@ export default function AdminRoutesClient({
                     >
                         Back
                     </Button>
-                    <img src="/ant-logo.png" alt="AntAPP Logo" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+                    <Avatar size="sm" initials={userName.charAt(0).toUpperCase()} src={profilePhotoUrl ?? undefined} />
                     <YStack gap="$1">
                         <XStack alignItems="center" gap="$2">
                             <Text variant="heading2">Routes</Text>
