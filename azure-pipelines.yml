@@ -93,23 +93,13 @@ stages:
                 - script: |
                     set -euo pipefail
                     cd /opt/antapp
-
-                    required_vars=(DOCKER_HUB_USERNAME IMAGE_TAG DB_CONNECTION_STRING JWT_SECRET RESEND_API_KEY)
-                    for var_name in "${required_vars[@]}"; do
-                      value="${!var_name:-}"
-                      if [ -z "$value" ] || [[ "$value" == \$\(* ]]; then
-                        echo "Missing required deploy variable: ${var_name}"
-                        exit 1
-                      fi
-                    done
-
-                    compose=(docker compose --env-file /dev/null)
+                    export DOCKER_HUB_USERNAME=$(DOCKER_HUB_USERNAME)
+                    export IMAGE_TAG=$(IMAGE_TAG)
 
                     echo "Deploying AntAPP images with tag: ${IMAGE_TAG}"
-                    "${compose[@]}" config --images
 
                     for attempt in 1 2 3; do
-                      if "${compose[@]}" pull backend web; then
+                      if docker compose pull backend web; then
                         break
                       fi
                       if [ "$attempt" = "3" ]; then
@@ -118,14 +108,8 @@ stages:
                       sleep 10
                     done
 
-                    "${compose[@]}" up -d --force-recreate --remove-orphans backend web
-                    "${compose[@]}" ps backend web
+                    docker compose up -d --force-recreate --remove-orphans backend web
+                    docker compose ps backend web
                     docker image prune -af --filter "until=24h"
                     docker builder prune -f --keep-storage=2gb
                   displayName: Pull and restart containers
-                  env:
-                    DOCKER_HUB_USERNAME: $(DOCKER_HUB_USERNAME)
-                    IMAGE_TAG: $(IMAGE_TAG)
-                    DB_CONNECTION_STRING: $(DB_CONNECTION_STRING)
-                    JWT_SECRET: $(JWT_SECRET)
-                    RESEND_API_KEY: $(RESEND_API_KEY)

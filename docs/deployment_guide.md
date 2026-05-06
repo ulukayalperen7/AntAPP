@@ -18,8 +18,8 @@ originSessionId: b0464f4c-9dc1-46b5-90fc-9459152c5bc5
 | `antapp-web` | 3001→3000 | `efekurucay/antapp-web:latest` |
 | `antapp-db` | 5432 | `postgis/postgis:16-3.4` |
 
-Config dosyaları: `/opt/antapp/.env` (manual/server secrets) ve `/opt/antapp/docker-compose.yml`.
-Azure self-hosted agent deploy sırasında `/opt/antapp/.env` okumaz; `docker compose --env-file /dev/null` kullanır ve gerekli prod secret'ları `antapp-prod` variable group'undan environment variable olarak geçirir.
+Config dosyaları: `/opt/antapp/.env` (server secrets) ve `/opt/antapp/docker-compose.yml`.
+Deploy sırasında `docker compose pull/up` `/opt/antapp/.env` dosyasındaki prod secret'ları kullanır; pipeline bu dosyayı replace etmez.
 
 ## CI/CD Pipeline (Azure DevOps → azure-pipelines.yml)
 
@@ -27,7 +27,7 @@ Azure self-hosted agent deploy sırasında `/opt/antapp/.env` okumaz; `docker co
 
 **Önemli:** `--force-recreate` var, her deploy container'ı yeniden oluşturur. Olmadan Docker image değişmişse bile container'a dokunmaz.
 
-Variable group: **Azure DevOps → Library → antapp-prod**. Deploy için zorunlu değerler: `DOCKER_HUB_USERNAME`, `DB_CONNECTION_STRING`, `JWT_SECRET`, `RESEND_API_KEY`.
+Variable group: **Azure DevOps → Library → antapp-prod**. Deploy için zorunlu pipeline değeri: `DOCKER_HUB_USERNAME`.
 
 ## Migration Kuralı
 
