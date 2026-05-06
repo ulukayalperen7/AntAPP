@@ -20,6 +20,7 @@ namespace Ant.Application.Features.Spots.Commands.CreateSpot
         public double Longitude { get; set; }
         public string GooglePlaceId { get; set; }
         public bool IsActive { get; set; }
+        public Guid? OwnerUserId { get; set; }
     }
 
     public class CreateSpotCommandHandler : IRequestHandler<CreateSpotCommand, Response<Guid>>
@@ -43,6 +44,7 @@ namespace Ant.Application.Features.Spots.Commands.CreateSpot
                 Location = new Point(request.Longitude, request.Latitude) { SRID = 4326 },
                 GooglePlaceId = request.GooglePlaceId,
                 IsActive = request.IsActive,
+                OwnerUserId = request.OwnerUserId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

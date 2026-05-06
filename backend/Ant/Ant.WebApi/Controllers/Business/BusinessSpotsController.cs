@@ -25,6 +25,7 @@ namespace Ant.WebApi.Controllers.Business
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Response<Guid>))]
         public async Task<IActionResult> Create([FromServices] IOutputCacheStore outputCacheStore, CreateSpotCommand command)
         {
+            command.OwnerUserId = GetUserId();
             var response = await Mediator.Send(command);
             await OutputCacheTags.EvictSpotsAsync(outputCacheStore, HttpContext.RequestAborted);
             return Ok(response);

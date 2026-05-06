@@ -282,7 +282,7 @@ export default function BusinessSpotsClient({
               <Button
                 variant="outline"
                 size="sm"
-                onPress={() => router.push('/home')}
+                onPress={() => router.push('/dashboard')}
                 icon={<Compass size={14} color="currentColor" />}
               >
                 User
