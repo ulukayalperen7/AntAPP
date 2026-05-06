@@ -8,7 +8,7 @@ Built as a 4-person software engineering project, AntAPP combines a modern cross
 
 ## Product Preview
 
-### Social route feed
+### Social Post feed
 
 ![AntAPP dashboard](docs/assets/screenshots/dashboard.png)
 
@@ -16,9 +16,15 @@ Built as a 4-person software engineering project, AntAPP combines a modern cross
 
 ![AntAPP route discovery](docs/assets/screenshots/routes.png)
 
+### Route Detail
+![AntAPP route discovery](docs/assets/screenshots/route_detail.png)
+
 ### Spot directory
 
 ![AntAPP spots directory](docs/assets/screenshots/spots.png)
+
+### Spot Detail
+![AntAPP spots directory](docs/assets/screenshots/spot_detail.png)
 
 ### Live activity map
 
